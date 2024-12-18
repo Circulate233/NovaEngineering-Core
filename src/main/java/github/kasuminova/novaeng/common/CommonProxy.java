@@ -16,6 +16,7 @@ import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.machine.IllumPool;
+import github.kasuminova.novaeng.common.machine.Xzjt;
 import github.kasuminova.novaeng.common.machine.SingularityCore;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -88,6 +89,7 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.GECKOLIB.isPresent()) {
             RegistryMachineSpecial.registrySpecialMachine(SingularityCore.SINGULARITY_CORE);
         }
+        RegistryMachineSpecial.registrySpecialMachine(Xzjt.XZJT);
         RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.GEOCENTRIC_DRILL);
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
