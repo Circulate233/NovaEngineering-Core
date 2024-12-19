@@ -36,9 +36,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import vazkii.botania.common.Botania;
-import vazkii.botania.common.block.ModBlocks;
-
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Collections;
