@@ -94,7 +94,7 @@ public class GeocentricDrill implements MachineSpecial {
                 .filter(oreName -> oreName.startsWith("rawOre"))
                 .forEach(oreName -> {
                     NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
-                    if (!ores.isEmpty()) {
+                    if (!ores.isEmpty() && oreName != "rawOreAluminium") {
                         ItemStack stack = ores.get(0).copy();
                         stack.setCount(ORE_COUNT);
                         rawOres.put(oreName, stack);
