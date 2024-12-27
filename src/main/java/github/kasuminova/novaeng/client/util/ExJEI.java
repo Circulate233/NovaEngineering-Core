@@ -71,6 +71,7 @@ public class ExJEI implements IModPlugin {
             "DraconicEvolution.Fusion");
 
         new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(pattern_storage)).addOutput(CraftTweakerMC.getIItemStack(replicator)).addElement(IJeiUtils.createFontInfoElement("需要紧贴" + replicator.getDisplayName() + "才可用",0,20,0x000000,0,0)).build();
+        
         UuGraph.iterator().forEachRemaining(item -> {
             ItemStack stack = item.getKey().copy();
             if (stack != null && stack.getItem() != null) {
