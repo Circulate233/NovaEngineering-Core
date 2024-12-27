@@ -26,12 +26,16 @@ import ink.ikx.rt.api.mods.jei.core.IJeiRecipe;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
 import ink.ikx.rt.api.mods.jei.IJeiUtils;
+import java.util.*;
 
 @JEIPlugin
 @SideOnly(Side.CLIENT)
 public class ExJEI implements IModPlugin {
 
     public static IModRegistry registration;
+    public static List<String> blockList = Arrays.asList(
+        "mekanismgenerators","artisanworktables"
+    );
     
     public static ItemStack getOtherModsItemStack(String modId, String itemName) {
         Item item = GameRegistry.findRegistry(Item.class).getValue(new ResourceLocation(modId, itemName));
@@ -71,11 +75,11 @@ public class ExJEI implements IModPlugin {
             "DraconicEvolution.Fusion");
 
         new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(pattern_storage)).addOutput(CraftTweakerMC.getIItemStack(replicator)).addElement(IJeiUtils.createFontInfoElement("需要紧贴" + replicator.getDisplayName() + "才可用",0,20,0x000000,0,0)).build();
-        
+
         UuGraph.iterator().forEachRemaining(item -> {
             ItemStack stack = item.getKey().copy();
             if (stack != null && stack.getItem() != null) {
-                if (item.getValue() != Double.POSITIVE_INFINITY) {
+                if (item.getValue() != Double.POSITIVE_INFINITY && !blockList.contains(stack.getItem().getRegistryName().getNamespace())) {
                     Double bValue = item.getValue() / 100000;
                     String UUM = "需要" + Util.toSiString(bValue, 2) + "B UU物质复制";
                     new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(stack)).addOutput(CraftTweakerMC.getIItemStack(stack)).addElement(IJeiUtils.createFontInfoElement(UUM,0,20,0x000000,0,0)).build();
