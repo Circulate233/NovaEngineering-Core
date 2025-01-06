@@ -35,6 +35,7 @@ import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -103,7 +104,7 @@ public class CommonProxy implements IGuiHandler {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
 
-        Upgrades.MAGNET.registerItem(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.getDefaultInstance(), 1);
+        Upgrades.MAGNET.registerItem(new ItemStack(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL), 1);
     }
 
     public void loadComplete() {

@@ -36,7 +36,6 @@ import javax.annotation.Nullable;
 
 public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
 
-    private static final int OFFHAND_SLOT = 40;
     public static String NAME = "wireless_universal_terminal";
     IWirelessTermRegistry registry = AEApi.instance().registries().wireless();
 
@@ -82,7 +81,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                     openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL);
                     break;
                 case 4:
-                    Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : OFFHAND_SLOT, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                    Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : 40, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
                     break;
             }
         }
