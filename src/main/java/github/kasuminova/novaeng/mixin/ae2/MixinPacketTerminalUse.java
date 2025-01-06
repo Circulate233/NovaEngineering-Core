@@ -64,7 +64,7 @@ public class MixinPacketTerminalUse extends AppEngPacket {
                 break;
             } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL){
                 RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player,novaEngineering_Core$determineMode(terminal.name()));
-                openGui(is, i, player, false);
+                openGui(is, i, player, true);
                 return;
             }
         }

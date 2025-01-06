@@ -50,10 +50,10 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             public float apply(@NotNull ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
                 if (stack.getTagCompound() != null) {
                     int mode = stack.getTagCompound().getInteger("mode");
-                    if (mode != 0){
-                        return mode;
-                    } else if (stack.getTagCompound().hasKey("Nova")) {
+                    if (stack.getTagCompound().hasKey("Nova")){
                         return 114514;
+                    } else {
+                        return mode;
                     }
                 }
                 return 0;
