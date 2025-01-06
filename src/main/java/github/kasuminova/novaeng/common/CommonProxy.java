@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.common;
 import appeng.api.AEApi;
 import appeng.api.config.Upgrades;
 import appeng.api.storage.ICellHandler;
-import appeng.util.Platform;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
@@ -104,9 +103,7 @@ public class CommonProxy implements IGuiHandler {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
 
-        if (Platform.isClient()) {
-            Upgrades.MAGNET.registerItem(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.getDefaultInstance(), 1);
-        }
+        Upgrades.MAGNET.registerItem(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.getDefaultInstance(), 1);
     }
 
     public void loadComplete() {
