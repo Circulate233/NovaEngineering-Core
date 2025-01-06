@@ -1,0 +1,38 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "novaeng_core:items/wireless_universal_terminal"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "mode": 1
+      },
+      "model": "appliedenergistics2:item/wireless_crafting_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 2
+      },
+      "model": "appliedenergistics2:item/wireless_fluid_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 3
+      },
+      "model": "appliedenergistics2:item/wireless_pattern_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 4
+      },
+      "model": "ae2fc:item/wireless_fluid_pattern_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 114514
+      },
+      "model": "novaeng_core:item/wireless_nova_terminal"
+    }
+  ]
+}

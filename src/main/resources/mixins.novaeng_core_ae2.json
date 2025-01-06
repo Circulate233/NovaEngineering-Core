@@ -21,6 +21,8 @@
         "MixinCraftingCPUStatus",
         "MixinCraftingGridCache",
         "MixinTileChestFilter",
-        "MixinTileDriveFilter"
+        "MixinTileDriveFilter",
+        "MixinPacketTerminalUse",
+        "MixinClientHelper"
     ]
 }

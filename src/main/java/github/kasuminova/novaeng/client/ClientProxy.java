@@ -57,6 +57,8 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(HyperNetClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(ClientTickHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(WirelessUniversalTerminalHandler.INSTANCE);
 
         if (Mods.GECKOLIB.isPresent()) {
             ClientRegistry.bindTileEntitySpecialRenderer(SingularityCore.class, MachineControllerRenderer.INSTANCE);

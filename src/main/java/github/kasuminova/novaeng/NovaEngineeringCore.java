@@ -4,6 +4,8 @@ import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import github.kasuminova.novaeng.common.handler.UpdateItemModeMessageHandler;
+import github.kasuminova.novaeng.common.handler.WirelessTerminalRefresh;
 import github.kasuminova.novaeng.common.network.*;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
@@ -78,7 +80,6 @@ public class NovaEngineeringCore {
         event.getModMetadata().version = VERSION;
 
         byte start = 0;
-
         NET_CHANNEL.registerMessage(PktHyperNetStatus.class, PktHyperNetStatus.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktTerminalGuiData.class, PktTerminalGuiData.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktResearchTaskComplete.class, PktResearchTaskComplete.class, start++, Side.CLIENT);
@@ -101,6 +102,8 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktEFabricatorPatternSearchGUIAction.class, PktEFabricatorPatternSearchGUIAction.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
+        NET_CHANNEL.registerMessage(UpdateItemModeMessageHandler.class,UpdateItemModeMessage.class, start++, Side.SERVER);
+        NET_CHANNEL.registerMessage(WirelessTerminalRefresh.Handler.class, WirelessTerminalRefresh.class, start++, Side.SERVER);
 
         proxy.preInit();
     }

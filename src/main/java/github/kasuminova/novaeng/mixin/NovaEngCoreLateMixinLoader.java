@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.mixin;
 
-import github.kasuminova.novaeng.common.mod.Mods;
 import net.minecraftforge.fml.common.Loader;
 import zone.rong.mixinbooter.ILateMixinLoader;
 
@@ -26,6 +25,9 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_immersiveengineering.json", "immersiveengineering");
         addModdedMixinCFG("mixins.novaeng_core_mets.json",                 "mets");
         addModdedMixinCFG("mixins.novaeng_core_nae2.json",                 "nae2");
+        addModdedMixinCFG("mixins.novaeng_core_ae2fc.json",                 "ae2fc");
+        addModdedMixinCFG("mixins.novaeng_core_botania.json",                 "botania");
+        addModdedMixinCFG("mixins.novaeng_core_jetif.json",                 "jetif");
         addMixinCFG("mixins.novaeng_core_forge_late.json");
         addMixinCFG("mixins.novaeng_core_dme.json",                               
                 () -> Loader.isModLoaded("deepmoblearning") && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution"));

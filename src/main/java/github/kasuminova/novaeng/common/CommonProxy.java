@@ -71,6 +71,7 @@ public class CommonProxy implements IGuiHandler {
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
         }
+
     }
 
     public void init() {
@@ -94,6 +95,7 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
+            AEApi.instance().registries().wireless().registerWirelessHandler(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL);
         }
     }
 
