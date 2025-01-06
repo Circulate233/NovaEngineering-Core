@@ -74,7 +74,7 @@ public class NovaEngineeringCore {
         proxy.construction();
     }
 
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    @SuppressWarnings({"ValueOfIncrementOrDecrementUsed", "UnusedAssignment"})
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         event.getModMetadata().version = VERSION;
@@ -103,6 +103,7 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(UpdateItemModeMessageHandler.class,UpdateItemModeMessage.class, start++, Side.SERVER);
+        //noinspection UnusedAssignment
         NET_CHANNEL.registerMessage(WirelessTerminalRefresh.Handler.class, WirelessTerminalRefresh.class, start++, Side.SERVER);
 
         proxy.preInit();

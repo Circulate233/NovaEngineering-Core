@@ -30,6 +30,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorCont
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
+import github.kasuminova.novaeng.common.util.ExJEI;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
@@ -98,6 +99,10 @@ public class CommonProxy implements IGuiHandler {
             handlers.add(0, EStorageCellHandler.INSTANCE);
             AEApi.instance().registries().wireless().registerWirelessHandler(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL);
         }
+
+        if (Loader.isModLoaded("ic2")) {
+            ExJEI.jeiCreate();
+        }
     }
 
     public void postInit() {
@@ -105,6 +110,10 @@ public class CommonProxy implements IGuiHandler {
         HyperNetMachineEventHandler.registerHandler();
 
         Upgrades.MAGNET.registerItem(new ItemStack(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL), 1);
+
+        if (Loader.isModLoaded("ic2")) {
+            ExJEI.jeiRecipeRegister();
+        }
     }
 
     public void loadComplete() {

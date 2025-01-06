@@ -1,39 +1,36 @@
-package github.kasuminova.novaeng.client.util;
+package github.kasuminova.novaeng.common.util;
 
-import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import stanhebben.zenscript.annotations.ZenClass;
-import stanhebben.zenscript.annotations.ZenMethod;
+import ic2.core.ref.BlockName;
+import ic2.core.ref.ItemName;
+import ic2.core.ref.TeBlock;
+import ic2.core.util.Util;
+import ic2.core.uu.UuGraph;
+import ink.ikx.rt.api.mods.jei.IJeiUtils;
+import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
+import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.IModRegistry;
+import mezz.jei.api.JEIPlugin;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ic2.core.util.Util;
-import ic2.core.util.StackUtil;
-import ic2.core.ref.TeBlock;
-import ic2.core.uu.UuGraph;
-import ic2.core.ref.BlockName;
-import java.util.Map;
+
 import javax.annotation.Nonnull;
-import mezz.jei.api.JEIPlugin;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import ink.ikx.rt.api.mods.jei.core.IJeiPanel;
-import ink.ikx.rt.api.mods.jei.core.IJeiRecipe;
-import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
-import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
-import ink.ikx.rt.api.mods.jei.IJeiUtils;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @JEIPlugin
 @SideOnly(Side.CLIENT)
 public class ExJEI implements IModPlugin {
 
     public static IModRegistry registration;
-    public static List<String> blockList = Arrays.asList(
+    private static final List<String> blockList = Arrays.asList(
         "mekanismgenerators","artisanworktables"
     );
     
@@ -48,9 +45,6 @@ public class ExJEI implements IModPlugin {
     @Override
     public void register(@Nonnull IModRegistry registration){
         ExJEI.registration = registration;
-        ItemStack pattern_storage = BlockName.te.getItemStack(TeBlock.pattern_storage);
-        ItemStack replicator = BlockName.te.getItemStack(TeBlock.replicator);
-
         registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","combination_crafter"),
             "extendedcrafting:combination_crafting");
         registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","marked_pedestal"),
@@ -73,19 +67,39 @@ public class ExJEI implements IModPlugin {
             "astralsorcery.altar.discovery");
         registration.addRecipeCatalyst(getOtherModsItemStack("packageddraconic","fusion_crafter"),
             "DraconicEvolution.Fusion");
+    }
 
-        new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(pattern_storage)).addOutput(CraftTweakerMC.getIItemStack(replicator)).addElement(IJeiUtils.createFontInfoElement("需要紧贴" + replicator.getDisplayName() + "才可用",0,20,0x000000,0,0)).build();
+    public static void jeiCreate() {
+        IItemStack pattern_storage = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.pattern_storage));
+        IItemStack replicator = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.replicator));
+        MCJeiPanel JeiP = new MCJeiPanel("replicator_jei", "可复制列表");
+        JeiP.setModid("ic2");
+        JeiP.recipeCatalysts.addAll(
+            Arrays.asList(
+                pattern_storage,
+                replicator,
+                CraftTweakerMC.getIItemStack(ItemName.crystal_memory.getItemStack())
+            )
+        );
+        JeiP.background = IJeiUtils.createBackground(80, 32);
+        JeiP.slots.addAll(
+            Arrays.asList(
+                IJeiUtils.createItemSlot(30,0,true,false),
+                IJeiUtils.createItemSlot(30,0,false,false)
+            )
+        );
+        JeiP.icon = replicator;
+        JeiP.register();
+    }
 
+    public static void jeiRecipeRegister() {
         UuGraph.iterator().forEachRemaining(item -> {
             ItemStack stack = item.getKey().copy();
-            if (stack != null && stack.getItem() != null) {
-                if (item.getValue() != Double.POSITIVE_INFINITY && !blockList.contains(stack.getItem().getRegistryName().getNamespace())) {
-                    Double bValue = item.getValue() / 100000;
-                    String UUM = "需要" + Util.toSiString(bValue, 2) + "B UU物质复制";
-                    new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(stack)).addOutput(CraftTweakerMC.getIItemStack(stack)).addElement(IJeiUtils.createFontInfoElement(UUM,0,20,0x000000,0,0)).build();
-                }
+            if (item.getValue() != Double.POSITIVE_INFINITY && !blockList.contains(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())) {
+                double bValue = item.getValue() / 100000;
+                String UUM = "需要" + Util.toSiString(bValue, 2) + "B UU物质复制";
+                new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(stack)).addOutput(CraftTweakerMC.getIItemStack(stack)).addElement(IJeiUtils.createFontInfoElement(UUM, 0, 20, 0x000000, 0, 0)).build();
             }
         });
-
     }
 }
