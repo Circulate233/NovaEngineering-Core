@@ -5,6 +5,13 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinCPacketUseKeybindHandler"
+    "MixinCPacketUseKeybindHandler",
+    "MixinGuiWirelessFluidPatternTerminal"
+  ],
+  "client": [
+    "MixinGuiFluidPatternTerminalCraftingStatus"
+  ],
+  "server": [
+
   ]
 }
