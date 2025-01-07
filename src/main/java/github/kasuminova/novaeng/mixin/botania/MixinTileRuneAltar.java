@@ -4,14 +4,11 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.recipe.RecipeRuneAltar;
 import vazkii.botania.common.block.ModBlocks;
@@ -33,16 +30,6 @@ public abstract class MixinTileRuneAltar extends TileSimpleInventory {
     public void saveLastRecipe() {}
     @Shadow
     public void recieveMana(int mana) {}
-
-    @Unique
-    Item novaEngineering_Core$Universe = novaEngineering_Core$getOtherModsItem("contenttweaker", "universe");
-    @Unique
-    Item novaEngineering_Core$Guilt = novaEngineering_Core$getOtherModsItem("contenttweaker", "guilt");
-
-    @Unique
-    public Item novaEngineering_Core$getOtherModsItem(String modId, String itemName) {
-        return GameRegistry.findRegistry(Item.class).getValue(new ResourceLocation(modId, itemName));
-    }
 
     /**
      * @author Circulation_

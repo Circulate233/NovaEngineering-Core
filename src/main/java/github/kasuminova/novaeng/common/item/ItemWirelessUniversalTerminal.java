@@ -136,6 +136,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             ItemStack item = player.getHeldItem(hand);
             if (item.getTagCompound() != null) {
                 if (item.getTagCompound().hasKey("cache")){
+                    item.getTagCompound().setInteger("craft",1);
                     NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                     if (cache.tagCount() != 0) {
                         item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
@@ -153,6 +154,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             ItemStack item = player.inventory.getStackInSlot(i);
             if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 item.getTagCompound().setInteger("mode",mode);
+                item.getTagCompound().setInteger("craft",1);
                 if (mode != 0 && mode != 2) {
                     NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                     if (cache.tagCount() != 0) {
@@ -169,6 +171,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                 ItemStack item = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
                 if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     item.getTagCompound().setInteger("mode",mode);
+                    item.getTagCompound().setInteger("craft",1);
                     if (mode != 0 && mode != 2) {
                         NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                         if (cache.tagCount() != 0) {
@@ -188,6 +191,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             ItemStack item = player.inventory.getStackInSlot(i);
             if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 int mode = item.getTagCompound().getInteger("mode");
+                item.getTagCompound().setInteger("craft",0);
                 if (mode != 0 && mode != 2) {
                     item.getTagCompound().setInteger("mode", mode);
                     NBTTagList items = item.getTagCompound().getCompoundTag("craftingGrid").getTagList("Items", 10);
@@ -208,6 +212,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                 ItemStack item = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
                 if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     int mode = item.getTagCompound().getInteger("mode");
+                    item.getTagCompound().setInteger("craft",0);
                     if (mode != 0 && mode != 2) {
                         if (!item.getTagCompound().hasKey("cache")){
                             item.getTagCompound().setTag("cache",new NBTTagCompound());
