@@ -6,10 +6,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinCPacketUseKeybindHandler",
-    "MixinGuiWirelessFluidPatternTerminal"
+    "MixinGuiFluidPatternTerminalCraftingStatus"
   ],
   "client": [
-    "MixinGuiFluidPatternTerminalCraftingStatus"
   ],
   "server": [
 
