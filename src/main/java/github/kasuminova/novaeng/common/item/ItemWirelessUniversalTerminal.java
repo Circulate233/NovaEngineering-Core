@@ -33,11 +33,32 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
 
     public static String NAME = "wireless_universal_terminal";
     IWirelessTermRegistry registry = AEApi.instance().registries().wireless();
+
+    static List<Integer> modes = Arrays.asList(0,1,2,3);
+
+    public static List<Integer> getModes() {
+        List<Integer> initial = modes;
+        if (Loader.isModLoaded("ae2fcr")) {
+            initial.add(4);
+        }
+        return initial;
+    }
+
+    public static int[] getAllMode() {
+        List<Integer> initial = modes;
+        if (Loader.isModLoaded("ae2fc")) {
+            initial.add(4);
+        }
+        return initial.stream().mapToInt(Integer::intValue).toArray();
+    }
 
     public ItemWirelessUniversalTerminal() {
         this.setMaxStackSize(1);
@@ -65,24 +86,40 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public ActionResult<ItemStack> onItemRightClick(World w, EntityPlayer player, EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
         if (item.getTagCompound() != null) {
-            int mode = item.getTagCompound().getInteger("mode");
-            nbtChange(player, mode, hand);
-            switch (mode) {
-                case 0:
-                    registry.openWirelessTerminalGui(player.getHeldItem(hand), w, player);
-                    break;
-                case 1:
-                    openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL);
-                    break;
-                case 2:
-                    openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_FLUID_TERMINAL);
-                    break;
-                case 3:
-                    openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL);
-                    break;
-                case 4:
-                    Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : 40, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                    break;
+            List<Integer> list = null;
+            if (item.getTagCompound().hasKey("modes")) {
+                list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+            }
+            if (list != null) {
+                int mode = item.getTagCompound().getInteger("mode");
+                nbtChange(player, mode, hand);
+                switch (mode) {
+                    case 0:
+                        if (getModes().contains(mode)) {
+                            registry.openWirelessTerminalGui(player.getHeldItem(hand), w, player);
+                        }
+                        break;
+                    case 1:
+                        if (getModes().contains(mode)) {
+                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL);
+                        }
+                        break;
+                    case 2:
+                        if (getModes().contains(mode)) {
+                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_FLUID_TERMINAL);
+                        }
+                        break;
+                    case 3:
+                        if (getModes().contains(mode)) {
+                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL);
+                        }
+                        break;
+                    case 4:
+                        if (getModes().contains(mode)) {
+                            Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : 40, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                        }
+                        break;
+                }
             }
         }
 

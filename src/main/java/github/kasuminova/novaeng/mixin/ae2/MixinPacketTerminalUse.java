@@ -16,6 +16,10 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Mixin(value = PacketTerminalUse.class,remap = false)
 public class MixinPacketTerminalUse extends AppEngPacket {
 
@@ -34,13 +38,23 @@ public class MixinPacketTerminalUse extends AppEngPacket {
 
         for(int i = 0; i < mainInventory.size(); ++i) {
             ItemStack is = mainInventory.get(i);
-            if (terminal.getItemDefinition().isSameAs(is)) {
-                openGui(is, i, player, false);
-                return;
-            } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL){
-                RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player,novaEngineering_Core$determineMode(terminal.name()));
-                openGui(is, i, player, false);
-                return;
+
+            if (is.getTagCompound() != null) {
+                int mode = novaEngineering_Core$determineMode(terminal.name());
+
+                List<Integer> list = null;
+                if (is.getTagCompound().hasKey("modes")) {
+                    list = Arrays.stream(is.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+                }
+
+                if (terminal.getItemDefinition().isSameAs(is)) {
+                    openGui(is, i, player, false);
+                    return;
+                } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(mode)) {
+                    RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, mode);
+                    openGui(is, i, player, false);
+                    return;
+                }
             }
         }
 
@@ -59,13 +73,20 @@ public class MixinPacketTerminalUse extends AppEngPacket {
     void tryOpenBauble(EntityPlayer player) {
         for(int i = 0; i < BaublesApi.getBaublesHandler(player).getSlots(); ++i) {
             ItemStack is = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
-            if (terminal.getItemDefinition().isSameAs(is)) {
-                openGui(is, i, player, true);
-                break;
-            } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL){
-                RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player,novaEngineering_Core$determineMode(terminal.name()));
-                openGui(is, i, player, true);
-                return;
+            if (is.getTagCompound() != null) {
+                int mode = novaEngineering_Core$determineMode(terminal.name());
+                List<Integer> list = null;
+                if (is.getTagCompound().hasKey("modes")) {
+                    list = Arrays.stream(is.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+                }
+                if (terminal.getItemDefinition().isSameAs(is)) {
+                    openGui(is, i, player, true);
+                    break;
+                } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(mode)) {
+                    RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, mode);
+                    openGui(is, i, player, true);
+                    return;
+                }
             }
         }
     }

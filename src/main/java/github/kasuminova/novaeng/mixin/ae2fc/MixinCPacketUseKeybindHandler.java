@@ -16,6 +16,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Mixin(value = CPacketUseKeybind.Handler.class, remap = false)
 public class MixinCPacketUseKeybindHandler {
     /**
@@ -29,13 +33,19 @@ public class MixinCPacketUseKeybindHandler {
         player.getServerWorld().addScheduledTask(() -> {
             for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
                 ItemStack stackInSlot = player.inventory.getStackInSlot(i);
-                if (stackInSlot.getItem() == FCItems.WIRELESS_FLUID_PATTERN_TERMINAL) {
-                    Util.openWirelessTerminal(stackInSlot, i, false, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                    return;
-                } else if (stackInSlot.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
-                    RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player,4);
-                    Util.openWirelessTerminal(stackInSlot, i, false, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                    return;
+                if (stackInSlot.getTagCompound() != null) {
+                    List<Integer> list = null;
+                    if (stackInSlot.getTagCompound().hasKey("modes")) {
+                        list = Arrays.stream(stackInSlot.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+                    }
+                    if (stackInSlot.getItem() == FCItems.WIRELESS_FLUID_PATTERN_TERMINAL) {
+                        Util.openWirelessTerminal(stackInSlot, i, false, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                        return;
+                    } else if (stackInSlot.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(4)) {
+                        RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, 4);
+                        Util.openWirelessTerminal(stackInSlot, i, false, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                        return;
+                    }
                 }
             }
             if (Loader.isModLoaded("baubles")) {
@@ -54,13 +64,19 @@ public class MixinCPacketUseKeybindHandler {
     private static void tryOpenBauble(EntityPlayer player) {
         for (int i = 0; i < BaublesApi.getBaublesHandler(player).getSlots(); i++) {
             ItemStack stackInSlot = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
-            if (stackInSlot.getItem() == FCItems.WIRELESS_FLUID_PATTERN_TERMINAL) {
-                Util.openWirelessTerminal(stackInSlot, i, true, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                return;
-            } else if (stackInSlot.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
-                RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player,4);
-                Util.openWirelessTerminal(stackInSlot, i, true, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                return;
+            if (stackInSlot.getTagCompound() != null) {
+                List<Integer> list = null;
+                if (stackInSlot.getTagCompound().hasKey("modes")) {
+                    list = Arrays.stream(stackInSlot.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+                }
+                if (stackInSlot.getItem() == FCItems.WIRELESS_FLUID_PATTERN_TERMINAL) {
+                    Util.openWirelessTerminal(stackInSlot, i, true, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                    return;
+                } else if (stackInSlot.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(4)) {
+                    RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, 4);
+                    Util.openWirelessTerminal(stackInSlot, i, true, player.world, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                    return;
+                }
             }
         }
     }

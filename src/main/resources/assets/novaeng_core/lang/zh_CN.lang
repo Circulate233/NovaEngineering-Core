@@ -510,4 +510,7 @@ gui.geocentric_drill.ore_control.tooltip.mark=单击标记此矿物，§a提高�
 gui.geocentric_drill.ore_control.tooltip.unmark=单击取消标记此矿物。
 gui.geocentric_drill.ore_control.tooltip.chance=输出权重：§a%s%%§f
 
+gui.novaeng_core.replicator=可复制列表
+gui.novaeng_core.replicator.tooltips1=需要%sB UU物质复制
+
 itemGroup.novaeng_core=新星工程：核心
