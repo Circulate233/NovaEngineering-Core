@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,28 +31,31 @@ public class ClientTickHandler {
                 delta = delta / 120 ;
             }
             if (stack.getItem() instanceof ItemWirelessUniversalTerminal && delta != 0) {
-                List<Integer> list = new ArrayList<>(Arrays.asList(0));
+                List<Integer> list = null;
                 if (stack.getTagCompound() != null) {
                     if (stack.getTagCompound().hasKey("modes")) {
                         list = Arrays.stream(stack.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                     }
-                    int listMax = Arrays.stream(stack.getTagCompound().getIntArray("modes")).max().getAsInt() + 1;
+                    if (list != null) {
+                        int listMax = Arrays.stream(stack.getTagCompound().getIntArray("modes")).max().getAsInt() + 1;
 
-                    int newVal = stack.getTagCompound().getInteger("mode") + (delta % listMax);
+                        int newVal = stack.getTagCompound().getInteger("mode") + (delta % listMax);
 
-                    if (newVal > 0) {
-                        newVal = newVal % listMax;
-                    } else if (newVal < 0) {
-                        newVal = listMax + newVal;
+                        if (newVal > 0) {
+                            newVal = newVal % listMax;
+                        } else if (newVal < 0) {
+                            newVal = listMax + newVal;
+                        }
+
+                        while (list.size() != 1 && !list.contains(newVal)) {
+                            newVal = (newVal + 1) % listMax;
+                        }
+
+                        stack.getTagCompound().setInteger("mode", newVal);
+                        NovaEngineeringCore.NET_CHANNEL.sendToServer(new UpdateItemModeMessage(stack, newVal));
+
+                        event.setCanceled(true);
                     }
-                    while (list.size() != 1 && !list.contains(newVal)) {
-                        newVal = (newVal + 1) % listMax;
-                    }
-
-                    stack.getTagCompound().setInteger("mode", newVal);
-                    NovaEngineeringCore.NET_CHANNEL.sendToServer(new UpdateItemModeMessage(stack, newVal));
-
-                    event.setCanceled(true);
                 }
             }
         }
