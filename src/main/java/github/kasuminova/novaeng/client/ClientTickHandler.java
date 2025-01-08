@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.client;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.item.ItemWirelessUniversalTerminal;
 import github.kasuminova.novaeng.common.network.UpdateItemModeMessage;
-import github.kasuminova.novaeng.common.registry.RegistryItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.MouseEvent;
@@ -13,6 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +32,11 @@ public class ClientTickHandler {
                 delta = delta / 120 ;
             }
             if (stack.getItem() instanceof ItemWirelessUniversalTerminal && delta != 0) {
-                List<Integer> list = null;
+                List<Integer> list = new ArrayList<>(Arrays.asList(0));
                 if (stack.getTagCompound() != null) {
                     if (stack.getTagCompound().hasKey("modes")) {
                         list = Arrays.stream(stack.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                     }
-                }
-
-                if (list != null) {
                     int listMax = Arrays.stream(stack.getTagCompound().getIntArray("modes")).max().getAsInt() + 1;
 
                     int newVal = stack.getTagCompound().getInteger("mode") + (delta % listMax);
@@ -49,7 +46,7 @@ public class ClientTickHandler {
                     } else if (newVal < 0) {
                         newVal = listMax + newVal;
                     }
-                    while (!list.contains(newVal)) {
+                    while (list.size() != 1 && !list.contains(newVal)) {
                         newVal = (newVal + 1) % listMax;
                     }
 
