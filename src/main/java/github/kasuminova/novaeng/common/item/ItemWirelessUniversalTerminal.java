@@ -240,7 +240,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                         } else {
                             item.getTagCompound().getCompoundTag("craftingGrid").removeTag("Items");
                         }
-                    }s
+                    }
                 }
             }
         }
