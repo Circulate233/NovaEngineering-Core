@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,22 +43,18 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public static String NAME = "wireless_universal_terminal";
     IWirelessTermRegistry registry = AEApi.instance().registries().wireless();
 
-    static List<Integer> modes = Arrays.asList(0,1,2,3);
+    public static List<Integer> modes = new ArrayList<>(Arrays.asList(0,1,2,3));
 
     public static List<Integer> getModes() {
         List<Integer> initial = modes;
-        if (Loader.isModLoaded("ae2fcr")) {
+        if (Loader.isModLoaded("ae2fc")) {
             initial.add(4);
         }
         return initial;
     }
 
     public static int[] getAllMode() {
-        List<Integer> initial = modes;
-        if (Loader.isModLoaded("ae2fc")) {
-            initial.add(4);
-        }
-        return initial.stream().mapToInt(Integer::intValue).toArray();
+        return getModes().stream().mapToInt(Integer::intValue).toArray();
     }
 
     public ItemWirelessUniversalTerminal() {
