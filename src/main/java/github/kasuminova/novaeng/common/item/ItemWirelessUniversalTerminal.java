@@ -86,40 +86,38 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public ActionResult<ItemStack> onItemRightClick(World w, EntityPlayer player, EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
         if (item.getTagCompound() != null) {
-            List<Integer> list = null;
+            List<Integer> list;
             if (item.getTagCompound().hasKey("modes")) {
                 list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
+            } else {
+                list = Arrays.asList(-1,0);
             }
-            if (list != null) {
-                int mode = item.getTagCompound().getInteger("mode");
-                nbtChange(player, mode, hand);
-                switch (mode) {
-                    case 0:
-                        if (getModes().contains(mode)) {
-                            registry.openWirelessTerminalGui(player.getHeldItem(hand), w, player);
-                        }
-                        break;
-                    case 1:
-                        if (getModes().contains(mode)) {
-                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL);
-                        }
-                        break;
-                    case 2:
-                        if (getModes().contains(mode)) {
-                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_FLUID_TERMINAL);
-                        }
-                        break;
-                    case 3:
-                        if (getModes().contains(mode)) {
-                            openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL);
-                        }
-                        break;
-                    case 4:
-                        if (getModes().contains(mode)) {
-                            Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : 40, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
-                        }
-                        break;
-                }
+            int mode = item.getTagCompound().getInteger("mode");
+            nbtChange(player, mode, hand);
+            switch (mode) {
+                case 0:
+                    registry.openWirelessTerminalGui(player.getHeldItem(hand), w, player);
+                    break;
+                case 1:
+                    if (list.contains(mode)) {
+                        openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL);
+                    }
+                    break;
+                case 2:
+                    if (list.contains(mode)) {
+                        openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_FLUID_TERMINAL);
+                    }
+                    break;
+                case 3:
+                    if (list.contains(mode)) {
+                        openWirelessTerminalGui(player.getHeldItem(hand), player, GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL);
+                    }
+                    break;
+                case 4:
+                    if (list.contains(mode)) {
+                        Util.openWirelessTerminal(player.getHeldItem(hand), hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : 40, false, w, player, GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                    }
+                    break;
             }
         }
 
