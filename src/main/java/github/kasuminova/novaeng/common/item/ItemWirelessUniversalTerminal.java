@@ -161,9 +161,9 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                         player.sendMessage(PlayerMessages.StationCanNotBeLocated.get());
                     } else {
                         if (handler.hasPower(player, 0.5F, item)) {
-                            if (mode != 5) {
+                            if (mode < 5) {
                                 Platform.openGUI(player, null, null, gui);
-                            } else {
+                            } else if (mode == 5) {
                                 GuiHandler.openItemGui(player, player.world, player.inventory.currentItem, false, MkEGuis.WIRELESS_GAS_TERM);
                             }
                         } else {
