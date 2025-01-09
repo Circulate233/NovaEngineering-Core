@@ -220,6 +220,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
     implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
     implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
+    implementation(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
     implementation(rfg.deobf("curse.maven:nae2-884359:4955559"))
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))

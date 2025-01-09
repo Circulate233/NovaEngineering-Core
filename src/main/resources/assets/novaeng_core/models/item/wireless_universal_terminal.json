@@ -30,6 +30,12 @@
     },
     {
       "predicate": {
+        "mode": 5
+      },
+      "model": "mekeng:item/wireless_gas_terminal"
+    },
+    {
+      "predicate": {
         "mode": 114514
       },
       "model": "novaeng_core:item/wireless_nova_terminal"
