@@ -192,9 +192,11 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                 if (item.getTagCompound().hasKey("cache")) {
                     NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                     if (cache.tagCount() != 0) {
-                        item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
-                        item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
-                    } else {
+                        if (mode < 6) {
+                            item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
+                        } else if (mode < 10) {
+                            item.getTagCompound().setTag("crafting", cache);
+                        }
                         item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
                     }
                 }
@@ -208,14 +210,16 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 item.getTagCompound().setInteger("mode", mode);
                 item.getTagCompound().setInteger("craft", 1);
-                if (mode != 0 && mode != 2) {
+                if (mode != 0 && mode != 2 && mode != 5) {
                     List<Integer> list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                     if (list.contains(mode)) {
                         NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                         if (cache.tagCount() != 0) {
-                            item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
-                            item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
-                        } else {
+                            if (mode < 6) {
+                                item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
+                            } else if (mode < 10){
+                                item.getTagCompound().setTag("crafting", cache);
+                            }
                             item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
                         }
                     }
@@ -228,16 +232,19 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                 if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     item.getTagCompound().setInteger("mode", mode);
                     item.getTagCompound().setInteger("craft", 1);
-                    if (mode != 0 && mode != 2) {
+                    if (mode != 0 && mode != 2 && mode != 5) {
                         List<Integer> list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                         if (list.contains(mode)) {
                             NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
                             if (cache.tagCount() != 0) {
-                                item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
-                                item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
-                            } else {
-                                item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
+                                if (mode < 6) {
+                                    item.getTagCompound().getCompoundTag("craftingGrid").setTag("Items", cache);
+                                } else if (mode < 10){
+                                    item.getTagCompound().setTag("crafting", cache);
+                                }
+
                             }
+                            item.getTagCompound().getCompoundTag("cache").removeTag(String.valueOf(mode));
                         }
                     }
                 }
@@ -251,7 +258,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 int mode = item.getTagCompound().getInteger("mode");
                 item.getTagCompound().setInteger("craft", 0);
-                if (mode != 0 && mode != 2) {
+                if (mode != 0 && mode != 2 && mode != 5) {
                     List<Integer> list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                     if (list.contains(mode)) {
                         item.getTagCompound().setInteger("mode", mode);
@@ -297,7 +304,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                 if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     int mode = item.getTagCompound().getInteger("mode");
                     item.getTagCompound().setInteger("craft", 0);
-                    if (mode != 0 && mode != 2) {
+                    if (mode != 0 && mode != 2 && mode != 5) {
                         List<Integer> list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                         if (list.contains(mode)) {
                             if (!item.getTagCompound().hasKey("cache")) {
