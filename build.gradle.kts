@@ -208,20 +208,21 @@ dependencies {
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("hellfirepvp:modularmachinery:2.1.0:main"))
-    implementation(rfg.deobf("ink:RandomTweaker-1.4.7"))
-    implementation(rfg.deobf("lykrast:jetif-1.12.2-1.5.2"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
     implementation(rfg.deobf("kasuminova:lumenized:1.0.3:dev"))
+    implementation(rfg.deobf("curse.maven:RandomTweaker-514170:5528753"))
+    implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
     implementation(rfg.deobf("curse.maven:ctm-267602:2915363"))
 //    implementation(rfg.deobf("curse.maven:component-model-hider-940949:4885858"))
     implementation(rfg.deobf("curse.maven:had-enough-items-557549:4810661"))
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
     implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
     implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
+    implementation(rfg.deobf("curse.maven:ae2exttable-1157825:5989751"))
     implementation(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
-    implementation(rfg.deobf("curse.maven:nae2-884359:4955559"))
+    implementation(rfg.deobf("curse.maven:nae2-884359:5380800"))
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))
     implementation(rfg.deobf("curse.maven:CodeChickenLib-242818:2779848"))
@@ -234,7 +235,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:botania-225643:3330934"))
     implementation(rfg.deobf("curse.maven:astral-sorcery-241721:3044416"))
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
-    implementation(rfg.deobf("curse.maven:zenutil-401178:5056679"))
+    implementation(rfg.deobf("curse.maven:zenutil-401178:6033519"))
     compileOnly(rfg.deobf("curse.maven:smooth-font-285742:3944565"))
     implementation(rfg.deobf("curse.maven:scalingguis-319656:2716334"))
     implementation(rfg.deobf("curse.maven:lolasm-460609:5257348"))
@@ -265,7 +266,7 @@ dependencies {
     // Performance Test Tool
     runtimeOnly(rfg.deobf("curse.maven:spark-361579:3245793"))
     // Optimization
-    implementation(rfg.deobf("curse.maven:stellarcore-1064321:5791405"))
+    implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
 }
 

@@ -36,6 +36,30 @@
     },
     {
       "predicate": {
+        "mode": 6
+      },
+      "model": "ae2exttable:item/wireless_basic_crafting_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 7
+      },
+      "model": "ae2exttable:item/wireless_advanced_crafting_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 8
+      },
+      "model": "ae2exttable:item/wireless_elite_crafting_terminal"
+    },
+    {
+      "predicate": {
+        "mode": 9
+      },
+      "model": "ae2exttable:item/wireless_ultimate_crafting_terminal"
+    },
+    {
+      "predicate": {
         "mode": 114514
       },
       "model": "novaeng_core:item/wireless_nova_terminal"
