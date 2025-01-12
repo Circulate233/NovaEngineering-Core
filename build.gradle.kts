@@ -218,6 +218,8 @@ dependencies {
 //    implementation(rfg.deobf("curse.maven:component-model-hider-940949:4885858"))
     implementation(rfg.deobf("curse.maven:had-enough-items-557549:4810661"))
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
+    implementation(rfg.deobf("curse.maven:FTB-Library-237167:2985811"))
+    implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))
     implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
     implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
     implementation(rfg.deobf("curse.maven:ae2exttable-1157825:5989751"))
