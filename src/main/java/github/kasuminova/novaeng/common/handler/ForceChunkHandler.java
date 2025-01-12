@@ -18,8 +18,8 @@ public class ForceChunkHandler {
 
     public static final ForceChunkHandler INSTANCE = new ForceChunkHandler();
     Random random = new Random();
-    final int randomX = random.nextInt(100000) + 100000;
-    final int randomY = random.nextInt(100000) + 100000;
+    final int randomX = random.nextInt(100000) + 150000;
+    final int randomY = random.nextInt(100000) + 150000;
 
     private void request(MinecraftServer server) {
         for (DimensionType i : DimensionManager.getRegisteredDimensions().keySet()) {
