@@ -15,9 +15,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Xzjt implements MachineSpecial {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "xzjt");
-    public static final Xzjt XZJT = new Xzjt();
+public class MMAltar implements MachineSpecial {
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "mm_altar");
+    public static final MMAltar MM_ALTAR = new MMAltar();
 
     public static final List<BlockPos> posSet1 = Arrays.asList(
         new BlockPos(-3,-5,-3), new BlockPos(-3,-5,3),
@@ -40,7 +40,7 @@ public class Xzjt implements MachineSpecial {
     public static Block BLOCKSJ2 = getOtherModsBlock("contenttweaker","fallenstarforcefieldcontrolblock");
     public static Block BLOCKSJ3 = getOtherModsBlock("contenttweaker","universalforcefieldcontrolblock");
 
-    protected Xzjt() {
+    protected MMAltar() {
     }
 
     public static Block getOtherModsBlock(String modId, String blockName) {
