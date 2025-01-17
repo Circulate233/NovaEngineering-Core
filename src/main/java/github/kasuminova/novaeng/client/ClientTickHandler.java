@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.item.ItemWirelessUniversalTerminal;
 import github.kasuminova.novaeng.common.network.UpdateItemModeMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -52,6 +53,7 @@ public class ClientTickHandler {
                         }
 
                         stack.getTagCompound().setInteger("mode", newVal);
+                        mc.player.sendStatusMessage(new TextComponentString(stack.getDisplayName()),true);
                         NovaEngineeringCore.NET_CHANNEL.sendToServer(new UpdateItemModeMessage(stack, newVal));
 
                         event.setCanceled(true);
