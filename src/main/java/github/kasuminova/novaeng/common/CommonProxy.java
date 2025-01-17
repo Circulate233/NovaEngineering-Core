@@ -5,6 +5,7 @@ import appeng.api.config.Upgrades;
 import appeng.api.storage.ICellHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.client.util.ExJEI;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
 import github.kasuminova.novaeng.common.container.*;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
@@ -30,7 +31,6 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorCont
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
-import github.kasuminova.novaeng.common.util.ExJEI;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
@@ -43,6 +43,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -100,8 +101,7 @@ public class CommonProxy implements IGuiHandler {
             handlers.add(0, EStorageCellHandler.INSTANCE);
             AEApi.instance().registries().wireless().registerWirelessHandler(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL);
         }
-
-        if (Loader.isModLoaded("ic2")) {
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient() && Loader.isModLoaded("ic2")) {
             ExJEI.jeiCreate();
         }
     }
@@ -112,7 +112,7 @@ public class CommonProxy implements IGuiHandler {
 
         Upgrades.MAGNET.registerItem(new ItemStack(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL), 1);
 
-        if (Loader.isModLoaded("ic2")) {
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient() && Loader.isModLoaded("ic2")) {
             ExJEI.jeiRecipeRegister();
         }
     }

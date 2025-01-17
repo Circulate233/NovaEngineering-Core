@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.common.util;
+package github.kasuminova.novaeng.client.util;
 
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;

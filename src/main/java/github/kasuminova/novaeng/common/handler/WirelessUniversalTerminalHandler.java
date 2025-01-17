@@ -1,8 +1,7 @@
-package github.kasuminova.novaeng.client;
+package github.kasuminova.novaeng.common.handler;
 
 import appeng.client.gui.AEBaseGui;
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.handler.WirelessTerminalRefresh;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.event.GuiOpenEvent;

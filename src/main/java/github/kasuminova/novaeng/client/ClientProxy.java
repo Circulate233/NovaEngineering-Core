@@ -10,6 +10,7 @@ import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
+import github.kasuminova.novaeng.common.handler.WirelessUniversalTerminalHandler;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
