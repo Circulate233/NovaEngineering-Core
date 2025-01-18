@@ -94,15 +94,14 @@ public class GeocentricDrill implements MachineSpecial {
                 .filter(oreName -> oreName.startsWith("rawOre"))
                 .forEach(oreName -> {
                     NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
-                    if (!ores.isEmpty() && oreName != "rawOreAluminium") {
+                    if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
                         ItemStack stack = ores.get(0).copy();
                         stack.setCount(ORE_COUNT);
                         rawOres.put(oreName, stack);
                     }
                 });
 
-        addRFToolsDimShard(rawOres);
-        addEnvironmentTechOres(rawOres);
+        addOres(rawOres);
         addGeocentricQuartzCrystalOre(rawOres);
 
         this.rawOres.clear();
@@ -123,13 +122,6 @@ public class GeocentricDrill implements MachineSpecial {
         primer.build();
     }
 
-    private static void addRFToolsDimShard(final Map<String, ItemStack> rawOres) {
-        List<ItemStack> genDimShards = OreDictionary.getOres("gemDimensionalShard", false);
-        if (!genDimShards.isEmpty()) {
-            rawOres.put("gemDimensionalShard", ItemUtils.copyStackWithSize(genDimShards.get(0), 4));
-        }
-    }
-
     private static void addGeocentricQuartzCrystalOre(final Map<String, ItemStack> rawOres) {
         Item geocentricCrystal = Item.REGISTRY.getObject(new ResourceLocation("contenttweaker", "geocentric_crystal"));
         if (geocentricCrystal != null) {
@@ -137,7 +129,15 @@ public class GeocentricDrill implements MachineSpecial {
         }
     }
 
-    private static void addEnvironmentTechOres(final Map<String, ItemStack> rawOres) {
+    private static void addOres(final Map<String, ItemStack> rawOres) {
+        List<ItemStack> dustDraconium = OreDictionary.getOres("dustDraconium", false);
+        if (!dustDraconium.isEmpty()) {
+            rawOres.put("dustDraconium", ItemUtils.copyStackWithSize(dustDraconium.get(0), 6));
+        }
+        List<ItemStack> blockSkyStone = OreDictionary.getOres("blockSkyStone", false);
+        if (!blockSkyStone.isEmpty()) {
+            rawOres.put("blockSkyStone", ItemUtils.copyStackWithSize(blockSkyStone.get(0), 4));
+        }
         List<ItemStack> crystalLitherite = OreDictionary.getOres("crystalLitherite", false);
         if (!crystalLitherite.isEmpty()) {
             rawOres.put("crystalLitherite", ItemUtils.copyStackWithSize(crystalLitherite.get(0), 4));
