@@ -31,6 +31,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -146,10 +147,14 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     @Nonnull
     @Override
     public String getItemStackDisplayName(@Nonnull ItemStack stack) {
-        if (stack.getTagCompound() != null) {
-            return (I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim() + AllWireless(stack.getTagCompound().getInteger("mode"))).trim();
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+            if (stack.getTagCompound() != null) {
+                return (I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim() + AllWireless(stack.getTagCompound().getInteger("mode"))).trim();
+            } else {
+                return super.getItemStackDisplayName(stack);
+            }
         } else {
-            return super.getItemStackDisplayName(stack);
+            return "";
         }
     }
 
