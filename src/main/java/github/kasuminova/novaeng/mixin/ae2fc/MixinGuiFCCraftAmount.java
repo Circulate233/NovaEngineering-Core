@@ -28,7 +28,7 @@ public class MixinGuiFCCraftAmount extends GuiCraftAmount {
         super(inventoryPlayer, te);
     }
 
-    @Inject(method="initGui", at = @At(value="INVOKE", target="Lappeng/helpers/WirelessTerminalGuiObject;getItemStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER), cancellable=true)
+    @Inject(method="initGui", at = @At(value="INVOKE", target="Lappeng/helpers/WirelessTerminalGuiObject;getItemStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER), cancellable=true, remap=true)
     protected void onInitGui(CallbackInfo ci) {
         Object te = ((AEBaseContainer)this.inventorySlots).getTarget();
         ItemStack icon = ItemStack.EMPTY;
