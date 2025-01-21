@@ -33,8 +33,13 @@ public class MixinCraftingCPUStatusTWO {
         if (te instanceof WirelessTerminalGuiObject wt) {
             ItemStack item = wt.getItemStack();
             if (item.getItem() instanceof ItemWirelessUniversalTerminal bt) {
-                this.novaEngineering_Core$extendedOriginalGui = bt.getGuiType(item);
-                this.myIcon = item;
+                if (item.getTagCompound() != null) {
+                    switch (item.getTagCompound().getInteger("mode")){
+                        case 6,7,8,9:
+                            this.novaEngineering_Core$extendedOriginalGui = bt.getGuiType(item);
+                            this.myIcon = item;
+                    }
+                }
             }
         }
     }

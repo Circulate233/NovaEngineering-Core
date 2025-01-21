@@ -6,6 +6,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinCPacketUseKeybindHandler",
+    "MixinGuiFCCraftAmount",
+    "MixinGuiFCCraftConfirm",
     "MixinGuiFluidPatternTerminalCraftingStatus"
   ],
   "client": [

@@ -43,14 +43,21 @@ public abstract class MixinGuiCraftAmount extends AEBaseGui {
         Object target = ((AEBaseContainer) this.inventorySlots).getTarget();
         if (target instanceof WirelessTerminalGuiObject term)
             if (term.getItemStack().getItem() instanceof ItemWirelessUniversalTerminal item) {
-                for (Object btn: new ArrayList<>(this.buttonList)) {
-                    if (btn instanceof GuiTabButton b) {
-                        this.buttonList.remove(b);
+                ItemStack itemstack = term.getItemStack();
+                if (itemstack.getTagCompound() != null) {
+                    switch (itemstack.getTagCompound().getInteger("mode")) {
+                        case 6,7,8,9: {
+                            for (Object btn : new ArrayList<>(this.buttonList)) {
+                                if (btn instanceof GuiTabButton b) {
+                                    this.buttonList.remove(b);
+                                }
+                            }
+                            this.novaEngineering_Core$extendedOriginalGui = item.getGuiType(term.getItemStack());
+                            ItemStack myIcon = new ItemStack(ItemRegistry.partByGuiType(this.novaEngineering_Core$extendedOriginalGui));
+                            this.buttonList.add((this.originalGuiBtn = new GuiTabButton(this.guiLeft + 154, this.guiTop, myIcon, myIcon.getDisplayName(), this.itemRender)));
+                        }
                     }
                 }
-                this.novaEngineering_Core$extendedOriginalGui = item.getGuiType(term.getItemStack());
-                ItemStack myIcon = new ItemStack(ItemRegistry.partByGuiType(this.novaEngineering_Core$extendedOriginalGui));
-                this.buttonList.add((this.originalGuiBtn = new GuiTabButton(this.guiLeft + 154, this.guiTop, myIcon, myIcon.getDisplayName(), this.itemRender)));
             }
     }
 
