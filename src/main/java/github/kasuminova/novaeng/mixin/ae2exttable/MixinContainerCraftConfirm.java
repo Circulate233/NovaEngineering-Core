@@ -23,8 +23,12 @@ public class MixinContainerCraftConfirm extends AEBaseContainer {
     @Inject(method="startJob", at=@At(value="INVOKE", target="Lappeng/container/implementations/ContainerCraftConfirm;setAutoStart(Z)V", shift=At.Shift.AFTER), cancellable=true)
     public void startJobMixin(CallbackInfo ci) {if (this.obj != null) {
             if (this.obj.getItemStack().getItem() instanceof ItemWirelessUniversalTerminal t) {
-                ExtendedTerminalNetworkHandler.instance().sendToServer(new PacketSwitchGui(t.getGuiType(this.obj.getItemStack())));
-                ci.cancel();
+                switch (this.obj.getItemStack().getTagCompound().getInteger("mode")) {
+                    case 6, 7, 8, 9: {
+                        ExtendedTerminalNetworkHandler.instance().sendToServer(new PacketSwitchGui(t.getGuiType(this.obj.getItemStack())));
+                        ci.cancel();
+                    }
+                }
             }
         }
 
