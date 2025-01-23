@@ -28,9 +28,6 @@ public abstract class MixinGuiCraftAmount extends AEBaseGui {
     @Shadow
     private GuiTabButton originalGuiBtn;
 
-    @Shadow
-    private GuiButton next;
-
     @Unique
     private AE2ExtendedGUIs novaEngineering_Core$extendedOriginalGui;
 

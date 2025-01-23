@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.client.handler;
 
 import appeng.client.gui.AEBaseGui;
+import appeng.core.AELog;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.handler.WirelessTerminalRefresh;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
@@ -17,6 +18,7 @@ public class WirelessUniversalTerminalHandler {
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
         if (event.getGui() != null){
+            AELog.info(event.getGui().toString());
             if (event.getGui() instanceof AEBaseGui){
                 gui = event.getGui();
             } else {
