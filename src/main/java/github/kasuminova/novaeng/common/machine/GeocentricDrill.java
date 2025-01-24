@@ -37,7 +37,7 @@ public class GeocentricDrill implements MachineSpecial {
     public static final ResourceLocation RECIPE_REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "earth_drill_working");
 
     public static final int ENERGY_PER_TICK = 12_000_000;
-    public static final int ORE_COUNT = 6;
+    public static final int ORE_COUNT = 1;
 
     public static final int ACCELERATE_MULTIPLIER = 15;
 
@@ -132,39 +132,39 @@ public class GeocentricDrill implements MachineSpecial {
     private static void addOres(final Map<String, ItemStack> rawOres) {
         List<ItemStack> dustDraconium = OreDictionary.getOres("dustDraconium", false);
         if (!dustDraconium.isEmpty()) {
-            rawOres.put("dustDraconium", ItemUtils.copyStackWithSize(dustDraconium.get(0), 6));
+            rawOres.put("dustDraconium", ItemUtils.copyStackWithSize(dustDraconium.get(0), ORE_COUNT));
         }
         List<ItemStack> blockSkyStone = OreDictionary.getOres("blockSkyStone", false);
         if (!blockSkyStone.isEmpty()) {
-            rawOres.put("blockSkyStone", ItemUtils.copyStackWithSize(blockSkyStone.get(0), 4));
+            rawOres.put("blockSkyStone", ItemUtils.copyStackWithSize(blockSkyStone.get(0), 8));
         }
         List<ItemStack> crystalLitherite = OreDictionary.getOres("crystalLitherite", false);
         if (!crystalLitherite.isEmpty()) {
-            rawOres.put("crystalLitherite", ItemUtils.copyStackWithSize(crystalLitherite.get(0), 4));
+            rawOres.put("crystalLitherite", ItemUtils.copyStackWithSize(crystalLitherite.get(0), 8));
         }
         List<ItemStack> crystalErodium = OreDictionary.getOres("crystalErodium", false);
         if (!crystalErodium.isEmpty()) {
-            rawOres.put("crystalErodium", ItemUtils.copyStackWithSize(crystalErodium.get(0), 3));
+            rawOres.put("crystalErodium", ItemUtils.copyStackWithSize(crystalErodium.get(0), 6));
         }
         List<ItemStack> crystalLonsdaleite = OreDictionary.getOres("crystalLonsdaleite", false);
         if (!crystalLonsdaleite.isEmpty()) {
-            rawOres.put("crystalLonsdaleite", ItemUtils.copyStackWithSize(crystalLonsdaleite.get(0), 2));
+            rawOres.put("crystalLonsdaleite", ItemUtils.copyStackWithSize(crystalLonsdaleite.get(0), 4));
         }
         List<ItemStack> crystalKyronite = OreDictionary.getOres("crystalKyronite", false);
         if (!crystalKyronite.isEmpty()) {
-            rawOres.put("crystalKyronite", ItemUtils.copyStackWithSize(crystalKyronite.get(0), 2));
+            rawOres.put("crystalKyronite", ItemUtils.copyStackWithSize(crystalKyronite.get(0), 4));
         }
         List<ItemStack> crystalPladium = OreDictionary.getOres("crystalPladium", false);
         if (!crystalPladium.isEmpty()) {
-            rawOres.put("crystalPladium", ItemUtils.copyStackWithSize(crystalPladium.get(0), 2));
+            rawOres.put("crystalPladium", ItemUtils.copyStackWithSize(crystalPladium.get(0), 4));
         }
         List<ItemStack> crystalIonite = OreDictionary.getOres("crystalIonite", false);
         if (!crystalIonite.isEmpty()) {
-            rawOres.put("crystalIonite", ItemUtils.copyStackWithSize(crystalIonite.get(0), 2));
+            rawOres.put("crystalIonite", ItemUtils.copyStackWithSize(crystalIonite.get(0), 4));
         }
         List<ItemStack> crystalAethium = OreDictionary.getOres("crystalAethium", false);
         if (!crystalAethium.isEmpty()) {
-            rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.get(0), 1));
+            rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.get(0), 2));
         }
     }
 
