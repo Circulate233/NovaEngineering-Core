@@ -5,13 +5,13 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinNEEGuiHandler"
+    "MixinCraftingTransferHandler",
+    "MixinJEIPlugin",
+    "MixinNEEGuiHandler",
+    "MixinPacketCraftingRequest"
   ],
   "client": [
-    "MixinCraftingTransferHandler",
-    "MixinJEIPlugin"
   ],
   "server": [
-    "MixinPacketCraftingRequest"
   ]
 }

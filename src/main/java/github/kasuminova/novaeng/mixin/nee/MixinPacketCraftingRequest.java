@@ -40,7 +40,7 @@ public abstract class MixinPacketCraftingRequest implements IMessageHandler<Pack
 
     /**
      * @author Circulation_
-     * @reason 修改方法使得兼容ae2exttable
+     * @reason 修改方法使得兼容ae2exttable,修复一些崩溃问题
      */
     @Overwrite
     public IMessage onMessage(PacketCraftingRequest message, MessageContext ctx) {
