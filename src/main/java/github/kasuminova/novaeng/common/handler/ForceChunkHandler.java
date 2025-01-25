@@ -30,7 +30,7 @@ public class ForceChunkHandler {
                     if (worldServer.getTotalWorldTime() % 50 == 0) {
                         ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
                         Objects.requireNonNull(ticket);
-                        ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY));
+                        worldServer.addScheduledTask(() -> ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY)));
                     }
                 }
             }
