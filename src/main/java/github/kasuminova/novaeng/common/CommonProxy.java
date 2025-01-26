@@ -16,6 +16,7 @@ import github.kasuminova.novaeng.common.hypernet.old.recipe.HyperNetRecipeManage
 import github.kasuminova.novaeng.common.integration.IntegrationCRT;
 import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
+import github.kasuminova.novaeng.common.machine.Drills.*;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.machine.IllumPool;
 import github.kasuminova.novaeng.common.machine.MMAltar;
@@ -100,6 +101,13 @@ public class CommonProxy implements IGuiHandler {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
             AEApi.instance().registries().wireless().registerWirelessHandler(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL);
+        }
+        if (Loader.isModLoaded("immersiveengineering")){
+            RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.MINERAL_EXTRACTOR);
+            RegistryMachineSpecial.registrySpecialMachine(VoidMiner.VOID_MINER);
+            RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.DIFFERENT_WORLD);
+            RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.MANA_ORE_DRILL);
+            RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.ORICHALCOS_DRILL);
         }
         if (FMLCommonHandler.instance().getEffectiveSide().isClient() && Loader.isModLoaded("ic2")) {
             ExJEI.jeiCreate();
