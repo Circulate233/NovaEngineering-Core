@@ -3,9 +3,10 @@ package github.kasuminova.novaeng.mixin.ae2exttable;
 import appeng.api.parts.IPart;
 import appeng.container.AEBaseContainer;
 import appeng.container.implementations.ContainerCraftConfirm;
-import com._0xc4de.ae2exttable.network.ExtendedTerminalNetworkHandler;
-import com._0xc4de.ae2exttable.network.packets.PacketSwitchGui;
+import appeng.container.interfaces.IInventorySlotAware;
+import com._0xc4de.ae2exttable.client.gui.PartGuiHandler;
 import github.kasuminova.novaeng.common.item.ItemWirelessUniversalTerminal;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,13 +21,18 @@ public class MixinContainerCraftConfirm extends AEBaseContainer {
         super(ip, myTile, myPart);
     }
 
-    @Inject(method="startJob", at=@At(value="INVOKE", target="Lappeng/container/implementations/ContainerCraftConfirm;setAutoStart(Z)V", shift=At.Shift.AFTER), cancellable=true)
+    @Inject(method="startJob", at=@At(value="INVOKE", target="Lappeng/container/ContainerOpenContext;getTile()Lnet/minecraft/tileentity/TileEntity;", shift=At.Shift.AFTER), cancellable=true)
     public void startJobMixin(CallbackInfo ci) {
-        if (this.obj != null && this.obj.getItemStack().getItem() instanceof ItemWirelessUniversalTerminal t) {
-            switch (this.obj.getItemStack().getTagCompound().getInteger("mode")) {
-                case 6, 7, 8, 9: {
-                    ExtendedTerminalNetworkHandler.instance().sendToServer(new PacketSwitchGui(t.getGuiType(this.obj.getItemStack())));
-                    ci.cancel();
+        TileEntity te = this.getOpenContext().getTile();
+        if (te == null) {
+            if (this.obj != null && this.obj.getItemStack().getItem() instanceof ItemWirelessUniversalTerminal t) {
+                switch (this.obj.getItemStack().getTagCompound().getInteger("mode")) {
+                    case 6, 7, 8, 9: {
+                        IInventorySlotAware i = ((IInventorySlotAware) this.obj);
+                        EntityPlayer player = this.getInventoryPlayer().player;
+                        PartGuiHandler.openWirelessTerminalGui(this.obj.getItemStack(), i.getInventorySlot(), i.isBaubleSlot(), player.world, player, t.getGuiType(this.obj.getItemStack()));
+                        ci.cancel();
+                    }
                 }
             }
         }

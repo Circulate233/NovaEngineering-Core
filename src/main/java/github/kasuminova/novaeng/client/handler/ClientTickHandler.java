@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.client;
+package github.kasuminova.novaeng.client.handler;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.item.ItemWirelessUniversalTerminal;
@@ -16,7 +16,6 @@ import org.lwjgl.input.Mouse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @SideOnly(Side.CLIENT)
 public class ClientTickHandler {

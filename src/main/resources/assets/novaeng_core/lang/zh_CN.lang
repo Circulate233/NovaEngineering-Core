@@ -513,4 +513,10 @@ gui.geocentric_drill.ore_control.tooltip.chance=输出权重：§a%s%%§f
 gui.novaeng_core.replicator=可复制列表
 gui.novaeng_core.replicator.tooltips1=需要%sB UU物质复制
 
+item.wut.tooltip=§9手持时使用shift+滚轮切换模式
+item.wut.tooltip1=§9可以使用合成进去的终端原本的快捷键打开
+item.wut.tooltip2=§6按住shift查看更多介绍
+item.wut.shift_tooltip=持有终端：
+item.wut.shift_tooltip1=无
+
 itemGroup.novaeng_core=新星工程：核心

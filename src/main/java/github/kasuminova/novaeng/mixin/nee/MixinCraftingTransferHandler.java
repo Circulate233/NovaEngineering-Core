@@ -61,7 +61,6 @@ public abstract class MixinCraftingTransferHandler<C extends AEBaseContainer & I
                     cir.setReturnValue(new CraftingInfoError(this.initAnalyzer(analyzer, craftingTerm, recipeLayout, player), recipeLayout, true));
                 }
             }
-
             boolean preview = KeyBindings.isPreviewKeyDown();
             boolean nonPreview = KeyBindings.isNonPreviewKeyDown();
             if (!preview && !nonPreview) {

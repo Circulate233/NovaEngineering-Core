@@ -37,7 +37,7 @@ public class GeocentricDrill implements MachineSpecial {
     public static final ResourceLocation RECIPE_REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "earth_drill_working");
 
     public static final int ENERGY_PER_TICK = 12_000_000;
-    public static final int ORE_COUNT = 1;
+    public static final int ORE_COUNT = 12;
 
     public static final int ACCELERATE_MULTIPLIER = 15;
 

@@ -20,6 +20,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,6 +39,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -76,7 +78,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         this.addPropertyOverride(new ResourceLocation("mode"), new IItemPropertyGetter() {
             @SideOnly(Side.CLIENT)
             public float apply(@NotNull ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
-                if (stack.getTagCompound() != null) {
+                if (stack.hasTagCompound()) {
                     int mode = stack.getTagCompound().getInteger("mode");
                     if (stack.getTagCompound().hasKey("Nova")) {
                         return 114514;
@@ -93,7 +95,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     @SuppressWarnings("NullableProblems")
     public ActionResult<ItemStack> onItemRightClick(World w, EntityPlayer player, EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
-        if (item.getTagCompound() != null) {
+        if (item.hasTagCompound()) {
             List<Integer> list;
             if (item.getTagCompound().hasKey("modes")) {
                 list = Arrays.stream(item.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
@@ -148,7 +150,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     @Override
     public String getItemStackDisplayName(@Nonnull ItemStack stack) {
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            if (stack.getTagCompound() != null) {
+            if (stack.hasTagCompound()) {
                 return (I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim() + AllWireless(stack.getTagCompound().getInteger("mode"))).trim();
             } else {
                 return super.getItemStackDisplayName(stack);
@@ -192,7 +194,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public void nbtChange(EntityPlayer player, int mode, EnumHand hand) {
         if (mode != 0 && mode != 2) {
             ItemStack item = player.getHeldItem(hand);
-            if (item.getTagCompound() != null) {
+            if (item.hasTagCompound()) {
                 item.getTagCompound().setInteger("craft", 1);
                 if (item.getTagCompound().hasKey("cache")) {
                     NBTTagList cache = item.getTagCompound().getCompoundTag("cache").getTagList(String.valueOf(mode), 10);
@@ -212,7 +214,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public void nbtChange(EntityPlayer player, int mode) {
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack item = player.inventory.getStackInSlot(i);
-            if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+            if (item.hasTagCompound() && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 item.getTagCompound().setInteger("mode", mode);
                 item.getTagCompound().setInteger("craft", 1);
                 if (mode != 0 && mode != 2 && mode != 5) {
@@ -234,7 +236,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         if (Loader.isModLoaded("baubles")) {
             for (int i = 0; i < BaublesApi.getBaublesHandler(player).getSlots(); i++) {
                 ItemStack item = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
-                if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+                if (item.hasTagCompound() && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     item.getTagCompound().setInteger("mode", mode);
                     item.getTagCompound().setInteger("craft", 1);
                     if (mode != 0 && mode != 2 && mode != 5) {
@@ -260,7 +262,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public void nbtChangeB(EntityPlayer player) {
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack item = player.inventory.getStackInSlot(i);
-            if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+            if (item.hasTagCompound() && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                 int mode = item.getTagCompound().getInteger("mode");
                 item.getTagCompound().setInteger("craft", 0);
                 if (mode != 0 && mode != 2 && mode != 5) {
@@ -306,7 +308,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         if (Loader.isModLoaded("baubles")) {
             for (int i = 0; i < BaublesApi.getBaublesHandler(player).getSlots(); i++) {
                 ItemStack item = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
-                if (item.getTagCompound() != null && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+                if (item.hasTagCompound() && item.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
                     int mode = item.getTagCompound().getInteger("mode");
                     item.getTagCompound().setInteger("craft", 0);
                     if (mode != 0 && mode != 2 && mode != 5) {
@@ -362,7 +364,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
             case 3:
                 return getString("item.appliedenergistics2.wireless_pattern_terminal.name");
             case 4:
-                return getString("item.ae2fc:part_fluid_pattern_terminal.name");
+                return getString("item.ae2fc:wireless_fluid_pattern_terminal.name");
             case 5:
                 return getString("item.mekeng:wireless_gas_terminal.name");
             case 6:
@@ -382,9 +384,34 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         return "§6(" + I18n.format(value) + ")";
     }
 
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips) {
+        super.addCheckedInformation(stack, world, lines, advancedTooltips);
+        if (stack.hasTagCompound()) {
+           if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)){
+               lines.add(I18n.format("item.wut.shift_tooltip"));
+               int[] modes = stack.getTagCompound().getIntArray("modes");
+               if (modes.length != 0) {
+                   for (int number : modes) {
+                       if (number != 0) {
+                           lines.add("  - " + AllWireless(number));
+                       }
+                   }
+               } else {
+                   lines.add("   " + I18n.format("item.wut.shift_tooltip1"));
+               }
+           } else {
+               lines.add(I18n.format("item.wut.tooltip"));
+               lines.add(I18n.format("item.wut.tooltip1"));
+               lines.add(I18n.format("item.wut.tooltip2"));
+           }
+        }
+    }
+
     @Override
     public IGuiHandler getGuiHandler(ItemStack is) {
-        if (is.getTagCompound() != null) {
+        if (is.hasTagCompound()) {
             int mode = is.getTagCompound().getInteger("mode");
             switch (mode) {
                 case 0:
@@ -413,7 +440,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
 
     @Optional.Method(modid = "ae2exttable")
     public AE2ExtendedGUIs getGuiType(ItemStack item) {
-        if (item.getTagCompound() != null) {
+        if (item.hasTagCompound()) {
             int mode = item.getTagCompound().getInteger("mode");
             return getGui(mode);
         }

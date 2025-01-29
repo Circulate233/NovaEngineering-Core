@@ -8,7 +8,6 @@ import appeng.api.networking.security.ISecurityGrid;
 import appeng.container.AEBaseContainer;
 import appeng.container.implementations.ContainerMEMonitorable;
 import appeng.container.interfaces.IInventorySlotAware;
-import com._0xc4de.ae2exttable.client.container.ContainerMEMonitorableTwo;
 import com.github.vfyjxf.nee.container.ContainerCraftingAmount;
 import com.github.vfyjxf.nee.network.NEEGuiHandler;
 import com.github.vfyjxf.nee.network.packet.PacketCraftingRequest;
@@ -16,7 +15,6 @@ import com.github.vfyjxf.nee.utils.GuiUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -55,11 +53,6 @@ public abstract class MixinPacketCraftingRequest implements IMessageHandler<Pack
                     IGrid grid = gn.getGrid();
                     ISecurityGrid security = grid.getCache(ISecurityGrid.class);
                     if (security.hasPermission(player, SecurityPermissions.CRAFT)) {
-                        if (Loader.isModLoaded("ae2exttable")) {
-                            if (container instanceof ContainerMEMonitorableTwo) {
-                                this.handlerCraftingTermRequest(baseContainer, message, grid, ah, player);
-                            }
-                        }
                         if (container instanceof ContainerMEMonitorable) {
                             this.handlerCraftingTermRequest(baseContainer, message, grid, ah, player);
                         }
@@ -71,7 +64,6 @@ public abstract class MixinPacketCraftingRequest implements IMessageHandler<Pack
                         }
                     }
                 }
-
             });
         }
         return null;
