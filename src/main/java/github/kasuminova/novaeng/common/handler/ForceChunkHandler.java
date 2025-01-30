@@ -38,7 +38,7 @@ public class ForceChunkHandler {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
+        if (event.phase == TickEvent.Phase.START) {
             if (time % 50 == 0) {
                 request(Universe.get().server);
             }
