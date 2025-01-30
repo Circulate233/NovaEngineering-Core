@@ -209,7 +209,7 @@ dependencies {
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("hellfirepvp:modularmachinery:2.1.0:main"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
-    implementation(rfg.deobf("_0xc4de:ae2exttable-v1.0.2-dev"))
+    implementation(rfg.deobf("_0xc4de:ae2exttable-dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
     implementation(rfg.deobf("kasuminova:lumenized:1.0.3:dev"))

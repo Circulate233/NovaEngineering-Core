@@ -20,6 +20,7 @@ public class ForceChunkHandler {
     Random random = new Random();
     final int randomX = random.nextInt(100000) + 150000;
     final int randomY = random.nextInt(100000) + 150000;
+    int time = 0;
 
     private void request(MinecraftServer server) {
         for (DimensionType i : DimensionManager.getRegisteredDimensions().keySet()) {
@@ -27,11 +28,9 @@ public class ForceChunkHandler {
             if (id != 2) {
                 if (DimensionManager.isDimensionRegistered(id)) {
                     WorldServer worldServer = server.getWorld(id);
-                    if (worldServer.getTotalWorldTime() % 50 == 0) {
-                        ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
+                    ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
                         Objects.requireNonNull(ticket);
                         worldServer.addScheduledTask(() -> ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY)));
-                    }
                 }
             }
         }
@@ -39,9 +38,11 @@ public class ForceChunkHandler {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        MinecraftServer server = Universe.get().server;
-        if (event.phase == TickEvent.Phase.START) {
-            request(server);
+        if (event.phase == TickEvent.Phase.END) {
+            if (time % 50 == 0) {
+                request(Universe.get().server);
+            }
+            ++time;
         }
     }
 
