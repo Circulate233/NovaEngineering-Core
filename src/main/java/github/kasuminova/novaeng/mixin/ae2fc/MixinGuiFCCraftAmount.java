@@ -28,19 +28,21 @@ public class MixinGuiFCCraftAmount extends GuiCraftAmount {
         super(inventoryPlayer, te);
     }
 
-    @Inject(method="initGui", at = @At(value="INVOKE", target="Lappeng/helpers/WirelessTerminalGuiObject;getItemStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER), cancellable=true, remap=true)
-    protected void onInitGui(CallbackInfo ci) {
+    @Inject(method="initGui", at = @At(value= "TAIL"), cancellable=true,remap = true)
+    public void onInitGui(CallbackInfo ci) {
         Object te = ((AEBaseContainer)this.inventorySlots).getTarget();
         ItemStack icon = ItemStack.EMPTY;
-        ItemStack tool = ((WirelessTerminalGuiObject) te).getItemStack();
-        if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
-            icon = tool;
-            this.originGui = GuiType.WIRELESS_FLUID_PATTERN_TERMINAL;
-        }
-        if (!icon.isEmpty() && this.originGui != null) {
-            this.buttonList.remove(this.originalGuiBtn);
-            this.buttonList.add(this.originalGuiBtn = new GuiTabButton(this.guiLeft + 154, this.guiTop, icon, icon.getDisplayName(), this.itemRender));
-            ci.cancel();
+        if (te instanceof WirelessTerminalGuiObject) {
+            ItemStack tool = ((WirelessTerminalGuiObject) te).getItemStack();
+            if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+                icon = tool;
+                this.originGui = GuiType.WIRELESS_FLUID_PATTERN_TERMINAL;
+            }
+            if (!icon.isEmpty() && this.originGui != null) {
+                this.buttonList.remove(this.originalGuiBtn);
+                this.buttonList.add(this.originalGuiBtn = new GuiTabButton(this.guiLeft + 154, this.guiTop, icon, icon.getDisplayName(), this.itemRender));
+                ci.cancel();
+            }
         }
     }
 

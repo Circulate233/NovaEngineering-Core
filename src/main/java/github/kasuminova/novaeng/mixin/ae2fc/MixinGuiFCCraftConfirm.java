@@ -24,12 +24,14 @@ public class MixinGuiFCCraftConfirm extends GuiCraftConfirm {
         super(inventoryPlayer, te);
     }
 
-    @Inject(method="initGui", at = @At(value="INVOKE", target="Lappeng/helpers/WirelessTerminalGuiObject;getItemStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER), remap=true)
-    protected void onInitGui(CallbackInfo ci) {
+    @Inject(method="initGui", at = @At(value="TAIL"),remap = true)
+    public void onInitGui(CallbackInfo ci) {
         Object te = ((AEBaseContainer)this.inventorySlots).getTarget();
-        ItemStack tool = ((WirelessTerminalGuiObject) te).getItemStack();
-        if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
-            this.originGui = GuiType.WIRELESS_FLUID_PATTERN_TERMINAL;
+        if (te instanceof WirelessTerminalGuiObject) {
+            ItemStack tool = ((WirelessTerminalGuiObject) te).getItemStack();
+            if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+                this.originGui = GuiType.WIRELESS_FLUID_PATTERN_TERMINAL;
+            }
         }
     }
 }

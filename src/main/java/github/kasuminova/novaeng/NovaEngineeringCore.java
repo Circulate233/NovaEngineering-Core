@@ -4,7 +4,6 @@ import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
-import github.kasuminova.novaeng.common.handler.UpdateItemModeMessageHandler;
 import github.kasuminova.novaeng.common.handler.WirelessTerminalRefresh;
 import github.kasuminova.novaeng.common.network.*;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
@@ -102,7 +101,7 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktEFabricatorPatternSearchGUIAction.class, PktEFabricatorPatternSearchGUIAction.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
-        NET_CHANNEL.registerMessage(UpdateItemModeMessageHandler.class,UpdateItemModeMessage.class, start++, Side.SERVER);
+        NET_CHANNEL.registerMessage(UpdateItemModeMessage.Handler.class,UpdateItemModeMessage.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(WirelessTerminalRefresh.Handler.class, WirelessTerminalRefresh.class, start++, Side.SERVER);
 
         proxy.preInit();

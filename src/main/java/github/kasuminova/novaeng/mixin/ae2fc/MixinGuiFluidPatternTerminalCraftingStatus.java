@@ -33,11 +33,15 @@ public class MixinGuiFluidPatternTerminalCraftingStatus extends GuiCraftingStatu
         super(inventoryPlayer, te);
     }
 
-    @Inject(method="actionPerformed", at = @At(value="INVOKE", target="Lappeng/helpers/WirelessTerminalGuiObject;getItemStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER), remap=true)
-    protected void onActionPerformed(GuiButton btn, CallbackInfo ci) {
-        ItemStack tool = ((WirelessTerminalGuiObject) part).getItemStack();
-        if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
-            InventoryHandler.switchGui(GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+    @Inject(method="actionPerformed", at = @At(value= "HEAD"),remap = true)
+    public void onActionPerformed(GuiButton btn, CallbackInfo ci) {
+        if (btn == this.originalGuiBtn) {
+            if (this.part instanceof WirelessTerminalGuiObject t) {
+                ItemStack tool = t.getItemStack();
+                if (tool.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL) {
+                    InventoryHandler.switchGui(GuiType.WIRELESS_FLUID_PATTERN_TERMINAL);
+                }
+            }
         }
     }
 }

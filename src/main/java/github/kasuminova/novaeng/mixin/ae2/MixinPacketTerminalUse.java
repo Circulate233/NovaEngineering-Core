@@ -9,12 +9,12 @@ import github.kasuminova.novaeng.common.registry.RegistryItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Optional;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,63 +28,41 @@ public class MixinPacketTerminalUse extends AppEngPacket {
     @Shadow
     void openGui(ItemStack itemStack, int slotIdx, EntityPlayer player, boolean isBauble){}
 
-    /**
-     * @author Circulation_
-     * @reason 使无线通用终端可以使用ae2快捷键
-     */
-    @Overwrite
-    public void serverPacketData(INetworkInfo manager, AppEngPacket packet, EntityPlayer player) {
+    @Inject(method="serverPacketData", at = @At(value= "HEAD"), cancellable = true)
+    public void serverPacketDataMixin(INetworkInfo manager, AppEngPacket packet, EntityPlayer player, CallbackInfo ci) {
         NonNullList<ItemStack> mainInventory = player.inventory.mainInventory;
-
         for(int i = 0; i < mainInventory.size(); ++i) {
             ItemStack is = mainInventory.get(i);
-
-            if (is.getTagCompound() != null) {
+            if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && is.getTagCompound() != null) {
                 int mode = novaEngineering_Core$determineMode(terminal.name());
-
                 List<Integer> list = null;
                 if (is.getTagCompound().hasKey("modes")) {
                     list = Arrays.stream(is.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                 }
-
-                if (terminal.getItemDefinition().isSameAs(is)) {
-                    openGui(is, i, player, false);
-                    return;
-                } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(mode)) {
+                if (list != null && list.contains(mode)) {
                     RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, mode);
                     openGui(is, i, player, false);
+                    ci.cancel();
                     return;
                 }
             }
         }
-
-        if (Loader.isModLoaded("baubles")) {
-            tryOpenBauble(player);
-        }
-
     }
 
-    /**
-     * @author Circulation_
-     * @reason 同上,使得额外支持饰品栏
-     */
-    @Overwrite
-    @Optional.Method(modid = "baubles")
-    void tryOpenBauble(EntityPlayer player) {
+    @Inject(method="tryOpenBauble", at = @At(value= "HEAD"), cancellable = true)
+    void tryOpenBaubleMixin(EntityPlayer player, CallbackInfo ci) {
         for(int i = 0; i < BaublesApi.getBaublesHandler(player).getSlots(); ++i) {
             ItemStack is = BaublesApi.getBaublesHandler(player).getStackInSlot(i);
-            if (is.getTagCompound() != null) {
+            if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && is.getTagCompound() != null) {
                 int mode = novaEngineering_Core$determineMode(terminal.name());
                 List<Integer> list = null;
                 if (is.getTagCompound().hasKey("modes")) {
                     list = Arrays.stream(is.getTagCompound().getIntArray("modes")).boxed().collect(Collectors.toList());
                 }
-                if (terminal.getItemDefinition().isSameAs(is)) {
-                    openGui(is, i, player, true);
-                    break;
-                } else if (is.getItem() == RegistryItems.WIRELESS_UNIVERSAL_TERMINAL && list != null && list.contains(mode)) {
+                if (list != null && list.contains(mode)) {
                     RegistryItems.WIRELESS_UNIVERSAL_TERMINAL.nbtChange(player, mode);
                     openGui(is, i, player, true);
+                    ci.cancel();
                     return;
                 }
             }

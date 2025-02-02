@@ -151,7 +151,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
     public String getItemStackDisplayName(@Nonnull ItemStack stack) {
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             if (stack.hasTagCompound()) {
-                return (I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim() + AllWireless(stack.getTagCompound().getInteger("mode"))).trim();
+                return (I18n.format(this.getUnlocalizedNameInefficiently(stack) + ".name").trim() + getWirelessName(stack.getTagCompound().getInteger("mode"))).trim();
             } else {
                 return super.getItemStackDisplayName(stack);
             }
@@ -355,7 +355,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         }
     }
 
-    public static String AllWireless(int value) {
+    public static String getWirelessName(int value) {
         switch (value) {
             case 1:
                 return getString("item.appliedenergistics2.wireless_crafting_terminal.name");
@@ -380,6 +380,9 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
         }
     }
 
+    @Override
+    public boolean willAutoSync(ItemStack stack, EntityLivingBase player) {return true;}
+
     public static String getString(String value) {
         return "§6(" + I18n.format(value) + ")";
     }
@@ -395,7 +398,7 @@ public class ItemWirelessUniversalTerminal extends ToolWirelessTerminal {
                if (modes.length != 0) {
                    for (int number : modes) {
                        if (number != 0) {
-                           lines.add("  - " + AllWireless(number));
+                           lines.add("  - " + getWirelessName(number));
                        }
                    }
                } else {
