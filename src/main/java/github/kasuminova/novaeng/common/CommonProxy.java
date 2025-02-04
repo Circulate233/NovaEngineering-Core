@@ -6,6 +6,8 @@ import appeng.api.storage.ICellHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.util.ExJEI;
+import github.kasuminova.novaeng.common.Enchantment.MagicBreaking;
+import github.kasuminova.novaeng.common.Trait.Register;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
 import github.kasuminova.novaeng.common.container.*;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
@@ -48,6 +50,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -77,6 +80,9 @@ public class CommonProxy implements IGuiHandler {
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
         }
+
+        ForgeRegistries.ENCHANTMENTS.register(MagicBreaking.MAGICBREAKING);
+        Register.TRAITREGISTER.registerModifiers();
     }
 
     public void init() {

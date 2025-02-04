@@ -519,4 +519,9 @@ item.wut.tooltip2=§6按住shift查看更多介绍
 item.wut.shift_tooltip=持有终端：
 item.wut.shift_tooltip1=无
 
+enchantment.magic_breaking=破魔
+enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
+modifier.magic_breaking.name=破魔
+modifier.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
+
 itemGroup.novaeng_core=新星工程：核心

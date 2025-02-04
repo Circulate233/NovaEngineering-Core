@@ -213,6 +213,8 @@ dependencies {
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
     implementation(rfg.deobf("kasuminova:lumenized:1.0.3:dev"))
+    implementation(rfg.deobf("curse.maven:mantle-74924:2713386"))
+    implementation(rfg.deobf("curse.maven:tinkers-construct-74072:2902483"))
     implementation(rfg.deobf("curse.maven:not-enough-energistics-515565:5234732"))
     implementation(rfg.deobf("curse.maven:RandomTweaker-514170:5528753"))
     implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
