@@ -25,8 +25,8 @@ public class EnchantmentHandler {
         if (event.getSource().getTrueSource() instanceof EntityPlayer player) {
             EntityLivingBase entity = event.getEntityLiving();
             ItemStack currentItem = player.getHeldItemMainhand();
-            if (!currentItem.isEmpty() && EnchantmentHelper.getEnchantments(currentItem).containsKey(MagicBreaking.MAGICBREAKING)) {
-                if (entity.getHealth() > 10) {
+            if (entity.getHealth() > 10) {
+                if (!currentItem.isEmpty() && EnchantmentHelper.getEnchantments(currentItem).containsKey(MagicBreaking.MAGICBREAKING)) {
                     Multimap<String, AttributeModifier> mapAttackModifier = currentItem.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
                     float attackDamage = 1.0F;
                     if (mapAttackModifier != null && !mapAttackModifier.isEmpty()) {
