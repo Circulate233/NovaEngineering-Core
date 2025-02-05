@@ -1,10 +1,11 @@
-package github.kasuminova.novaeng.common.Enchantment;
+package github.kasuminova.novaeng.common.enchantment;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class MagicBreaking extends Enchantment {
 
@@ -20,6 +21,10 @@ public class MagicBreaking extends Enchantment {
     public boolean isTreasureEnchantment()
     {
         return true;
+    }
+
+    public @NotNull String getId() {
+        return this.name;
     }
 
 }

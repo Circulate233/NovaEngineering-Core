@@ -1,16 +1,17 @@
 package github.kasuminova.novaeng.client;
 
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
+import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.*;
 import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
 import github.kasuminova.novaeng.client.handler.ClientEventHandler;
 import github.kasuminova.novaeng.client.handler.ClientTickHandler;
 import github.kasuminova.novaeng.client.handler.HyperNetClientEventHandler;
+import github.kasuminova.novaeng.client.util.ExJEI;
 import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
-import github.kasuminova.novaeng.common.handler.WirelessUniversalTerminalHandler;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
@@ -31,9 +32,11 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import slimeknights.tconstruct.library.book.TinkerBook;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +62,6 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientTickHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(WirelessUniversalTerminalHandler.INSTANCE);
 
         if (Mods.GECKOLIB.isPresent()) {
             ClientRegistry.bindTileEntitySpecialRenderer(SingularityCore.class, MachineControllerRenderer.INSTANCE);
@@ -73,6 +75,10 @@ public class ClientProxy extends CommonProxy {
         super.init();
 
         TitleUtils.setRandomTitle("*Init*");
+
+        if (Loader.isModLoaded("ic2")) {
+            ExJEI.jeiCreate();
+        }
     }
 
     @Override
@@ -83,6 +89,12 @@ public class ClientProxy extends CommonProxy {
         ClientCommandHandler.instance.registerCommand(CommandPacketProfiler.INSTANCE);
 
         TitleUtils.setRandomTitle("*PostInit*");
+
+        if (Loader.isModLoaded("ic2")) {
+            ExJEI.jeiRecipeRegister();
+        }
+
+        TinkerBook.INSTANCE.addTransformer(BookTransformerAppendModifiers.INSTANCE_FALSE);
     }
 
     @Override
