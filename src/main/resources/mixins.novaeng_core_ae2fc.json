@@ -6,10 +6,12 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinContainerCraftConfirm",
+    "MixinCPacketLoadPattern",
     "MixinCPacketUseKeybindHandler",
     "MixinGuiFCCraftAmount",
     "MixinGuiFCCraftConfirm",
-    "MixinGuiFluidPatternTerminalCraftingStatus"
+    "MixinGuiFluidPatternTerminalCraftingStatus",
+    "MixinItemOrPartGuiFactory"
   ],
   "client": [
   ],
