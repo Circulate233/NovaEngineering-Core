@@ -13,7 +13,6 @@ import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
-import mezz.jei.api.JEIPlugin;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@JEIPlugin
 @SideOnly(Side.CLIENT)
 public class ExJEI implements IModPlugin {
 
@@ -47,28 +45,6 @@ public class ExJEI implements IModPlugin {
     @Override
     public void register(@Nonnull IModRegistry registration){
         ExJEI.registration = registration;
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","combination_crafter"),
-            "extendedcrafting:combination_crafting");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","marked_pedestal"),
-            "extendedcrafting:combination_crafting");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","advanced_crafter"),
-            "extendedcrafting:table_crafting_5x5");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","elite_crafter"),
-            "extendedcrafting:table_crafting_7x7");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedexcrafting","ultimate_crafter"),
-            "extendedcrafting:table_crafting_9x9");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedavaritia","extreme_crafter"),
-            "Avatitia.Extreme");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedastral","trait_crafter"),
-            "astralsorcery.altar.trait");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedastral","constellation_crafter"),
-            "astralsorcery.altar.constellation");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedastral","attunement_crafter"),
-            "astralsorcery.altar.attunement");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packagedastral","discovery_crafter"),
-            "astralsorcery.altar.discovery");
-        registration.addRecipeCatalyst(getOtherModsItemStack("packageddraconic","fusion_crafter"),
-            "DraconicEvolution.Fusion");
     }
 
     public static void jeiCreate() {

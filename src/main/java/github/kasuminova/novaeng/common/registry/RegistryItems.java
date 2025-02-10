@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.common.registry;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.renderer.EStorageEnergyCellItemRenderer;
 import github.kasuminova.novaeng.common.item.ItemBasic;
-import github.kasuminova.novaeng.common.item.ItemWirelessUniversalTerminal;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellFluid;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellItem;
@@ -18,7 +17,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -35,8 +33,6 @@ public class RegistryItems {
     public static final List<Item> ITEM_MODELS_TO_REGISTER = new LinkedList<>();
     public static final Map<String, Item> ITEM_CUSTOM_MODELS_TO_REGISTER = new LinkedHashMap<>();
 
-    @GameRegistry.ObjectHolder(NovaEngineeringCore.MOD_ID + ":" + "wireless_universal_terminal")
-    public static ItemWirelessUniversalTerminal WIRELESS_UNIVERSAL_TERMINAL;
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
@@ -53,7 +49,6 @@ public class RegistryItems {
         ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L9);
 
-        ITEMS_TO_REGISTER.add(new ItemWirelessUniversalTerminal());
         ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
 
         registerItems();

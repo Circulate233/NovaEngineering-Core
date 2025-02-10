@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common;
 
 import appeng.api.AEApi;
-import appeng.api.config.Upgrades;
 import appeng.api.storage.ICellHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
@@ -38,7 +37,6 @@ import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -75,7 +73,6 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ForceChunkHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(WirelessUniversalTerminalHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
@@ -105,7 +102,6 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
-            AEApi.instance().registries().wireless().registerWirelessHandler(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL);
         }
         if (Loader.isModLoaded("immersiveengineering")){
             RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.MINERAL_EXTRACTOR);
@@ -120,8 +116,6 @@ public class CommonProxy implements IGuiHandler {
     public void postInit() {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
-
-        Upgrades.MAGNET.registerItem(new ItemStack(RegistryItems.WIRELESS_UNIVERSAL_TERMINAL), 1);
     }
 
     public void loadComplete() {
