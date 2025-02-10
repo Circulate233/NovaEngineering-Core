@@ -326,6 +326,9 @@ idea {
                     self.add(Gradle("4. Run Obfuscated Server").apply {
                         setProperty("taskNames", listOf("runObfServer"))
                     })
+                    self.add(Gradle("5. Build Jars").apply {
+                        setProperty("taskNames", listOf("build"))
+                    })
                     /*
                     These require extra configuration in IntelliJ, so are not enabled by default
                     self.add(Application("Run Client (IJ Native, Deprecated)", project).apply {

@@ -3,7 +3,9 @@ package github.kasuminova.novaeng.client;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.*;
-import github.kasuminova.novaeng.client.handler.*;
+import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
+import github.kasuminova.novaeng.client.handler.ClientEventHandler;
+import github.kasuminova.novaeng.client.handler.HyperNetClientEventHandler;
 import github.kasuminova.novaeng.client.util.ExJEI;
 import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
@@ -58,8 +60,6 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(HyperNetClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(ClientTickHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(WirelessUniversalTerminalHandler.INSTANCE);
 
         if (Mods.GECKOLIB.isPresent()) {
             ClientRegistry.bindTileEntitySpecialRenderer(SingularityCore.class, MachineControllerRenderer.INSTANCE);

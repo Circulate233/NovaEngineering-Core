@@ -19,7 +19,6 @@ item.novaeng_core.ecalculator_cell_64m.name=§9ECO - §bCE4 §b闪存晶阵
 item.novaeng_core.ecalculator_cell_1024m.name=§9ECO - §6CE6 §b闪存晶阵
 item.novaeng_core.ecalculator_cell_16384m.name=§9ECO - §5CE9 §b闪存晶阵
 
-item.novaeng_core.wireless_universal_terminal.name=§9[NEW]无线通用终端
 item.novaeng_core.magic_breaking_stone.name=破魔之石
 
 novaeng.ecalculator_cell.insert.tip=蹲下时手持矩阵并右击驱动器以插入晶阵。
@@ -513,12 +512,6 @@ gui.geocentric_drill.ore_control.tooltip.chance=输出权重：§a%s%%§f
 
 gui.novaeng_core.replicator=可复制列表
 gui.novaeng_core.replicator.tooltips1=需要%sB UU物质复制
-
-item.wut.tooltip=§9手持时使用shift+滚轮切换模式
-item.wut.tooltip1=§9可以使用合成进去的终端原本的快捷键打开
-item.wut.tooltip2=§6按住shift查看更多介绍
-item.wut.shift_tooltip=持有终端：
-item.wut.shift_tooltip1=无
 
 enchantment.magic_breaking=破魔
 enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
