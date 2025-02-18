@@ -273,6 +273,7 @@ dependencies {
     // Optimization
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
+    implementation(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
 }
 
 // Publishing to a Maven repository
