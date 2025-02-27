@@ -21,6 +21,10 @@ item.novaeng_core.ecalculator_cell_16384m.name=§9ECO - §5CE9 §b闪存晶阵
 
 item.novaeng_core.magic_breaking_stone.name=破魔之石
 
+item.novaeng_core.horologium_compass.name=星晷罗盘
+item.novaeng_core.horologium_compass.tooltip.0=§9追寻时间之痕迹
+tile.horologium_compass.success=§6罗盘指示你:§9时间的屏障将在%s天后变得薄弱.
+
 novaeng.ecalculator_cell.insert.tip=蹲下时手持矩阵并右击驱动器以插入晶阵。
 novaeng.ecalculator_cell.extract.tip=蹲下时空手并右击驱动器以取出晶阵。
 novaeng.ecalculator_cell.tip.0=§b闪存晶阵§7为§9计算子系统§7提供§a内存存储§7。

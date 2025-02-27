@@ -3,8 +3,14 @@ package github.kasuminova.novaeng.common.item;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
@@ -35,5 +41,15 @@ public class ItemBasic extends Item {
 
     public static ItemBasic getItem(String name) {
         return map.get(name);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SuppressWarnings("DataFlowIssue")
+    protected void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips){
+        int i = 0;
+        while (I18n.hasKey(this.getTranslationKey() + ".tooltip." + i)){
+            lines.add(I18n.format(this.getTranslationKey() + ".tooltip." + i));
+            i++;
+        }
     }
 }
