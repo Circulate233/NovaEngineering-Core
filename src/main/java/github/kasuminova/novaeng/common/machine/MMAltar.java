@@ -1,8 +1,10 @@
 package github.kasuminova.novaeng.common.machine;
 
+import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.modifier.MultiBlockModifierReplacement;
+import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
 import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor;
 import ink.ikx.mmce.common.utils.StackUtils;
@@ -49,6 +51,10 @@ public class MMAltar implements MachineSpecial {
 
     @Override
     public void init(final DynamicMachine machine) {
+        machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
+            TileMultiblockMachineController controller = event.getController();
+            controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC);
+        });
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement("xzjtsj1",
                 buildModifierReplacementBlockArray(BLOCKSJ1, posSet1),
                 Collections.emptyList(),
