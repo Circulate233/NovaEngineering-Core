@@ -45,7 +45,7 @@ public class MMAltar implements MachineSpecial {
     protected MMAltar() {
     }
 
-    public static Block getOtherModsBlock(String modId, String blockName) {
+    protected static Block getOtherModsBlock(String modId, String blockName) {
         return GameRegistry.findRegistry(Block.class).getValue(new ResourceLocation(modId, blockName));
     }
 

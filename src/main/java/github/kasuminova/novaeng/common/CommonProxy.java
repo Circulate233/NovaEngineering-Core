@@ -73,6 +73,7 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ForceChunkHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(RawOreHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
@@ -116,6 +117,7 @@ public class CommonProxy implements IGuiHandler {
     public void postInit() {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
+        RawOreHandler.registry();
     }
 
     public void loadComplete() {
