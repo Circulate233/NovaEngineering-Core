@@ -40,11 +40,18 @@ public class RawOreHandler {
 
                     if (!OreDictionary.getOres("ore" + rawOreName).isEmpty()) {
                         ItemStack[] ores = OreDictionary.getOres("ore" + rawOreName).toArray(new ItemStack[0]);
+                        final ItemStack ODore = OreDictHelper.getPriorityItemFromOreDict("ore" + rawOreName);
                         for (ItemStack ore : ores){
-                            map.put(OreKey.getKey(ore.getItem().getRegistryName(),ore.getItemDamage()),rawOre);
-                            mapO.put(OreKey.getKey(ore.getItem().getRegistryName(),ore.getItemDamage()),OreDictHelper.getPriorityItemFromOreDict("ore" + rawOreName));
+                            ResourceLocation rg = ore.getItem().getRegistryName();
+                            map.put(OreKey.getKey(rg,ore.getItemDamage()),rawOre);
+                            mapO.put(OreKey.getKey(rg,ore.getItemDamage()),ODore);
+                            if (rg.getPath().equals( "redstone_ore")){
+                                rg = new ResourceLocation("minecraft","lit_redstone_ore");
+                                map.put(OreKey.getKey(rg,ore.getItemDamage()),rawOre);
+                                mapO.put(OreKey.getKey(rg,ore.getItemDamage()),ODore);
+                            }
 
-                            NovaEngineeringCore.log.info("registered : " + (ore.getItem().getRegistryName() + ":" + ore.getItemDamage()) + "[" + rawOreName + "]");
+                            NovaEngineeringCore.log.info("registered : " + (rg + ":" + ore.getItemDamage()) + "[" + rawOreName + "]");
                         }
                     }
                 }
