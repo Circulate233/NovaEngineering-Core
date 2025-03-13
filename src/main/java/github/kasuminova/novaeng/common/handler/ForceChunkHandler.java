@@ -11,7 +11,6 @@ import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.Objects;
 import java.util.Random;
 
 public class ForceChunkHandler {
@@ -28,9 +27,16 @@ public class ForceChunkHandler {
             if (id != 2) {
                 if (DimensionManager.isDimensionRegistered(id)) {
                     WorldServer worldServer = server.getWorld(id);
-                    ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
-                        Objects.requireNonNull(ticket);
-                        worldServer.addScheduledTask(() -> ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY)));
+                    if (worldServer != null) {
+                        ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
+                        if (ticket != null) {
+                            worldServer.addScheduledTask(() -> {
+                                if (worldServer != null && ticket != null) {
+                                    ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY));
+                                }
+                            });
+                        }
+                    }
                 }
             }
         }

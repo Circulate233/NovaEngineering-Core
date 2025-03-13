@@ -207,6 +207,7 @@ dependencies {
 
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
+    implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
     implementation(rfg.deobf("hellfirepvp:modularmachinery:2.1.0:main"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("_0xc4de:ae2exttable-dev"))

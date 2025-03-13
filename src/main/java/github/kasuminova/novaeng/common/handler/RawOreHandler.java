@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -62,7 +63,7 @@ public class RawOreHandler {
         oreMap = Collections.unmodifiableMap(mapO);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {
         if (!event.getWorld().isRemote) {
             IBlockState blockState = event.getState();
