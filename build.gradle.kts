@@ -217,6 +217,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:mantle-74924:2713386"))
     implementation(rfg.deobf("curse.maven:tinkers-construct-74072:2902483"))
     implementation(rfg.deobf("curse.maven:not-enough-energistics-515565:5234732"))
+    implementation(rfg.deobf("curse.maven:psi-241665:3085917"))
     implementation(rfg.deobf("curse.maven:RandomTweaker-514170:5528753"))
     implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
     implementation(rfg.deobf("curse.maven:ctm-267602:2915363"))
