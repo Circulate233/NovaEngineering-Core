@@ -37,14 +37,14 @@ public class GeocentricDrill implements MachineSpecial {
     public static final ResourceLocation RECIPE_REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "earth_drill_working");
 
     public static final int ENERGY_PER_TICK = 12_000_000;
-    public static final int ORE_COUNT = 12;
+    public static final int ORE_COUNT = 15;
 
     public static final int ACCELERATE_MULTIPLIER = 15;
 
     public static final int MIN_DEPTH = 1000;
     public static final int MAX_DEPTH = 20000;
 
-    public static final int PARALLELISM_PER_DEPTH = 25;
+    public static final int PARALLELISM_PER_DEPTH = 20;
     public static final int COMPUTATION_POINT_PER_PARALLELISM = 4;
 
     public static final int MAX_PARALLELISM = MAX_DEPTH / PARALLELISM_PER_DEPTH;

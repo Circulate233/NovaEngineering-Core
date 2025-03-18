@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.mixin.psi;
 
+import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import net.minecraft.util.text.TextComponentString;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,6 +51,10 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
     public Object executeRed(PieceTrickExplode instance, SpellContext spellContext, SpellParam spellParam) {
         Double powerVal = this.getParamValue(novaEngineering_Core$context, this.power);
         if (novaEngineering_Core$context != null && powerVal != null && powerVal > novaEngineering_Core$MAXPOWER){
+            NovaEngineeringCore.log.info(spellContext.caster.getName() + "试图释放超过5的爆炸效果，已经修正");
+            if (NovaEngCoreConfig.CLIENT.piece){
+                spellContext.caster.world.playerEntities.forEach(player -> player.sendMessage(new TextComponentString(spellContext.caster.getName() + "[" + spellContext.caster.getUniqueID() + "]试图释放超过5的爆炸效果，已经修正")));
+            }
             return novaEngineering_Core$MAXPOWER;
         }
         return powerVal;

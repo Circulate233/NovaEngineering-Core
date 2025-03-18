@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.common.hypernet.computer;
 
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
 import github.kasuminova.novaeng.common.hypernet.calculation.*;
+import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierKeys;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvCPUConst;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvCalculateCardConst;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvExtensionConst;
@@ -9,7 +10,6 @@ import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvPo
 import github.kasuminova.novaeng.common.hypernet.computer.exception.EnergyDeficitException;
 import github.kasuminova.novaeng.common.hypernet.computer.exception.EnergyOverloadException;
 import github.kasuminova.novaeng.common.hypernet.computer.exception.ModularServerException;
-import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierKeys;
 import github.kasuminova.novaeng.common.hypernet.computer.module.ModuleCapacitor;
 import github.kasuminova.novaeng.common.hypernet.computer.module.ModulePSU;
 import github.kasuminova.novaeng.common.hypernet.computer.module.ServerModule;

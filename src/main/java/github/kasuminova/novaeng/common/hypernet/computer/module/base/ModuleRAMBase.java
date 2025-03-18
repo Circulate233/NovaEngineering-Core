@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module.base;
 
 import crafttweaker.annotations.ZenRegister;
-import github.kasuminova.novaeng.common.hypernet.computer.module.ModuleRAM;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
+import github.kasuminova.novaeng.common.hypernet.computer.module.ModuleRAM;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;

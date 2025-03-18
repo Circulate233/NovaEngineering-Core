@@ -12,7 +12,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.21.3"
+version = "1.21.4"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -208,7 +208,7 @@ dependencies {
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
-    implementation(rfg.deobf("hellfirepvp:modularmachinery:2.1.0:main"))
+    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5952626"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("_0xc4de:ae2exttable-dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
@@ -247,11 +247,12 @@ dependencies {
     implementation(rfg.deobf("curse.maven:scalingguis-319656:2716334"))
     implementation(rfg.deobf("curse.maven:lolasm-460609:5257348"))
     compileOnly(rfg.deobf("curse.maven:matter-overdrive-community-edition-557428:4592069"))
-    compileOnly(rfg.deobf("curse.maven:cofh-core-69162:2920433"))
-    compileOnly(rfg.deobf("curse.maven:cofh-world-271384:2920434"))
-    compileOnly(rfg.deobf("curse.maven:thermal-foundation-222880:2926428"))
+    implementation(rfg.deobf("curse.maven:cofh-core-69162:2920433"))
+    implementation(rfg.deobf("curse.maven:cofh-world-271384:2920434"))
+    implementation(rfg.deobf("curse.maven:thermal-foundation-222880:2926428"))
     compileOnly(rfg.deobf("curse.maven:thermal-innovation-291737:2920441"))
-    compileOnly(rfg.deobf("curse.maven:thermal-expansion-69163:2926431"))
+    compileOnly(rfg.deobf("curse.maven:rftools-224641:2861573"))
+    implementation(rfg.deobf("curse.maven:thermal-expansion-69163:2926431"))
     compileOnly(rfg.deobf("curse.maven:athenaeum-284350:4633750"))
     compileOnly(rfg.deobf("curse.maven:artisan-worktables-284351:3205284"))
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671384"))

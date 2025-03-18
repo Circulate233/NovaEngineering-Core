@@ -1,14 +1,14 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module;
 
 import crafttweaker.annotations.ZenRegister;
-import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import github.kasuminova.novaeng.common.hypernet.calculation.Calculable;
 import github.kasuminova.novaeng.common.hypernet.calculation.CalculateRequest;
+import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierKeys;
+import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierManager;
 import github.kasuminova.novaeng.common.hypernet.computer.HardwareBandwidthConsumer;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.hypernet.computer.exception.ModularServerException;
-import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierKeys;
-import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierManager;
+import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import stanhebben.zenscript.annotations.ZenClass;
 
 @ZenRegister

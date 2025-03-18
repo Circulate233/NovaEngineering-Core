@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module;
 
 import crafttweaker.annotations.ZenRegister;
-import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
+import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import net.minecraft.nbt.NBTTagCompound;
 import stanhebben.zenscript.annotations.ZenClass;
 

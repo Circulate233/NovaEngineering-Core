@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.common.handler;
 
+import crafttweaker.annotations.ZenRegister;
+import crafttweaker.api.item.IItemStack;
+import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -13,10 +16,14 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import stanhebben.zenscript.annotations.ZenClass;
+import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ZenRegister
+@ZenClass("novaeng.hypernet.RawOre")
 public class RawOreHandler {
 
     public static final RawOreHandler INSTANCE = new RawOreHandler();
@@ -25,6 +32,15 @@ public class RawOreHandler {
     private static Map<OreKey, ItemStack> rawOreMap;
     private static Map<OreKey, ItemStack> oreMap;
     private RawOreHandler(){}
+
+    @ZenMethod
+    public static IItemStack getRawOre(IItemStack ore){
+        if (rawOreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
+            return CraftTweakerMC.getIItemStack(rawOreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
+        } else {
+            return null;
+        }
+    }
 
     public static void registry(){
         Map<OreKey,ItemStack> map = new HashMap<>();
@@ -106,6 +122,13 @@ public class RawOreHandler {
         private OreKey(ResourceLocation Rl,int Meta){
             rl = Rl;
             meta = Meta;
+        }
+
+        public static OreKey getKey(ItemStack itemStack) {
+            ResourceLocation rl = itemStack.getItem().getRegistryName();
+            int meta = itemStack.getItemDamage();
+            return keyPool.computeIfAbsent(rl, k -> new ConcurrentHashMap<>())
+                    .computeIfAbsent(meta, m -> new OreKey(rl, meta));
         }
 
         public static OreKey getKey(ResourceLocation rl, int meta) {

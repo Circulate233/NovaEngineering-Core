@@ -3,10 +3,10 @@ package github.kasuminova.novaeng.common.hypernet.computer.module.base;
 import com.github.bsideup.jabel.Desugar;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
-import github.kasuminova.novaeng.common.hypernet.computer.module.ServerModule;
 import github.kasuminova.novaeng.common.hypernet.calculation.Calculable;
 import github.kasuminova.novaeng.common.hypernet.calculation.CalculateType;
 import github.kasuminova.novaeng.common.hypernet.calculation.CalculateTypes;
+import github.kasuminova.novaeng.common.hypernet.computer.module.ServerModule;
 import net.minecraft.client.resources.I18n;
 import stanhebben.zenscript.annotations.ZenClass;
 

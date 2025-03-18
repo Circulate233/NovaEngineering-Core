@@ -4,7 +4,6 @@ import appeng.core.sync.AppEngPacket;
 import appeng.core.sync.AppEngPacketHandlerBase;
 import appeng.core.sync.network.AppEngServerPacketHandler;
 import com.llamalad7.mixinextras.sugar.Local;
-import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
