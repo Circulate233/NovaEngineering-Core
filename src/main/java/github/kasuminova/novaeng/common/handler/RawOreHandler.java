@@ -89,9 +89,11 @@ public class RawOreHandler {
             final OreKey key = OreKey.getKey(registryName,meta);
             if (rawOreMap.containsKey(key)){
                 List<ItemStack> drops = event.getDrops();
+                drops.clear();
                 if (event.isSilkTouching()) {
-                    drops.clear();
-                    drops.add(oreMap.get(key));
+                    if (drops.isEmpty()) {
+                        drops.add(oreMap.get(key));
+                    }
                     return;
                 } else if (registryName.getNamespace().equals("astralsorcery") && hasSilkTouch(event.getHarvester())) {
                     return;
@@ -101,9 +103,9 @@ public class RawOreHandler {
                 int random = event.getWorld().rand.nextInt((fortune + 2));
                 ItemStack rawOre = rawOreMap.get(key).copy();
                 rawOre.setCount(Math.max(random, 1));
-
-                drops.clear();
-                drops.add(rawOre);
+                if (drops.isEmpty()){
+                    drops.add(rawOre);
+                }
             }
         }
     }
