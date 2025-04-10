@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module;
 
 import crafttweaker.annotations.ZenRegister;
-import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import github.kasuminova.novaeng.common.hypernet.computer.Extension;
 import github.kasuminova.novaeng.common.hypernet.computer.HardwareBandwidthConsumer;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
+import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import stanhebben.zenscript.annotations.ZenClass;
 
 @ZenRegister

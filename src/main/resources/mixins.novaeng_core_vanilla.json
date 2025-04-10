@@ -5,12 +5,14 @@
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-        "MixinNettyPacketDecoder",
-        "forge.MixinSimpleIndexedCodec"
+      "MixinNettyPacketDecoder",
+      "MixinRecipeBookServer",
+      "forge.MixinSimpleIndexedCodec"
     ],
     "client": [
       "AccessorParticleManager",
       "MixinFontRenderer",
+      "MixinNetHandlerPlayClient",
       "MixinNettyCompressionDecoder"
     ]
 }

@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.common.registry;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.renderer.EStorageEnergyCellItemRenderer;
+import github.kasuminova.novaeng.common.item.ItemBasic;
+import github.kasuminova.novaeng.common.item.ItemHorologiumCompass;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellFluid;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellGas;
@@ -34,6 +36,7 @@ public class RegistryItems {
     public static final List<Item> ITEM_MODELS_TO_REGISTER = new LinkedList<>();
     public static final Map<String, Item> ITEM_CUSTOM_MODELS_TO_REGISTER = new LinkedHashMap<>();
 
+
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
@@ -52,6 +55,9 @@ public class RegistryItems {
         ITEMS_TO_REGISTER.add(ECalculatorCell.L4);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L9);
+        ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
+
+        ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
 
         registerItems();
 

@@ -72,13 +72,12 @@ public class NovaEngineeringCore {
         proxy.construction();
     }
 
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    @SuppressWarnings({"ValueOfIncrementOrDecrementUsed", "UnusedAssignment"})
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         event.getModMetadata().version = VERSION;
 
         byte start = 0;
-
         NET_CHANNEL.registerMessage(PktHyperNetStatus.class, PktHyperNetStatus.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktTerminalGuiData.class, PktTerminalGuiData.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktResearchTaskComplete.class, PktResearchTaskComplete.class, start++, Side.CLIENT);

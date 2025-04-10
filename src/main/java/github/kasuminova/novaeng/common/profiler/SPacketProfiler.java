@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.profiler;
 
 import com.mojang.authlib.GameProfile;
-import github.kasuminova.novaeng.common.util.ClassUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;

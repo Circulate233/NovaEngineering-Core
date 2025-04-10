@@ -1,0 +1,15 @@
+{
+  "modifier": "magic_breaking",
+  "text": [
+    {
+      "text": "你的伤害总能穿透一切防御"
+    }
+  ],
+  "effects": [
+    "使得武器具有破魔性",
+    "只需要强化一次"
+  ],
+  "demoTool": [
+    "tconstruct:broadsword"
+  ]
+}

@@ -21,6 +21,10 @@ public class NovaEngCoreConfig {
         @Config.Name("EnableNovaEngTitle")
         public boolean enableNovaEngTitle = true;
 
+        @Config.RequiresMcRestart
+        @Config.Name("爆炸")
+        public boolean piece = true;
+
     }
 
     /*

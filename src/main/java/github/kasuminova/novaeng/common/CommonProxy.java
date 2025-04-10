@@ -6,6 +6,7 @@ import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
 import github.kasuminova.novaeng.common.container.*;
+import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.handler.*;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetTerminal;
@@ -14,8 +15,10 @@ import github.kasuminova.novaeng.common.hypernet.old.recipe.HyperNetRecipeManage
 import github.kasuminova.novaeng.common.integration.IntegrationCRT;
 import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
+import github.kasuminova.novaeng.common.machine.Drills.*;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.machine.IllumPool;
+import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.machine.SingularityCore;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -28,6 +31,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorCont
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
+import github.kasuminova.novaeng.common.trait.Register;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
@@ -42,6 +46,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -66,10 +71,15 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(EStorageEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EFabricatorEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(ForceChunkHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(RawOreHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
         }
+
+        ForgeRegistries.ENCHANTMENTS.register(MagicBreaking.MAGICBREAKING);
     }
 
     public void init() {
@@ -88,16 +98,26 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.GECKOLIB.isPresent()) {
             RegistryMachineSpecial.registrySpecialMachine(SingularityCore.SINGULARITY_CORE);
         }
+        RegistryMachineSpecial.registrySpecialMachine(MMAltar.MM_ALTAR);
         RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.GEOCENTRIC_DRILL);
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
         }
+        if (Loader.isModLoaded("immersiveengineering")){
+            RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.MINERAL_EXTRACTOR);
+            RegistryMachineSpecial.registrySpecialMachine(VoidMiner.VOID_MINER);
+            RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.DIFFERENT_WORLD);
+            RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.MANA_ORE_DRILL);
+            RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.ORICHALCOS_DRILL);
+        }
+        Register.TRAITREGISTER.registerModifiers();
     }
 
     public void postInit() {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
+        RawOreHandler.registry();
     }
 
     public void loadComplete() {

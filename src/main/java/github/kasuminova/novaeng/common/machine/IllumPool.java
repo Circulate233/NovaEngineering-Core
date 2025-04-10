@@ -324,7 +324,7 @@ public class IllumPool implements MachineSpecial {
         int sparkleFXCount = 3;
         TileFactoryController factory = (TileFactoryController) controller;
         FactoryRecipeThread recipeThread = factory.getCoreRecipeThreads().get("辉光转化术式");
-        if (recipeThread != null) {
+        if (recipeThread != null && recipeThread.getActiveRecipe() != null) {
             sparkleFXCount += Math.min(recipeThread.getActiveRecipe().getParallelism() / 40, 4);
         }
         for (int i = 0; i < sparkleFXCount; i++) {
