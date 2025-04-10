@@ -13,6 +13,7 @@ import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorage
 import github.kasuminova.novaeng.common.container.data.EStorageCellData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
+import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
@@ -54,6 +55,16 @@ public class EStorageCellInfo extends SizedColumn {
             CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
     );
 
+    public static final TextureProperties CELL_TYPE_BACKGROUND_GAS = new TextureProperties(BG_TEX_RES,
+            28, 82,
+            CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
+    );
+
+    public static final TextureProperties CELL_TYPE_BACKGROUND_EMPTY = new TextureProperties(BG_TEX_RES,
+            1, 82,
+            CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
+    );
+
     protected TextureProperties cellBackground = TextureProperties.EMPTY;
     protected TextureProperties cellTypeBackground = TextureProperties.EMPTY;
 
@@ -82,8 +93,10 @@ public class EStorageCellInfo extends SizedColumn {
             case C -> cellBackground = CELL_BACKGROUND_L9;
         }
         switch (data.type()) {
+            case EMPTY -> cellTypeBackground = CELL_TYPE_BACKGROUND_EMPTY;
             case ITEM -> cellTypeBackground = CELL_TYPE_BACKGROUND_ITEM;
             case FLUID -> cellTypeBackground = CELL_TYPE_BACKGROUND_FLUID;
+            case GAS -> cellTypeBackground = Mods.MEKENG.isPresent() ? CELL_TYPE_BACKGROUND_GAS : CELL_TYPE_BACKGROUND_EMPTY;
         }
     }
 
@@ -96,12 +109,13 @@ public class EStorageCellInfo extends SizedColumn {
         long maxBytes = EStorageCellDrive.getMaxBytes(data);
 
         String typeName = I18n.format("gui.estorage_controller.cell_info." + switch (type) {
-            case EMPTY -> "unknown";
+            case EMPTY -> "empty";
             case ITEM -> "item";
             case FLUID -> "fluid";
+            case GAS -> Mods.MEKENG.isPresent() ? "gas" : "empty";
         });
         String levelName = switch (level) {
-            case EMPTY -> "unknown";
+            case EMPTY -> "empty";
             case A -> "L4";
             case B -> "L6";
             case C -> "L9";

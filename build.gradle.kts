@@ -264,6 +264,7 @@ dependencies {
     // Optimization
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5791405"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
+    implementation(rfg.deobf("curse.maven:mekanism-energistics-1027681:5775101"))
 }
 
 // Publishing to a Maven repository
