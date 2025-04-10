@@ -6,8 +6,10 @@ import github.kasuminova.novaeng.common.item.ItemBasic;
 import github.kasuminova.novaeng.common.item.ItemHorologiumCompass;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellFluid;
+import github.kasuminova.novaeng.common.item.estorage.EStorageCellGas;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellItem;
 import github.kasuminova.novaeng.common.item.estorage.ItemBlockEStorageEnergyCell;
+import hellfirepvp.modularmachinery.common.base.Mods;
 import hellfirepvp.modularmachinery.common.item.ItemDynamicColor;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -45,7 +47,11 @@ public class RegistryItems {
         ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_A);
         ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_B);
         ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_C);
-
+        if (Mods.MEKENG.isPresent()) {
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_A);
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_B);
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_C);
+        }
         ITEMS_TO_REGISTER.add(ECalculatorCell.L4);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L9);

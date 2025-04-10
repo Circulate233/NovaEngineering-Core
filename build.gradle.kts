@@ -233,6 +233,7 @@ dependencies {
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))
     implementation(rfg.deobf("curse.maven:CodeChickenLib-242818:2779848"))
+    compileOnly(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
     compileOnly(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:3862197"))
     compileOnly(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
 //    implementation(rfg.deobf("sddsd233:mekceu-9.8.11.185"))
@@ -276,7 +277,7 @@ dependencies {
     // Optimization
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
-    compileOnly(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
+    implementation(rfg.deobf("curse.maven:mekanism-energistics-1027681:5775101"))
 }
 
 // Publishing to a Maven repository

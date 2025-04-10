@@ -12,6 +12,7 @@ import github.kasuminova.novaeng.common.container.data.EStorageCellData;
 import github.kasuminova.novaeng.common.container.data.EStorageEnergyData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
+import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 
@@ -27,9 +28,15 @@ public class EStorageGraph extends Row {
         WidgetController widgetController = controllerGUI.getWidgetController();
         widgetController.addWidgetContainer(new FluidGraph(this));
         widgetController.addWidgetContainer(new ItemGraph(this));
+        if (getMekEngLoad()) {
+            widgetController.addWidgetContainer(new GasGraph(this));
+        }
         widgetController.addWidgetContainer(new TotalGraph(this));
         widgetController.addWidgetContainer(new FluidTypeGraph(this));
         widgetController.addWidgetContainer(new ItemTypeGraph(this));
+        if (getMekEngLoad()) {
+            widgetController.addWidgetContainer(new GasTypeGraph(this));
+        }
         widgetController.addWidgetContainer(new EnergyCapacityGraph(this));
         widgetController.addWidgetContainer(new EnergyUsageGraph(this));
     }
@@ -131,11 +138,53 @@ public class EStorageGraph extends Row {
         }
     }
 
+    public class GasGraph extends Graph {
+
+        public GasGraph(final EStorageGraph graphParent) {
+            super(graphParent,
+                    10, 70,
+                    60, 16,
+                    2,
+                    1, 232,
+                    65, 6,
+                    true, false);
+        }
+
+        @Override
+        public void update(final WidgetGui gui) {
+            super.update(gui);
+            if (!value.isAnimFinished()) {
+                label.setContents(Collections.singletonList(
+                        I18n.format("gui.estorage_controller.graph.gas.percent",
+                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                );
+            }
+        }
+
+        @Override
+        public boolean onGuiEvent(final GuiEvent event) {
+            if (event instanceof ESGUIDataUpdateEvent) {
+                double totalUsedBytes = 0;
+                double totalMaxBytes = 0;
+                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                    long maxBytes = EStorageCellDrive.getMaxBytes(data);
+                    totalMaxBytes += maxBytes;
+                    if (data.type() == DriveStorageType.GAS) {
+                        long usedBytes = data.usedBytes();
+                        totalUsedBytes += usedBytes;
+                    }
+                }
+                value.set(totalMaxBytes <= 0 ? 0 : totalUsedBytes / totalMaxBytes);
+            }
+            return super.onGuiEvent(event);
+        }
+    }
+
     public class TotalGraph extends Graph {
 
         public TotalGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    8, 70,
+                    8, getMekEngLoad() ? 70 + 19 : 70,
                     64, 16,
                     2,
                     2, 239,
@@ -267,6 +316,52 @@ public class EStorageGraph extends Row {
         }
     }
 
+    public class GasTypeGraph extends Graph {
+
+        protected final AnimationValue totalUsedGasTypes = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
+        protected final AnimationValue totalMaxGasTypes = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
+
+        public GasTypeGraph(final EStorageGraph graphParent) {
+            super(graphParent,
+                    82, 63,
+                    59, 16,
+                    1,
+                    1, 197,
+                    59, 6,
+                    false, false);
+        }
+
+        @Override
+        public void update(final WidgetGui gui) {
+            super.update(gui);
+            if (!value.isAnimFinished()) {
+                label.setContents(Collections.singletonList(
+                        I18n.format("gui.estorage_controller.graph.gas_type",
+                                NovaEngUtils.formatNumber((long) totalUsedGasTypes.get(), 1),
+                                NovaEngUtils.formatNumber((long) totalMaxGasTypes.get(), 1)
+                        ))
+                );
+            }
+        }
+
+        @Override
+        public boolean onGuiEvent(final GuiEvent event) {
+            if (event instanceof ESGUIDataUpdateEvent) {
+                int totalUsedGasTypes = 0;
+                int totalMaxGasTypes = 0;
+                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                    if (data.type() == DriveStorageType.GAS) {
+                        totalUsedGasTypes += data.usedTypes();
+                        totalMaxGasTypes += 25;
+                    }
+                }
+                this.totalUsedGasTypes.set(totalUsedGasTypes);
+                this.totalMaxGasTypes.set(totalMaxGasTypes);
+                value.set(totalUsedGasTypes <= 0 ? 0 : (double) totalUsedGasTypes / totalMaxGasTypes);
+            }
+            return super.onGuiEvent(event);
+        }
+    }
 
     public class EnergyUsageGraph extends Graph {
 
@@ -274,7 +369,7 @@ public class EStorageGraph extends Row {
 
         public EnergyUsageGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    83, 63,
+                    83, getMekEngLoad() ? 80 : 63,
                     61, 16,
                     1,
                     1, 211,
@@ -317,7 +412,7 @@ public class EStorageGraph extends Row {
 
         public EnergyCapacityGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    83, 78,
+                    83, getMekEngLoad() ? 97 : 80,
                     60, 16,
                     1,
                     1, 218,
@@ -362,4 +457,7 @@ public class EStorageGraph extends Row {
         }
     }
 
+    public boolean getMekEngLoad() {
+        return Mods.MEKENG.isPresent();
+    }
 }
