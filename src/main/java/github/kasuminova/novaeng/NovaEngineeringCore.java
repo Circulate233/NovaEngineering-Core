@@ -60,7 +60,7 @@ public class NovaEngineeringCore {
                 if (hitokoto == null || hitokoto.isEmpty()) {
                     return;
                 }
-                LOG.info(LOG_PREFIX + hitokoto);
+                LOG.info(LOG_PREFIX + "{}", hitokoto);
             });
             thread.setName("NovaEng Core Hitokoto Initializer");
             thread.start();
@@ -127,11 +127,11 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStopping(FMLServerStoppingEvent event) {
-        log.info(TextFormatting.BLUE + "服务器正在关闭，正在生成网络包报告。");
+        log.info("{}服务器正在关闭，正在生成网络包报告。", TextFormatting.BLUE);
         for (final String message : SPacketProfiler.getProfilerMessages()) {
             log.info(message);
         }
-        log.info(TextFormatting.BLUE + "所有玩家的完整网络包报告：");
+        log.info("{}所有玩家的完整网络包报告：", TextFormatting.BLUE);
         for (final String message : SPacketProfiler.getFullProfilerMessages()) {
             log.info(message);
         }

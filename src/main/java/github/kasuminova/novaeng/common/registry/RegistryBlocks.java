@@ -37,7 +37,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import slimeknights.mantle.util.RecipeMatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +64,7 @@ public class RegistryBlocks {
         prepareItemBlockRegister(new ItemBlockAngel(registerBlock(BlockAngel.INSTANCE)));
         prepareItemBlockRegister(registerBlock(BlockSingularityCoreController.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockGeocentricDrillController.INSTANCE));
+        prepareItemBlockRegister(registerBlock(BlockRedstoneLogicalPort.INSTANCE));
 
         // EStorage
         prepareItemBlockRegister(new ItemEStorageController(registerBlock(BlockEStorageController.L4)));

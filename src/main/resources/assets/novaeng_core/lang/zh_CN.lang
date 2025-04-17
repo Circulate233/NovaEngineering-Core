@@ -209,6 +209,8 @@ top.ecalculator.thread_core.status.online=§a在线
 top.ecalculator.thread_core.threads=§9线程状态：
 top.ecalculator.thread_core.crafting=§9正在合成：
 
+tile.novaeng_core.redstone_logical_port.name=红石逻辑端口
+
 tile.novaeng_core.hypernet_terminal_controller.name=HyperNet 网络终端
 tile.novaeng_core.modular_server_assembler.name=模块服务器组装台（未实装）
 tile.novaeng_core.angel_block.name=天使方块+

@@ -11,41 +11,21 @@ import ic2.core.uu.UuGraph;
 import ink.ikx.rt.api.mods.jei.IJeiUtils;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 @SideOnly(Side.CLIENT)
-public class ExJEI implements IModPlugin {
+public class ExJEI{
 
-    public static IModRegistry registration;
     private static final List<String> blockList = Arrays.asList(
         "mekanismgenerators","artisanworktables"
     );
-    
-    public static ItemStack getOtherModsItemStack(String modId, String itemName) {
-        Item item = GameRegistry.findRegistry(Item.class).getValue(new ResourceLocation(modId, itemName));
-        if (item != null) {
-            return new ItemStack(item,1);
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void register(@Nonnull IModRegistry registration){
-        ExJEI.registration = registration;
-    }
 
     public static void jeiCreate() {
         IItemStack pattern_storage = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.pattern_storage));

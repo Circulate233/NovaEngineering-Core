@@ -12,7 +12,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.21.5"
+version = "1.21.7"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -228,7 +228,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))
     implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
     implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
-    implementation(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
+    compileOnly(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
     implementation(rfg.deobf("curse.maven:nae2-884359:5380800"))
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))
@@ -237,7 +237,7 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:3862197"))
     compileOnly(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
 //    implementation(rfg.deobf("sddsd233:mekceu-9.8.11.185"))
-    implementation(rfg.deobf("curse.maven:mekanism-ce-unofficial-840735:5946841"))
+    compileOnly(rfg.deobf("curse.maven:mekanism-ce-unofficial-840735:5946841"))
     implementation(rfg.deobf("curse.maven:RedstoneFlux-270789:2920436"))
     implementation(rfg.deobf("software.bernie.geckolib:geckolib-forge-1.12.2:3.0.31"))
     implementation(rfg.deobf("curse.maven:botania-225643:3330934"))
@@ -277,7 +277,7 @@ dependencies {
     // Optimization
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
-    implementation(rfg.deobf("curse.maven:mekanism-energistics-1027681:5775101"))
+    implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
 }
 
 // Publishing to a Maven repository
@@ -367,7 +367,7 @@ idea {
                     afterEvaluate {
                         self.javac.moduleJavacAdditionalOptions = mapOf(
                                 (project.name + ".main") to
-                                        tasks.compileJava.get().options.compilerArgs.map { '"' + it + '"' }.joinToString(" ")
+                                        tasks.compileJava.get().options.compilerArgs.joinToString(" ") { '"' + it + '"' }
                         )
                     }
                 }

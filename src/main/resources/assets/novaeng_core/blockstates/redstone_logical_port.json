@@ -1,0 +1,61 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "novaeng_core:redstone_logical_port"
+  },
+  "variants": {
+    "power=0": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=1": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=2": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=3": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=4": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=5": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=6": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=7": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=8": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=9": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=10": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=11": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=12": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=13": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=14": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "power=15": {
+      "model": "novaeng_core:redstone_logical_port"
+    },
+    "inventory": [
+      {
+        "transform": "forge:default-block"
+      }
+    ]
+  }
+}
