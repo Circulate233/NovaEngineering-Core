@@ -226,7 +226,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
     implementation(rfg.deobf("curse.maven:FTB-Library-237167:2985811"))
     implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))
-    implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
+    implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:6302098"))
     implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
     compileOnly(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
     implementation(rfg.deobf("curse.maven:nae2-884359:5380800"))
@@ -278,6 +278,10 @@ dependencies {
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
     implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
+    implementation(rfg.deobf("curse.maven:AutoRegLib-250363:2746011"))
+    implementation(rfg.deobf("curse.maven:Cucumber-272335:2645867"))
+    implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
+    implementation(rfg.deobf("curse.maven:extended-crafting-nomifactory-edition-398267:5778512"))
 }
 
 // Publishing to a Maven repository

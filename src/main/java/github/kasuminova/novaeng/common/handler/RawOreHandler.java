@@ -42,6 +42,15 @@ public class RawOreHandler {
         }
     }
 
+    @ZenMethod
+    public static IItemStack getOre(IItemStack ore){
+        if (oreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
+            return CraftTweakerMC.getIItemStack(oreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
+        } else {
+            return null;
+        }
+    }
+
     public static void registry(){
         Map<OreKey,ItemStack> map = new HashMap<>();
         Map<OreKey,ItemStack> mapO = new HashMap<>();
@@ -62,13 +71,13 @@ public class RawOreHandler {
                             ResourceLocation rg = ore.getItem().getRegistryName();
                             map.put(OreKey.getKey(rg,ore.getItemDamage()),rawOre);
                             mapO.put(OreKey.getKey(rg,ore.getItemDamage()),ODore);
-                            if (rg.getPath().equals( "redstone_ore")){
-                                rg = new ResourceLocation("minecraft","lit_redstone_ore");
-                                map.put(OreKey.getKey(rg,ore.getItemDamage()),rawOre);
-                                mapO.put(OreKey.getKey(rg,ore.getItemDamage()),ODore);
+                            if (rg != null && rg.getPath().equals("redstone_ore")) {
+                                rg = new ResourceLocation("minecraft", "lit_redstone_ore");
+                                map.put(OreKey.getKey(rg, ore.getItemDamage()), rawOre);
+                                mapO.put(OreKey.getKey(rg, ore.getItemDamage()), ODore);
                             }
 
-                            NovaEngineeringCore.log.info("registered : " + (rg + ":" + ore.getItemDamage()) + "[" + rawOreName + "]");
+                            NovaEngineeringCore.log.info("registered : {}[{}]", rg + ":" + ore.getItemDamage(), rawOreName);
                         }
                     }
                 }
@@ -95,7 +104,7 @@ public class RawOreHandler {
                         drops.add(oreMap.get(key));
                     }
                     return;
-                } else if (registryName.getNamespace().equals("astralsorcery") && hasSilkTouch(event.getHarvester())) {
+                } else if (registryName != null && registryName.getNamespace().equals("astralsorcery") && hasSilkTouch(event.getHarvester())) {
                     return;
                 }
 

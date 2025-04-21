@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.tile.ecotech.ecalculator;
 
-import net.minecraft.nbt.NBTTagCompound;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorParallelProc;
 
 public class ECalculatorParallelProc extends ECalculatorPart {
 
@@ -9,26 +9,12 @@ public class ECalculatorParallelProc extends ECalculatorPart {
     public ECalculatorParallelProc() {
     }
 
-    public ECalculatorParallelProc(final int parallelism) {
-        this.parallelism = parallelism;
+    public ECalculatorParallelProc(final BlockECalculatorParallelProc parallelism) {
+        this.parallelism = parallelism.getParallelism();
     }
 
     public int getParallelism() {
         return parallelism;
-    }
-
-    @Override
-    public void readCustomNBT(final NBTTagCompound compound) {
-        super.readCustomNBT(compound);
-        this.parallelism = compound.getShort("parallelism");
-
-        updateContainingBlockInfo();
-    }
-
-    @Override
-    public void writeCustomNBT(final NBTTagCompound compound) {
-        super.writeCustomNBT(compound);
-        compound.setShort("parallelism", (short) this.parallelism);
     }
 
     @Override

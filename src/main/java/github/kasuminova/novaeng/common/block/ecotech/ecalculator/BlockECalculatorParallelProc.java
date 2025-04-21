@@ -24,9 +24,9 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("deprecation")
 public class BlockECalculatorParallelProc extends BlockECalculatorPart {
 
-    public static final BlockECalculatorParallelProc L4 = new BlockECalculatorParallelProc("l4", 256);
-    public static final BlockECalculatorParallelProc L6 = new BlockECalculatorParallelProc("l6", 2048);
-    public static final BlockECalculatorParallelProc L9 = new BlockECalculatorParallelProc("l9", 16384);
+    public static final BlockECalculatorParallelProc L4 = new BlockECalculatorParallelProc("l4", 64);
+    public static final BlockECalculatorParallelProc L6 = new BlockECalculatorParallelProc("l6", 192);
+    public static final BlockECalculatorParallelProc L9 = new BlockECalculatorParallelProc("l9", 576);
 
     protected final int parallelism;
 
@@ -48,13 +48,13 @@ public class BlockECalculatorParallelProc extends BlockECalculatorPart {
     @Nullable
     @Override
     public TileEntity createNewTileEntity(@Nonnull final World worldIn, final int meta) {
-        return new ECalculatorParallelProc(this.parallelism);
+        return new ECalculatorParallelProc(this);
     }
 
     @Nullable
     @Override
     public TileEntity createTileEntity(@Nonnull final World world, @Nonnull final IBlockState state) {
-        return new ECalculatorParallelProc(this.parallelism);
+        return new ECalculatorParallelProc(this);
     }
 
     @Nonnull
