@@ -1,20 +1,26 @@
 package github.kasuminova.novaeng.common.tile.ecotech.ecalculator;
 
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorParallelProc;
+import net.minecraft.block.Block;
 
 public class ECalculatorParallelProc extends ECalculatorPart {
 
-    public int parallelism = 0;
+    private Block block;
 
     public ECalculatorParallelProc() {
-    }
 
-    public ECalculatorParallelProc(final BlockECalculatorParallelProc parallelism) {
-        this.parallelism = parallelism.getParallelism();
     }
 
     public int getParallelism() {
-        return parallelism;
+         return ((BlockECalculatorParallelProc)this.getBlock()).getParallelism();
+    }
+
+    public Block getBlock() {
+        if (this.block == null && this.world != null) {
+            this.block = this.world.getBlockState(this.pos).getBlock();
+        }
+
+        return this.block;
     }
 
     @Override
