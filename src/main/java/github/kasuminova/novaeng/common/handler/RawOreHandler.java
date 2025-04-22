@@ -100,8 +100,10 @@ public class RawOreHandler {
                 List<ItemStack> drops = event.getDrops();
                 drops.clear();
                 if (event.isSilkTouching()) {
+                    ItemStack ore = oreMap.get(key).copy();
+                    ore.setCount(1);
                     if (drops.isEmpty()) {
-                        drops.add(oreMap.get(key));
+                        drops.add(ore);
                     }
                     return;
                 } else if (registryName != null && registryName.getNamespace().equals("astralsorcery") && hasSilkTouch(event.getHarvester())) {

@@ -31,7 +31,7 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PR
                        "required:mixinbooter@[8.0,);" +
                        "required:lumenized@[1.0.2,);",
         acceptedMinecraftVersions = "[1.12, 1.13)",
-        acceptableRemoteVersions = "[1.21.0, 1.22.0)"
+        acceptableRemoteVersions = "[1.21.7, 1.23.0)"
 )
 @SuppressWarnings("MethodMayBeStatic")
 public class NovaEngineeringCore {
