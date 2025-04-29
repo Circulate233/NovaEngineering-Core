@@ -16,6 +16,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -34,7 +35,7 @@ public class RawOreHandler {
     private RawOreHandler(){}
 
     @ZenMethod
-    public static IItemStack getRawOre(IItemStack ore){
+    public static IItemStack getRawOre(@NotNull IItemStack ore){
         if (rawOreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
             return CraftTweakerMC.getIItemStack(rawOreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
         } else {
@@ -43,11 +44,11 @@ public class RawOreHandler {
     }
 
     @ZenMethod
-    public static IItemStack getOre(IItemStack ore){
+    public static IItemStack getOre(@NotNull IItemStack ore){
         if (oreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
             return CraftTweakerMC.getIItemStack(oreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
         } else {
-            return null;
+            return ore;
         }
     }
 
@@ -180,7 +181,9 @@ public class RawOreHandler {
                 }
             }
 
-            return candidates.isEmpty() ? oreEntries.get(0) : candidates.get(0);
+            var out = candidates.isEmpty() ? oreEntries.get(0) : candidates.get(0);
+            if (out.getItemDamage() == 32767)out.setItemDamage(0);
+            return out;
         }
 
     }
