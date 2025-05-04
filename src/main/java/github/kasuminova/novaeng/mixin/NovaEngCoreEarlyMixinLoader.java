@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.mixin;
 
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import zone.rong.mixinbooter.IEarlyMixinLoader;
@@ -9,14 +10,10 @@ import zone.rong.mixinbooter.IEarlyMixinLoader;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 
 @SuppressWarnings("unused")
@@ -29,6 +26,10 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
             LOG.info(LOG_PREFIX + "CleanroomLoader detected.");
             if (FMLLaunchHandler.side().isClient()) {
                 checkLauncher();
+            }
+        } else {
+            if (FMLLaunchHandler.side().isClient()) {
+                checkJavaVersion();
             }
         }
     }
@@ -80,6 +81,82 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         } else {
             LOG.info(LOG_PREFIX + "Launcher check passed.");
         }
+    }
+
+    private static final String RESOURCE_BUNDLE = "messages";
+    static ResourceBundle bundler;
+
+    private static String getString(String key){
+        return new String(bundler.getString(key).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 愚蠢的一切，为什么要用十年前的java？
+     */
+    public static void checkJavaVersion() {
+        String version = SystemUtils.JAVA_VERSION;
+        LOG.info(RESOURCE_BUNDLE + ".{}", version);
+
+        try {
+            bundler = ResourceBundle.getBundle(RESOURCE_BUNDLE);
+            String[] mainParts = version.split("\\.");
+            if (mainParts.length < 3) {
+                logWarning(RESOURCE_BUNDLE + ".java.version.invalid", version);
+                return;
+            }
+
+            ResourceBundle bundle = ResourceBundle.getBundle(
+                    "messages",
+                    Locale.getDefault(),
+                    Thread.currentThread().getContextClassLoader()
+            );
+
+            int major = Integer.parseInt(mainParts[0]);
+            int minor = Integer.parseInt(mainParts[1]);
+            String[] updateParts = mainParts[2].split("_");
+
+            if (updateParts.length < 1) {
+                logWarning(RESOURCE_BUNDLE + ".java.version.invalid.format", mainParts[2]);
+                return;
+            }
+
+            int update = Integer.parseInt(updateParts[1]);
+
+            if (major == 1 && minor == 8 && update < 271) {
+                String warningMessage = getString("java.version.warning");
+                String detail = String.format(getString("java.version.warning.detail"), version);
+                String recommendation = getString("java.version.warning.recommend");
+                String risk = getString("java.version.warning.risk");
+                String confirm = getString("java.version.warning.confirm");
+
+                showWarningDialog(warningMessage + "\n" + detail + "\n" + recommendation + "\n" + risk + "\n\n" + confirm);
+            }
+        } catch (NumberFormatException e) {
+            logError(version, e);
+        }
+    }
+
+    private static void showWarningDialog(String message) {
+        if (!Desktop.isDesktopSupported()) {
+            logWarning(RESOURCE_BUNDLE + ".desktop.unsupported");
+            return;
+        }
+
+        int input = JOptionPane.showConfirmDialog(null, message,
+                getString("java.version.warning.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (input != JOptionPane.YES_OPTION) {
+            throw new RuntimeException(getString("java.version.blocked"));
+        }
+    }
+
+    private static void logWarning(String key, Object... params) {
+        LOG.warn(getString(key), params);
+    }
+
+    private static void logError(Object... params) {
+        LOG.error(getString("messages.java.version.parse.error"), params);
     }
 
     public static boolean isCleanroomLoader() {
