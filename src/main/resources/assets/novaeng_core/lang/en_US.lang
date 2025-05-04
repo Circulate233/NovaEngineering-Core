@@ -15,9 +15,9 @@ item.novaeng_core.estorage_cell_fluid_16m.name=§9ECO - §bLE4 §9存储矩阵§
 item.novaeng_core.estorage_cell_fluid_64m.name=§9ECO - §6LE6 §9存储矩阵§b（流体）
 item.novaeng_core.estorage_cell_fluid_256m.name=§9ECO - §5LE9 §9存储矩阵§b（流体）
 
-item.ecoaeextension.estorage_cell_gas_16m.name=§9ECO - §bLE4 §9存储矩阵§b（气体）
-item.ecoaeextension.estorage_cell_gas_64m.name=§9ECO - §6LE6 §9存储矩阵§b（气体）
-item.ecoaeextension.estorage_cell_gas_256m.name=§9ECO - §5LE9 §9存储矩阵§b（气体）
+item.novaeng_core.estorage_cell_gas_16m.name=§9ECO - §bLE4 §9存储矩阵§b（气体）
+item.novaeng_core.estorage_cell_gas_64m.name=§9ECO - §6LE6 §9存储矩阵§b（气体）
+item.novaeng_core.estorage_cell_gas_256m.name=§9ECO - §5LE9 §9存储矩阵§b（气体）
 
 item.novaeng_core.ecalculator_cell_64m.name=§9ECO - §bCE4 §b闪存晶阵
 item.novaeng_core.ecalculator_cell_1024m.name=§9ECO - §6CE6 §b闪存晶阵
