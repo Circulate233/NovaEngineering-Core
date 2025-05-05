@@ -142,15 +142,19 @@ public class ResearchStation extends NetNode {
         double baseConsumption = currentResearching.getMinComputationPointPerTick();
         consumption = Math.min(baseConsumption, getComputationLeft());
 
+        final short overclockingValue = (short) Math.max(0,event.getController().getCustomDataTag().getShort("overclocking") - 1);
+
         ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
         int totalTick = activeRecipe.getTotalTick();
         activeRecipe.setTick(Math.max((int) (getProgressPercent() * totalTick) - 1, 0));
         event.getRecipeThread().setStatus(CraftingStatus.SUCCESS).setStatusInfo("研究中...");
 
-        HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
-                center.getComputationPointGeneration() - center.getComputationPointConsumption(),
-                Math.min(baseConsumption * 4, getComputationLeft())))
-        );
+        if (overclockingValue > 0) {
+            HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
+                    center.getComputationPointGeneration() - center.getComputationPointConsumption(),
+                    Math.min(baseConsumption * overclockingValue, getComputationLeft())))
+            );
+        }
     }
 
     protected void doExtraResearch(final double maxConsumption) {

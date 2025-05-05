@@ -1,10 +1,10 @@
 item.hypernet_connect_card.tooltip.1=§9这张存储卡可以储存一个 HyperNet 网络的频段和坐标信息，存储的密钥经过重重加密。
 item.hypernet_connect_card.tooltip.2=§9右击支持 HyperNet 的机械控制器，即可自动解析存储卡并连接至 HyperNet 计算网络。
 item.hypernet_connect_card.tooltip.3=§a存储卡可以重复使用。
-item.hypernet_connect_card.tooltip.4=§c警告：使用时请保持 HyperNet 计算网络中心在线。HyperNet 通讯距离无限，但是无法跨越维度。
-item.hypernet_connect_card.tooltip.no_pos.tip.0=§b存储卡中保存的坐标：§e空
+item.hypernet_connect_card.tooltip.4=§c警告:使用时请保持 HyperNet 计算网络中心在线。HyperNet 通讯距离无限，但是无法跨越维度。
+item.hypernet_connect_card.tooltip.no_pos.tip.0=§b存储卡中保存的坐标:§e空
 item.hypernet_connect_card.tooltip.no_pos.tip.1=§2右击任意等级的计算网络中心控制器来写入数据。
-item.hypernet_connect_card.tooltip.pos.tip.0=§b存储卡中保存的坐标：§a（X: %s, Y: %s, Z: %s）
+item.hypernet_connect_card.tooltip.pos.tip.0=§b存储卡中保存的坐标:§a（X: %s, Y: %s, Z: %s）
 item.hypernet_connect_card.tooltip.pos.tip.1=§2右击任意等级的计算网络中心控制器来覆写数据。
 
 item.novaeng_core.estorage_cell_item_16m.name=§9ECO - §bLE4 §9存储矩阵§a（物品）
@@ -34,7 +34,7 @@ novaeng.ecalculator_cell.extract.tip=蹲下时空手并右击驱动器以取出�
 novaeng.ecalculator_cell.tip.0=§b闪存晶阵§7为§9计算子系统§7提供§a内存存储§7。
 novaeng.ecalculator_cell.tip.1=§b闪存晶阵§7是存储矩阵的高速存取特化版本。
 novaeng.ecalculator_cell.tip.2=相比§9存储矩阵§7，其内部规模要§a更加宏大§7，但作为代价，其存储容量也远§c不如§9存储矩阵§7。
-novaeng.ecalculator_cell.tip.3=§b字节数提供：§a%sB
+novaeng.ecalculator_cell.tip.3=§b字节数提供:§a%sB
 novaeng.ecalculator_cell.l6.tip=§c只有 §6C6§c 等级及以上的主机可以驱动此晶阵。
 novaeng.ecalculator_cell.l9.tip=§c只有 §6C9§c 等级的主机可以驱动此晶阵。
 
@@ -45,38 +45,38 @@ novaeng.estorage_cell.l9.tip=§c只有 §6L9§c 等级的主机可以驱动此�
 
 novaeng.estorage_cell_drive.player.inserted=§a已插入存储矩阵。
 novaeng.estorage_cell_drive.player.removed=§a已取出存储矩阵。
-novaeng.estorage_cell_drive.player.no_permission=§c访问被拒绝（原因：无 ME 网络权限）。
+novaeng.estorage_cell_drive.player.no_permission=§c访问被拒绝（原因:无 ME 网络权限）。
 
 novaeng.ecalculator_thread_core.info.0=§b线程核心§7是计算子系统的主要部分，为主机提供§5线程数§7。
 novaeng.ecalculator_thread_core.info.1=§b线程核心§7提供的§9线程§7为子系统提供最大§b虚拟合成处理器（vCPU）§7数量。
 novaeng.ecalculator_thread_core.info.2=拆除时会直接§a保存压缩后的 CPU 数据至掉落物§7。
-novaeng.ecalculator_thread_core.modifiers=§b线程数§7修正：
-novaeng.ecalculator_thread_core.modifier.add=  最大线程数：§a+%s
+novaeng.ecalculator_thread_core.modifiers=§b线程数§7修正:
+novaeng.ecalculator_thread_core.modifier.add=  最大线程数:§a+%s
 
 novaeng.ecalculator_thread_core_hyper.info.0=§9超线程核心§7相比§b线程核心§7，能为主机提供§a更多§7的§5线程数§7。
 novaeng.ecalculator_thread_core_hyper.info.1=作为代价，每个§a合成任务§7需要的字节数会§c更多§7（§c+10%%§7）。
 novaeng.ecalculator_thread_core_hyper.info.2=主机会优先使用§b普通线程§7而不是§9超线程§7。
-novaeng.ecalculator_thread_core_hyper.modifier.add=  最大超线程数：§a+%s
+novaeng.ecalculator_thread_core_hyper.modifier.add=  最大超线程数:§a+%s
 
 novaeng.ecalculator_parallel_proc.info.0=§5并行核心§7为计算子系统提供§5并行数§7。
 novaeng.ecalculator_parallel_proc.info.1=§5并行数§7可提高§a所有§b线程核心§7每次处理合成任务的§a处理数量§7。
-novaeng.ecalculator_parallel_proc.modifiers=§5并行数§7修正：
-novaeng.ecalculator_parallel_proc.modifier.add=  最大并行数：§a+%s
+novaeng.ecalculator_parallel_proc.modifiers=§5并行数§7修正:
+novaeng.ecalculator_parallel_proc.modifier.add=  最大并行数:§a+%s
 
 novaeng.ecalculator_cell_drive.info.0=§b晶阵驱动器§7为计算子系统提供§b闪存晶阵§7的存储空间。
 novaeng.ecalculator_cell_drive.info.1=§b晶阵驱动器§7能够驱动的晶阵等级取决于主机的§5等级§7。
 novaeng.ecalculator_cell_drive.player.inserted=§a已插入闪存晶阵。
 novaeng.ecalculator_cell_drive.player.removed=§a已取出闪存晶阵。
-novaeng.ecalculator_cell_drive.player.no_permission=§c访问被拒绝（原因：无 ME 网络权限）。
+novaeng.ecalculator_cell_drive.player.no_permission=§c访问被拒绝（原因:无 ME 网络权限）。
 
 novaeng.extendable_storage_subsystem.info.0=整个§9存储子系统§7的§a核心§7。
-novaeng.extendable_storage_subsystem.info.1=最大长度：§a12
+novaeng.extendable_storage_subsystem.info.1=最大长度:§a12
 novaeng.extendable_fabricator_subsystem.info.0=整个§e合成子系统§7的§a核心§7。
-novaeng.extendable_fabricator_subsystem.info.1=最大长度：§a12
+novaeng.extendable_fabricator_subsystem.info.1=最大长度:§a12
 novaeng.extendable_calculate_subsystem.info.0=整个§b计算子系统§7的§a核心§7。
-novaeng.extendable_calculate_subsystem.info.1=最大长度：§a12
+novaeng.extendable_calculate_subsystem.info.1=最大长度:§a12
 novaeng.extendable_calculate_subsystem.info.2=计算子系统引入了§b虚拟合成处理器§7的设定（简称 §bvCPU§7），通过 ME 通讯接口来访问。
-novaeng.extendable_calculate_subsystem.info.3=§b虚拟合成处理器（vCPU）§7：
+novaeng.extendable_calculate_subsystem.info.3=§b虚拟合成处理器（vCPU）§7:
 novaeng.extendable_calculate_subsystem.info.4=  主机每次只向 ME 网络提供一个 §bvCPU§7，其容量为子系统当前所有可用的字节数。
 novaeng.extendable_calculate_subsystem.info.5=  每当用户发配合成任务给 §bvCPU§7 时，主机会自动调节 §bvCPU§7 的字节数至任务所需的字节数，然后将其分配给§b线程核心§7。
 novaeng.extendable_calculate_subsystem.info.6=  分配完成后，如果系统当前可用字节数大于 §e10%%§7，则会自动分配新的 §bvCPU§7，否则§c停止分配§7，直到可用字节数大于 §e10%%§7。
@@ -85,13 +85,13 @@ novaeng.extendable_calculate_subsystem.info.8=  §bvCPU§7 会在合成任务完
 
 novaeng.efabricator_parallel_proc.info.0=§5并行核心§7为合成子系统提供§5并行数§7。
 novaeng.efabricator_parallel_proc.info.1=§5并行数§7可提高§b工作核心§7每次处理合成任务的§a处理数量§7（最大不超过队列深度）。
-novaeng.efabricator_parallel_proc.modifiers=§5并行数§7修正：
-novaeng.efabricator_parallel_proc.overclock_modifiers=启用§c超频§7时：
-novaeng.efabricator_parallel_proc.modifier.add=最大并行数：§a+%s
-novaeng.efabricator_parallel_proc.modifier.sub=最大并行数修正：§c-%s
-novaeng.efabricator_parallel_proc.modifier.mul=最大并行数修正：§a+%s%%
-novaeng.efabricator_parallel_proc.modifier.mul.debuff=最大并行数修正：§c-%s%%
-novaeng.efabricator_parallel_proc.info.2=启用§9主动冷却§7时：
+novaeng.efabricator_parallel_proc.modifiers=§5并行数§7修正:
+novaeng.efabricator_parallel_proc.overclock_modifiers=启用§c超频§7时:
+novaeng.efabricator_parallel_proc.modifier.add=最大并行数:§a+%s
+novaeng.efabricator_parallel_proc.modifier.sub=最大并行数修正:§c-%s
+novaeng.efabricator_parallel_proc.modifier.mul=最大并行数修正:§a+%s%%
+novaeng.efabricator_parallel_proc.modifier.mul.debuff=最大并行数修正:§c-%s%%
+novaeng.efabricator_parallel_proc.info.2=启用§9主动冷却§7时:
 novaeng.efabricator_parallel_proc.info.3=  §a消除§7超频的§c负面§7修正。
 novaeng.efabricator_parallel_proc.info.4=  工作后溢出的并行数转换为工作间隔§a减成§7并消耗§9冷却液§7，最低不低于 §b1§7 Tick（§b0.05s§7）。
 novaeng.efabricator_parallel_proc.info.5=    每溢出 §e5%%§7 最大并行数，为子系统降低 §b1§7 Tick（§b0.05s§7）的工作间隔。
@@ -99,15 +99,15 @@ novaeng.efabricator_parallel_proc.info.6=    每降低 §b1§7 Tick（§b0.05s§
 
 novaeng.efabricator_worker.info.0=§b工作核心§7是合成子系统的§e主要部分§7。
 novaeng.efabricator_worker.info.1=每个核心带有 §a32§7 队列深度，每次工作处理 §a1§7 个合成任务。
-novaeng.efabricator_worker.info.2=每次合成能量消耗：§b100 AE
-novaeng.efabricator_worker.info.3=启用§c超频§7时：
+novaeng.efabricator_worker.info.2=每次合成能量消耗:§b100 AE
+novaeng.efabricator_worker.info.3=启用§c超频§7时:
 novaeng.efabricator_worker.info.4=  队列深度 §ax2 §b(F4)
 novaeng.efabricator_worker.info.5=  队列深度 §ax4 §6(F6)
 novaeng.efabricator_worker.info.6=  队列深度 §ax8 §5(F9)
 novaeng.efabricator_worker.info.7=  能量消耗 §cx4 §b(F4)
 novaeng.efabricator_worker.info.8=  能量消耗 §cx8 §6(F6)
 novaeng.efabricator_worker.info.9=  能量消耗 §cx16 §5(F9)
-novaeng.efabricator_worker.info.10=启用§9主动冷却§7时：
+novaeng.efabricator_worker.info.10=启用§9主动冷却§7时:
 novaeng.efabricator_worker.info.11=  §a消除§7超频的§c负面§7修正。
 novaeng.efabricator_worker.info.12=  每次合成额外消耗 §c5§7 冷却单位。
 novaeng.efabricator_worker.info.13=  每个工作核心为子系统降低 §b1§7 Tick（§b0.05s§7）的工作间隔，最低不低于 §b10§7 Tick（§b0.5s§7）。
@@ -129,15 +129,15 @@ novaeng.ecalculator_me_channel.info.1=  §9通讯接口§7向 ME 网络提供§b
 novaeng.ecalculator_me_channel.info.2=  此子系统§a不消耗§7额外能源。
 novaeng.ecalculator_me_channel.info.3=通过连接 ME 线缆至§9通讯接口§7以和子系统建立连接。
 
-novaeng.hypernet.connect.result.success=§a连接成功§b（状态：%s 已连接 / %s 最大连接数）。
-novaeng.hypernet.connect.result.no_permission=§c连接失败，HyperNet 网络授权密钥不匹配（原因：非网络所有者）。
-novaeng.hypernet.connect.result.unknown_center=§c连接失败（原因：未知的计算网络中心，区块可能被卸载或控制器不存在）。
-novaeng.hypernet.connect.result.center_not_working=§c连接失败（原因：计算网络中心处于离线状态）。
-novaeng.hypernet.connect.result.center_reached_connection_limit=§c连接失败（原因：已达到计算网络中心的最大连接数：%s）。
-novaeng.hypernet.connect.result.unsupported_node=§c连接失败（原因：未知的网络节点）。
-novaeng.hypernet.connect.result.node_type_reached_max_presences=§c连接失败（原因：已达到当前网络节点类型的连接上限：%s）。
+novaeng.hypernet.connect.result.success=§a连接成功§b（状态:%s 已连接 / %s 最大连接数）。
+novaeng.hypernet.connect.result.no_permission=§c连接失败，HyperNet 网络授权密钥不匹配（原因:非网络所有者）。
+novaeng.hypernet.connect.result.unknown_center=§c连接失败（原因:未知的计算网络中心，区块可能被卸载或控制器不存在）。
+novaeng.hypernet.connect.result.center_not_working=§c连接失败（原因:计算网络中心处于离线状态）。
+novaeng.hypernet.connect.result.center_reached_connection_limit=§c连接失败（原因:已达到计算网络中心的最大连接数:%s）。
+novaeng.hypernet.connect.result.unsupported_node=§c连接失败（原因:未知的网络节点）。
+novaeng.hypernet.connect.result.node_type_reached_max_presences=§c连接失败（原因:已达到当前网络节点类型的连接上限:%s）。
 
-novaeng.hypernet.connect_card.write_failed.no_permission=§cHyperNet 网络授权访问被拒绝（原因：非网络所有者）。
+novaeng.hypernet.connect_card.write_failed.no_permission=§cHyperNet 网络授权访问被拒绝（原因:非网络所有者）。
 
 novaeng.hypernet.connect_card.write_success=§a写入成功。
 novaeng.hypernet.connect_card.write_success.new_owner=§a写入成功，并且现在您是此网络中心的所有者。
@@ -158,60 +158,60 @@ upgrade.data_processor.module.ram.tip.2=§9工作时每秒有 §a10%% §9的概�
 
 upgrade.data_processor.module.ram.limit_provision=§9上限提供: §e%s§9 (效率: %s)
 
-upgrade.data_processor.module.energy.tip=§9最大功耗：§c%s
-upgrade.data_processor.module.durability.tip=§9耐久：§e%s / %s§a（%s）
-upgrade.data_processor.module.durability.unknown.tip=§9最大耐久（等待计算机初始化）：§e%s ～ %s
+upgrade.data_processor.module.energy.tip=§9最大功耗:§c%s
+upgrade.data_processor.module.durability.tip=§9耐久:§e%s / %s§a（%s）
+upgrade.data_processor.module.durability.unknown.tip=§9最大耐久（等待计算机初始化）:§e%s ～ %s
 
-top.hypernet.online=§9HyperNet 网络状态：§a已连接
-top.hypernet.offline=§9HyperNet 网络状态：§c断开连接
+top.hypernet.online=§9HyperNet 网络状态:§a已连接
+top.hypernet.offline=§9HyperNet 网络状态:§c断开连接
 
-top.hypernet.connected=§9网络当前在线设备数量：
+top.hypernet.connected=§9网络当前在线设备数量:
 
-top.hypernet.computation_point_consumption=§9算力消耗：
-top.hypernet.computation_point_generation=§9算力产出：
+top.hypernet.computation_point_consumption=§9算力消耗:
+top.hypernet.computation_point_generation=§9算力产出:
 
-top.hypernet.research_station.current=§9当前研究：
-top.hypernet.research_station.current.empty=§9当前研究：§c无
+top.hypernet.research_station.current=§9当前研究:
+top.hypernet.research_station.current.empty=§9当前研究:§c无
 top.hypernet.research_station.progress=§9研究进度
 
-top.hypernet.database.stored.research=§9已存储研究认知数量：
-top.hypernet.database.stored.research.max=§9最大研究认知存储数量：
+top.hypernet.database.stored.research=§9已存储研究认知数量:
+top.hypernet.database.stored.research.max=§9最大研究认知存储数量:
 
-top.hypernet.computation_point.total=§9网络总算力消耗 / 产出：
+top.hypernet.computation_point.total=§9网络总算力消耗 / 产出:
 
-top.hypernet.processor.generation=§9当前算力 / 最大算力：
-top.hypernet.processor.efficiency=§9工作效率：
-top.hypernet.processor.load=§9平均负载：
-top.hypernet.processor.circuit_durability=§9电路板耐久剩余：
-top.hypernet.processor.heat=§9内部热量：
+top.hypernet.processor.generation=§9当前算力 / 最大算力:
+top.hypernet.processor.efficiency=§9工作效率:
+top.hypernet.processor.load=§9平均负载:
+top.hypernet.processor.circuit_durability=§9电路板耐久剩余:
+top.hypernet.processor.heat=§9内部热量:
 
-top.estorage.drive.status=§9驱动器状态：
+top.estorage.drive.status=§9驱动器状态:
 top.estorage.drive.status.offline=§c离线
 top.estorage.drive.status.online=§a在线
-top.estorage.drive.cell=§9驱动器矩阵：
-top.estorage.drive.cell.unsupported=§c警告：驱动器不支持此矩阵等级，需要升级主机。
-top.estorage.drive.cell.bytes=§9字节使用：
-top.estorage.drive.cell.types=§9类型使用：
+top.estorage.drive.cell=§9驱动器矩阵:
+top.estorage.drive.cell.unsupported=§c警告:驱动器不支持此矩阵等级，需要升级主机。
+top.estorage.drive.cell.bytes=§9字节使用:
+top.estorage.drive.cell.types=§9类型使用:
 
-top.efabricator.worker.status=§9工作核心状态：
+top.efabricator.worker.status=§9工作核心状态:
 top.efabricator.worker.status.offline=§c离线
 top.efabricator.worker.status.online=§a在线
-top.efabricator.worker.queue_status=§9队列状态：
-top.efabricator.worker.current_crafting=§9正在合成：
-top.efabricator.worker.enqueued_crafting=§9排队中：
+top.efabricator.worker.queue_status=§9队列状态:
+top.efabricator.worker.current_crafting=§9正在合成:
+top.efabricator.worker.enqueued_crafting=§9排队中:
 
-top.ecalculator.controller.storage=§9字节使用：
-top.ecalculator.controller.threads=§9线程状态：
-top.ecalculator.controller.parallelism=§9共享并行数：
-top.ecalculator.controller.avg_parallelism=§9当前使用并行数：
-top.ecalculator.controller.avg_time_usage=§b总性能使用：
-top.ecalculator.thread_core.status=§9核心状态：
+top.ecalculator.controller.storage=§9字节使用:
+top.ecalculator.controller.threads=§9线程状态:
+top.ecalculator.controller.parallelism=§9共享并行数:
+top.ecalculator.controller.avg_parallelism=§9当前使用并行数:
+top.ecalculator.controller.avg_time_usage=§b总性能使用:
+top.ecalculator.thread_core.status=§9核心状态:
 top.ecalculator.thread_core.status.offline=§c离线
 top.ecalculator.thread_core.status.online=§a在线
-top.ecalculator.thread_core.threads=§9线程状态：
-top.ecalculator.thread_core.crafting=§9正在合成：
-top.ecalculator.thread_core.avg_parallelism=§9平均并行数：
-top.ecalculator.thread_core.avg_time_usage=§b平均性能使用：
+top.ecalculator.thread_core.threads=§9线程状态:
+top.ecalculator.thread_core.crafting=§9正在合成:
+top.ecalculator.thread_core.avg_parallelism=§9平均并行数:
+top.ecalculator.thread_core.avg_time_usage=§b平均性能使用:
 
 tile.novaeng_core.redstone_logical_port.name=红石逻辑端口
 
@@ -272,17 +272,17 @@ tile.novaeng_core.geocentric_drill_controller.name=§6地心钻探机控制器
 
 craftcheck.failure.geocentric_drill_depth=无法钻探，最低钻探深度为 1000m！
 
-novaeng.hypernet.computation_point_required.tip=§9算力：§b%s
-novaeng.hypernet.computation_point_required.tip.parallelized=§9算力 (受并行影响)：§b%s
+novaeng.hypernet.computation_point_required.tip=§9算力:§b%s
+novaeng.hypernet.computation_point_required.tip.parallelized=§9算力 (受并行影响):§b%s
 
-novaeng.hypernet.calculable.tip.base_ratio=§b基础效率系数：§a%s
-novaeng.hypernet.calculable.tip.energy_consume_ratio=§b设计最大能耗：§c%s RF/t
+novaeng.hypernet.calculable.tip.base_ratio=§b基础效率系数:§a%s
+novaeng.hypernet.calculable.tip.energy_consume_ratio=§b设计最大能耗:§c%s RF/t
 novaeng.hypernet.calculable.supported=此模块可提供计算功能。
 
-novaeng.hypernet.hardware_bandwidth.consume=§b硬件带宽占用：§e%s
-novaeng.hypernet.hardware_bandwidth.provide=§b硬件带宽提供：§a%s
+novaeng.hypernet.hardware_bandwidth.consume=§b硬件带宽占用:§e%s
+novaeng.hypernet.hardware_bandwidth.provide=§b硬件带宽提供:§a%s
 
-novaeng.hypernet.calculate.tip.efficiency=%s：%s（效率：%s%%）
+novaeng.hypernet.calculate.tip.efficiency=%s:%s（效率:%s%%）
 
 novaeng.hypernet.calculate.type_name.intricate=§b复杂运算§f
 novaeng.hypernet.calculate.type_name.logic=§9密集运算§f
@@ -294,13 +294,13 @@ novaeng.hypernet.calculate.type.logic=§a%s §9次密集运算/t§f
 novaeng.hypernet.calculate.type.neuron=§a%s §c神经网络规模§f
 novaeng.hypernet.calculate.type.qbit=§a%s §e量子位§f
 
-novaeng.hypernet.research_required.tip=§6需要研究认知：§f%s
+novaeng.hypernet.research_required.tip=§6需要研究认知:§f%s
 
 gui.hypernet.controller.title=§9///////// HyperNet 代理网络 /////////
-gui.hypernet.controller.computation_point_consumption=§9算力消耗：§b
-gui.hypernet.controller.computation_point_consumption.total=§9总算力消耗 / 产出：§b%s / %s
-gui.hypernet.controller.connected=§9网络状态：§a已连接
-gui.hypernet.controller.disconnected=§9网络状态：§c断开连接
+gui.hypernet.controller.computation_point_consumption=§9算力消耗:§b
+gui.hypernet.controller.computation_point_consumption.total=§9总算力消耗 / 产出:§b%s / %s
+gui.hypernet.controller.connected=§9网络状态:§a已连接
+gui.hypernet.controller.disconnected=§9网络状态:§c断开连接
 gui.hypernet.controller.version=§7HyperNet Proxy Monitor v1.0
 gui.hypernet.controller.footer=§9/////////////////////////////////////////
 
@@ -324,6 +324,9 @@ novaeng.hypernet.database.working.tooltip.1=每存储 §a1 §f个研究认知，
 novaeng.hypernet.research_station.hypercol=HyperCol AI
 novaeng.hypernet.research_station.working.tooltip.0=仅在工作状态下消耗能量。
 novaeng.hypernet.research_station.working.tooltip.1=工作状态下根据当前研究，消耗指定数量的算力。
+novaeng.hypernet.research_station.overclocking.name=§9自动超频极限值
+novaeng.hypernet.research_station.overclocking.tooltip.0=§9当前极限:
+novaeng.hypernet.research_station.overclocking.tooltip.1=§9最大极限:§a5
 
 novaeng.hypernet.repair.tooltip=完成时，修复 §a%s §f点耐久值。
 novaeng.hypernet.radiator.tooltip=工作时，每秒可以吸收 §c%sHU§f 内部热量。
@@ -349,14 +352,14 @@ gui.toast.research.complete=HyperNet 研究已完成！
 
 gui.terminal_controller.title.nxc=nxc 的虚空终端
 gui.terminal_controller.search=§7§o搜索研究...
-gui.terminal_controller.status=§b状态：
+gui.terminal_controller.status=§b状态:
 gui.terminal_controller.status.missing_structure=§c结构不完整
 gui.terminal_controller.status.online=§a终端在线
 gui.terminal_controller.status.offline=§c终端离线
-gui.terminal_controller.status.network.computation_point_consumption=§9总算力消耗：
-gui.terminal_controller.status.network.computation_point_generation=§9总算力产出：
+gui.terminal_controller.status.network.computation_point_consumption=§9总算力消耗:
+gui.terminal_controller.status.network.computation_point_generation=§9总算力产出:
 gui.terminal_controller.status.network.computation_point.info=§b%s
-gui.terminal_controller.status.network.total_connected=§9在线设备数量：§b
+gui.terminal_controller.status.network.total_connected=§9在线设备数量:§b
 
 gui.terminal_controller.connect_card.empty=请插入密钥卡
 gui.terminal_controller.connect_card.validate=§a密钥卡已识别
@@ -365,15 +368,15 @@ gui.terminal_controller.connect_card.invalidate=§c无效的密钥卡
 gui.terminal_controller.data.unlocked=研究已解锁
 gui.terminal_controller.data.locked=研究可用
 gui.terminal_controller.data.unavailable=研究不可用
-gui.terminal_controller.data.progress=研究进度：%s
+gui.terminal_controller.data.progress=研究进度:%s
 
 gui.terminal_controller.screen.none=点击左侧的研究认知卡以预览。
 
-gui.terminal_controller.screen.info.dependencies=前置研究：
+gui.terminal_controller.screen.info.dependencies=前置研究:
 gui.terminal_controller.screen.info.dependencies.none=§2无
-gui.terminal_controller.screen.info.tech_level=科技等级：
-gui.terminal_controller.screen.info.required_points=需要研究点：§9
-gui.terminal_controller.screen.info.min_computation_point_per_tick=最低算力要求：§b
+gui.terminal_controller.screen.info.tech_level=科技等级:
+gui.terminal_controller.screen.info.required_points=需要研究点:§9
+gui.terminal_controller.screen.info.min_computation_point_per_tick=最低算力要求:§b
 
 gui.terminal_controller.screen.info.unavailable.0=§c研究描述不可用。
 gui.terminal_controller.screen.info.unavailable.1=§c解锁该研究所有的前置研究以继续。
@@ -383,13 +386,13 @@ gui.terminal_controller.screen.info.toggle=§a点击切换未解锁和解锁状�
 gui.terminal_controller.screen.info.start=§a左击向研究站发送当前研究任务。
 gui.terminal_controller.screen.info.start.instant=§9中键点击向研究站强制发送当前研究任务，并立即完成研究（需要创造模式，网络中数据库已满时可能无法发送）。
 gui.terminal_controller.screen.info.reset=§e右击取消研究站当前正在进行的任务。
-gui.terminal_controller.screen.info.start.time=§9预计耗时：%s 小时 %s 分钟 %s 秒（%s Ticks）。
-gui.terminal_controller.screen.info.start.warn.computation=§e警告：当前算力可能不足以完成研究。
+gui.terminal_controller.screen.info.start.time=§9预计耗时:%s 小时 %s 分钟 %s 秒（%s Ticks）。
+gui.terminal_controller.screen.info.start.warn.computation=§e警告:当前算力可能不足以完成研究。
 gui.terminal_controller.screen.info.start.error=§c无法开始研究。
 gui.terminal_controller.screen.info.start.error.tech_level=§c未找到研究站或研究站等级过低。
 gui.terminal_controller.screen.info.start.error.computation=§c算力不足。
 gui.terminal_controller.screen.info.start.error.database_space=§c未找到网络数据库或网络数据库空间已满。
-gui.terminal_controller.screen.info.start.error.dependencies=§c缺失前置研究：%s
+gui.terminal_controller.screen.info.start.error.dependencies=§c缺失前置研究:%s
 
 gui.modular_server_assembler.assembly.cpu.name=CPU 槽位 §a#%s
 gui.modular_server_assembler.assembly.cpu_heat_radiator.name=CPU 散热器槽位 §a#%s
@@ -409,44 +412,44 @@ gui.modular_server_assembler.assembly.psu.name=PSU 电源槽位 §a#%s
 gui.modular_server_assembler.assembly.capacitor.name=电容槽位 §a#%s
 
 gui.modular_server_assembler.assembly.invalid=§4插槽内物品无效，请移除。
-gui.modular_server_assembler.assembly.dependencies=以下插槽必须安装后才可解锁本插槽：
+gui.modular_server_assembler.assembly.dependencies=以下插槽必须安装后才可解锁本插槽:
 gui.modular_server_assembler.assembly.dependencies.installed=§a（已安装）§f
 gui.modular_server_assembler.assembly.dependencies.uninstalled=§c（缺失）§f
-gui.modular_server_assembler.assembly.dependents=此插槽安装后解锁以下插槽：
+gui.modular_server_assembler.assembly.dependents=此插槽安装后解锁以下插槽:
 
-gui.modular_server_assembler.assembly.soft_dependencies=此插槽安装后还需要以下插槽安装后才可完全工作：
-gui.modular_server_assembler.assembly.soft_dependents=此插槽安装后以下插槽才可完全工作：
+gui.modular_server_assembler.assembly.soft_dependencies=此插槽安装后还需要以下插槽安装后才可完全工作:
+gui.modular_server_assembler.assembly.soft_dependents=此插槽安装后以下插槽才可完全工作:
 
 gui.modular_server_assembler.assembly.inv.change.main=点击切换至组件插槽窗口。
 gui.modular_server_assembler.assembly.inv.change.heat=点击切换至散热器插槽窗口。
 
 gui.modular_server_assembler.info.missing_server=在组装台中放入服务器以显示服务器状态。
-gui.modular_server_assembler.info.total_modules=§2已安装的所有模块数量：§a%s
-gui.modular_server_assembler.info.total_cpus=§2已安装的 CPU 数量：§a%s
-gui.modular_server_assembler.info.total_rams=§2已安装的 RAM 数量：§a%s
-gui.modular_server_assembler.info.total_calculate_cards=§2已安装的计算卡数量：§a%s
-gui.modular_server_assembler.info.total_extensions=§2已安装的扩展卡数量：§a%s
-gui.modular_server_assembler.info.total_psus=§2已安装的 PSU 电源数量：§a%s
-gui.modular_server_assembler.info.total_capacitors=§2已安装的电容器数量：§a%s
+gui.modular_server_assembler.info.total_modules=§2已安装的所有模块数量:§a%s
+gui.modular_server_assembler.info.total_cpus=§2已安装的 CPU 数量:§a%s
+gui.modular_server_assembler.info.total_rams=§2已安装的 RAM 数量:§a%s
+gui.modular_server_assembler.info.total_calculate_cards=§2已安装的计算卡数量:§a%s
+gui.modular_server_assembler.info.total_extensions=§2已安装的扩展卡数量:§a%s
+gui.modular_server_assembler.info.total_psus=§2已安装的 PSU 电源数量:§a%s
+gui.modular_server_assembler.info.total_capacitors=§2已安装的电容器数量:§a%s
 
-gui.modular_server_assembler.info.max_energy_cap=§6最大储能：§c%sRF
-gui.modular_server_assembler.info.max_energy_consumption=§6最大能量消耗（Tick）：§c%sRF
-gui.modular_server_assembler.info.max_energy_provision=§6最大能量输入（Tick）：§c%sRF
-gui.modular_server_assembler.info.total_hardware_bandwidth=§9硬件带宽（总计）：§a%s
-gui.modular_server_assembler.info.used_hardware_bandwidth=§9硬件带宽（已使用）：§e%s§f（§6%s§f）
+gui.modular_server_assembler.info.max_energy_cap=§6最大储能:§c%sRF
+gui.modular_server_assembler.info.max_energy_consumption=§6最大能量消耗（Tick）:§c%sRF
+gui.modular_server_assembler.info.max_energy_provision=§6最大能量输入（Tick）:§c%sRF
+gui.modular_server_assembler.info.total_hardware_bandwidth=§9硬件带宽（总计）:§a%s
+gui.modular_server_assembler.info.used_hardware_bandwidth=§9硬件带宽（已使用）:§e%s§f（§6%s§f）
 
-gui.modular_server_assembler.calculate.expected=§b预期计算能力：
-gui.modular_server_assembler.calculate.name=%s：
-gui.modular_server_assembler.calculate.value=%s（效率：%s%%）
+gui.modular_server_assembler.calculate.expected=§b预期计算能力:
+gui.modular_server_assembler.calculate.name=%s:
+gui.modular_server_assembler.calculate.value=%s（效率:%s%%）
 
-gui.modular_server_assembler.info.can_start=§b是否可启动：%s
+gui.modular_server_assembler.info.can_start=§b是否可启动:%s
 gui.modular_server_assembler.info.can_start.true=§a可用
 gui.modular_server_assembler.info.can_start.false=§c不可用
 
-gui.modular_server_assembler.error=§e以下原因阻止了计算机启动：
+gui.modular_server_assembler.error=§e以下原因阻止了计算机启动:
 
 gui.modular_server_assembler.error.dependencies.0=§c有插槽缺失前置。
-gui.modular_server_assembler.error.dependencies.1=§c以下插槽被其他插槽所依赖，必须安装相应的模块后才可继续：
+gui.modular_server_assembler.error.dependencies.1=§c以下插槽被其他插槽所依赖，必须安装相应的模块后才可继续:
 
 gui.modular_server_assembler.error.require_cpu=§c至少需要安装一个 CPU 模块。
 gui.modular_server_assembler.error.require_ram=§c至少需要安装一个 RAM 模块。
@@ -455,44 +458,44 @@ gui.modular_server_assembler.error.require_capacitor=§c至少需要安装一个
 gui.modular_server_assembler.error.hardware_bandwidth=§c使用的硬件带宽过高（最高 150%%）。
 
 gui.modular_server_assembler.error.invalid_slot.0=§c有槽位安装了错误的模块。
-gui.modular_server_assembler.error.invalid_slot.1=§c以下槽位中的模块是有问题的：
+gui.modular_server_assembler.error.invalid_slot.1=§c以下槽位中的模块是有问题的:
 
 gui.estorage_controller.cell_info.tip.0=%s（%s）
-gui.estorage_controller.cell_info.tip.1=类型使用：%s / %s
-gui.estorage_controller.cell_info.tip.2=字节使用：%s / %s
+gui.estorage_controller.cell_info.tip.1=类型使用:%s / %s
+gui.estorage_controller.cell_info.tip.2=字节使用:%s / %s
 
 gui.estorage_controller.cell_info.item=物品存储矩阵
 gui.estorage_controller.cell_info.fluid=流体存储矩阵
 gui.estorage_controller.cell_info.gas=气体存储矩阵
 gui.estorage_controller.cell_info.empty=未知
 
-gui.estorage_controller.graph.fluid.percent=流体存储占用：%s%%
-gui.estorage_controller.graph.item.percent=物品存储占用：%s%%
-gui.estorage_controller.graph.gas.percent=气体存储占用：%s%%
-gui.estorage_controller.graph.total.percent=总存储占用：%s%%
-gui.estorage_controller.graph.gas_type=气体类型：%s / %s
-gui.estorage_controller.graph.fluid_type=流体类型：%s / %s
-gui.estorage_controller.graph.item_type=物品类型：%s / %s
-gui.estorage_controller.graph.energy_usage=总耗能：%sAE/t
-gui.estorage_controller.graph.energy_stored.percent=能量存储：%s%%
-gui.estorage_controller.graph.energy_stored=能量存储：%sAE / %sAE
+gui.estorage_controller.graph.fluid.percent=流体存储占用:%s%%
+gui.estorage_controller.graph.item.percent=物品存储占用:%s%%
+gui.estorage_controller.graph.gas.percent=气体存储占用:%s%%
+gui.estorage_controller.graph.total.percent=总存储占用:%s%%
+gui.estorage_controller.graph.gas_type=气体类型:%s / %s
+gui.estorage_controller.graph.fluid_type=流体类型:%s / %s
+gui.estorage_controller.graph.item_type=物品类型:%s / %s
+gui.estorage_controller.graph.energy_usage=总耗能:%sAE/t
+gui.estorage_controller.graph.energy_stored.percent=能量存储:%s%%
+gui.estorage_controller.graph.energy_stored=能量存储:%sAE / %sAE
 
 gui.efabricator_pattern_bus.title=§9ECO - §eFD 智能样板总线
 gui.efabricator_pattern_bus.inventory=物品栏
 
-gui.efabricator.total_crafted=统计 - 已完成配方数：%s
-gui.efabricator.total_crafted.update=统计 - 已完成配方数：%s，合成速度：§a+%s/Tick§f
+gui.efabricator.total_crafted=统计 - 已完成配方数:%s
+gui.efabricator.total_crafted.update=统计 - 已完成配方数:%s，合成速度:§a+%s/Tick§f
 gui.efabricator.button.upload_pattern=上传样板至当前网络中可用的§9可扩展合成子系统§7中。
-gui.efabricator.queue.status=队列：%s / %s
-gui.efabricator.max_energy_usage=最大能耗：§b%s AE
+gui.efabricator.queue.status=队列:%s / %s
+gui.efabricator.max_energy_usage=最大能耗:§b%s AE
 gui.efabricator.max_energy_usage.tip=显示值为所有工作核心满负载时工作一次的能耗。
 gui.efabricator.overclocked.enable.tip=单击启用§e超频 I§f 模式，在有限范围内提升性能，消耗更多§c能量§f。
 gui.efabricator.overclocked.disable.tip=单击禁用§e超频 I§f 模式。
-gui.efabricator.active_cooling=主动冷却：%s
+gui.efabricator.active_cooling=主动冷却:%s
 gui.efabricator.active_cooling.enable.tip.0=单击启用 §9ECO - FZ 主动冷却子系统§f，消耗流体输入仓内的§9冷却液，§f提升§a性能§f并降低§a能耗§f。
-gui.efabricator.active_cooling.enable.tip.1=支持的§9冷却液§f：
-gui.efabricator.active_cooling.enable.tip.1.coolant=  输入：%s §a%smB§f，输出：%s §a%smB§f，冷却单位：§b%s§f
-gui.efabricator.active_cooling.enable.tip.1.coolant.no_output=  输入：%s §a%smB§f，输出：§c无§f，冷却单位：§b%s§f
+gui.efabricator.active_cooling.enable.tip.1=支持的§9冷却液§f:
+gui.efabricator.active_cooling.enable.tip.1.coolant=  输入:%s §a%smB§f，输出:%s §a%smB§f，冷却单位:§b%s§f
+gui.efabricator.active_cooling.enable.tip.1.coolant.no_output=  输入:%s §a%smB§f，输出:§c无§f，冷却单位:§b%s§f
 gui.efabricator.active_cooling.enable.tip.2=启用主动冷却会使子系统进入§6超频 II§f 模式。
 gui.efabricator.active_cooling.enable.tip.3=如果§e超频 I§f 模式已启用，启用§9主动冷却§f会使子系统进入§c超频 III§f 模式。
 gui.efabricator.active_cooling.enable.tip.4=  §c超频 III§f 模式将§2极大幅度§f提升整机性能，并降低§a能量§f消耗，消耗更多§9冷却液§f。
@@ -501,17 +504,17 @@ gui.efabricator.active_cooling.enable.tip.6=§f如果流体输出仓为满，则
 gui.efabricator.active_cooling.disable.tip=单击禁用 §9ECO - FZ 主动冷却子系统§f。
 gui.efabricator.active_cooling.on=§a启用
 gui.efabricator.active_cooling.off=§c禁用
-gui.efabricator.pattern_bus.count=样板总线：%s
-gui.efabricator.parallel_proc.count=并行核心：%s
-gui.efabricator.worker.count=工作核心：%s
-gui.efabricator.crafting_progress.0=总队列占用：%s%%
+gui.efabricator.pattern_bus.count=样板总线:%s
+gui.efabricator.parallel_proc.count=并行核心:%s
+gui.efabricator.worker.count=工作核心:%s
+gui.efabricator.crafting_progress.0=总队列占用:%s%%
 gui.efabricator.crafting_progress.1=%s / %s
-gui.efabricator.crafting_time.0=预计耗时：%s
-gui.efabricator.total_parallelism=总并行数：%s
-gui.efabricator.total_parallelism.limit=限制为：%s
-gui.efabricator.total_parallelism.overflow=溢出：%s (%s%%)
-gui.efabricator.total_parallelism.overflow_speedup=加速：%s Tick (%s%%)
-gui.efabricator.total_parallelism.overflow_speedup.coolants.0=冷却液消耗：
+gui.efabricator.crafting_time.0=预计耗时:%s
+gui.efabricator.total_parallelism=总并行数:%s
+gui.efabricator.total_parallelism.limit=限制为:%s
+gui.efabricator.total_parallelism.overflow=溢出:%s (%s%%)
+gui.efabricator.total_parallelism.overflow_speedup=加速:%s Tick (%s%%)
+gui.efabricator.total_parallelism.overflow_speedup.coolants.0=冷却液消耗:
 gui.efabricator.total_parallelism.overflow_speedup.coolants.1=%s mB/t
 gui.efabricator.switch.pattern_search=单击切换到§9样板管理器§f。
 gui.efabricator.switch.default=单击切换到§9合成监控器§f。
@@ -526,12 +529,12 @@ gui.geocentric_drill.dive.ctrl_down=单击使钻探机下潜 §a1000m§f，最�
 gui.geocentric_drill.ascend=单击使钻探机上浮 §a100m§f，最小值 §e1000m§f。
 gui.geocentric_drill.ascend.ctrl_down=单击使钻探机上浮 §a1000m§f，最小值 §e1000m§f。
 
-gui.geocentric_drill.monitor.depth=§b当前深度 / 目标深度：§a%sm§b / §e%sm
-gui.geocentric_drill.monitor.output_multiplier=§b产出倍率：§a%sx§b
+gui.geocentric_drill.monitor.depth=§b当前深度 / 目标深度:§a%sm§b / §e%sm
+gui.geocentric_drill.monitor.output_multiplier=§b产出倍率:§a%sx§b
 
 gui.geocentric_drill.ore_control.tooltip.mark=单击标记此矿物，§a提高§f此矿物的输出权重，§c降低§f其他矿物的输出权重。
 gui.geocentric_drill.ore_control.tooltip.unmark=单击取消标记此矿物。
-gui.geocentric_drill.ore_control.tooltip.chance=输出权重：§a%s%%§f
+gui.geocentric_drill.ore_control.tooltip.chance=输出权重:§a%s%%§f
 
 gui.novaeng_core.replicator=可复制列表
 gui.novaeng_core.replicator.tooltips1=需要%sB UU物质复制
@@ -541,4 +544,4 @@ enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物
 modifier.magic_breaking.name=破魔
 modifier.magic_breaking.desc=§6§o众御皆虚§9\n对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
 
-itemGroup.novaeng_core=新星工程：核心
+itemGroup.novaeng_core=新星工程:核心
