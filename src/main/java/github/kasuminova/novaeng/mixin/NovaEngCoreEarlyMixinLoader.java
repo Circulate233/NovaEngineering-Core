@@ -96,6 +96,10 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
      * 愚蠢的一切，为什么要用十年前的java？
      */
     public static void checkJavaVersion() {
+        if (!System.getProperty("os.name").toLowerCase().contains("win")) {
+            return;
+        }
+
         String version = SystemUtils.JAVA_VERSION;
         LOG.info(RESOURCE_BUNDLE + ".{}", version);
 

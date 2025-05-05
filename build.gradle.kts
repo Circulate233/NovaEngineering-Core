@@ -213,7 +213,7 @@ dependencies {
     implementation(rfg.deobf("_0xc4de:ae2exttable-dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
-    implementation(rfg.deobf("kasuminova:lumenized:1.0.3:dev"))
+    implementation(rfg.deobf("curse.maven:lumenized-1234162:6378222"))
     implementation(rfg.deobf("curse.maven:mantle-74924:2713386"))
     implementation(rfg.deobf("curse.maven:tinkers-construct-74072:2902483"))
     implementation(rfg.deobf("curse.maven:not-enough-energistics-515565:5234732"))
