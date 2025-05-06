@@ -8,7 +8,7 @@ import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilde
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.event.MMEvents;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.util.SmartInterfaceType;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.translation.I18n;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -63,7 +63,7 @@ public class ResearchStationType extends NetNodeType {
         MachineModifier.addSmartInterfaceType(name,
                 SmartInterfaceType.create("overclocking", 1)
                         .setHeaderInfo("novaeng.hypernet.research_station.overclocking.name")
-                        .setValueInfo(I18n.format("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
+                        .setValueInfo(I18n.translateToLocalFormatted("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
                         .setFooterInfo("novaeng.hypernet.research_station.overclocking.tooltip.1")
         );
         MMEvents.onMachinePostTick(name,event -> {
