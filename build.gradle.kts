@@ -283,6 +283,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
     implementation(rfg.deobf("curse.maven:extended-crafting-nomifactory-edition-398267:5778512"))
     implementation(rfg.deobf("curse.maven:techguns-244201:2958103"))
+    implementation(rfg.deobf("curse.maven:legendary-tooltips-532127:5734973"))
 }
 
 // Publishing to a Maven repository
