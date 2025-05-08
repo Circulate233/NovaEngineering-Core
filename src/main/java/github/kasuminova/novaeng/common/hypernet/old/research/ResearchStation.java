@@ -149,19 +149,19 @@ public class ResearchStation extends NetNode {
         activeRecipe.setTick(Math.max((int) (getProgressPercent() * totalTick) - 1, 0));
         event.getRecipeThread().setStatus(CraftingStatus.SUCCESS).setStatusInfo("研究中...");
 
-        if (overclockingValue > 0) {
-            HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
-                    center.getComputationPointGeneration() - center.getComputationPointConsumption(),
-                    Math.min(baseConsumption * overclockingValue, getComputationLeft())))
-            );
-        }
+        HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
+                center.getComputationPointGeneration() - center.getComputationPointConsumption(),
+                Math.min(baseConsumption * overclockingValue, getComputationLeft())))
+        );
     }
 
     protected void doExtraResearch(final double maxConsumption) {
-        if (center != null) {
-            double consumed = center.consumeComputationPoint(maxConsumption);
-            completedPoints += consumed;
-            consumption += consumed;
+        if (maxConsumption > 0) {
+            if (center != null) {
+                double consumed = center.consumeComputationPoint(maxConsumption);
+                completedPoints += consumed;
+                consumption += consumed;
+            }
         }
 
         writeResearchProgressToDatabase();

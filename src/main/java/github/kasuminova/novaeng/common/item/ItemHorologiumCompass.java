@@ -2,13 +2,12 @@ package github.kasuminova.novaeng.common.item;
 
 import hellfirepvp.astralsorcery.common.constellation.distribution.ConstellationSkyHandler;
 import hellfirepvp.astralsorcery.common.data.config.Config;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,13 +26,14 @@ public class ItemHorologiumCompass extends ItemBasic {
     private static final int cycle = 36;
 
     @Override
-    public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
+    @NotNull
+    public ActionResult<ItemStack> onItemRightClick(@NotNull World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
         if (!world.isRemote) return super.onItemRightClick(world, player, hand);
 
         Optional<Long> testSeed = ConstellationSkyHandler.getInstance().getSeedIfPresent(world);
         if (testSeed.isPresent()) {
             int actualDay = getActualDay(world, testSeed.get());
-            player.sendMessage(new TextComponentString(I18n.format("tile.horologium_compass.success", actualDay)));
+            player.sendMessage(new TextComponentTranslation("tile.horologium_compass.success", actualDay));
             player.getCooldownTracker().setCooldown(player.getHeldItem(hand).getItem(), 1200);
         }
 

@@ -46,6 +46,8 @@ minecraft {
     args.add("-Dmixin.hotSwap=true")
     args.add("-Dmixin.checks.interfaces=true")
     args.add("-Dmixin.debug.export=true")
+    args.add("-Dlegacy.debugClassLoading=true")
+    args.add("-Dlegacy.debugClassLoadingSave=true")
     extraRunJvmArguments.addAll(args)
 
     // If needed, add extra tweaker classes like for mixins.
@@ -233,6 +235,9 @@ dependencies {
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))
     implementation(rfg.deobf("curse.maven:CodeChickenLib-242818:2779848"))
+    implementation(rfg.deobf("curse.maven:wanionlib-253043:4623135"))
+    implementation(rfg.deobf("curse.maven:avaritia-1-1x-unofficial-1165010:6207893"))
+    implementation(rfg.deobf("curse.maven:eternal-singularity-253077:2922583"))
     compileOnly(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
     compileOnly(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:3862197"))
     compileOnly(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
