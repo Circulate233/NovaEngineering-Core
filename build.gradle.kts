@@ -12,7 +12,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.22.0"
+version = "1.22.1"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -212,7 +212,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
     implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5952626"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
-    implementation(rfg.deobf("_0xc4de:ae2exttable-dev"))
+    implementation(rfg.deobf("curse.maven:extended-crafting-terminals-for-applied-1157825:6503414"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
     implementation(rfg.deobf("curse.maven:lumenized-1234162:6378222"))

@@ -15,7 +15,6 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
     private static final Map<String, BooleanSupplier> MIXIN_CONFIGS = new LinkedHashMap<>();
 
     static {
-        addMixinCFG("mixins.novaeng_core.json");
         addModdedMixinCFG("mixins.novaeng_core_ae2.json",                  "appliedenergistics2");
         addModdedMixinCFG("mixins.novaeng_core_astralsorcery.json",        "astralsorcery");
         addModdedMixinCFG("mixins.novaeng_core_athenaeum.json",            "athenaeum");
