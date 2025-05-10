@@ -8,6 +8,7 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
     id("eclipse")
     id("com.gtnewhorizons.retrofuturagradle") version "1.3.19"
+    kotlin("jvm")
 }
 
 // Project properties
@@ -46,8 +47,8 @@ minecraft {
     args.add("-Dmixin.hotSwap=true")
     args.add("-Dmixin.checks.interfaces=true")
     args.add("-Dmixin.debug.export=true")
-    args.add("-Dlegacy.debugClassLoading=true")
-    args.add("-Dlegacy.debugClassLoadingSave=true")
+    //args.add("-Dlegacy.debugClassLoading=true")
+    //args.add("-Dlegacy.debugClassLoadingSave=true")
     extraRunJvmArguments.addAll(args)
 
     // If needed, add extra tweaker classes like for mixins.
@@ -169,6 +170,7 @@ repositories {
         url = uri("http://jenkins.usrv.eu:8081/nexus/content/groups/public/")
         isAllowInsecureProtocol = true
     }
+    mavenCentral()
 }
 
 //mixin {
@@ -289,6 +291,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:extended-crafting-nomifactory-edition-398267:5778512"))
     implementation(rfg.deobf("curse.maven:techguns-244201:2958103"))
     implementation(rfg.deobf("curse.maven:legendary-tooltips-532127:5734973"))
+    implementation(rfg.deobf("curse.maven:betterer-p2p-943734:4928154"))
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 // Publishing to a Maven repository
