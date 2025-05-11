@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Map;
-import java.util.Queue;
 
 @Mixin(value = CraftingCPUCluster.class, remap = false)
 public abstract class MixinCraftingCPUClusterTwo {
@@ -52,21 +51,20 @@ public abstract class MixinCraftingCPUClusterTwo {
             if (size > max) max = size;
         }
         this.r$craftingFrequency = instance.getValue().getValue();
+        //this.r$craftingFrequency = Math.min(this.remainingOperations,this.r$craftingFrequency);
         if (max * this.r$craftingFrequency > Integer.MAX_VALUE){
             this.r$craftingFrequency = Integer.MAX_VALUE / max;
         }
-        //this.r$craftingFrequency = Math.min(this.remainingOperations,this.r$craftingFrequency);
         return key;
     }
 
-    @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Ljava/util/Queue;poll()Ljava/lang/Object;"))
-    private Object pollR(Queue<ICraftingMedium> instance) {
-        ICraftingMedium m = instance.poll();
-        if (m instanceof MEPatternProvider mep){
+    @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingMedium;isBusy()Z"))
+    private boolean isBusyR(ICraftingMedium instance) {
+        if (instance instanceof MEPatternProvider mep){
             this.r$isMEPatternProvider = mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
                     || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE;
         }
-        return m;
+        return instance.isBusy();
     }
 
     @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Lappeng/api/networking/energy/IEnergyGrid;extractAEPower(DLappeng/api/config/Actionable;Lappeng/api/config/PowerMultiplier;)D"))
