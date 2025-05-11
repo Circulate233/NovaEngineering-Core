@@ -12,6 +12,7 @@ import appeng.api.storage.data.IItemList;
 import appeng.crafting.MECraftingInventory;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.tile.MEPatternProvider;
+import github.kasuminova.novaeng.common.tile.MEPatternProviderNova;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,11 +38,12 @@ public abstract class MixinCraftingCPUClusterTwo {
     private int remainingOperations;
     @Unique
     private boolean r$isMEPatternProvider = false;
+    @Unique
+    private boolean r$IgnoreParallel = false;
 
     @Unique
     private long r$craftingFrequency = 0;
 
-    // TODO: 为样板供应器增加一个升级项目，用于允许忽略并行处理单元，并且默认上限被并行处理单元限制
     @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Ljava/util/Map$Entry;getKey()Ljava/lang/Object;"))
     private Object getKeyR(Map.Entry<ICraftingPatternDetails,AccessorTaskProgress> instance) {
         var key = instance.getKey();
@@ -51,7 +53,6 @@ public abstract class MixinCraftingCPUClusterTwo {
             if (size > max) max = size;
         }
         this.r$craftingFrequency = instance.getValue().getValue();
-        //this.r$craftingFrequency = Math.min(this.remainingOperations,this.r$craftingFrequency);
         if (max * this.r$craftingFrequency > Integer.MAX_VALUE){
             this.r$craftingFrequency = Integer.MAX_VALUE / max;
         }
@@ -60,9 +61,17 @@ public abstract class MixinCraftingCPUClusterTwo {
 
     @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingMedium;isBusy()Z"))
     private boolean isBusyR(ICraftingMedium instance) {
-        if (instance instanceof MEPatternProvider mep){
-            this.r$isMEPatternProvider = mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
-                    || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE;
+        if (instance instanceof MEPatternProviderNova mep){
+            if (mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
+                    || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
+                this.r$isMEPatternProvider = true;
+                if (mep.r$isIgnoreParallel()) {
+                    this.r$IgnoreParallel = true;
+                } else {
+                    this.r$IgnoreParallel = false;
+                    this.r$craftingFrequency = Math.min(this.remainingOperations, this.r$craftingFrequency);
+                }
+            }
         }
         return instance.isBusy();
     }
@@ -163,7 +172,9 @@ public abstract class MixinCraftingCPUClusterTwo {
     @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Ljava/util/Map$Entry;getValue()Ljava/lang/Object;",ordinal = 2))
     private Object getValueR(Map.Entry<ICraftingPatternDetails,AccessorTaskProgress> instance) {
         if (r$isMEPatternProvider) {
-            //this.remainingOperations -= (int) (this.r$craftingFrequency - 1);
+            if (!this.r$IgnoreParallel) {
+                this.remainingOperations -= (int) (this.r$craftingFrequency - 1);
+            }
             var value = instance.getValue();
             value.setValue(value.getValue() - (this.r$craftingFrequency - 1));
             return value;
