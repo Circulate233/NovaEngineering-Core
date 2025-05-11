@@ -40,6 +40,8 @@ public abstract class MixinCraftingCPUClusterTwo {
     private boolean r$isMEPatternProvider = false;
     @Unique
     private boolean r$IgnoreParallel = false;
+    @Unique
+    private volatile boolean r$isCraftable = false;
 
     @Unique
     private long r$craftingFrequency = 0;
@@ -47,6 +49,10 @@ public abstract class MixinCraftingCPUClusterTwo {
     @Redirect(method = "executeCrafting",at = @At(value = "INVOKE", target = "Ljava/util/Map$Entry;getKey()Ljava/lang/Object;"))
     private Object getKeyR(Map.Entry<ICraftingPatternDetails,AccessorTaskProgress> instance) {
         var key = instance.getKey();
+        if (key.isCraftable()){
+            this.r$isCraftable = true;
+            return key;
+        }
         long max = 0;
         for (IAEItemStack stack : key.getCondensedInputs()) {
             long size = stack.getStackSize();
@@ -71,8 +77,10 @@ public abstract class MixinCraftingCPUClusterTwo {
                     this.r$IgnoreParallel = false;
                     this.r$craftingFrequency = Math.min(this.remainingOperations, this.r$craftingFrequency);
                 }
+                return instance.isBusy();
             }
         }
+        this.r$isMEPatternProvider = false;
         return instance.isBusy();
     }
 
