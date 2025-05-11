@@ -1,26 +1,28 @@
 {
-    "package": "github.kasuminova.novaeng.mixin.ae2",
-    "refmap": "mixins.novaeng_core.refmap.json",
-    "target": "@env(DEFAULT)",
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "client": [
-        "MixinAppEngClientPacketHandler",
-        "MixinGuiCraftingStatus",
-        "MixinGuiPatternTerm"
-    ],
-    "server": [
-        "MixinPacketInventoryAction"
-    ],
-    "mixins": [
-        "AccessorAbstractCellInventory",
-        "AccessorCellRegistry",
-        "AccessorContainerPatternEncoder",
-        "MixinAppEngServerPacketHandler",
-        "MixinCraftingCPUCluster",
-        "MixinCraftingCPUStatus",
-        "MixinCraftingGridCache",
-        "MixinTileChestFilter",
-        "MixinTileDriveFilter"
-    ]
+  "package": "github.kasuminova.novaeng.mixin.ae2",
+  "refmap": "mixins.novaeng_core.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MixinAppEngClientPacketHandler",
+    "MixinGuiCraftingStatus",
+    "MixinGuiPatternTerm"
+  ],
+  "server": [
+    "MixinPacketInventoryAction"
+  ],
+  "mixins": [
+    "AccessorAbstractCellInventory",
+    "AccessorCellRegistry",
+    "AccessorContainerPatternEncoder",
+    "MixinAppEngServerPacketHandler",
+    "MixinCraftingCPUCluster",
+    "MixinCraftingCPUClusterTwo",
+    "MixinCraftingCPUClusterTwo$AccessorTaskProgress",
+    "MixinCraftingCPUStatus",
+    "MixinCraftingGridCache",
+    "MixinTileChestFilter",
+    "MixinTileDriveFilter"
+  ]
 }
