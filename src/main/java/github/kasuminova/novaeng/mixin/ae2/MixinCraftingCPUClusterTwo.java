@@ -75,9 +75,9 @@ public abstract class MixinCraftingCPUClusterTwo {
                     || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
 
                 for (IAEItemStack input : r$pattern.getCondensedInputs()) {
-                    if (input == null)continue;
                     long size = input.getStackSize() * this.r$craftingFrequency;
                     var item = this.inventory.extractItems(input.copy().setStackSize(size),Actionable.SIMULATE, this.machineSrc);
+                    if (item == null)continue;
                     if (item.getStackSize() < size){
                         long size0 = item.getStackSize()/input.getStackSize();
                         if (size0 < 2){
