@@ -35,6 +35,7 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_legendarytooltips.json","legendarytooltips");
         addModdedMixinCFG("mixins.novaeng_core_avaritia.json","avaritia");
         addModdedMixinCFG("mixins.novaeng_core_betterp2p.json","betterp2p");
+        addModdedMixinCFG("mixins.novaeng_core_nco.json","nuclearcraft");
         addMixinCFG("mixins.novaeng_core_forge_late.json");
         addMixinCFG("mixins.novaeng_core_dme.json",                               
                 () -> Loader.isModLoaded("deepmoblearning") && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution"));
