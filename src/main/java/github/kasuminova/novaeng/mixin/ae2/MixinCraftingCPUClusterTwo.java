@@ -11,6 +11,7 @@ import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
 import appeng.crafting.MECraftingInventory;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
+import appeng.me.helpers.MachineSource;
 import github.kasuminova.mmce.common.tile.MEPatternProvider;
 import github.kasuminova.novaeng.common.tile.MEPatternProviderNova;
 import net.minecraft.item.ItemStack;
@@ -36,12 +37,14 @@ public abstract class MixinCraftingCPUClusterTwo {
 
     @Shadow
     private int remainingOperations;
+    @Shadow private MachineSource machineSrc;
+    @Shadow private MECraftingInventory inventory;
     @Unique
     private boolean r$isMEPatternProvider = false;
     @Unique
     private boolean r$IgnoreParallel = false;
     @Unique
-    private volatile boolean r$isCraftable = false;
+    private ICraftingPatternDetails r$pattern;
 
     @Unique
     private long r$craftingFrequency = 0;
@@ -50,7 +53,6 @@ public abstract class MixinCraftingCPUClusterTwo {
     private Object getKeyR(Map.Entry<ICraftingPatternDetails,AccessorTaskProgress> instance) {
         var key = instance.getKey();
         if (key.isCraftable()){
-            this.r$isCraftable = true;
             return key;
         }
         long max = 0;
@@ -62,6 +64,7 @@ public abstract class MixinCraftingCPUClusterTwo {
         if (max * this.r$craftingFrequency > Integer.MAX_VALUE){
             this.r$craftingFrequency = Integer.MAX_VALUE / max;
         }
+        r$pattern = key;
         return key;
     }
 
@@ -70,6 +73,21 @@ public abstract class MixinCraftingCPUClusterTwo {
         if (instance instanceof MEPatternProviderNova mep){
             if (mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
                     || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
+
+                for (IAEItemStack input : r$pattern.getCondensedInputs()) {
+                    if (input == null)continue;
+                    long size = input.getStackSize() * this.r$craftingFrequency;
+                    var item = this.inventory.extractItems(input.copy().setStackSize(size),Actionable.SIMULATE, this.machineSrc);
+                    if (item.getStackSize() < size){
+                        long size0 = item.getStackSize()/input.getStackSize();
+                        if (size0 < 2){
+                            this.r$craftingFrequency = 1;
+                        } else {
+                            this.r$craftingFrequency = size0;
+                        }
+                    }
+                }
+                
                 this.r$isMEPatternProvider = true;
                 if (mep.r$isIgnoreParallel()) {
                     this.r$IgnoreParallel = true;
