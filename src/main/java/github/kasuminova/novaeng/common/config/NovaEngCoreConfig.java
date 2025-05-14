@@ -15,6 +15,9 @@ public class NovaEngCoreConfig {
     @Config.Name("Client")
     public static final Client CLIENT = new Client();
 
+    @Config.Name("Server")
+    public static final Server SERVER = new Server();
+
     public static class Client {
 
         @Config.RequiresMcRestart
@@ -24,6 +27,14 @@ public class NovaEngCoreConfig {
         @Config.RequiresMcRestart
         @Config.Name("爆炸")
         public boolean piece = true;
+
+    }
+
+    public static class Server{
+
+        @Config.RequiresMcRestart
+        @Config.Name("ForceChunkHandler")
+        public boolean ForceChunkHandler = true;
 
     }
 

@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.handler;
 
 import com.feed_the_beast.ftblib.lib.data.Universe;
-import com.feed_the_beast.ftbutilities.FTBUtilities;
+import mekanism.common.Mekanism;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.DimensionType;
@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.*;
+
+import static github.kasuminova.novaeng.common.config.NovaEngCoreConfig.SERVER;
 
 public class ForceChunkHandler {
 
@@ -35,7 +37,7 @@ public class ForceChunkHandler {
                     WorldServer worldServer = server.getWorld(id);
                     if (ForgeChunkManager.getPersistentChunksFor(worldServer).containsKey(chunk))continue;
                     if (map.get(id) == null){
-                        ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
+                        ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(Mekanism.instance, worldServer, ForgeChunkManager.Type.NORMAL);
                         if (ticket != null) {
                             ticket.setChunkListDepth(1);
                             map.put(id, ticket);
@@ -51,6 +53,7 @@ public class ForceChunkHandler {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (!SERVER.ForceChunkHandler)return;
         if (event.phase == TickEvent.Phase.START) {
             if (time % 100 == 0) {
                 request(Universe.get().server);
