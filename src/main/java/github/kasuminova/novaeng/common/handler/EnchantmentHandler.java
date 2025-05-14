@@ -29,7 +29,7 @@ public class EnchantmentHandler {
                 if (!currentItem.isEmpty() && EnchantmentHelper.getEnchantments(currentItem).containsKey(MagicBreaking.MAGICBREAKING)) {
                     Multimap<String, AttributeModifier> mapAttackModifier = currentItem.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
                     float attackDamage = 1.0F;
-                    if (mapAttackModifier != null && !mapAttackModifier.isEmpty()) {
+                    if (!mapAttackModifier.isEmpty()) {
                         final Collection<AttributeModifier> attackModifiers = mapAttackModifier.get(SharedMonsterAttributes.ATTACK_DAMAGE.getName());
                         for (AttributeModifier modifier : attackModifiers) {
                             attackDamage += (float) modifier.getAmount();
@@ -42,8 +42,6 @@ public class EnchantmentHandler {
                         }
 
                         event.setAmount(0);
-                        event.setCanceled(true);
-
                     }
                 }
             }
