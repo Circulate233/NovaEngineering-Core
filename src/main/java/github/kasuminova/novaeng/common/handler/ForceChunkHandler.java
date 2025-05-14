@@ -11,7 +11,7 @@ import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.Random;
+import java.util.*;
 
 public class ForceChunkHandler {
 
@@ -19,23 +19,28 @@ public class ForceChunkHandler {
     Random random = new Random();
     final int randomX = random.nextInt(100000) + 150000;
     final int randomY = random.nextInt(100000) + 150000;
+    final ChunkPos chunk = new ChunkPos(randomX, randomY);
     int time = 0;
+    Map<Integer,ForgeChunkManager.Ticket> map = new HashMap<>();
+    private static final Set<DimensionType> REGISTERED_DIMENSIONS = new HashSet<>();
 
     private void request(MinecraftServer server) {
-        for (DimensionType i : DimensionManager.getRegisteredDimensions().keySet()) {
+        if (REGISTERED_DIMENSIONS.isEmpty()){
+            REGISTERED_DIMENSIONS.addAll(DimensionManager.getRegisteredDimensions().keySet());
+        }
+        for (DimensionType i : REGISTERED_DIMENSIONS) {
             int id = i.getId();
             if (id != 2) {
                 if (DimensionManager.isDimensionRegistered(id)) {
                     WorldServer worldServer = server.getWorld(id);
-                    if (worldServer != null) {
+                    if (ForgeChunkManager.getPersistentChunksFor(worldServer).containsKey(chunk))continue;
+                    if (map.get(id) == null){
                         ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
-                        if (ticket != null) {
-                            worldServer.addScheduledTask(() -> {
-                                if (worldServer != null && ticket != null) {
-                                    ForgeChunkManager.forceChunk(ticket, new ChunkPos(randomX, randomY));
-                                }
-                            });
-                        }
+                        ticket.setChunkListDepth(1);
+                        map.put(id,ticket);
+                    }
+                    if (map.get(id) != null) {
+                        worldServer.addScheduledTask(() -> ForgeChunkManager.forceChunk(map.get(id), chunk));
                     }
                 }
             }
@@ -45,7 +50,7 @@ public class ForceChunkHandler {
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            if (time % 50 == 0) {
+            if (time % 100 == 0) {
                 request(Universe.get().server);
             }
             ++time;
