@@ -16,12 +16,12 @@ import java.util.*;
 public class ForceChunkHandler {
 
     public static final ForceChunkHandler INSTANCE = new ForceChunkHandler();
-    Random random = new Random();
-    final int randomX = random.nextInt(100000) + 150000;
-    final int randomY = random.nextInt(100000) + 150000;
-    final ChunkPos chunk = new ChunkPos(randomX, randomY);
+    static Random random = new Random();
+    static final int randomX = random.nextInt(100000) + 150000;
+    static final int randomY = random.nextInt(100000) + 150000;
+    public static final ChunkPos chunk = new ChunkPos(randomX, randomY);
     int time = 0;
-    Map<Integer,ForgeChunkManager.Ticket> map = new HashMap<>();
+    public static final Map<Integer,ForgeChunkManager.Ticket> map = new HashMap<>();
     private static final Set<DimensionType> REGISTERED_DIMENSIONS = new HashSet<>();
 
     private void request(MinecraftServer server) {
@@ -36,8 +36,10 @@ public class ForceChunkHandler {
                     if (ForgeChunkManager.getPersistentChunksFor(worldServer).containsKey(chunk))continue;
                     if (map.get(id) == null){
                         ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(FTBUtilities.INST, worldServer, ForgeChunkManager.Type.NORMAL);
-                        ticket.setChunkListDepth(1);
-                        map.put(id,ticket);
+                        if (ticket != null) {
+                            ticket.setChunkListDepth(1);
+                            map.put(id, ticket);
+                        }
                     }
                     if (map.get(id) != null) {
                         worldServer.addScheduledTask(() -> ForgeChunkManager.forceChunk(map.get(id), chunk));
