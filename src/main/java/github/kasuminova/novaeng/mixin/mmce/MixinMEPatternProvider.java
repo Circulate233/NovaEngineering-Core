@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.*;
 @Mixin(value = MEPatternProvider.class,remap = false)
 public abstract class MixinMEPatternProvider extends MEMachineComponent implements MEPatternProviderNova {
     @Unique
-    public boolean novaEngineering_Core$ignoreParallel = true;
+    public boolean novaEngineering_Core$ignoreParallel = false;
 
     @Shadow
     public abstract MEPatternProvider.WorkModeSetting getWorkMode();
