@@ -71,7 +71,7 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(EStorageEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EFabricatorEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(ForceChunkHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(WorldLoadedHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(RawOreHandler.INSTANCE);
 

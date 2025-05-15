@@ -4,13 +4,12 @@ import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
-import github.kasuminova.novaeng.common.handler.ForceChunkHandler;
+import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.network.*;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
@@ -125,11 +124,13 @@ public class NovaEngineeringCore {
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
         event.registerServerCommand(CommandSPacketProfiler.INSTANCE);
+        WorldLoadedHandler.REGISTERED_DIMENSIONS.clear();
+        WorldLoadedHandler.ERRORWROLD.clear();
+        WorldLoadedHandler.init = true;
     }
 
     @Mod.EventHandler
     public void onServerStopping(FMLServerStoppingEvent event) {
-        ForceChunkHandler.map.values().forEach(ticket -> ForgeChunkManager.unforceChunk(ticket,ForceChunkHandler.chunk));
         log.info("{}服务器正在关闭，正在生成网络包报告。", TextFormatting.BLUE);
         for (final String message : SPacketProfiler.getProfilerMessages()) {
             log.info(message);
