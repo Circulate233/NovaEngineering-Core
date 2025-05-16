@@ -13,6 +13,7 @@
       "AccessorParticleManager",
       "MixinFontRenderer",
       "MixinNetHandlerPlayClient",
-      "MixinNettyCompressionDecoder"
+      "MixinNettyCompressionDecoder",
+      "forge.MixinForgeHooksClient"
     ]
 }
