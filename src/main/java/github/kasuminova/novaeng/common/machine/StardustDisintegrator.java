@@ -20,7 +20,7 @@ import java.util.List;
 
 public class StardustDisintegrator implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "stardust_disintegrator");
-    public static final StardustDisintegrator STARDUST_DISINTEGRATOR = new StardustDisintegrator();
+    public static final StardustDisintegrator INSTANCE = new StardustDisintegrator();
 
     public static final List<BlockPos> CRYSTALS_POS_PRESET = Arrays.asList(
             // LEFT - MID - RIGHT
@@ -39,12 +39,17 @@ public class StardustDisintegrator implements MachineSpecial {
 
     @Override
     public void onSyncTick(final TileMultiblockMachineController controller) {
-        
+        MachineSpecial.super.onSyncTick(controller);
     }
 
     @Override
-    public void onTOPInfo(final ProbeMode probeMode, final IProbeInfo probeInfo, final EntityPlayer player, final IProbeHitData data, final TileMultiblockMachineController controller) {
-        
+    public void onTOPInfo(final ProbeMode probeMode,
+                          final IProbeInfo probeInfo,
+                          final EntityPlayer player,
+                          final IProbeHitData data,
+                          final TileMultiblockMachineController controller) {
+
+        MachineSpecial.super.onTOPInfo(probeMode, probeInfo, player, data, controller);
     }
 
     protected static void checkStructure(final MachineStructureUpdateEvent event) {

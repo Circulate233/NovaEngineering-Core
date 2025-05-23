@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class VoidMiner extends Drill{
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "void_miner");
-    public static final VoidMiner VOID_MINER = new VoidMiner();
+    public static final VoidMiner INSTANCE = new VoidMiner();
 
     @Override
     public ResourceLocation getRegistryName() {

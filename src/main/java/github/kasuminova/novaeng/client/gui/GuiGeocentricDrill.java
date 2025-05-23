@@ -113,7 +113,7 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
     }
 
     public void updateData() {
-        this.oreControlList.setStackList(GeocentricDrill.GEOCENTRIC_DRILL.getRawOres(), owner.getAccelerateOres());
+        this.oreControlList.setStackList(GeocentricDrill.INSTANCE.getRawOres(), owner.getAccelerateOres());
         this.dive.setAvailable(owner.getTargetDepth() < GeocentricDrill.MAX_DEPTH);
         this.ascend.setAvailable(owner.getTargetDepth() > GeocentricDrill.MIN_DEPTH);
     }

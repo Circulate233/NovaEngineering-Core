@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class SingularityCore implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "singularity_core");
-    public static final SingularityCore SINGULARITY_CORE = new SingularityCore();
+    public static final SingularityCore INSTANCE = new SingularityCore();
 
     @Override
     public void init(final DynamicMachine machine) {

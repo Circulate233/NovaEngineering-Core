@@ -32,7 +32,7 @@ import java.util.*;
 
 public class GeocentricDrill implements MachineSpecial {
 
-    public static final GeocentricDrill GEOCENTRIC_DRILL = new GeocentricDrill();
+    public static final GeocentricDrill INSTANCE = new GeocentricDrill();
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "earth_drill");
     public static final ResourceLocation RECIPE_REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "earth_drill_working");
 

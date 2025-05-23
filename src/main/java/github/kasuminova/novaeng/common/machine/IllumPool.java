@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 
 public class IllumPool implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "illum_pool");
-    public static final IllumPool ILLUM_POOL = new IllumPool();
+    public static final IllumPool INSTANCE = new IllumPool();
 
     public static final int MAX_MANA_STORE = 10_000_000;
     public static final int MAX_ILLUM_STORE = 10_000;

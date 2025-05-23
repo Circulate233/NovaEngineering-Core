@@ -75,7 +75,7 @@ public class GeocentricDrillController extends TileMachineController {
     }
 
     public synchronized void addAccelerateOre(final String accelerateOre) {
-        if (GeocentricDrill.GEOCENTRIC_DRILL.getRawOres().containsKey(accelerateOre)) {
+        if (GeocentricDrill.INSTANCE.getRawOres().containsKey(accelerateOre)) {
             accelerateOres.add(accelerateOre);
             accelerateOresChanged = true;
             markNoUpdateSync();
@@ -91,7 +91,7 @@ public class GeocentricDrillController extends TileMachineController {
 
     @Override
     public synchronized RecipeCraftingContext createContext(final ActiveMachineRecipe activeRecipe) {
-        MachineRecipe newRecipe = GeocentricDrill.GEOCENTRIC_DRILL.rebuildRecipe(activeRecipe.getRecipe(), accelerateOres);
+        MachineRecipe newRecipe = GeocentricDrill.INSTANCE.rebuildRecipe(activeRecipe.getRecipe(), accelerateOres);
         ActiveMachineRecipe modifiedRecipe = new ActiveMachineRecipe(newRecipe, activeRecipe.getMaxParallelism());
         modifiedRecipe.setTick(activeRecipe.getTick());
         modifiedRecipe.setTotalTick(activeRecipe.getTotalTick());

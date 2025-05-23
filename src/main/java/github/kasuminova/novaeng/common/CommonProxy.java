@@ -15,11 +15,8 @@ import github.kasuminova.novaeng.common.hypernet.old.recipe.HyperNetRecipeManage
 import github.kasuminova.novaeng.common.integration.IntegrationCRT;
 import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
+import github.kasuminova.novaeng.common.machine.*;
 import github.kasuminova.novaeng.common.machine.Drills.*;
-import github.kasuminova.novaeng.common.machine.GeocentricDrill;
-import github.kasuminova.novaeng.common.machine.IllumPool;
-import github.kasuminova.novaeng.common.machine.MMAltar;
-import github.kasuminova.novaeng.common.machine.SingularityCore;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
@@ -93,23 +90,24 @@ public class CommonProxy implements IGuiHandler {
         AssemblyLine.registerNetNode();
         HyperNetRecipeManager.registerRecipes();
         if (Mods.ASTRAL_SORCERY.isPresent() && Mods.BOTANIA.isPresent()) {
-            RegistryMachineSpecial.registrySpecialMachine(IllumPool.ILLUM_POOL);
+            RegistryMachineSpecial.registrySpecialMachine(IllumPool.INSTANCE);
         }
         if (Mods.GECKOLIB.isPresent()) {
-            RegistryMachineSpecial.registrySpecialMachine(SingularityCore.SINGULARITY_CORE);
+            RegistryMachineSpecial.registrySpecialMachine(SingularityCore.INSTANCE);
         }
-        RegistryMachineSpecial.registrySpecialMachine(MMAltar.MM_ALTAR);
-        RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.GEOCENTRIC_DRILL);
+        RegistryMachineSpecial.registrySpecialMachine(MMAltar.INSTANCE);
+        RegistryMachineSpecial.registrySpecialMachine(DreamEnergyCore.INSTANCE);
+        RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE);
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
         }
         if (Loader.isModLoaded("immersiveengineering")){
-            RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.MINERAL_EXTRACTOR);
-            RegistryMachineSpecial.registrySpecialMachine(VoidMiner.VOID_MINER);
-            RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.DIFFERENT_WORLD);
-            RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.MANA_ORE_DRILL);
-            RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.ORICHALCOS_DRILL);
+            RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.INSTANCE);
+            RegistryMachineSpecial.registrySpecialMachine(VoidMiner.INSTANCE);
+            RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.INSTANCE);
+            RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.INSTANCE);
+            RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.INSTANCE);
         }
         Register.TRAITREGISTER.registerModifiers();
     }

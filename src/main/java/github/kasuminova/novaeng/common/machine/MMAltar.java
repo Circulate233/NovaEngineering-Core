@@ -19,7 +19,7 @@ import java.util.List;
 
 public class MMAltar implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "mm_altar");
-    public static final MMAltar MM_ALTAR = new MMAltar();
+    public static final MMAltar INSTANCE = new MMAltar();
 
     public static final List<BlockPos> posSet1 = Arrays.asList(
         new BlockPos(-3,-5,-3), new BlockPos(-3,-5,3),

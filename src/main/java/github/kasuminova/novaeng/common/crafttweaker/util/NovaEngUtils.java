@@ -1,9 +1,11 @@
 package github.kasuminova.novaeng.common.crafttweaker.util;
 
 import crafttweaker.annotations.ZenRegister;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -12,6 +14,8 @@ import java.text.NumberFormat;
 @ZenClass("novaeng.NovaEngUtils")
 public class NovaEngUtils {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
+    public static final BigInteger BigLongMax = BigInteger.valueOf(Long.MAX_VALUE);
+    public static boolean isClient = FMLCommonHandler.instance().getEffectiveSide().isClient();
 
     static {
         DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_UP);
@@ -50,6 +54,36 @@ public class NovaEngUtils {
             return formatDouble((double) value / 1_000_000_000_000_000L, 2) + "P";
         } else {
             return formatDouble((double) value / 1_000_000_000_000_000_000L, 2) + "E";
+        }
+    }
+
+    @ZenMethod
+    public static String formatNumber(String value) {
+        var BigValue = new BigInteger(value);
+        var big = BigValue.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : BigValue.longValue();
+        String zf = "";
+        if (value.startsWith("-")){
+            zf += "-";
+        }
+        if (big < 1000) {
+            return zf + value;
+        } else if (big < 1000000) {
+            return zf + (big / 1000) + "K";
+        } else if (big < 1000000000) {
+            return zf + ((big / 1000)/ 1000) + "M";
+        } else if (big < 1000000000000L) {
+            return zf + ((big / 1000000)/ 1000) + "G";
+        } else if (big < 1000000000000000L) {
+            return zf + ((big / 1000000000)/ 1000) + "T";
+        } else if (big < 1000000000000000000L) {
+            return zf + ((big / 1_000_000_000_000L)/ 1000) + "P";
+        } else if (big != (Long.MAX_VALUE)){
+            return zf + ((big / 1_000_000_000_000_000L)/ 1000) + "E";
+        }  else {
+            int cfs = value.length() - 1;
+            float cft = (1.00f * Integer.parseInt(value.substring(0,3))) / 100;
+
+            return zf + cft + " * 10 ^ " + cfs;
         }
     }
 

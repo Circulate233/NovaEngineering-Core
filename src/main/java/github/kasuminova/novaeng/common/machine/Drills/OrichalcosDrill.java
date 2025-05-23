@@ -6,7 +6,7 @@ import net.minecraft.util.ResourceLocation;
 public class OrichalcosDrill extends Drill {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "orichalcos_drill");
-    public static final OrichalcosDrill ORICHALCOS_DRILL = new OrichalcosDrill();
+    public static final OrichalcosDrill INSTANCE = new OrichalcosDrill();
 
     @Override
     public ResourceLocation getRegistryName() {
