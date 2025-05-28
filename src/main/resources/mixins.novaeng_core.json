@@ -9,8 +9,10 @@
   ],
   "mixins": [
     "MixinCommonProxy",
+    "MixinMachineRecipe",
     "MixinMachineRegistry",
     "MixinMEPatternProvider",
+    "MixinRecipeAdapterBuilder",
     "MixinTaskExecutor",
     "MixinTileMultiblockMachineController"
   ]

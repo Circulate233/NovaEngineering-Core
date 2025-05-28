@@ -54,23 +54,28 @@ public class DreamEnergyCore implements MachineSpecial{
     @Override
     public void init(DynamicMachine machine) {
         if (isClient) {
-            machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
-                var ctrl = event.getController();
-                var data = ctrl.getCustomDataTag();
-                var speed = data.getFloat("speed");
-                var energyStored = data.getString("energyStored").isEmpty() ? "0":data.getString("energyStored");
-
-                String[] info = {
-                        "§b/////////// 梦之管理者 ///////////",
-                        "§b能量储存：§a" + formatNumber(energyStored) + " RF",
-                        "§b输入输出值：§a" + formatNumber((long) (defaultTransferAmount * speed)) + " RF/t",
-                        "§b一分钟内平均交互速度：§a" + change(ctrl) + " RF/t",
-                        "§b///////////////////////////////////"
-                };
-
-                event.setExtraInfo(info);
-            });
+            CInit(machine);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void CInit(DynamicMachine machine){
+        machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
+            var ctrl = event.getController();
+            var data = ctrl.getCustomDataTag();
+            var speed = data.getFloat("speed");
+            var energyStored = data.getString("energyStored").isEmpty() ? "0":data.getString("energyStored");
+
+            String[] info = {
+                    "§b/////////// 梦之管理者 ///////////",
+                    "§b能量储存：§a" + formatNumber(energyStored) + " RF",
+                    "§b输入输出值：§a" + formatNumber((long) (defaultTransferAmount * speed)) + " RF/t",
+                    "§b一分钟内平均交互速度：§a" + change(ctrl) + " RF/t",
+                    "§b///////////////////////////////////"
+            };
+
+            event.setExtraInfo(info);
+        });
     }
 
     private String change(TileMultiblockMachineController ctrl){

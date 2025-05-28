@@ -37,14 +37,14 @@ public class WorldLoadedHandler {
 
     private void request(MinecraftServer server) {
         if (init){
-            DimensionManager.getRegisteredDimensions().keySet().forEach(dim -> loadWorld(DimensionManager.getDimensions(dim)));
+            loadWorld(0,1,-1);
             init = false;
         } else {
             REGISTERED_DIMENSIONS.forEach(WorldLoadedHandler::loadWorld);
         }
     }
 
-    public static void loadWorld(int[] id){
+    public static void loadWorld(int... id){
         for (int i : id) {
             loadWorld(i);
         }
