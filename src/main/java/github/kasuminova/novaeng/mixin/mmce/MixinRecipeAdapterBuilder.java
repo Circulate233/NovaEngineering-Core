@@ -2,9 +2,9 @@ package github.kasuminova.novaeng.mixin.mmce;
 
 import github.kasuminova.novaeng.common.util.NovaRAB;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeAdapterBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import stanhebben.zenscript.annotations.NotNull;
 
 @Mixin(value = RecipeAdapterBuilder.class,remap = false)
 public class MixinRecipeAdapterBuilder implements NovaRAB {

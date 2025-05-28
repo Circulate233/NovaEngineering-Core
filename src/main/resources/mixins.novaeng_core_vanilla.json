@@ -1,19 +1,20 @@
 {
-    "package": "github.kasuminova.novaeng.mixin.minecraft",
-    "refmap": "mixins.novaeng_core.refmap.json",
-    "target": "@env(DEFAULT)",
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "mixins": [
-      "MixinNettyPacketDecoder",
-      "MixinRecipeBookServer",
-      "forge.MixinSimpleIndexedCodec"
-    ],
-    "client": [
-      "AccessorParticleManager",
-      "MixinFontRenderer",
-      "MixinNetHandlerPlayClient",
-      "MixinNettyCompressionDecoder",
-      "forge.MixinForgeHooksClient"
-    ]
+  "package": "github.kasuminova.novaeng.mixin.minecraft",
+  "refmap": "mixins.novaeng_core.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinGuiListExtended",
+    "MixinNettyPacketDecoder",
+    "MixinRecipeBookServer",
+    "forge.MixinSimpleIndexedCodec"
+  ],
+  "client": [
+    "AccessorParticleManager",
+    "MixinFontRenderer",
+    "MixinNetHandlerPlayClient",
+    "MixinNettyCompressionDecoder",
+    "forge.MixinForgeHooksClient"
+  ]
 }
