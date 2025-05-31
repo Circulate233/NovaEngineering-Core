@@ -36,4 +36,11 @@ public class RecipePrimerEx {
         }
         return primer;
     }
+
+    @ZenMethod
+    public static RecipePrimer setMultipleParallelized(final RecipePrimer primer, final int multipe) {
+        primer.addPreCheckHandler(event -> event.getActiveRecipe().setMaxParallelism((event.getActiveRecipe().getMaxParallelism() * multipe)));
+        return primer;
+    }
+
 }
