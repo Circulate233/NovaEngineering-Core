@@ -33,10 +33,16 @@ public class FixedSizeDeque<E> {
     }
 
     public E getFirst() {
+        if (deque.isEmpty()){
+            return null;
+        }
         return deque.getFirst();
     }
 
     public E getLast(){
+        if (deque.isEmpty()){
+            return null;
+        }
         return deque.getLast();
     }
 

@@ -58,20 +58,21 @@ public class NovaEngUtils {
     }
 
     @ZenMethod
-    public static String formatNumber(String value) {
-        var BigValue = new BigInteger(value).abs();
+    public static String formatNumber(BigInteger num) {
+        final var value = num.toString();
+        var BigValue = num.abs();
         long big = BigValue.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : BigValue.longValue();
-        String zf = "";
+        StringBuilder zf = new StringBuilder();
         if (value.startsWith("-")){
-            zf += "-";
+            zf.append("-");
         }
         if (big != (Long.MAX_VALUE)){
-            return formatNumber(big,1);
+            return zf.append(formatNumber(big,1)).toString();
         } else {
             int cfs = value.length() - 1;
             float cft = (1.00f * Integer.parseInt(value.substring(0,3))) / 100;
 
-            return zf + cft + " * 10 ^ " + cfs;
+            return zf.append(cft).append(" * 10 ^ ").append(cfs).toString();
         }
     }
 

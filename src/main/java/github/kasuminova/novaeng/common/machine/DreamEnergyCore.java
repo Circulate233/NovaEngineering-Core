@@ -162,13 +162,13 @@ public class DreamEnergyCore implements MachineSpecial{
         machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
             var ctrl = event.getController();
             var data = ctrl.getCustomDataTag();
-            var speed = data.getFloat("speed");
+            var speed = data.hasKey("speed") ? data.getFloat("speed") : 1.0f;
             var energyStored = data.getString("energyStored").isEmpty() ? "0":data.getString("energyStored");
 
             String[] info = {
                     "§b/////////// 梦之管理者 ///////////",
-                    "§b能量储存：§a" + formatNumber(energyStored) + " RF",
-                    "§b输入输出值：§a" + formatNumber((long) (defaultTransferAmount * speed)) + " RF/t",
+                    "§b能量储存：§a" + formatNumber(getBigInt(energyStored)) + " RF",
+                    "§b输入输出值：§a" + formatNumber((long) (defaultTransferAmount * speed),1) + " RF/t",
                     "§b一分钟内平均交互速度：§a" + change(ctrl) + " RF/t",
                     "§b///////////////////////////////////"
             };
@@ -243,11 +243,14 @@ public class DreamEnergyCore implements MachineSpecial{
         FixedSizeDeque<String> energy = getEnergyInfo(ctrl.getWorld(),ctrl.getPos());
         var newtime = energy.getFirst();
         var oldtime = energy.getLast();
-        var newbig = getBigInt(newtime);
-        var oldbig = getBigInt(oldtime);
-        var changel = newbig.subtract(oldbig);
-
-        return formatNumber(changel.compareTo(BigLongMax) >= 0 ? longmax : Long.toString(changel.longValue() / (1200L / MinuteScale * energy.size())));
+        var newbig = newtime == null ? BigInteger.ZERO : getBigInt(newtime);
+        var oldbig = oldtime == null ? BigInteger.ZERO : getBigInt(oldtime);
+        if (newbig.equals(oldbig)) {
+            return "0";
+        } else {
+            var changel = newbig.subtract(oldbig);
+            return formatNumber(newbig.subtract(oldbig));
+        }
     }
 
     private static FixedSizeDeque<String> getEnergyInfo(World world,BlockPos pos) {
