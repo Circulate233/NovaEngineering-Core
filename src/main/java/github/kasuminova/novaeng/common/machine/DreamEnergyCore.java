@@ -2,10 +2,16 @@ package github.kasuminova.novaeng.common.machine;
 
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent;
+import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
+import github.kasuminova.mmce.common.helper.IMachineController;
 import github.kasuminova.novaeng.common.util.FixedSizeDeque;
 import hellfirepvp.modularmachinery.ModularMachinery;
+import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
+import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeModifierBuilder;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
+import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,6 +21,7 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,16 +30,37 @@ import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.*;
 @ZenRegister
 @ZenClass("novaeng.DreamEnergyCore")
 public class DreamEnergyCore implements MachineSpecial{
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "dream_energy_core");
+    private static final String MachineID = "dream_energy_core";
+    private static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
     public static final DreamEnergyCore INSTANCE = new DreamEnergyCore();
-    public static long defaultTransferAmount = 10000000;
     private static final Map<World,Map<BlockPos, FixedSizeDeque<String>>> map = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Map<String, BigInteger>> ENERGY_STORED_CACHE =
+            ThreadLocal.withInitial(HashMap::new);
+
     private static final int MinuteScale = 30;
+    //最小传输速度,按倍计。
+    private static float minSpeed = 0.01f;
+    //最大传输速度,按倍计。
+    private static int maxSpeed = 40000;
+    //基础输入输出速度。能量输入输出速度计算方法为：defaultTransferAmount * speed,其中 speed 可由玩家控制。
+    private static long defaultTransferAmount = 10000000;
 
     @ZenMethod
-    public static long setDefaultTransferAmount(long value){
-        defaultTransferAmount = value;
+    public static long setDefaultTransferAmount(long varue){
+        defaultTransferAmount = varue;
         return defaultTransferAmount;
+    }
+
+    @ZenMethod
+    public static float setMinSpeed(float varue){
+        minSpeed = varue;
+        return minSpeed;
+    }
+
+    @ZenMethod
+    public static int setMaxSpeed(int varue){
+        maxSpeed = varue;
+        return maxSpeed;
     }
 
     @Override
@@ -53,9 +81,80 @@ public class DreamEnergyCore implements MachineSpecial{
 
     @Override
     public void init(DynamicMachine machine) {
+        SInit(machine);
         if (isClient) {
             CInit(machine);
         }
+    }
+
+    public void SInit(DynamicMachine machine){
+        machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
+            TileMultiblockMachineController controller = event.getController();
+            controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC);
+        });
+        var inputThreadName = "梦之收集者";
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread(inputThreadName));
+        var outputThreadName = "梦之释放者";
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread(outputThreadName));
+        var fairyCraftingThreadName = "梦之同步者";
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread(fairyCraftingThreadName));
+        var manaCraftingThreadName = "梦之聚合者";
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread(manaCraftingThreadName));
+
+        // 输出配方
+        RecipeBuilder.newBuilder("extract", MachineID, 1, 1, true)
+                .addEnergyPerTickOutput(defaultTransferAmount)
+                .addPreCheckHandler(event -> {
+                    var ctrl = event.getController();
+                    var data = ctrl.getCustomDataTag();
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
+                    var energy = data.hasKey("energyStored") ? "0" : data.getString("energyStored");
+                    if (!canExtract(data, speed)) {
+                        event.setFailed("内部能量储量不足！");
+                        return;
+                    }
+                    ctrl.addPermanentModifier("extract", RecipeModifierBuilder.create("modularmachinery:energy", "output", speed, 1, false).build());
+                })
+                .addFactoryFinishHandler(event -> {
+                    var ctrl = event.getController();
+                    var thread = event.getFactoryRecipeThread();
+                    var data = ctrl.getCustomDataTag();
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
+                    extractEnergy(data, speed, defaultTransferAmount);
+                })
+                .setParallelized(false)
+                .addRecipeTooltip("由梦之收集者运行。", "在智能数据接口处修改速度。")
+                .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
+                .setThreadName(outputThreadName)
+                .build();
+
+        // 输入配方
+        RecipeBuilder.newBuilder("receive", MachineID, 1, 2, true)
+                .addEnergyPerTickInput(defaultTransferAmount)
+                .addFactoryPreTickHandler(event -> {
+                    var ctrl = event.getController();
+                    var data = ctrl.getCustomDataTag();
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
+                    ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
+                })
+                .addPreCheckHandler(event -> {
+                    var ctrl = event.getController();
+                    var data = ctrl.getCustomDataTag();
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
+                    ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
+                })
+                .addFactoryPostTickHandler(event -> {
+                    var ctrl = event.getController();
+                    var thread = event.getFactoryRecipeThread();
+                    var data = ctrl.getCustomDataTag();
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
+                    receiveEnergy(data, speed);
+                })
+                .setParallelized(false)
+                .addRecipeTooltip("由梦之释放者运行。", "在智能数据接口处修改速度。")
+                .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
+                .setThreadName(inputThreadName)
+                .build();
     }
 
     @SideOnly(Side.CLIENT)
@@ -78,15 +177,77 @@ public class DreamEnergyCore implements MachineSpecial{
         });
     }
 
+    /**
+     * 能否提取能量。
+     */
+    private static boolean canExtract(NBTTagCompound nbt,float speed){
+        if (nbt.hasKey("energyStored")) {
+            var energyStored = getBigInt(nbt.getString("energyStored"));
+            var sz = (long) (speed * defaultTransferAmount);
+            if (energyStored.compareTo(BigLongMax) >= 0) {
+                if (ENERGY_STORED_CACHE.get().size() > 800) {
+                    ENERGY_STORED_CACHE.get().clear();
+                }
+                return true;
+            }
+            return energyStored.longValue() >= sz;
+        }
+        return false;
+    }
+
+    /**
+     * 将能量存储进控制器内部。
+     */
+    private static void receiveEnergy(NBTTagCompound nbt,float speed) {
+        var energyStored = nbt.hasKey("energyStored") ? getBigInt(nbt.getString("energyStored")) : BigInteger.ZERO;
+        var sz = BigInteger.valueOf((long) (speed * defaultTransferAmount));
+
+        nbt.setString("energyStored",energyStored.add(sz).toString());
+        if (ENERGY_STORED_CACHE.get().size() > 800) {
+            ENERGY_STORED_CACHE.get().clear();
+        }
+    }
+
+    /**
+     * 提取控制器内部能量至能量输出仓。
+     */
+    private static void extractEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
+        var energyStored = nbt.hasKey("energyStored") ? getBigInt(nbt.getString("energyStored")) : BigInteger.ZERO;
+        var sz = BigInteger.valueOf((long) (speed * defaultTransferAmount));
+
+        nbt.setString("energyStored",energyStored.subtract(sz).toString());
+        if (ENERGY_STORED_CACHE.get().size() > 800) {
+            ENERGY_STORED_CACHE.get().clear();
+        }
+    }
+
+    /**
+     * 额外的crt方法复用方法作为能量消耗方法
+     * @param ctrl 控制器
+     * @param speed 倍率
+     * @param amount 每倍率消耗
+     */
+    @ZenMethod
+    public static void extractEnergy(IMachineController ctrl,float speed,long amount){
+        extractEnergy(ctrl.getController().getCustomDataTag(),speed,amount);
+    }
+
+    @ZenMethod
+    public static BigInteger getBigInt(String num){
+        return ENERGY_STORED_CACHE.get().computeIfAbsent(num, BigInteger::new);
+    }
+
+    private static final String longmax = Long.toString(Long.MAX_VALUE);
+
     private String change(TileMultiblockMachineController ctrl){
         FixedSizeDeque<String> energy = getEnergyInfo(ctrl.getWorld(),ctrl.getPos());
         var newtime = energy.getFirst();
         var oldtime = energy.getLast();
-        var newbig = new BigInteger(newtime);
-        var oldbig = new BigInteger(oldtime);
+        var newbig = getBigInt(newtime);
+        var oldbig = getBigInt(oldtime);
         var changel = newbig.subtract(oldbig);
 
-        return formatNumber(changel.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : changel.longValue() / (1200L / MinuteScale * energy.size()));
+        return formatNumber(changel.compareTo(BigLongMax) >= 0 ? longmax : Long.toString(changel.longValue() / (1200L / MinuteScale * energy.size())));
     }
 
     private static FixedSizeDeque<String> getEnergyInfo(World world,BlockPos pos) {

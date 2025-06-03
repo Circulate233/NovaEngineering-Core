@@ -59,27 +59,15 @@ public class NovaEngUtils {
 
     @ZenMethod
     public static String formatNumber(String value) {
-        var BigValue = new BigInteger(value);
-        var big = BigValue.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : BigValue.longValue();
+        var BigValue = new BigInteger(value).abs();
+        long big = BigValue.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : BigValue.longValue();
         String zf = "";
         if (value.startsWith("-")){
             zf += "-";
         }
-        if (big < 1000) {
-            return zf + value;
-        } else if (big < 1000000) {
-            return zf + (big / 1000) + "K";
-        } else if (big < 1000000000) {
-            return zf + ((big / 1000)/ 1000) + "M";
-        } else if (big < 1000000000000L) {
-            return zf + ((big / 1000000)/ 1000) + "G";
-        } else if (big < 1000000000000000L) {
-            return zf + ((big / 1000000000)/ 1000) + "T";
-        } else if (big < 1000000000000000000L) {
-            return zf + ((big / 1_000_000_000_000L)/ 1000) + "P";
-        } else if (big != (Long.MAX_VALUE)){
-            return zf + ((big / 1_000_000_000_000_000L)/ 1000) + "E";
-        }  else {
+        if (big != (Long.MAX_VALUE)){
+            return formatNumber(big,1);
+        } else {
             int cfs = value.length() - 1;
             float cft = (1.00f * Integer.parseInt(value.substring(0,3))) / 100;
 

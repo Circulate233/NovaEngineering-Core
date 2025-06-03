@@ -84,8 +84,7 @@ public class CommonProxy implements IGuiHandler {
                 new ResourceLocation(ModularMachinery.MODID, "hypernet_terminal"),
                 HyperNetTerminal.class
         );
-
-        IntegrationTOP.registerProvider();
+        if (Loader.isModLoaded("theoneprobe")) IntegrationTOP.registerProvider();
         RecipeAdapterExtended.registerAdapter();
         AssemblyLine.registerNetNode();
         HyperNetRecipeManager.registerRecipes();

@@ -55,7 +55,9 @@ public class RegistryItems {
         ITEMS_TO_REGISTER.add(ECalculatorCell.L4);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
         ITEMS_TO_REGISTER.add(ECalculatorCell.L9);
-        ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
+        if (Mods.ASTRAL_SORCERY.isPresent()) {
+            ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
+        }
 
         ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
 

@@ -23,7 +23,7 @@ public class IBlockPosEx {
             case WEST -> new MCBlockPos(z,y,-x);
             case UP -> new MCBlockPos(x,-z,y);
             case DOWN -> new MCBlockPos(x,z,y);
-            default -> instance;
+            case NORTH -> new MCBlockPos(x,y,z);
         };
     }
 
