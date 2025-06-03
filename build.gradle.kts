@@ -294,6 +294,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:betterer-p2p-943734:4928154"))
     implementation(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:6160826"))
     implementation(rfg.deobf("curse.maven:Loot-Overhaul-299389:2711740"))
+    implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(kotlin("stdlib-jdk8"))
 }
 

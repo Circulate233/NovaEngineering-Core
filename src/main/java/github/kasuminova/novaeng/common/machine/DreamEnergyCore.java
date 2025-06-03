@@ -30,8 +30,8 @@ import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.*;
 @ZenRegister
 @ZenClass("novaeng.DreamEnergyCore")
 public class DreamEnergyCore implements MachineSpecial{
-    private static final String MachineID = "dream_energy_core";
-    private static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
+    public static final String MachineID = "dream_energy_core";
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
     public static final DreamEnergyCore INSTANCE = new DreamEnergyCore();
     private static final Map<World,Map<BlockPos, FixedSizeDeque<String>>> map = new ConcurrentHashMap<>();
     private static final ThreadLocal<Map<String, BigInteger>> ENERGY_STORED_CACHE =
@@ -41,9 +41,9 @@ public class DreamEnergyCore implements MachineSpecial{
     //最小传输速度,按倍计。
     private static float minSpeed = 0.01f;
     //最大传输速度,按倍计。
-    private static int maxSpeed = 40000;
+    private static int maxSpeed = 100000;
     //基础输入输出速度。能量输入输出速度计算方法为：defaultTransferAmount * speed,其中 speed 可由玩家控制。
-    private static long defaultTransferAmount = 10000000;
+    private static long defaultTransferAmount = 100000000;
 
     @ZenMethod
     public static long setDefaultTransferAmount(long varue){
@@ -248,8 +248,9 @@ public class DreamEnergyCore implements MachineSpecial{
         if (newbig.equals(oldbig)) {
             return "0";
         } else {
-            var changel = newbig.subtract(oldbig);
-            return formatNumber(newbig.subtract(oldbig));
+            var changel = newbig.subtract(oldbig).longValue();
+            var denominator = 1200L / MinuteScale * energy.size();
+            return formatNumber(changel / denominator);
         }
     }
 
