@@ -10,6 +10,7 @@ import github.kasuminova.novaeng.common.item.ItemBlockME;
 import github.kasuminova.novaeng.common.item.ecalculator.*;
 import github.kasuminova.novaeng.common.item.efabriactor.*;
 import github.kasuminova.novaeng.common.item.estorage.ItemEStorageController;
+import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.*;
@@ -65,6 +66,7 @@ public class RegistryBlocks {
         prepareItemBlockRegister(registerBlock(BlockSingularityCoreController.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockGeocentricDrillController.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockRedstoneLogicalPort.INSTANCE));
+        prepareItemBlockRegister(registerBlock(BlockDreamEnergyPort.INSTANCE));
 
         // EStorage
         prepareItemBlockRegister(new ItemEStorageController(registerBlock(BlockEStorageController.L4)));
@@ -122,6 +124,7 @@ public class RegistryBlocks {
         registerTileEntity(TileModularServerAssembler.class, "modular_server_assembler");
         registerTileEntity(SingularityCore.class, "singularity_core");
         registerTileEntity(GeocentricDrillController.class, "geocentric_drill_controller");
+        registerTileEntity(TileDreamEnergyPort.class,"dream_energy_port");
 
         // EStorage
         registerTileEntity(EStorageController.class, "estorage_controller");

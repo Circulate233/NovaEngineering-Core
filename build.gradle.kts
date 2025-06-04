@@ -13,7 +13,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.22.2"
+version = "1.22.3"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -295,6 +295,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:6160826"))
     implementation(rfg.deobf("curse.maven:Loot-Overhaul-299389:2711740"))
     implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
+    implementation(rfg.deobf("curse.maven:Flux-Networks-248020:3178199"))
     implementation(kotlin("stdlib-jdk8"))
 }
 
