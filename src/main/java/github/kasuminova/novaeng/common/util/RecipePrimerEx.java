@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.util;
 
 import crafttweaker.annotations.ZenRegister;
+import github.kasuminova.novaeng.mixin.util.NovaRAB;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentSelectorTag;
 import hellfirepvp.modularmachinery.common.crafting.requirement.RequirementItem;

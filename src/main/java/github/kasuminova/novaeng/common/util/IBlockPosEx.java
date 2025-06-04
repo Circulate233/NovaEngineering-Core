@@ -14,9 +14,9 @@ public class IBlockPosEx {
 
     @ZenMethod
     public static IBlockPos createPosByFacing(IBlockPos instance,IFacing facing,int NorthX,int NorthY,int NorthZ){
-        var x = instance.getX();
-        var y = instance.getY();
-        var z = instance.getZ();
+        var x = instance.getX() + NorthX;
+        var y = instance.getY() + NorthY;
+        var z = instance.getZ() + NorthZ;
         return switch ((EnumFacing) facing.getInternal()) {
             case SOUTH -> new MCBlockPos(-x,y,-z);
             case EAST -> new MCBlockPos(-z,y,x);

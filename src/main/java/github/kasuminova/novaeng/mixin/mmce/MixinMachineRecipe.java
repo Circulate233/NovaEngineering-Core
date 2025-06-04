@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import github.kasuminova.novaeng.common.util.NovaRAB;
+import github.kasuminova.novaeng.mixin.util.NovaRAB;
 import hellfirepvp.modularmachinery.common.crafting.MachineRecipe;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentSelectorTag;
