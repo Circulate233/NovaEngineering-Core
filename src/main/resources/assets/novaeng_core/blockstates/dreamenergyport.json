@@ -1,0 +1,19 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "novaeng_core:dreamenergyport"
+  },
+  "variants": {
+    "connected=false":  {
+      "model": "novaeng_core:dreamenergyport"
+    },
+    "connected=true":  {
+      "model": "novaeng_core:dreamenergyport"
+    },
+    "inventory": [
+      {
+        "transform": "forge:default-block"
+      }
+    ]
+  }
+}

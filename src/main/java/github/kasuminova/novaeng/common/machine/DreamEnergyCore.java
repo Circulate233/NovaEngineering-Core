@@ -225,7 +225,7 @@ public class DreamEnergyCore implements MachineSpecial{
      */
     public static void receiveEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
         var energyStored = getEnergyStored(nbt);
-        var sz = getBigInt(Long.toString((long) (speed * defaultTransferAmount)));
+        var sz = getBigInt((long) (speed * defaultTransferAmount));
 
         nbt.setString("energyStored",energyStored.add(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
@@ -238,7 +238,7 @@ public class DreamEnergyCore implements MachineSpecial{
      */
     public static void extractEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
         var energyStored = getEnergyStored(nbt);
-        var sz = getBigInt(Long.toString((long) (speed * defaultTransferAmount)));
+        var sz = getBigInt((long) (speed * defaultTransferAmount));
 
         nbt.setString("energyStored",energyStored.subtract(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
@@ -278,6 +278,11 @@ public class DreamEnergyCore implements MachineSpecial{
     }
 
     @ZenMethod
+    public static BigInteger getBigInt(long num){
+        return getBigInt(Long.toString(num));
+    }
+
+    @ZenMethod
     public static BigInteger getBigInt(String num){
         return ENERGY_STORED_CACHE.computeIfAbsent(num, BigInteger::new);
     }
@@ -293,9 +298,13 @@ public class DreamEnergyCore implements MachineSpecial{
         if (newbig.equals(oldbig)) {
             return "0";
         } else {
-            var changel = newbig.subtract(oldbig).longValue();
+            var changel = newbig.subtract(oldbig);
             var denominator = 1200L / MinuteScale * energy.size();
-            return formatNumber(changel / denominator);
+            if (changel.compareTo(BigLongMax) > 0) {
+                return formatNumber(changel.divide(getBigInt(denominator)));
+            } else {
+                return formatNumber(changel.longValue() / denominator);
+            }
         }
     }
 

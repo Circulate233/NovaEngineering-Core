@@ -8,6 +8,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,6 +17,7 @@ import sonar.fluxnetworks.common.block.BlockFluxStorage;
 import sonar.fluxnetworks.common.registry.RegistryBlocks;
 import sonar.fluxnetworks.common.registry.RegistryItems;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -46,5 +49,18 @@ public class BlockDreamEnergyPort extends BlockFluxStorage {
         super.addInformation(stack, player, tooltip, advanced);
         tooltip.add(I18n.format("text.dream_energy_port.0"));
         tooltip.add(I18n.format("text.dream_energy_port.1"));
+    }
+
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    @Nonnull
+    @Override
+    public EnumBlockRenderType getRenderType(@Nonnull IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "modularmachinery:block/blockmodel_overlay_all",
+  "textures": {
+    "bg_all": "contenttweaker:blocks/extrememachineblock",
+    "ov_all": "fluxnetworks:items/fluxcore"
+  }
+}
