@@ -24,11 +24,11 @@ public class IBlockPosEx {
         var z = instance.getZ() + NorthZ;
         return switch (facing) {
             case SOUTH -> new BlockPos(-x,y,-z);
+            case NORTH -> new BlockPos(x,y,z);
             case EAST -> new BlockPos(-z,y,x);
             case WEST -> new BlockPos(z,y,-x);
             case UP -> new BlockPos(x,-z,y);
             case DOWN -> new BlockPos(x,z,y);
-            case NORTH -> new BlockPos(x,y,z);
         };
     }
 

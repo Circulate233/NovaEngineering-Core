@@ -25,8 +25,8 @@ public class TileDreamEnergyPort extends TileFluxStorage {
     public TileDreamEnergyPort() {
         this.customName = "Dream Energy Port";
         this.limit = (long) FluxConfig.gargantuanTransfer;
-        this.handler = new DreamEnergyPortHandler(this);
         this.stack = new ItemStack(BlockDreamEnergyPort.INSTANCE);
+        this.handler = new DreamEnergyPortHandler(this);
     }
 
     @Override
@@ -53,10 +53,17 @@ public class TileDreamEnergyPort extends TileFluxStorage {
     }
 
     @Override
+    public int getLogicPriority() {
+        return this.surgeMode ? -100000 : Math.min(this.priority - 1000000, -100000);
+    }
+
+    @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         if (compound.hasKey("ctrlPos")){
             this.ctrlPos = BlockPos.fromLong(compound.getLong("ctrlPos"));
+            this.handler.setCtrlPos(this.ctrlPos);
+            this.handler.setWorld(this.world);
         }
     }
 
@@ -66,6 +73,9 @@ public class TileDreamEnergyPort extends TileFluxStorage {
     }
 
     public boolean getCtrlStructureFormed(){
+        if (this.ctrlPos == null){
+            return false;
+        }
         if (this.world.getTileEntity(ctrlPos) instanceof TileMultiblockMachineController ctrl) {
             if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)){
                 return ctrl.isStructureFormed();

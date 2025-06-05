@@ -214,6 +214,7 @@ top.ecalculator.thread_core.avg_parallelism=§9平均并行数:
 top.ecalculator.thread_core.avg_time_usage=§b平均性能使用:
 
 tile.novaeng_core.redstone_logical_port.name=红石逻辑端口
+tile.novaeng_core.dream_energy_port.name=通量交互端口
 
 tile.novaeng_core.hypernet_terminal_controller.name=HyperNet 网络终端
 tile.novaeng_core.modular_server_assembler.name=模块服务器组装台（未实装）
@@ -538,6 +539,9 @@ gui.geocentric_drill.ore_control.tooltip.chance=输出权重:§a%s%%§f
 
 gui.novaeng_core.replicator=可复制列表
 gui.novaeng_core.replicator.tooltips1=需要%sB UU物质复制
+
+text.dream_energy_port.0="替换梦之能量核心的智能数据接口以启用通量模式"
+text.dream_energy_port.1="通量模式下,梦之能量核心将直接作为通量网络缓存"
 
 enchantment.magic_breaking=破魔
 enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们

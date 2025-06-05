@@ -43,7 +43,7 @@ public class DreamEnergyCore implements MachineSpecial{
     private static float minSpeed = 0.01f;
     //最大传输速度,按倍计。
     private static int maxSpeed = 100000;
-    //基础输入输出速度。能量输入输出速度计算方法为：defaultTransferAmount * speed,其中 speed 可由玩家控制。
+    //基础输入输出速度。能量输入输出速度计算方法为:defaultTransferAmount * speed,其中 speed 可由玩家控制。
     private static long defaultTransferAmount = 100000000;
 
     private static IBlockPos facePos;
@@ -105,6 +105,9 @@ public class DreamEnergyCore implements MachineSpecial{
             }
             if (ctrl.getWorld().getTileEntity(facePos) instanceof TileDreamEnergyPort tdep){
                 tdep.setCtrlPos(ctrl.getPos());
+                ctrl.getCustomDataTag().setBoolean("wireless",true);
+            } else {
+                ctrl.getCustomDataTag().setBoolean("wireless",false);
             }
         });
         var inputThreadName = "梦之收集者";
@@ -124,6 +127,10 @@ public class DreamEnergyCore implements MachineSpecial{
                     var data = ctrl.getCustomDataTag();
                     var speed = Math.max(1.0f,data.getFloat("speed"));
                     var energy = data.hasKey("energyStored") ? "0" : data.getString("energyStored");
+                    if (data.getBoolean("wireless")){
+                        event.setFailed("当前处于通量模式");
+                        return;
+                    }
                     if (!canExtract(data, speed)) {
                         event.setFailed("内部能量储量不足！");
                         return;
@@ -145,6 +152,11 @@ public class DreamEnergyCore implements MachineSpecial{
         // 输入配方
         RecipeBuilder.newBuilder("receive", MachineID, 1, 2, true)
                 .addEnergyPerTickInput(defaultTransferAmount)
+                .addPreCheckHandler(event -> {
+                    if (event.getController().getCustomDataTag().getBoolean("wireless")){
+                        event.setFailed("当前处于通量模式");
+                    }
+                })
                 .addFactoryPreTickHandler(event -> {
                     var ctrl = event.getController();
                     var data = ctrl.getCustomDataTag();
@@ -180,9 +192,9 @@ public class DreamEnergyCore implements MachineSpecial{
 
             String[] info = {
                     "§b/////////// 梦之管理者 ///////////",
-                    "§b能量储存：§a" + formatNumber(getBigInt(energyStored)) + " RF",
-                    "§b输入输出值：§a" + formatNumber((long) (defaultTransferAmount * speed),1) + " RF/t",
-                    "§b一分钟内平均交互速度：§a" + change(ctrl) + " RF/t",
+                    "§b能量储存:§a" + formatNumber(getBigInt(energyStored)) + " RF",
+                    data.getBoolean("wireless") ? "§b输入输出速度:#FF6347-FFA54F-FFFF00-7FFF00-40E0D0-00BFFFInfinity" : "§b输入输出速度:§a" + formatNumber((long) (defaultTransferAmount * speed),1) + " RF/t",
+                    "§b一分钟内平均交互速度:§a" + change(ctrl) + " RF/t",
                     "§b///////////////////////////////////"
             };
 
@@ -211,9 +223,9 @@ public class DreamEnergyCore implements MachineSpecial{
     /**
      * 将能量存储进控制器内部。
      */
-    private static void receiveEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
+    public static void receiveEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
         var energyStored = getEnergyStored(nbt);
-        var sz = BigInteger.valueOf((long) (speed * defaultTransferAmount));
+        var sz = getBigInt(Long.toString((long) (speed * defaultTransferAmount)));
 
         nbt.setString("energyStored",energyStored.add(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
@@ -224,9 +236,9 @@ public class DreamEnergyCore implements MachineSpecial{
     /**
      * 提取控制器内部能量至能量输出仓。
      */
-    private static void extractEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
+    public static void extractEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
         var energyStored = getEnergyStored(nbt);
-        var sz = BigInteger.valueOf((long) (speed * defaultTransferAmount));
+        var sz = getBigInt(Long.toString((long) (speed * defaultTransferAmount)));
 
         nbt.setString("energyStored",energyStored.subtract(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
@@ -238,6 +250,7 @@ public class DreamEnergyCore implements MachineSpecial{
         return nbt.hasKey("energyStored") ? getBigInt(nbt.getString("energyStored")) : BigInteger.ZERO;
     }
 
+    @ZenMethod
     public static BigInteger getEnergyStored(IMachineController ctrl){
         return getEnergyStored(ctrl.getController().getCustomDataTag());
     }

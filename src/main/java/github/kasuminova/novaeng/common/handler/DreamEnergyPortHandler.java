@@ -10,7 +10,6 @@ import sonar.fluxnetworks.common.connection.transfer.BasicTransferHandler;
 import sonar.fluxnetworks.common.tileentity.TileFluxStorage;
 
 public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergyPort> {
-    private long added;
     private long removed;
     private BlockPos ctrlPos;
     private World world;
@@ -36,9 +35,11 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
 
     @Override
     public void onCycleEnd() {
-        this.change = this.added - this.removed;
-        this.added = 0L;
         this.removed = 0L;
+        if (this.buffer > 0){
+            this.addToBuffer(this.buffer);
+            this.buffer = 0L;
+        }
     }
 
     @Override
@@ -49,17 +50,16 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
     public void addToBuffer(long energy) {
         if (energy > 0L) {
             DreamEnergyCore.receiveEnergy(getCtrl(),1,energy);
-            this.added += energy;
             ((TileFluxStorage)this.device).markServerEnergyChanged();
         }
     }
 
     public long removeFromBuffer(long energy) {
-        long a = Math.min(Math.min(energy, this.getBuffer()), ((TileFluxStorage)this.device).getLogicLimit() - this.removed);
+        long a = Math.min(Math.min(energy, this.getBuffer()), Math.max(Long.MAX_VALUE - this.removed,0));
         if (a <= 0L) {
             return 0L;
         } else {
-            DreamEnergyCore.extractEnergy(getCtrl(),1,energy);
+            DreamEnergyCore.extractEnergy(getCtrl(),1,a);
             this.removed += a;
             ((TileFluxStorage)this.device).markServerEnergyChanged();
             return a;
@@ -75,7 +75,7 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
     }
 
     public TileMultiblockMachineController getCtrl(){
-        if (ctrlPos == null){
+        if (ctrlPos == null || this.world == null){
             return null;
         }
         if (this.world.getTileEntity(ctrlPos) instanceof TileMultiblockMachineController ctrl) {
