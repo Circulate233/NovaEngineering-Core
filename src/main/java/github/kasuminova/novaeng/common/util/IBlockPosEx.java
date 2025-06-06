@@ -18,18 +18,14 @@ public class IBlockPosEx {
         return new MCBlockPos(createPosByFacing((BlockPos) instance.getInternal(),(EnumFacing) facing.getInternal(),NorthX,NorthY,NorthZ));
     }
 
-    public static BlockPos createPosByFacing(BlockPos instance, EnumFacing facing, int NorthX, int NorthY, int NorthZ){
-        var x = instance.getX() + NorthX;
-        var y = instance.getY() + NorthY;
-        var z = instance.getZ() + NorthZ;
+    public static BlockPos createPosByFacing(BlockPos instance, EnumFacing facing, int x, int y, int z){
         return switch (facing) {
-            case SOUTH -> new BlockPos(-x,y,-z);
-            case NORTH -> new BlockPos(x,y,z);
-            case EAST -> new BlockPos(-z,y,x);
-            case WEST -> new BlockPos(z,y,-x);
-            case UP -> new BlockPos(x,-z,y);
-            case DOWN -> new BlockPos(x,z,y);
+            case NORTH -> instance.add(x,y,z);
+            case SOUTH -> instance.add(-x,y,-z);
+            case EAST -> instance.add(-z,y,x);
+            case WEST -> instance.add(z,y,-x);
+            case UP -> instance.add(x,-z,y);
+            case DOWN -> instance.add(x,z,y);
         };
     }
-
 }

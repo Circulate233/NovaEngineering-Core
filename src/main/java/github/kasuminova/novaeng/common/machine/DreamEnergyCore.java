@@ -153,17 +153,15 @@ public class DreamEnergyCore implements MachineSpecial{
         RecipeBuilder.newBuilder("receive", MachineID, 1, 2, true)
                 .addEnergyPerTickInput(defaultTransferAmount)
                 .addPreCheckHandler(event -> {
-                    if (event.getController().getCustomDataTag().getBoolean("wireless")){
-                        event.setFailed("当前处于通量模式");
-                    }
-                })
-                .addFactoryPreTickHandler(event -> {
                     var ctrl = event.getController();
                     var data = ctrl.getCustomDataTag();
+                    if (data.getBoolean("wireless")){
+                        event.setFailed("当前处于通量模式");
+                    }
                     var speed = Math.max(1.0f,data.getFloat("speed"));
                     ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
                 })
-                .addPreCheckHandler(event -> {
+                .addFactoryPreTickHandler(event -> {
                     var ctrl = event.getController();
                     var data = ctrl.getCustomDataTag();
                     var speed = Math.max(1.0f,data.getFloat("speed"));
