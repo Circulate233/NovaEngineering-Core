@@ -30,6 +30,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.trait.Register;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
+import github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader;
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
@@ -61,6 +62,10 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void preInit() {
+        if (Loader.isModLoaded("ecoaeextension")){
+            throw new RuntimeException(NovaEngCoreEarlyMixinLoader.getString("mod.ecoae.warning"));
+        }
+
         NetworkRegistry.INSTANCE.registerGuiHandler(NovaEngineeringCore.MOD_ID, this);
 
         MinecraftForge.EVENT_BUS.register(IntegrationCRT.INSTANCE);

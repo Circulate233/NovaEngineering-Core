@@ -109,12 +109,6 @@ public class IllumPool implements MachineSpecial {
                 Collections.emptyList(),
                 Collections.singletonList("魔力池上方布满彩虹桥方块可使其激活§a普通模式§f，催化剂模式必须基于此模式。"),
                 StackUtils.getStackFromBlockState(blockBifrostPerm.getDefaultState())));
-        // 星光模式
-        machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(STARLIGHT_CATALYST,
-                buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
-                Collections.emptyList(),
-                Collections.singletonList("魔力池上方倒满星能液可使其激活§b星光模式§f，与催化剂模式冲突。"),
-                StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));
         // 炼金模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(ALCHEMY_CATALYST,
                 buildModifierReplacementBlockArray(blockAlchemyCatalyst, CATALYST_POS_PRESET),
@@ -133,6 +127,12 @@ public class IllumPool implements MachineSpecial {
                 Collections.emptyList(),
                 Collections.singletonList("将彩虹桥方块下方的§c所有方块§f替换为§5次元催化器§f方块可使其激活§5次元模式§f。"),
                 StackUtils.getStackFromBlockState(blockDimensionCatalyst.getDefaultState())));
+        // 星光模式
+        machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(STARLIGHT_CATALYST,
+                buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
+                Collections.emptyList(),
+                Collections.singletonList("魔力池上方倒满星能液可使其激活§b星光模式§f，与催化剂模式冲突。"),
+                StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));
 
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
             TileMultiblockMachineController controller = event.getController();

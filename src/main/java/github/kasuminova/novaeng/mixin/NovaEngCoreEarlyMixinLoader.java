@@ -88,7 +88,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
     private static final String RESOURCE_BUNDLE = "messages";
     static ResourceBundle bundler;
 
-    private static String getString(String key){
+    public static String getString(String key){
         return new String(bundler.getString(key).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
@@ -138,7 +138,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
                 showWarningDialog(warningMessage + "\n" + detail + "\n" + recommendation + "\n" + risk + "\n\n" + confirm);
             }
         } catch (NumberFormatException e) {
-            logError(version, e);
+            logError("messages.java.version.parse.error",version, e);
         }
     }
 
@@ -161,8 +161,8 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         LOG.warn(getString(key), params);
     }
 
-    private static void logError(Object... params) {
-        LOG.error(getString("messages.java.version.parse.error"), params);
+    private static void logError(String key,Object... params) {
+        LOG.error(getString(key), params);
     }
 
     public static boolean isCleanroomLoader() {
