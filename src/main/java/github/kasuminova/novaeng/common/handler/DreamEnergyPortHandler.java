@@ -7,7 +7,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.fluxnetworks.common.connection.transfer.BasicTransferHandler;
-import sonar.fluxnetworks.common.tileentity.TileFluxStorage;
 
 public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergyPort> {
     private long removed;
@@ -36,10 +35,6 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
     @Override
     public void onCycleEnd() {
         this.removed = 0L;
-        if (this.buffer > 0){
-            this.addToBuffer(this.buffer);
-            this.buffer = 0L;
-        }
     }
 
     @Override
@@ -50,7 +45,7 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
     public void addToBuffer(long energy) {
         if (energy > 0L) {
             DreamEnergyCore.receiveEnergy(getCtrl(),1,energy);
-            ((TileFluxStorage)this.device).markServerEnergyChanged();
+            ((TileDreamEnergyPort)this.device).markServerEnergyChanged();
         }
     }
 
@@ -61,7 +56,7 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
         } else {
             DreamEnergyCore.extractEnergy(getCtrl(),1,a);
             this.removed += a;
-            ((TileFluxStorage)this.device).markServerEnergyChanged();
+            ((TileDreamEnergyPort)this.device).markServerEnergyChanged();
             return a;
         }
     }
