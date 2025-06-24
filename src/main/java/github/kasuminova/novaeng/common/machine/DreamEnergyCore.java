@@ -82,8 +82,8 @@ public class DreamEnergyCore implements MachineSpecial{
         var world = ctrl.getWorld();
         if (world.getWorldTime() % (1200 / MinuteScale) == 0){
             var data = ctrl.getCustomDataTag();
-            var energyStored = data.getString("energyStored").isEmpty() ? "0":data.getString("energyStored");
-            getEnergyInfo(world,ctrl.getPos()).addFirst(energyStored);
+            var energyStored = data.getString("energyStored").isEmpty() ? "0" : data.getString("energyStored");
+            getEnergyInfo(world, ctrl.getPos()).addFirst(energyStored);
         }
     }
 
@@ -110,6 +110,7 @@ public class DreamEnergyCore implements MachineSpecial{
                 ctrl.getCustomDataTag().setBoolean("wireless",false);
             }
         });
+
         var inputThreadName = "梦之收集者";
         machine.addCoreThread(FactoryRecipeThread.createCoreThread(inputThreadName));
         var outputThreadName = "梦之释放者";
@@ -125,12 +126,11 @@ public class DreamEnergyCore implements MachineSpecial{
                 .addPreCheckHandler(event -> {
                     var ctrl = event.getController();
                     var data = ctrl.getCustomDataTag();
-                    var speed = Math.max(1.0f,data.getFloat("speed"));
-                    var energy = data.hasKey("energyStored") ? "0" : data.getString("energyStored");
                     if (data.getBoolean("wireless")){
                         event.setFailed("当前处于通量模式");
                         return;
                     }
+                    var speed = Math.max(1.0f,data.getFloat("speed"));
                     if (!canExtract(data, speed)) {
                         event.setFailed("内部能量储量不足！");
                         return;
@@ -142,6 +142,7 @@ public class DreamEnergyCore implements MachineSpecial{
                     var data = ctrl.getCustomDataTag();
                     var speed = Math.max(1.0f,data.getFloat("speed"));
                     extractEnergy(data, speed, defaultTransferAmount);
+                    ctrl.markNoUpdateSync();
                 })
                 .setParallelized(false)
                 .addRecipeTooltip("由梦之收集者运行。", "在智能数据接口处修改速度。")
@@ -172,6 +173,7 @@ public class DreamEnergyCore implements MachineSpecial{
                     var data = ctrl.getCustomDataTag();
                     var speed = Math.max(1.0f,data.getFloat("speed"));
                     receiveEnergy(data, speed,defaultTransferAmount);
+                    ctrl.markNoUpdateSync();
                 })
                 .setParallelized(false)
                 .addRecipeTooltip("由梦之释放者运行。", "在智能数据接口处修改速度。")
@@ -222,10 +224,12 @@ public class DreamEnergyCore implements MachineSpecial{
      * 将能量存储进控制器内部。
      */
     public static void receiveEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
-        var energyStored = getEnergyStored(nbt);
-        var sz = getBigInt((long) (speed * defaultTransferAmount));
+        synchronized (nbt) {
+            var energyStored = getEnergyStored(nbt);
+            var sz = getBigInt((long) (speed * defaultTransferAmount));
+            nbt.setString("energyStored", energyStored.add(sz).toString());
+        }
 
-        nbt.setString("energyStored",energyStored.add(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
             ENERGY_STORED_CACHE.clear();
         }
@@ -235,10 +239,12 @@ public class DreamEnergyCore implements MachineSpecial{
      * 提取控制器内部能量至能量输出仓。
      */
     public static void extractEnergy(NBTTagCompound nbt,float speed,long defaultTransferAmount) {
-        var energyStored = getEnergyStored(nbt);
-        var sz = getBigInt((long) (speed * defaultTransferAmount));
+        synchronized (nbt) {
+            var energyStored = getEnergyStored(nbt);
+            var sz = getBigInt((long) (speed * defaultTransferAmount));
+            nbt.setString("energyStored",energyStored.subtract(sz).toString());
+        }
 
-        nbt.setString("energyStored",energyStored.subtract(sz).toString());
         if (ENERGY_STORED_CACHE.size() > 3000) {
             ENERGY_STORED_CACHE.clear();
         }
@@ -262,6 +268,7 @@ public class DreamEnergyCore implements MachineSpecial{
     @ZenMethod
     public static void receiveEnergy(IMachineController ctrl,float speed,long amount){
         receiveEnergy(ctrl.getController().getCustomDataTag(),speed,amount);
+        ctrl.getController().markNoUpdateSync();
     }
 
     /**
@@ -273,6 +280,7 @@ public class DreamEnergyCore implements MachineSpecial{
     @ZenMethod
     public static void extractEnergy(IMachineController ctrl,float speed,long amount){
         extractEnergy(ctrl.getController().getCustomDataTag(),speed,amount);
+        ctrl.getController().markNoUpdateSync();
     }
 
     @ZenMethod
