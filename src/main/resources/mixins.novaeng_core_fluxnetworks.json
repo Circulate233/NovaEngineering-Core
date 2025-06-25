@@ -8,6 +8,8 @@
   ],
   "mixins": [
     "MixinBasicTransferHandler",
-    "MixinFluxNetworkServer"
+    "MixinFluxNetworkServer",
+    "MixinFluxPointHandler",
+    "MixinWirelessHandler"
   ]
 }

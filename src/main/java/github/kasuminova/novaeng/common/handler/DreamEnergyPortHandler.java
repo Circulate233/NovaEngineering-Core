@@ -48,12 +48,9 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
         }
     }
 
-    boolean init = true;
-
     public long removeFromBuffer(long energy) {
         long a = Math.min(Math.min(energy, this.getBuffer()), Math.max(Long.MAX_VALUE - this.removed,0));
-        if (a <= 0L || init) {
-            init = false;
+        if (a <= 0L) {
             return 0L;
         } else {
             DreamEnergyCore.extractEnergy(getCtrl(),1,a);

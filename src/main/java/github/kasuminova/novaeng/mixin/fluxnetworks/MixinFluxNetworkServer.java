@@ -16,7 +16,7 @@ public abstract class MixinFluxNetworkServer extends FluxNetworkBase {
 
     @Redirect(method = "onEndServerTick", at = @At(value = "INVOKE", target = "Lsonar/fluxnetworks/api/network/ITransferHandler;getRequest()J",ordinal = 1))
     public long getRequest(ITransferHandler instance){
-        var i = instance.getRequest();
+        long i = instance.getRequest();
         if (this.bufferLimiter == Long.MAX_VALUE) {
             return 0;
         } else return Math.min(Long.MAX_VALUE - this.bufferLimiter, i);
