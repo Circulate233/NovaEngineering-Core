@@ -106,6 +106,7 @@ public class CommonProxy implements IGuiHandler {
         RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE);
         if (Loader.isModLoaded("deepmoblearning")) {
             RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing.INSTANCE);
+            RegistryMachineSpecial.registrySpecialMachine(BiogenicSimulationComputer.INSTANCE);
         }
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();

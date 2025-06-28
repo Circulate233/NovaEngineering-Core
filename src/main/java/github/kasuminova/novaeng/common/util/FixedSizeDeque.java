@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.util;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class FixedSizeDeque<E> {
+import java.util.*;
+import java.util.function.Consumer;
+
+public class FixedSizeDeque<E> implements Iterable<E> {
     private final Deque<E> deque;
     private final int maxSize;
 
@@ -48,5 +48,21 @@ public class FixedSizeDeque<E> {
 
     public int size() {
         return deque.size();
+    }
+
+    @Override
+    @NotNull
+    public Iterator<E> iterator() {
+        return deque.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super E> action) {
+        deque.forEach(action);
+    }
+
+    @Override
+    public Spliterator<E> spliterator() {
+        return deque.spliterator();
     }
 }

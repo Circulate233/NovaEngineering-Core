@@ -332,6 +332,9 @@ novaeng.hypernet.research_station.overclocking.tooltip.1=§9最大极限:§a5
 novaeng.hypernet.repair.tooltip=完成时，修复 §a%s §f点耐久值。
 novaeng.hypernet.radiator.tooltip=工作时，每秒可以吸收 §c%sHU§f 内部热量。
 
+novaeng.space_generator.tooltip0=§r需要先展开能源核心
+novaeng.space_generator.tooltip1=§r允许近乎无穷的并行数量
+
 novaeng.hypernet.tech_level.1=§a1§a.
 novaeng.hypernet.tech_level.2=§a2§a.
 novaeng.hypernet.tech_level.3=§a3§a.
