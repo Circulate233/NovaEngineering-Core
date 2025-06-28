@@ -292,10 +292,11 @@ dependencies {
     implementation(rfg.deobf("curse.maven:techguns-244201:2958103"))
     implementation(rfg.deobf("curse.maven:legendary-tooltips-532127:5734973"))
     implementation(rfg.deobf("curse.maven:betterer-p2p-943734:4928154"))
-    implementation(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:6160826"))
+    implementation(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:6605808"))
     implementation(rfg.deobf("curse.maven:Loot-Overhaul-299389:2711740"))
-    implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(rfg.deobf("curse.maven:Flux-Networks-248020:3178199"))
+    implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
+    implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
     implementation(kotlin("stdlib-jdk8"))
 }
 

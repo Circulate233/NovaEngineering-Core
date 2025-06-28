@@ -99,9 +99,14 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.GECKOLIB.isPresent()) {
             RegistryMachineSpecial.registrySpecialMachine(SingularityCore.INSTANCE);
         }
-        RegistryMachineSpecial.registrySpecialMachine(MMAltar.INSTANCE);
+        if (Mods.BM2.isPresent()) {
+            RegistryMachineSpecial.registrySpecialMachine(MMAltar.INSTANCE);
+        }
         RegistryMachineSpecial.registrySpecialMachine(DreamEnergyCore.INSTANCE);
         RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE);
+        if (Loader.isModLoaded("deepmoblearning")) {
+            RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing.INSTANCE);
+        }
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
