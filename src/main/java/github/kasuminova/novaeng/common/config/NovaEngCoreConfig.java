@@ -12,6 +12,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_ID)
 public class NovaEngCoreConfig {
 
+    @Config.RequiresMcRestart
+    @Config.Name("javaCheck")
+    public static boolean javaCheck = true;
+
     @Config.Name("Client")
     public static final Client CLIENT = new Client();
 

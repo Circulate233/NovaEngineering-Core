@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.mixin;
 
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
+import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.isClient;
+
 
 @SuppressWarnings("unused")
 public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMixinLoader {
@@ -24,15 +25,8 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
     public static final String LOG_PREFIX = "[NOVAENG_CORE_PRE]" + ' ';
 
     static {
-        if (isCleanroomLoader()) {
-            LOG.info(LOG_PREFIX + "CleanroomLoader detected.");
-            if (FMLLaunchHandler.side().isClient()) {
-                checkLauncher();
-            }
-        } else {
-            if (FMLLaunchHandler.side().isClient()) {
-                checkJavaVersion();
-            }
+        if (isCleanroomLoader() && isClient) {
+            checkLauncher();
         }
     }
 
@@ -42,7 +36,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
      * 你说得对，但是不得不写。<br/>
      * <a href="https://github.com/Hex-Dragon/PCL2/discussions/3004#discussioncomment-8741822">PCL2 Discussion Link</a><br/>
      */
-    private static void checkLauncher() {
+    public static void checkLauncher() {
         if (!System.getProperty("os.name").toLowerCase().contains("win")) {
             return;
         }

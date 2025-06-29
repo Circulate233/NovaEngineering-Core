@@ -30,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -38,6 +39,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import slimeknights.tconstruct.library.book.TinkerBook;
 
 import javax.annotation.Nullable;
+import java.io.File;
+
+import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.*;
 
 @SuppressWarnings("MethodMayBeStatic")
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -50,6 +54,15 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void construction() {
         super.construction();
+
+        var config = new Configuration(new File(Loader.instance().getConfigDir(), "novaeng_core.cfg"));
+        config.load();
+        if (config.getBoolean("javaCheck", Configuration.CATEGORY_GENERAL,true,"java1.8.0_51 is bad")) {
+            if (!isCleanroomLoader()){
+                checkJavaVersion();
+            }
+        }
+        config.save();
 
         TitleUtils.setRandomTitle("*Construction*");
     }
