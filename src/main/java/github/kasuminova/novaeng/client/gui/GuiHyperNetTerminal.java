@@ -492,10 +492,24 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         );
     }
 
+    protected static final Comparator<ResearchCognitionData> comparator =
+            (o1, o2) -> {
+                float a = o1.getTechLevel();
+                float b = o2.getTechLevel();
+                if (a == b){
+                    return 0;
+                } else {
+                    return a > b ? 1 : -1;
+                }
+            };
+
     protected void updateRenderingData() {
         renderingData.clear();
 
         Map<String, ResearchDataContext> tmp = new LinkedHashMap<>();
+
+        lockedData.sort(comparator);
+        unavailableData.sort(comparator);
 
         researchingData.forEach((data, progress) -> {
             ResearchDataContext context = new ResearchDataContext(data, true, true, progress);
@@ -511,7 +525,7 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
                 setCurrent(context);
             }
         });
-        unlockedData.forEach(data -> {
+        unlockedData.stream().sorted(comparator).forEach(data -> {
             ResearchDataContext context = new ResearchDataContext(data, false, true, -1D);
             tmp.put(data.getTranslatedName(), context);
             if (context.equals(current)) {
