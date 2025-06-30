@@ -504,15 +504,15 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
                 setCurrent(context);
             }
         });
-        unlockedData.forEach(data -> {
-            ResearchDataContext context = new ResearchDataContext(data, false, true, -1D);
+        lockedData.forEach(data -> {
+            ResearchDataContext context = new ResearchDataContext(data, true, true, -1D);
             tmp.put(data.getTranslatedName(), context);
             if (context.equals(current)) {
                 setCurrent(context);
             }
         });
-        lockedData.forEach(data -> {
-            ResearchDataContext context = new ResearchDataContext(data, true, true, -1D);
+        unlockedData.forEach(data -> {
+            ResearchDataContext context = new ResearchDataContext(data, false, true, -1D);
             tmp.put(data.getTranslatedName(), context);
             if (context.equals(current)) {
                 setCurrent(context);

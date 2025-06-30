@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin;
 
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
@@ -16,8 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
-import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.isClient;
-
 
 @SuppressWarnings("unused")
 public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMixinLoader {
@@ -25,8 +24,11 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
     public static final String LOG_PREFIX = "[NOVAENG_CORE_PRE]" + ' ';
 
     static {
-        if (isCleanroomLoader() && isClient) {
-            checkLauncher();
+        if (isCleanroomLoader()) {
+            LOG.info(LOG_PREFIX + "CleanroomLoader detected.");
+            if (FMLLaunchHandler.side().isClient()){
+                checkLauncher();
+            }
         }
     }
 

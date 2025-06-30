@@ -58,14 +58,12 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void construction() {
-
-    }
-
-    public void preInit() {
         if (Loader.isModLoaded("ecoaeextension")){
             throw new RuntimeException(NovaEngCoreEarlyMixinLoader.getString("mod.ecoae.warning"));
         }
+    }
 
+    public void preInit() {
         NetworkRegistry.INSTANCE.registerGuiHandler(NovaEngineeringCore.MOD_ID, this);
 
         MinecraftForge.EVENT_BUS.register(IntegrationCRT.INSTANCE);
