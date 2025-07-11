@@ -73,7 +73,7 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(WorldLoadedHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(RawOreHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
@@ -106,6 +106,9 @@ public class CommonProxy implements IGuiHandler {
             RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing.INSTANCE);
             RegistryMachineSpecial.registrySpecialMachine(BiogenicSimulationComputer.INSTANCE);
         }
+        if (Loader.isModLoaded("avaritia")){
+            RegistryMachineSpecial.registrySpecialMachine(SpaceGenerator.INSTANCE);
+        }
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
@@ -123,7 +126,7 @@ public class CommonProxy implements IGuiHandler {
     public void postInit() {
         MachineCoolants.INSTANCE.init();
         HyperNetMachineEventHandler.registerHandler();
-        RawOreHandler.registry();
+        OreHandler.registry();
     }
 
     public void loadComplete() {

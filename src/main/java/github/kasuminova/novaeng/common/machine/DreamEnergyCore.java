@@ -2,8 +2,10 @@ package github.kasuminova.novaeng.common.machine;
 
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.world.IBlockPos;
+import github.kasuminova.mmce.common.event.Phase;
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent;
 import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
+import github.kasuminova.mmce.common.event.machine.MachineTickEvent;
 import github.kasuminova.mmce.common.helper.IMachineController;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
 import github.kasuminova.novaeng.common.util.FixedSizeDeque;
@@ -77,17 +79,6 @@ public class DreamEnergyCore implements MachineSpecial{
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void onClientTick(final TileMultiblockMachineController ctrl) {
-        var world = ctrl.getWorld();
-        if (world.getWorldTime() % (1200 / MinuteScale) == 0){
-            var data = ctrl.getCustomDataTag();
-            var energyStored = data.getString("energyStored").isEmpty() ? "0" : data.getString("energyStored");
-            getEnergyInfo(world, ctrl.getPos()).addFirst(energyStored);
-        }
-    }
-
-    @Override
     public void init(DynamicMachine machine) {
         SInit(machine);
         if (isClient) {
@@ -96,6 +87,18 @@ public class DreamEnergyCore implements MachineSpecial{
     }
 
     public void SInit(DynamicMachine machine){
+        machine.addMachineEventHandler(MachineTickEvent.class,event -> {
+            if (event.phase == Phase.START) {
+                var ctrl = event.getController();
+                var world = ctrl.getWorld();
+                if (world.getWorldTime() % (1200 / MinuteScale) == 0) {
+                    var data = ctrl.getCustomDataTag();
+                    var energyStored = data.getString("energyStored").isEmpty() ? "0" : data.getString("energyStored");
+                    getEnergyInfo(world, ctrl.getPos()).addFirst(energyStored);
+                    data.setString("chance", change(ctrl,energyStored));
+                }
+            }
+        });
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
             TileMultiblockMachineController ctrl = event.getController();
             ctrl.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC);
@@ -115,10 +118,6 @@ public class DreamEnergyCore implements MachineSpecial{
         machine.addCoreThread(FactoryRecipeThread.createCoreThread(inputThreadName));
         var outputThreadName = "梦之释放者";
         machine.addCoreThread(FactoryRecipeThread.createCoreThread(outputThreadName));
-        var fairyCraftingThreadName = "梦之同步者";
-        machine.addCoreThread(FactoryRecipeThread.createCoreThread(fairyCraftingThreadName));
-        var manaCraftingThreadName = "梦之聚合者";
-        machine.addCoreThread(FactoryRecipeThread.createCoreThread(manaCraftingThreadName));
 
         // 输出配方
         RecipeBuilder.newBuilder("extract", MachineID, 1, 1, true)
@@ -189,12 +188,13 @@ public class DreamEnergyCore implements MachineSpecial{
             var data = ctrl.getCustomDataTag();
             var speed = data.hasKey("speed") ? data.getFloat("speed") : 1.0f;
             var energyStored = data.getString("energyStored").isEmpty() ? "0":data.getString("energyStored");
+            var chance = data.getString("chance");
 
             String[] info = {
                     "§b/////////// 梦之管理者 ///////////",
                     "§b能量储存:§a" + formatNumber(getBigInt(energyStored)) + " RF",
                     data.getBoolean("wireless") ? "§b输入输出速度:#FF6347-FFA54F-FFFF00-7FFF00-40E0D0-00BFFFInfinity" : "§b输入输出速度:§a" + formatNumber((long) (defaultTransferAmount * speed),1) + " RF/t",
-                    "§b一分钟内平均交互速度:§a" + change(ctrl) + " RF/t",
+                    "§b一分钟内平均交互速度:§a" + (chance.isEmpty() ? "0" : chance) + " RF/t",
                     "§b///////////////////////////////////"
             };
 
@@ -296,8 +296,11 @@ public class DreamEnergyCore implements MachineSpecial{
     private static final String longmax = Long.toString(Long.MAX_VALUE);
 
     private String change(TileMultiblockMachineController ctrl){
+        return change(ctrl,getEnergyInfo(ctrl.getWorld(),ctrl.getPos()).getFirst());
+    }
+
+    private String change(TileMultiblockMachineController ctrl,String newtime){
         FixedSizeDeque<String> energy = getEnergyInfo(ctrl.getWorld(),ctrl.getPos());
-        var newtime = energy.getFirst();
         var oldtime = energy.getLast();
         var newbig = newtime == null ? BigInteger.ZERO : getBigInt(newtime);
         var oldbig = oldtime == null ? BigInteger.ZERO : getBigInt(oldtime);

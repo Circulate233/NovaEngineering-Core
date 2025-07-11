@@ -22,6 +22,7 @@ import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -166,6 +167,7 @@ public class GeocentricDrill implements MachineSpecial {
         if (!crystalAethium.isEmpty()) {
             rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.get(0), 2));
         }
+        rawOres.put("glowstone_dust", new ItemStack(Items.GLOWSTONE_DUST,24));
     }
 
     public Map<String, ItemStack> getRawOres() {

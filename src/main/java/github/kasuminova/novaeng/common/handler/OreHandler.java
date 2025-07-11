@@ -18,7 +18,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import stanhebben.zenscript.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -27,15 +27,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.RawOre")
-public class RawOreHandler {
+public class OreHandler {
 
-    public static final RawOreHandler INSTANCE = new RawOreHandler();
+    public static final OreHandler INSTANCE = new OreHandler();
 
     private static final String rawOreOD = "rawOre";
     private static final String rawOreGemOD = "rawOreGem";
+    private static final String oreOD = "ore";
     private static Map<OreKey, ItemStack> rawOreMap;
     private static Map<OreKey, ItemStack> oreMap;
-    private RawOreHandler(){}
+    private OreHandler(){}
 
     @ZenMethod
     public static IItemStack getRawOre(@NotNull IItemStack ore){
@@ -55,26 +56,26 @@ public class RawOreHandler {
         }
     }
 
-    public static void registry(){
-        Map<OreKey,ItemStack> map = new HashMap<>();
-        Map<OreKey,ItemStack> mapO = new HashMap<>();
+    public static void registry() {
+        Map<OreKey, ItemStack> map = new HashMap<>();
+        Map<OreKey, ItemStack> mapO = new HashMap<>();
 
         for (String odName : OreDictionary.getOreNames()) {
-            if (odName.startsWith(rawOreOD)){
-                if (!OreDictionary.getOres(odName).isEmpty()){
+            if (odName.startsWith(rawOreOD)) {
+                if (!OreDictionary.getOres(odName).isEmpty()) {
                     ItemStack rawOre = OreDictionary.getOres(odName).get(0);
                     String rawOreName = odName.startsWith(rawOreGemOD) ?
                             odName.substring(rawOreGemOD.length()) :
                             odName.substring(rawOreOD.length());
 
-                    final String oreName = "ore" + rawOreName;
+                    final String oreName = oreOD + rawOreName;
                     if (!OreDictionary.getOres(oreName).isEmpty()) {
                         var ores = OreDictionary.getOres(oreName);
                         final ItemStack ODore = OreDictHelper.getPriorityItemFromOreDict(oreName);
-                        for (ItemStack ore : ores){
+                        for (ItemStack ore : ores) {
                             var ok = OreKey.getKey(ore);
-                            map.put(ok,rawOre);
-                            mapO.put(ok,ODore);
+                            map.put(ok, rawOre);
+                            mapO.put(ok, ODore);
 
                             if (ore.getItem() instanceof ItemBlock ik && ik.getBlock() == Blocks.REDSTONE_ORE) {
                                 ok = OreKey.getKey(Blocks.LIT_REDSTONE_ORE.getRegistryName(), ore.getItemDamage());
@@ -180,7 +181,7 @@ public class RawOreHandler {
         }
     }
 
-    private static class OreDictHelper {
+    public static class OreDictHelper {
         private static final String[] MOD_PRIORITY = {
                 "minecraft",
                 "thermalfoundation",
@@ -192,28 +193,34 @@ public class RawOreHandler {
         public static ItemStack getPriorityItemFromOreDict(String oreName) {
             List<ItemStack> oreEntries = OreDictionary.getOres(oreName);
 
-            if ("dimensional_shard_ore".equals(oreName)) {
-                ItemStack item = oreEntries.get(0).copy();
-                item.setItemDamage(0);
-                return item;
-            }
-
-            ItemStack candidates = ItemStack.EMPTY;
-
-            for (String modid : MOD_PRIORITY) {
-                for (ItemStack stack : oreEntries) {
-                    String itemModID = stack.getItem().getRegistryName().getNamespace();
-                    if (modid.equals(itemModID)) {
-                        candidates = stack.copy();
-                        break;
+            return switch (oreEntries.size()){
+                case 0 -> ItemStack.EMPTY;
+                case 1 -> oreEntries.get(0).copy();
+                default -> {
+                    if ("dimensional_shard_ore".equals(oreName)) {
+                        ItemStack item = oreEntries.get(0).copy();
+                        item.setItemDamage(0);
+                        yield item;
                     }
+
+                    ItemStack candidates = ItemStack.EMPTY;
+
+                    for (String modid : MOD_PRIORITY) {
+                        for (ItemStack stack : oreEntries) {
+                            String itemModID = stack.getItem().getRegistryName().getNamespace();
+                            if (modid.equals(itemModID)) {
+                                candidates = stack.copy();
+                                break;
+                            }
+                        }
+                        if (!candidates.isEmpty())break;
+                    }
+
+                    var out = candidates.isEmpty() ? oreEntries.get(0).copy() : candidates;
+                    if (out.getItemDamage() == 32767)out.setItemDamage(0);
+                    yield out;
                 }
-            }
-
-            var out = candidates.isEmpty() ? oreEntries.get(0) : candidates;
-            if (out.getItemDamage() == 32767)out.setItemDamage(0);
-            return out;
+            };
         }
-
     }
 }
