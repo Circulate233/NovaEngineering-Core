@@ -1,17 +1,14 @@
 package github.kasuminova.novaeng.mixin.ae2;
 
 import appeng.core.sync.AppEngPacket;
-import appeng.core.sync.AppEngPacketHandlerBase;
+import appeng.core.sync.PacketCallState;
 import appeng.core.sync.network.AppEngServerPacketHandler;
 import com.llamalad7.mixinextras.sugar.Local;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.lang.reflect.InvocationTargetException;
 
 @Mixin(AppEngServerPacketHandler.class)
 public class MixinAppEngServerPacketHandler {
@@ -21,20 +18,17 @@ public class MixinAppEngServerPacketHandler {
             method = "onPacketData",
             at = @At(
                     value = "INVOKE",
-                    target = "Lappeng/core/sync/AppEngPacketHandlerBase$PacketTypes;parsePacket(Lio/netty/buffer/ByteBuf;)Lappeng/core/sync/AppEngPacket;",
+                    target = "Lappeng/core/sync/AppEngPacket;setCallParam(Lappeng/core/sync/PacketCallState;)V",
                     remap = false
             ),
             remap = false
     )
-    private AppEngPacket redirectParsePacket(final AppEngPacketHandlerBase.PacketTypes instance, 
-                                             final ByteBuf in,
-                                             @Local(name = "player") EntityPlayer player) throws InvocationTargetException, InstantiationException, IllegalAccessException
-    {
-        AppEngPacket packet = instance.parsePacket(in);
+    private void redirectParsePacket(AppEngPacket instance, PacketCallState call,
+                                     @Local(name = "player") EntityPlayer player) {
         if (player != null) {
-            SPacketProfiler.onPacketReceived(player, packet);
+            SPacketProfiler.onPacketReceived(player, instance);
         }
-        return packet;
+        instance.setCallParam(call);
     }
 
 }

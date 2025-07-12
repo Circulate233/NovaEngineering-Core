@@ -36,6 +36,7 @@ public class OreHandler {
     private static final String oreOD = "ore";
     private static Map<OreKey, ItemStack> rawOreMap;
     private static Map<OreKey, ItemStack> oreMap;
+
     private OreHandler(){}
 
     @ZenMethod
