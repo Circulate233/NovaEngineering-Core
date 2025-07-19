@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.hypernet.old;
 
+import com.github.bsideup.jabel.Desugar;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchCognitionData;
@@ -212,17 +213,8 @@ public class Database extends NetNode {
         return new Status(type, storedResearchCognition.size(), researchingCognition.size());
     }
 
-    @SuppressWarnings("unused")
-    public static class Status {
-        private final DatabaseType type;
-        private final int storedCognition;
-        private final int researchingCognition;
-
-        public Status(final DatabaseType type, final int storedCognition, final int researchingCognition) {
-            this.type = type;
-            this.storedCognition = storedCognition;
-            this.researchingCognition = researchingCognition;
-        }
+    @Desugar
+    public record Status(DatabaseType type, int storedCognition, int researchingCognition) {
 
         public static Status readFromNBT(final NBTTagCompound tag) {
             if (!tag.hasKey("t") || !tag.hasKey("s") || !tag.hasKey("r")) {
@@ -248,18 +240,6 @@ public class Database extends NetNode {
 
         public boolean hasDatabaseSpace() {
             return type.getMaxResearchDataStoreSize() > storedCognition + researchingCognition;
-        }
-
-        public DatabaseType getType() {
-            return type;
-        }
-
-        public int getStoredCognition() {
-            return storedCognition;
-        }
-
-        public int getResearchingCognition() {
-            return researchingCognition;
         }
     }
 }

@@ -79,7 +79,9 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
             return;
         }
 
-        Collection<Database> databases = center.getNode(Database.class);
+        Collection<Database> databases = center.getNode(Database.class).stream()
+                .filter(Database::isWorking)
+                .collect(Collectors.toList());
 
         Set<ResearchCognitionData> researchCognition = databases.stream()
                 .flatMap(database -> database.getStoredResearchCognition().stream())

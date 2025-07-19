@@ -27,6 +27,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * TODO: 硬编码喵
@@ -172,7 +173,9 @@ public class ResearchStation extends NetNode {
         ActiveMachineRecipe recipe = thread.getActiveRecipe();
         recipe.setTick(recipe.getTotalTick() + 1);
 
-        Collection<Database> databases = center.getNode(Database.class);
+        Collection<Database> databases = center.getNode(Database.class).stream()
+                .filter(Database::isWorking)
+                .collect(Collectors.toList());
         if (databases.isEmpty()) {
             return;
         }

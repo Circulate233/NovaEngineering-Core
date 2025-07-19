@@ -1,0 +1,13 @@
+{
+  "package": "github.kasuminova.novaeng.mixin.packagedauto",
+  "refmap": "mixins.novaeng_core.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MixinGuiUnpackager"
+  ],
+  "mixins": [
+    "MixinPacketEjectTracker"
+  ]
+}

@@ -297,6 +297,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:Flux-Networks-248020:3178199"))
     implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
+    implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     implementation(kotlin("stdlib-jdk8"))
 }
 

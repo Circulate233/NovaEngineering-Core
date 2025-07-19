@@ -36,7 +36,7 @@ public class DatabaseType extends NetNodeType {
         String name = typeName;
         MachineModifier.addCoreThread(name, FactoryRecipeThread.createCoreThread(DATABASE_WORKING_THREAD_NAME));
 
-        RecipeBuilder.newBuilder(name + "_working", name, 20, 100, false)
+        RecipeBuilder.newBuilder(name + "_working", name, 20, 100, true)
                 .addEnergyPerTickInput(energyUsage)
                 .addFactoryPreTickHandler(event -> {
                     Database database = NetNodeCache.getCache(event.getController(), Database.class);
