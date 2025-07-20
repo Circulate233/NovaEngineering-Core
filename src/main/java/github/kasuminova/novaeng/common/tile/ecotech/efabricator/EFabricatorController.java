@@ -50,7 +50,7 @@ import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEF
 public class EFabricatorController extends EPartController<EFabricatorPart> {
 
     public static final int MAX_COOLANT_CACHE = 100_000;
-    public static final int WORK_DELAY = 20;
+    public static final int WORK_DELAY = 40;
 
     public static final List<BlockPos> HIDE_POS_LIST = Arrays.asList(
             // Center
@@ -261,8 +261,8 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
 
     @Override
     protected void onAddPart(final EFabricatorPart part) {
-        if (part instanceof EFabricatorMEChannel channel) {
-            this.channel = channel;
+        if (part instanceof EFabricatorMEChannel channelc) {
+            this.channel = channelc;
         }
     }
 
@@ -294,7 +294,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
                 .filter(Modifier::isDebuff)
                 .forEach(modifier -> parallelism[0] = modifier.apply(parallelism[0]));
 
-        this.parallelism = (int) Math.round(parallelism[0]);
+        this.parallelism = (int) Math.round(parallelism[0] * 2);
     }
 
     public synchronized void convertOverflowParallelismToWorkDelay(final int overflow) {
@@ -302,7 +302,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
             return;
         }
         float ratio = (float) parallelism / overflow;
-        int speedUp = Math.min(Math.round(ratio / 0.05f), maxWorkDelay - 1);
+        int speedUp = Math.min(Math.round(ratio / 0.05f) * 2, maxWorkDelay - 1);
 
         double coolantUsage = parallelism * 0.04;
         int maxCanConsume = (int) (coolantCache / coolantUsage);
@@ -315,7 +315,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
 
     public void updateWorkDelay() {
         if (activeCooling) {
-            this.maxWorkDelay = WORK_DELAY - this.getWorkers().size();
+            this.maxWorkDelay = WORK_DELAY - (this.getWorkers().size() * 2);
         } else {
             this.maxWorkDelay = WORK_DELAY;
         }
@@ -349,11 +349,14 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
 
     public boolean offerWork(EFabricatorWorker.CraftWork work) {
         boolean success = false;
-        for (EFabricatorWorker fabricatorWorker : getWorkers()) {
-            if (!fabricatorWorker.isFull()) {
-                fabricatorWorker.offerWork(work);
+        for (EFabricatorWorker worker : getWorkers()) {
+            if (!worker.isFull()) {
+                var i = worker.getRemainingSpace();
+                worker.offerWork(work.split(i));
                 success = true;
-                break;
+                if (work.getSize() < 1) {
+                    break;
+                }
             }
         }
         if (success && activeCooling && !speedupApplied) {

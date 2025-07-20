@@ -19,7 +19,7 @@ import java.util.*;
 public class EFabricatorWorker extends EFabricatorPart {
 
     public static final int MAX_ENERGY_CACHE = 500_000;
-    public static final int MAX_QUEUE_DEPTH = 32;
+    public static final int MAX_QUEUE_DEPTH = 64;
 
     public static final int ENERGY_USAGE = 100;
     public static final int COOLANT_USAGE = 5;
@@ -33,6 +33,10 @@ public class EFabricatorWorker extends EFabricatorPart {
     protected long lastUpdateTick = 0L;
 
     public EFabricatorWorker() {
+    }
+
+    public int getRemainingSpace(){
+        return this.getQueueDepth() - this.queue.size();
     }
 
     public synchronized int doWork() {
@@ -198,9 +202,10 @@ public class EFabricatorWorker extends EFabricatorPart {
         private static final String REPEAT_TAG = "R";
 
         private final Deque<EFabricatorWorker.CraftWork> queue = new ArrayDeque<>();
+        private int size = 0;
 
         public int size() {
-            return queue.size();
+            return size;
         }
 
         public boolean isEmpty() {
@@ -209,10 +214,17 @@ public class EFabricatorWorker extends EFabricatorPart {
 
         public void add(final EFabricatorWorker.CraftWork craftWork) {
             queue.add(craftWork);
+            size += craftWork.size;
         }
 
         public EFabricatorWorker.CraftWork poll() {
-            return queue.poll();
+            var i = queue.poll();
+            if (i != null) {
+                size -= i.size;
+            } else {
+                size = 0;
+            }
+            return i;
         }
 
         public EFabricatorWorker.CraftWork peek() {
@@ -295,13 +307,20 @@ public class EFabricatorWorker extends EFabricatorPart {
         private static final String REMAIN_TAG_PREFIX = "R#";
         private static final String REMAIN_SIZE_TAG = REMAIN_TAG_PREFIX + "S";
         private static final String OUTPUT_TAG = "O";
+        private static final String SIZE = "Z";
 
         private final ItemStack[] remaining;
         private final ItemStack output;
+        private int size;
 
-        public CraftWork(final ItemStack[] remaining, final ItemStack output) {
+        public CraftWork(final ItemStack[] remaining, final ItemStack output,final int size) {
             this.remaining = remaining;
             this.output = output;
+            this.size = size;
+        }
+
+        public int getSize() {
+            return size;
         }
 
         public CraftWork(final NBTTagCompound nbt, final List<ItemStack> stackSet) {
@@ -311,6 +330,22 @@ public class EFabricatorWorker extends EFabricatorPart {
                 remaining[remainIdx] = setIdx == -1 ? ItemStack.EMPTY : stackSet.get(setIdx);
             }
             output = stackSet.get(nbt.getInteger(OUTPUT_TAG));
+            size = Math.max(1,nbt.getInteger(SIZE));
+        }
+
+        public CraftWork split(int amount){
+            final var i = Math.min(amount,this.size);
+            final var inputs = new ItemStack[this.remaining.length];
+            for (int ii = 0; ii < remaining.length; ii++) {
+                inputs[ii] = remaining[ii].splitStack(amount);
+            }
+            final var eachOutput = this.output.getCount() / size;
+            final var output = this.output.copy();
+            final var outCount = i * eachOutput;
+            output.setCount(outCount);
+            this.output.shrink(outCount);
+            size -= i;
+            return new CraftWork(inputs,output,i);
         }
 
         public NBTTagCompound writeToNBT(final List<ItemStack> stackSet) {
@@ -346,12 +381,13 @@ public class EFabricatorWorker extends EFabricatorPart {
 
             stackSet.add(output);
             nbt.setShort(OUTPUT_TAG, (short) (stackSet.size() - 1));
+            nbt.setInteger(SIZE,size);
             return nbt;
         }
 
         public CraftWork copy() {
             ItemStack[] remaining = Arrays.stream(this.remaining).map(ItemStack::copy).toArray(ItemStack[]::new);
-            return new CraftWork(remaining, output.copy());
+            return new CraftWork(remaining, output.copy(),this.size);
         }
 
         @Override

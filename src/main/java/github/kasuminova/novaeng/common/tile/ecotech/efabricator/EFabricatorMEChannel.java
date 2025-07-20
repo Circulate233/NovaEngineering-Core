@@ -19,7 +19,7 @@ import appeng.me.GridAccessException;
 import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
 import appeng.me.helpers.MachineSource;
-import appeng.util.Platform;
+import com.glodblock.github.common.item.ItemFluidDrop;
 import com.glodblock.github.util.FluidCraftingPatternDetails;
 import github.kasuminova.mmce.common.util.PatternItemFilter;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
@@ -111,11 +111,20 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         }
 
         ItemStack[] remaining = new ItemStack[9];
+        int size = 1;
         for (int i = 0; i < Math.min(table.getSizeInventory(), 9); ++i) {
-            remaining[i] = Platform.getContainerItem(table.getStackInSlot(i));
+            var item = table.getStackInSlot(i);
+            if (item.isEmpty()){
+                remaining[i] = ItemStack.EMPTY;
+            } else {
+                remaining[i] = item;
+                size = item.getCount();
+            }
         }
 
-        return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output));
+        output.setCount(output.getCount() * size);
+
+        return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output, size));
     }
 
     protected boolean pushFluidPattern(FluidCraftingPatternDetails pattern) {
@@ -125,7 +134,19 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         IAEItemStack[] outputs = pattern.getOutputs();
         ItemStack output = outputs[0] != null ? outputs[0].getCachedItemStack(outputs[0].getStackSize()) : ItemStack.EMPTY;
 
-        return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output));
+        int size = 1;
+        var item = pattern.getInputs();
+        for (IAEItemStack stack : item) {
+            if (stack != null){
+                size = (int) stack.getStackSize();
+                if (stack.getItem() instanceof ItemFluidDrop){
+                    size = size / 1000;
+                }
+                break;
+            }
+        }
+
+        return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output, size));
     }
 
     public boolean insertPattern(final ItemStack patternStack) {
@@ -143,7 +164,7 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         if (partController != null) {
             return partController.isQueueFull();
         }
-        return false;
+        return true;
     }
 
     // Misc
