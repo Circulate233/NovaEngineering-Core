@@ -19,7 +19,8 @@ import appeng.me.GridAccessException;
 import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
 import appeng.me.helpers.MachineSource;
-import com.glodblock.github.common.item.ItemFluidDrop;
+import com.glodblock.github.common.item.ItemFluidPacket;
+import com.glodblock.github.common.item.fake.FakeItemRegister;
 import com.glodblock.github.util.FluidCraftingPatternDetails;
 import github.kasuminova.mmce.common.util.PatternItemFilter;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
@@ -28,10 +29,10 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.List;
 
 public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingProvider, IActionHost, IGridProxyable {
@@ -99,8 +100,8 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         }
 
         if (!pattern.isCraftable()) {
-            if (pattern instanceof FluidCraftingPatternDetails) {
-                return pushFluidPattern((FluidCraftingPatternDetails) pattern);
+            if (pattern instanceof FluidCraftingPatternDetails f) {
+                return pushFluidPattern(f,table);
             }
             return false;
         }
@@ -111,14 +112,16 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         }
 
         ItemStack[] remaining = new ItemStack[9];
-        int size = 1;
+        int size = 0;
         for (int i = 0; i < Math.min(table.getSizeInventory(), 9); ++i) {
             var item = table.getStackInSlot(i);
             if (item.isEmpty()){
                 remaining[i] = ItemStack.EMPTY;
             } else {
                 remaining[i] = item;
-                size = item.getCount();
+                if (size == 0) {
+                    size = item.getCount();
+                }
             }
         }
 
@@ -127,24 +130,32 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
         return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output, size));
     }
 
-    protected boolean pushFluidPattern(FluidCraftingPatternDetails pattern) {
-        ItemStack[] remaining = new ItemStack[9];
-        Arrays.fill(remaining, ItemStack.EMPTY);
-
+    protected boolean pushFluidPattern(final FluidCraftingPatternDetails pattern,final InventoryCrafting table) {
         IAEItemStack[] outputs = pattern.getOutputs();
         ItemStack output = outputs[0] != null ? outputs[0].getCachedItemStack(outputs[0].getStackSize()) : ItemStack.EMPTY;
 
-        int size = 1;
-        var item = pattern.getInputs();
-        for (IAEItemStack stack : item) {
-            if (stack != null){
-                size = (int) stack.getStackSize();
-                if (stack.getItem() instanceof ItemFluidDrop){
-                    size = size / 1000;
+        if (output.isEmpty())return false;
+
+        ItemStack[] remaining = new ItemStack[9];
+        int size = 0;
+        for (int i = 0; i < Math.min(table.getSizeInventory(), 9); ++i) {
+            var item = table.getStackInSlot(i);
+            if (item.isEmpty()){
+                remaining[i] = ItemStack.EMPTY;
+            } else {
+                remaining[i] = item;
+                if (size == 0) {
+                    size = item.getCount();
+                    if (item.getItem() instanceof ItemFluidPacket) {
+                        var amount = ((FluidStack) FakeItemRegister.getStack(item)).amount;
+                        var patternAmount = ((FluidStack) FakeItemRegister.getStack(pattern.getInputs()[i])).amount;
+                        size = amount/patternAmount;
+                    }
                 }
-                break;
             }
         }
+
+        output.setCount(output.getCount() * size);
 
         return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output, size));
     }

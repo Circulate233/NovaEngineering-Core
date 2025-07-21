@@ -13,6 +13,7 @@ import appeng.crafting.MECraftingInventory;
 import appeng.me.cache.CraftingGridCache;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import appeng.me.helpers.MachineSource;
+import com.glodblock.github.util.FluidCraftingPatternDetails;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -63,7 +64,7 @@ public abstract class MixinCraftingCPUClusterTwo {
         var key = original.call(instance);
 
         long max = 0;
-        var list = key.isCraftable() ? key.getCondensedOutputs() : key.getCondensedInputs();
+        var list = (key.isCraftable() || key instanceof FluidCraftingPatternDetails) ? key.getCondensedOutputs() : key.getCondensedInputs();
         for (IAEItemStack stack : list) {
             long size = stack.getStackSize();
             if (size > max) max = size;
@@ -77,7 +78,7 @@ public abstract class MixinCraftingCPUClusterTwo {
         return r$pattern = key;
     }
 
-    @Inject(method = "executeCrafting",at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingMedium;isBusy()Z"))
+    @Inject(method = "executeCrafting",at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingMedium;isBusy()Z",shift = At.Shift.AFTER))
     private void executeCraftingI(IEnergyGrid eg, CraftingGridCache cc, CallbackInfo ci, @Local(name = "m") ICraftingMedium instance) {
         if (instance instanceof MEPatternProviderNova mep){
             if (mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT

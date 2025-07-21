@@ -94,11 +94,11 @@ novaeng.efabricator_parallel_proc.modifier.mul.debuff=最大并行数修正:§c-
 novaeng.efabricator_parallel_proc.info.2=启用§9主动冷却§7时:
 novaeng.efabricator_parallel_proc.info.3=  §a消除§7超频的§c负面§7修正。
 novaeng.efabricator_parallel_proc.info.4=  工作后溢出的并行数转换为工作间隔§a减成§7并消耗§9冷却液§7，最低不低于 §b1§7 Tick（§b0.05s§7）。
-novaeng.efabricator_parallel_proc.info.5=    每溢出 §e5%%§7 最大并行数，为子系统降低 §b2§7 Tick（§b0.05s§7）的工作间隔。
-novaeng.efabricator_parallel_proc.info.6=    每降低 §b2§7 Tick（§b0.05s§7）工作间隔，额外消耗 §c最大并行数 * 4%%§7 冷却单位。
+novaeng.efabricator_parallel_proc.info.5=    每溢出 §e5%%§7 最大并行数，为子系统降低 §b1§7 Tick（§b0.05s§7）的工作间隔。
+novaeng.efabricator_parallel_proc.info.6=    每降低 §b1§7 Tick（§b0.05s§7）工作间隔，额外消耗 §c最大并行数 * 4%%§7 冷却单位。
 
 novaeng.efabricator_worker.info.0=§b工作核心§7是合成子系统的§e主要部分§7。
-novaeng.efabricator_worker.info.1=每个核心带有 §a64§7 队列深度，每次工作处理 §a1§7 个合成任务。
+novaeng.efabricator_worker.info.1=每个核心带有 §a32§7 队列深度，每次工作处理 §a1§7 个合成任务。
 novaeng.efabricator_worker.info.2=每次合成能量消耗:§b100 AE
 novaeng.efabricator_worker.info.3=启用§c超频§7时:
 novaeng.efabricator_worker.info.4=  队列深度 §ax2 §b(F4)

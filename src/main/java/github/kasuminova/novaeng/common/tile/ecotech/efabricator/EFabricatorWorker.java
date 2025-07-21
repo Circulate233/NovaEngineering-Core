@@ -19,7 +19,7 @@ import java.util.*;
 public class EFabricatorWorker extends EFabricatorPart {
 
     public static final int MAX_ENERGY_CACHE = 500_000;
-    public static final int MAX_QUEUE_DEPTH = 64;
+    public static final int MAX_QUEUE_DEPTH = 32;
 
     public static final int ENERGY_USAGE = 100;
     public static final int COOLANT_USAGE = 5;
