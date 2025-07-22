@@ -27,7 +27,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         if (isCleanroomLoader()) {
             LOG.info(LOG_PREFIX + "CleanroomLoader detected.");
             if (FMLLaunchHandler.side().isClient()){
-                checkLauncher();
+                //checkLauncher();
             }
         }
     }

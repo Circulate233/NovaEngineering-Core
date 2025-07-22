@@ -14,22 +14,31 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class ProcessorModuleCPUType extends ProcessorModuleType {
     protected final double computationPointGeneration;
 
-    public ProcessorModuleCPUType(final int minDurability,
-                                  final int maxDurability,
-                                  final int energyConsumption,
+    public ProcessorModuleCPUType(final int energyConsumption,
                                   final double computationPointGeneration)
     {
-        super(minDurability, maxDurability, energyConsumption);
+        super(energyConsumption);
         this.computationPointGeneration = computationPointGeneration;
     }
 
+    /**
+     * 已经删除耐久相关设定
+     */
+    @Deprecated
     @ZenMethod
     public static ProcessorModuleCPUType create(final int minDurability,
                                                 final int maxDurability,
                                                 final int energyConsumption,
                                                 final double computationPointGeneration)
     {
-        return new ProcessorModuleCPUType(minDurability, maxDurability, energyConsumption, computationPointGeneration);
+        return new ProcessorModuleCPUType(energyConsumption, computationPointGeneration);
+    }
+
+    @ZenMethod
+    public static ProcessorModuleCPUType create(final int energyConsumption,
+                                                final double computationPointGeneration)
+    {
+        return new ProcessorModuleCPUType(energyConsumption, computationPointGeneration);
     }
 
     @Override

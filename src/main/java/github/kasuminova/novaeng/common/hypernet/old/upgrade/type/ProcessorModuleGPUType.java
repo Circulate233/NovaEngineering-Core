@@ -11,21 +11,30 @@ import stanhebben.zenscript.annotations.ZenMethod;
 @ZenRegister
 @ZenClass("novaeng.hypernet.upgrade.type.ProcessorModuleGPUType")
 public class ProcessorModuleGPUType extends ProcessorModuleCPUType {
-    public ProcessorModuleGPUType(final int minDurability,
-                                  final int maxDurability,
-                                  final int energyConsumption,
+    public ProcessorModuleGPUType(final int energyConsumption,
                                   final double computationPointGeneration)
     {
-        super(minDurability, maxDurability, energyConsumption, computationPointGeneration);
-    }
+        super(energyConsumption, computationPointGeneration);
 
+    }
+    /**
+     * 已经删除耐久相关设定
+     */
+    @Deprecated
     @ZenMethod
     public static ProcessorModuleGPUType createGPUType(final int minDurability,
                                                 final int maxDurability,
                                                 final int energyConsumption,
                                                 final double computationPointGeneration)
     {
-        return new ProcessorModuleGPUType(minDurability, maxDurability, energyConsumption, computationPointGeneration);
+        return new ProcessorModuleGPUType(energyConsumption, computationPointGeneration);
+    }
+
+    @ZenMethod
+    public static ProcessorModuleGPUType createGPUType(final int energyConsumption,
+                                                       final double computationPointGeneration)
+    {
+        return new ProcessorModuleGPUType(energyConsumption, computationPointGeneration);
     }
 
     @Override

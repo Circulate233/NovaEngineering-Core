@@ -6,7 +6,6 @@ import github.kasuminova.mmce.common.upgrade.UpgradeType;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.hypernet.old.upgrade.type.ProcessorModuleCPUType;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
-import github.kasuminova.novaeng.common.util.RandomUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -31,12 +30,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
         for (List<MachineUpgrade> upgradeList : upgradeLists) {
             for (final MachineUpgrade upgrade : upgradeList) {
                 if (upgrade instanceof final ProcessorModuleCPU cpu) {
-                    if (cpu.maxDurability == 0) {
-                        cpu.initDurability();
-                    }
-                    if (cpu.durability > 0) {
-                        list.add(cpu);
-                    }
+                    list.add(cpu);
                 }
             }
         }
@@ -44,55 +38,23 @@ public class ProcessorModuleCPU extends DataProcessorModule {
     }
 
     public double calculate(final boolean doCalculate, double maxGeneration) {
-        if (durability <= 0 && maxDurability != 0) {
-            return 0.0F;
-        }
-
-        float efficiency = getEfficiency();
-        double generationBase = efficiency * getComputationPointGeneration();
+        double generationBase = getComputationPointGeneration();
         double left = Math.min((generationBase - maxGeneration), generationBase);
 
         if (left <= 0) {
-            if (doCalculate && RandomUtils.nextFloat() <= 0.005F) {
-                durability--;
-                writeNBTToItem();
-            }
             return generationBase;
         } else {
-            double trueGenerated = generationBase - left;
-            if (doCalculate && RandomUtils.nextFloat() <= 0.005F * (trueGenerated / generationBase)) {
-                durability--;
-                writeNBTToItem();
-            }
-            return trueGenerated;
+            return generationBase - left;
         }
     }
 
     public float getEfficiency() {
-        if (maxDurability == 0) {
-            return 1F;
-        }
-        float durabilityPercent = (float) durability / maxDurability;
-        if (durabilityPercent >= 0.25F) {
-            return 1F;
-        }
-
-        return Math.min(Math.max(durabilityPercent + 0.75F, 0.75F), 1.0F);
+        return 1.0F;
     }
 
     @Override
     public int getEnergyConsumption() {
         return moduleType.getEnergyConsumption();
-    }
-
-    @Override
-    protected void initDurability() {
-        int min = moduleType.getMinDurability();
-        int max = moduleType.getMaxDurability();
-
-        maxDurability = min + RandomUtils.nextInt(max - min);
-        durability = maxDurability;
-        writeNBTToItem();
     }
 
     @ZenGetter("computationalPointGeneration")
@@ -104,13 +66,10 @@ public class ProcessorModuleCPU extends DataProcessorModule {
     public List<String> getDescriptions() {
         List<String> desc = new ArrayList<>();
         desc.add(I18n.format("upgrade.data_processor.module.cpu.tip.0"));
-        desc.add(I18n.format("upgrade.data_processor.module.cpu.tip.1"));
-        desc.add(I18n.format("upgrade.data_processor.module.cpu.tip.2"));
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration())),
-                NovaEngUtils.formatPercent(getEfficiency(), 1.0F))
-        );
+                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
+        ));
 
         getEnergyDurabilityTip(desc, moduleType);
 
@@ -122,9 +81,8 @@ public class ProcessorModuleCPU extends DataProcessorModule {
         List<String> desc = new ArrayList<>();
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration())),
-                NovaEngUtils.formatPercent(getEfficiency(), 1.0F))
-        );
+                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
+        ));
 
         getEnergyDurabilityTip(desc, moduleType);
 
@@ -136,8 +94,6 @@ public class ProcessorModuleCPU extends DataProcessorModule {
         ProcessorModuleCPU upgrade = new ProcessorModuleCPU(getType());
         upgrade.eventProcessor.putAll(eventProcessor);
         upgrade.parentStack = parentStack;
-        upgrade.durability = durability;
-        upgrade.maxDurability = maxDurability;
         return upgrade;
     }
 
