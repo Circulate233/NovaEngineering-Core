@@ -118,10 +118,10 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
             if (item.isEmpty()){
                 remaining[i] = ItemStack.EMPTY;
             } else {
-                remaining[i] = item;
                 if (size == 0) {
                     size = item.getCount();
                 }
+                remaining[i] = getContainerItem(item);
             }
         }
 
@@ -143,21 +143,41 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
             if (item.isEmpty()){
                 remaining[i] = ItemStack.EMPTY;
             } else {
-                remaining[i] = item;
                 if (size == 0) {
                     size = item.getCount();
                     if (item.getItem() instanceof ItemFluidPacket) {
                         var amount = ((FluidStack) FakeItemRegister.getStack(item)).amount;
-                        var patternAmount = ((FluidStack) FakeItemRegister.getStack(pattern.getInputs()[i])).amount;
-                        size = amount/patternAmount;
+                        var pamount = ((FluidStack) FakeItemRegister.getStack(pattern.getInputs()[i])).amount;
+                        size = amount/pamount;
                     }
                 }
+                remaining[i] = getContainerItem(item);
             }
         }
 
         output.setCount(output.getCount() * size);
 
         return partController.offerWork(new EFabricatorWorker.CraftWork(remaining, output, size));
+    }
+
+    private static ItemStack getContainerItem(ItemStack stackInSlot) {
+        if (stackInSlot == null) {
+            return ItemStack.EMPTY;
+        } else {
+            Item i = stackInSlot.getItem();
+            if (i != null && i.hasContainerItem(stackInSlot)) {
+                ItemStack ci = i.getContainerItem(stackInSlot);
+                if (!ci.isEmpty() && ci.isItemStackDamageable() && ci.getItemDamage() == ci.getMaxDamage()) {
+                    ci = ItemStack.EMPTY;
+                }
+
+                ci.setCount(stackInSlot.getCount());
+                return ci;
+            } else if (!stackInSlot.isEmpty()) {
+                stackInSlot.setCount(0);
+                return stackInSlot;
+            } else return ItemStack.EMPTY;
+        }
     }
 
     public boolean insertPattern(final ItemStack patternStack) {

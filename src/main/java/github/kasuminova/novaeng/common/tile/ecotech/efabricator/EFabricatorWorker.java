@@ -64,7 +64,7 @@ public class EFabricatorWorker extends EFabricatorPart {
                     }
                 }
                 outputBuffer.add(AEItemStack.fromItemStack(craftWork.getOutput()));
-                completed++;
+                completed += parallelism;
             }
         }
 
@@ -316,7 +316,7 @@ public class EFabricatorWorker extends EFabricatorPart {
         public CraftWork(final ItemStack[] remaining, final ItemStack output,final int size) {
             this.remaining = remaining;
             this.output = output;
-            this.size = size;
+            this.size = Math.max(1,size);
         }
 
         public int getSize() {
@@ -337,15 +337,20 @@ public class EFabricatorWorker extends EFabricatorPart {
             final var i = Math.min(amount,this.size);
             final var inputs = new ItemStack[this.remaining.length];
             for (int ii = 0; ii < remaining.length; ii++) {
-                inputs[ii] = remaining[ii].splitStack(amount);
+                inputs[ii] = remaining[ii].splitStack(i);
             }
-            final var eachOutput = this.output.getCount() / size;
             final var output = this.output.copy();
-            final var outCount = i * eachOutput;
-            output.setCount(outCount);
-            this.output.shrink(outCount);
-            size -= i;
-            return new CraftWork(inputs,output,i);
+            if (size > 0) {
+                final var eachOutput = this.output.getCount() / size;
+                final var outCount = i * eachOutput;
+                output.setCount(outCount);
+                this.output.shrink(outCount);
+                size -= i;
+                return new CraftWork(inputs, output, i);
+            } else {
+                output.setCount(0);
+                return new CraftWork(inputs, output, 0);
+            }
         }
 
         public NBTTagCompound writeToNBT(final List<ItemStack> stackSet) {
