@@ -6,14 +6,10 @@ import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -113,8 +109,6 @@ public class OreHandler {
                         drops.add(ore);
                     }
                     return;
-                } else if (registryName != null && registryName.getNamespace().equals("astralsorcery") && hasSilkTouch(event.getHarvester())) {
-                    return;
                 }
 
                 int fortune = event.getFortuneLevel();
@@ -126,12 +120,6 @@ public class OreHandler {
                 }
             }
         }
-    }
-
-    public static boolean hasSilkTouch(EntityPlayer player) {
-        if (player instanceof FakePlayer)return false;
-        ItemStack mainHandStack = player.getHeldItemMainhand();
-        return EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, mainHandStack) != 0;
     }
 
     private final static class OreKey {

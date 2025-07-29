@@ -7,8 +7,11 @@ import net.minecraft.network.play.server.SPacketRecipeBook;
 import net.minecraft.stats.RecipeBookServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(value = RecipeBookServer.class)
@@ -55,9 +58,9 @@ public class MixinRecipeBookServer {
      * @author circulation
      * @reason 废弃原版配方书
      */
-    @Overwrite
-    private List<IRecipe> getRecipes() {
-        return new ArrayList<>();
+    @Inject(method = "getRecipes",at = @At("HEAD"), cancellable = true)
+    public void getRecipes(CallbackInfoReturnable<List<IRecipe>> cir) {
+        cir.setReturnValue(Collections.emptyList());
     }
 
     /**
@@ -66,7 +69,7 @@ public class MixinRecipeBookServer {
      */
     @Overwrite
     private List<IRecipe> getDisplayedRecipes() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     /**
