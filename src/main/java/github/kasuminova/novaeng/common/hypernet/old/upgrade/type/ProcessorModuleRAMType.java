@@ -14,7 +14,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class ProcessorModuleRAMType extends ProcessorModuleType {
     private final double computationPointGenerationLimit;
 
-    public ProcessorModuleRAMType(final int energyConsumption,
+    public ProcessorModuleRAMType(final long energyConsumption,
                                   final double computationPointGenerationLimit)
     {
         super(energyConsumption);
@@ -28,14 +28,14 @@ public class ProcessorModuleRAMType extends ProcessorModuleType {
     @ZenMethod
     public static ProcessorModuleRAMType create(final int minDurability,
                                                 final int maxDurability,
-                                                final int energyConsumption,
+                                                final long energyConsumption,
                                                 final double computationPointGenerationLimit)
     {
         return new ProcessorModuleRAMType(energyConsumption, computationPointGenerationLimit);
     }
 
     @ZenMethod
-    public static ProcessorModuleRAMType create(final int energyConsumption,
+    public static ProcessorModuleRAMType create(final long energyConsumption,
                                                 final double computationPointGenerationLimit)
     {
         return new ProcessorModuleRAMType(energyConsumption, computationPointGenerationLimit);

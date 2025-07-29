@@ -69,13 +69,15 @@ public class WorldLoadedHandler {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (!SERVER.ForceChunkHandler)return;
-        if (event.phase == TickEvent.Phase.START) {
-            if (time % 100 == 0) {
-                request(Universe.get().server);
+        switch (event.phase){
+            case START -> {
+                if (SERVER.ForceChunkHandler) {
+                    if (time % 100 == 0) {
+                        request(Universe.get().server);
+                    }
+                    ++time;
+                }
             }
-            ++time;
         }
     }
-
 }

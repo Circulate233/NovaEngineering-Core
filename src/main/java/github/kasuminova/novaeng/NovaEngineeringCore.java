@@ -2,6 +2,7 @@ package github.kasuminova.novaeng;
 
 import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
+import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
@@ -124,6 +125,7 @@ public class NovaEngineeringCore {
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
         event.registerServerCommand(CommandSPacketProfiler.INSTANCE);
+        event.registerServerCommand(CommandBuilder.INSTANCE);
         WorldLoadedHandler.REGISTERED_DIMENSIONS.clear();
         WorldLoadedHandler.ERRORWROLD.clear();
         WorldLoadedHandler.init = true;

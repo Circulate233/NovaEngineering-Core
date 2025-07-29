@@ -22,7 +22,7 @@ public abstract class DataProcessorModule extends DynamicMachineUpgrade {
     }
 
     @ZenGetter("energyConsumption")
-    public abstract int getEnergyConsumption();
+    public abstract long getEnergyConsumption();
 
     protected void getEnergyDurabilityTip(final List<String> desc, ProcessorModuleType moduleType) {
         desc.add(I18n.format("upgrade.data_processor.module.energy.tip",

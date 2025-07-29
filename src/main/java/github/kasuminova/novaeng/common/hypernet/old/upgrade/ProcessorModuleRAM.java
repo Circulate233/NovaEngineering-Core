@@ -52,7 +52,7 @@ public class ProcessorModuleRAM extends DataProcessorModule {
     }
 
     @Override
-    public int getEnergyConsumption() {
+    public long getEnergyConsumption() {
         return moduleType.getEnergyConsumption();
     }
 

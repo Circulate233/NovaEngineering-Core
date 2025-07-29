@@ -40,6 +40,7 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_fluxnetworks.json","fluxnetworks");
         addModdedMixinCFG("mixins.novaeng_core_extrabotany.json","extrabotany");
         addModdedMixinCFG("mixins.novaeng_core_packagedauto.json","packagedauto");
+        addModdedMixinCFG("mixins.novaeng_core_rftools.json","rftools");
 
         addMixinCFG("mixins.novaeng_core_forge_late.json");
         addMixinCFG("mixins.novaeng_core_dme.json",                               

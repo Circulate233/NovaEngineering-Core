@@ -8,9 +8,9 @@ import stanhebben.zenscript.annotations.ZenMethod;
 @ZenRegister
 @ZenClass("novaeng.hypernet.upgrade.type.ProcessorModuleType")
 public abstract class ProcessorModuleType {
-    protected final int energyConsumption;
+    protected final long energyConsumption;
 
-    public ProcessorModuleType(final int energyConsumption) {
+    public ProcessorModuleType(final long energyConsumption) {
         this.energyConsumption = energyConsumption;
     }
 
@@ -18,7 +18,7 @@ public abstract class ProcessorModuleType {
     public abstract ProcessorModuleType register(String typeName, String localizedName, int level);
 
     @ZenGetter("energyConsumption")
-    public int getEnergyConsumption() {
+    public long getEnergyConsumption() {
         return energyConsumption;
     }
 }

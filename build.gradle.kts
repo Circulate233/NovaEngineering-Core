@@ -13,7 +13,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.22.4"
+version = "1.22.5"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -259,7 +259,9 @@ dependencies {
     implementation(rfg.deobf("curse.maven:cofh-world-271384:2920434"))
     implementation(rfg.deobf("curse.maven:thermal-foundation-222880:2926428"))
     compileOnly(rfg.deobf("curse.maven:thermal-innovation-291737:2920441"))
-    compileOnly(rfg.deobf("curse.maven:rftools-224641:2861573"))
+    compileOnly(rfg.deobf("curse.maven:tesla-244651:2487959"))
+    implementation(rfg.deobf("curse.maven:mcjtylib-233105:2745846"))
+    implementation(rfg.deobf("curse.maven:rftools-224641:2861573"))
     implementation(rfg.deobf("curse.maven:thermal-expansion-69163:2926431"))
     compileOnly(rfg.deobf("curse.maven:athenaeum-284350:4633750"))
     compileOnly(rfg.deobf("curse.maven:artisan-worktables-284351:3205284"))
