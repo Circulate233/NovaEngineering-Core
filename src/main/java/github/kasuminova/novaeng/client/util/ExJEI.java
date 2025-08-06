@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.client.util;
 
-import com.github.bsideup.jabel.Desugar;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.common.util.SimpleItem;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.ItemName;
 import ic2.core.ref.TeBlock;
@@ -13,9 +13,7 @@ import ink.ikx.rt.api.mods.jei.IJeiUtils;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -68,28 +66,5 @@ public class ExJEI{
         });
 
         uniqueKeys.clear();
-    }
-
-    @Desugar
-    private record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
-
-        public static SimpleItem getInstance(ItemStack stack) {
-            return new SimpleItem(stack.getItem(), stack.getMetadata(), stack.getTagCompound());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            SimpleItem that = (SimpleItem) o;
-            return meta == that.meta && Objects.equals(item, that.item) && Objects.equals(nbt, that.nbt);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = item.hashCode();
-            result = 31 * result + meta;
-            result = 31 * result + (nbt != null ? nbt.hashCode() : 0);
-            return result;
-        }
     }
 }

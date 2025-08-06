@@ -7,7 +7,6 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.BlockEvent;
@@ -19,7 +18,6 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.RawOre")
@@ -73,13 +71,6 @@ public class OreHandler {
                             var ok = OreKey.getKey(ore);
                             map.put(ok, rawOre);
                             mapO.put(ok, ODore);
-
-                            if (ore.getItem() instanceof ItemBlock ik && ik.getBlock() == Blocks.REDSTONE_ORE) {
-                                ok = OreKey.getKey(Blocks.LIT_REDSTONE_ORE.getRegistryName(), ore.getItemDamage());
-                                map.put(ok, rawOre);
-                                mapO.put(ok, ODore);
-                            }
-
                             NovaEngineeringCore.log.info("registered : {}[{}]", ok.toString(), rawOreName);
                         }
                     }
@@ -97,8 +88,7 @@ public class OreHandler {
             IBlockState blockState = event.getState();
             Block block = blockState.getBlock();
             int meta = block.getMetaFromState(blockState);
-            ResourceLocation registryName = block.getRegistryName();
-            final OreKey key = OreKey.getKey(registryName,meta);
+            final OreKey key = OreKey.getKey(block,meta);
             if (rawOreMap.containsKey(key)){
                 List<ItemStack> drops = event.getDrops();
                 drops.clear();
@@ -123,28 +113,32 @@ public class OreHandler {
     }
 
     private final static class OreKey {
-        private final ResourceLocation rl;
-        private final int meta;
+        private final ItemStack item;
         private String toString;
         private int hash = -1;
 
-        private static final Map<ResourceLocation, Map<Integer, OreKey>> keyPool = new HashMap<>();
+        private OreKey(ItemStack item){
+            this.item = item;
+        }
 
-        private OreKey(ResourceLocation Rl,int Meta){
-            this.rl = Rl;
-            this.meta = Meta;
+        public int getMetadata(){
+            return item.getMetadata();
+        }
+
+        public ResourceLocation getRl(){
+            return item.getItem().getRegistryName();
         }
 
         @Override
         public boolean equals(Object o) {
             if (!(o instanceof OreKey oreKey)) return false;
-            return meta == oreKey.meta && rl.equals(oreKey.rl);
+            return this.getMetadata() == oreKey.getMetadata() && Objects.equals(this.getRl(),oreKey.getRl());
         }
 
         @Override
         public int hashCode() {
             if (hash == -1){
-                hash = Objects.hash(rl, meta);
+                hash = Objects.hash(this.getRl(), this.getMetadata());
             }
             return hash;
         }
@@ -152,22 +146,22 @@ public class OreHandler {
         @Override
         public String toString(){
             if (toString == null){
-                toString = rl.toString() + ":" + meta;
+                toString = this.getRl().toString() + ":" + this.getMetadata();
             }
             return toString;
         }
 
         public static OreKey getKey(ItemStack itemStack) {
-            ResourceLocation rl = itemStack.getItem().getRegistryName();
-            int meta = itemStack.getItemDamage();
-            return keyPool.computeIfAbsent(rl, k -> new ConcurrentHashMap<>())
-                    .computeIfAbsent(meta, m -> new OreKey(rl, meta));
+            return new OreKey(itemStack);
         }
 
-        public static OreKey getKey(ResourceLocation rl, int meta) {
-            return keyPool.computeIfAbsent(rl, k -> new ConcurrentHashMap<>())
-                    .computeIfAbsent(meta, m -> new OreKey(rl, meta));
+        private static final OreKey redStone = new OreKey(new ItemStack(Blocks.REDSTONE_ORE));
+
+        public static OreKey getKey(Block block,int meta) {
+            if (block == Blocks.LIT_REDSTONE_ORE)return redStone;
+            return new OreKey(new ItemStack(block,1,meta));
         }
+
     }
 
     public static class OreDictHelper {
