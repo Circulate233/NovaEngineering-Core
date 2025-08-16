@@ -9,6 +9,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Collection;
@@ -18,7 +19,7 @@ public class EnchantmentHandler {
     public static final EnchantmentHandler INSTANCE = new EnchantmentHandler();
 
     @SubscribeEvent
-    public void onMagicBreaking(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
+    public void onMagicBreaking(LivingHurtEvent event) {
         if (event.getEntity().world.isRemote || event.getSource().getTrueSource() == null) {
             return;
         }
