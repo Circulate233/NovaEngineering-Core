@@ -8,9 +8,14 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,14 +58,14 @@ public class ItemBlockAngel extends ItemBlock {
     }
 
     @Override
-    public EnumActionResult onItemUse(@Nonnull final EntityPlayer player,
-                                      @Nonnull final World worldIn,
-                                      @Nonnull final BlockPos _0,
-                                      @Nonnull final EnumHand hand,
-                                      @Nonnull final EnumFacing facing,
-                                      final float hitX,
-                                      final float hitY,
-                                      final float hitZ)
+    public @NotNull EnumActionResult onItemUse(@Nonnull final EntityPlayer player,
+                                               @Nonnull final World worldIn,
+                                               @Nonnull final BlockPos _0,
+                                               @Nonnull final EnumHand hand,
+                                               @Nonnull final EnumFacing facing,
+                                               final float hitX,
+                                               final float hitY,
+                                               final float hitZ)
     {
         EnumFacing playerFacing = player.getAdjustedHorizontalFacing();
         BlockPos pos = new BlockPos(player.posX, player.posY + player.eyeHeight, player.posZ);

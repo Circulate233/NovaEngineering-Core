@@ -1,8 +1,13 @@
 package github.kasuminova.novaeng.common.util;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class FixedSizeDeque<E> implements Iterable<E> {
@@ -22,7 +27,7 @@ public class FixedSizeDeque<E> implements Iterable<E> {
     }
 
     public List<E> getList() {
-        return new ArrayList<>(deque);
+        return new ObjectArrayList<>(deque);
     }
 
     public E get(int index) {

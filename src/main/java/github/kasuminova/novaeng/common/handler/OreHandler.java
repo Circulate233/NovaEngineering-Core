@@ -4,6 +4,9 @@ import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -17,7 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.RawOre")
@@ -52,8 +57,8 @@ public class OreHandler {
     }
 
     public static void registry() {
-        Map<OreKey, ItemStack> map = new HashMap<>();
-        Map<OreKey, ItemStack> mapO = new HashMap<>();
+        Object2ObjectMap<OreKey, ItemStack> map = new Object2ObjectOpenHashMap<>();
+        Object2ObjectMap<OreKey, ItemStack> mapO = new Object2ObjectOpenHashMap<>();
 
         for (String odName : OreDictionary.getOreNames()) {
             if (odName.startsWith(rawOreOD)) {
@@ -78,8 +83,8 @@ public class OreHandler {
             }
         }
 
-        rawOreMap = Collections.unmodifiableMap(map);
-        oreMap = Collections.unmodifiableMap(mapO);
+        rawOreMap = Object2ObjectMaps.unmodifiable(map);
+        oreMap = Object2ObjectMaps.unmodifiable(mapO);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

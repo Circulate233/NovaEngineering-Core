@@ -21,7 +21,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-import static github.kasuminova.novaeng.common.machine.GeocentricDrill.*;
+import static github.kasuminova.novaeng.common.machine.GeocentricDrill.MAX_DEPTH;
+import static github.kasuminova.novaeng.common.machine.GeocentricDrill.MAX_PARALLELISM;
+import static github.kasuminova.novaeng.common.machine.GeocentricDrill.MIN_DEPTH;
+import static github.kasuminova.novaeng.common.machine.GeocentricDrill.PARALLELISM_PER_DEPTH;
 
 public class GeocentricDrillController extends TileMachineController {
 

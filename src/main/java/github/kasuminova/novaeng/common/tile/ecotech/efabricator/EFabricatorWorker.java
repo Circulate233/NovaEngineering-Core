@@ -7,6 +7,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus;
 import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -14,7 +15,10 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 
 public class EFabricatorWorker extends EFabricatorPart {
 
@@ -201,7 +205,7 @@ public class EFabricatorWorker extends EFabricatorPart {
         private static final String STACK_SET_SIZE_TAG = "SSS";
         private static final String REPEAT_TAG = "R";
 
-        private final Deque<EFabricatorWorker.CraftWork> queue = new ArrayDeque<>();
+        private final Deque<CraftWork> queue = new ArrayDeque<>();
         private int size = 0;
 
         public int size() {
@@ -240,7 +244,7 @@ public class EFabricatorWorker extends EFabricatorPart {
                 return nbt;
             }
 
-            List<ItemStack> stackSet = new ArrayList<>();
+            List<ItemStack> stackSet = new ObjectArrayList<>();
 
             // Queue
             NBTTagList queueTag = new NBTTagList();
@@ -279,7 +283,7 @@ public class EFabricatorWorker extends EFabricatorPart {
 
         public void readFromNBT(final NBTTagCompound nbt) {
             queue.clear();
-            List<ItemStack> stackSet = new ArrayList<>();
+            List<ItemStack> stackSet = new ObjectArrayList<>();
 
             // StackSet
             NBTTagCompound stackSetTag = nbt.getCompoundTag(STACK_SET_TAG);

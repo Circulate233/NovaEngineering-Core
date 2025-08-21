@@ -22,6 +22,7 @@ import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,7 +30,11 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GeocentricDrill implements MachineSpecial {
 
@@ -179,7 +184,7 @@ public class GeocentricDrill implements MachineSpecial {
         recipe.addRequirement(new RequirementEnergy(IOType.INPUT, ENERGY_PER_TICK));
 
         float chance = 1F / (rawOres.size() + (accelerateOres.size() * (GeocentricDrill.ACCELERATE_MULTIPLIER - 1)));
-        List<ChancedIngredientStack> output = new ArrayList<>();
+        List<ChancedIngredientStack> output = new ObjectArrayList<>();
         rawOres.forEach((oreName, ore) -> output.add(new ChancedIngredientStack(
                 ore.copy(), accelerateOres.contains(oreName) ? chance * GeocentricDrill.ACCELERATE_MULTIPLIER : chance)
         ));

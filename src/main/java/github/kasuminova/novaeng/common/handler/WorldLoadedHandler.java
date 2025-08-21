@@ -4,6 +4,7 @@ import com.feed_the_beast.ftblib.lib.data.Universe;
 import crafttweaker.annotations.ZenRegister;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldServer;
@@ -14,7 +15,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -30,7 +30,7 @@ public class WorldLoadedHandler {
     static final int randomY = random.nextInt(100000) + 150000;
     public static final ChunkPos chunk = new ChunkPos(randomX, randomY);
     int time = 0;
-    public static final Map<Integer,ForgeChunkManager.Ticket> map = new HashMap<>();
+    public static final Map<Integer,ForgeChunkManager.Ticket> map = new Object2ObjectOpenHashMap<>();
     public static final IntSet REGISTERED_DIMENSIONS = new IntLinkedOpenHashSet();
     public static final IntSet ERRORWROLD = new IntLinkedOpenHashSet();
     public static boolean init = true;

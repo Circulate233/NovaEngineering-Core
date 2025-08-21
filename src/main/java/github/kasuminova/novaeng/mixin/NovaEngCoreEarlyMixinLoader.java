@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.commons.lang3.SystemUtils;
@@ -8,15 +9,17 @@ import org.apache.logging.log4j.Logger;
 import zone.rong.mixinbooter.IEarlyMixinLoader;
 
 import javax.annotation.Nullable;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JOptionPane;
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
 public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMixinLoader {
@@ -44,7 +47,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         }
 
         boolean detected = false;
-        List<String> lines = new ArrayList<>();
+        List<String> lines = new ObjectArrayList<>();
         try {
             String queryCmd = "tasklist.exe" + " /FO csv /FI \"STATUS eq RUNNING\" | findstr /R /C:\"Plain Craft Launcher 2\"";
             String cmd = "cmd";

@@ -2,18 +2,27 @@ package github.kasuminova.novaeng.common.adapter;
 
 import crafttweaker.util.IEventHandler;
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent;
-import github.kasuminova.novaeng.common.adapter.util.*;
+import github.kasuminova.novaeng.common.adapter.util.HashedItemStack;
+import github.kasuminova.novaeng.common.adapter.util.IC2MachineRecipeConverter;
+import github.kasuminova.novaeng.common.adapter.util.MekCrusherRecipeConverter;
+import github.kasuminova.novaeng.common.adapter.util.NCOBasicRecipeConverter;
+import github.kasuminova.novaeng.common.adapter.util.PulverizerRecipeConverter;
 import hellfirepvp.modularmachinery.common.crafting.MachineRecipe;
 import hellfirepvp.modularmachinery.common.crafting.adapter.RecipeAdapter;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
 import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AdapterShredder extends RecipeAdapter {
 
@@ -26,8 +35,8 @@ public class AdapterShredder extends RecipeAdapter {
     @Nonnull
     @Override
     public Collection<MachineRecipe> createRecipesFor(final ResourceLocation owningMachineName, final List<RecipeModifier> modifiers, final List<ComponentRequirement<?, ?>> additionalRequirements, final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers, final List<String> recipeTooltips) {
-        Set<HashedItemStack> registeredStack = new HashSet<>();
-        List<MachineRecipe> recipes = new LinkedList<>();
+        Set<HashedItemStack> registeredStack = new ObjectOpenHashSet<>();
+        List<MachineRecipe> recipes = new ObjectArrayList<>();
 
         recipes.addAll(PulverizerRecipeConverter.convert(
                 stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers));
@@ -53,7 +62,7 @@ public class AdapterShredder extends RecipeAdapter {
     }
 
     protected boolean checkStackRegistered(Set<HashedItemStack> registeredStack, List<ItemStack> stacks) {
-        List<HashedItemStack> checked = new ArrayList<>();
+        List<HashedItemStack> checked = new ObjectArrayList<>();
         for (final ItemStack stack : stacks) {
             if (stack.isEmpty()) {
                 return false;

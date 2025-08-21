@@ -38,7 +38,8 @@ public class EnchantmentHandler {
                         float damage = Math.max(attackDamage, event.getAmount());
                         float source = Math.max(entity.getHealth() - damage, 1);
 
-                        while (entity.getHealth() > source) {
+                        int i = 0;
+                        while (entity.getHealth() > source && i++ < 1000) {
                             entity.setHealth(source);
                         }
 

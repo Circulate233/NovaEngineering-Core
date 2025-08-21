@@ -29,7 +29,9 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.*;
+import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.BigLongMax;
+import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.formatNumber;
+import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.isClient;
 
 @ZenRegister
 @ZenClass("novaeng.DreamEnergyCore")

@@ -6,6 +6,9 @@ import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -13,7 +16,10 @@ import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
 import stanhebben.zenscript.annotations.ZenSetter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ZenRegister
@@ -33,8 +39,8 @@ public class ResearchCognitionData {
     private final boolean cycleResearch;
     private final int maxCycle;
 
-    private final List<String> descriptions;
-    private final List<String> unlockedDescriptions;
+    private final ObjectList<String> descriptions;
+    private final ObjectList<String> unlockedDescriptions;
     private final List<ResearchCognitionData> dependencies;
 
     private final Object2IntOpenHashMap<ResearchCognitionData> cycleDependencies = new Object2IntOpenHashMap<>();
@@ -45,8 +51,8 @@ public class ResearchCognitionData {
                                  final float techLevel,
                                  final double requiredPoints,
                                  final double minComputationPointPerTick,
-                                 final List<String> descriptions,
-                                 final List<String> unlockedDescriptions,
+                                 final ObjectList<String> descriptions,
+                                 final ObjectList<String> unlockedDescriptions,
                                  final List<ResearchCognitionData> dependencies)
     {
         this.researchName = researchName;
@@ -63,8 +69,8 @@ public class ResearchCognitionData {
             this.descriptions = descriptions;
             this.unlockedDescriptions = unlockedDescriptions;
         } else {
-            this.descriptions = new ArrayList<>();
-            this.unlockedDescriptions = new ArrayList<>();
+            this.descriptions = new ObjectArrayList<>();
+            this.unlockedDescriptions = new ObjectArrayList<>();
         }
     }
 
@@ -74,8 +80,8 @@ public class ResearchCognitionData {
                                  final float techLevel,
                                  final double requiredPoints,
                                  final double minComputationPointPerTick,
-                                 final List<String> descriptions,
-                                 final List<String> unlockedDescriptions,
+                                 final ObjectList<String> descriptions,
+                                 final ObjectList<String> unlockedDescriptions,
                                  final List<ResearchCognitionData> dependencies,
                                  final int maxCycle)
     {
@@ -94,8 +100,8 @@ public class ResearchCognitionData {
             this.unlockedDescriptions = unlockedDescriptions;
         } else {
             this.translatedName = "";
-            this.descriptions = new ArrayList<>();
-            this.unlockedDescriptions = new ArrayList<>();
+            this.descriptions = new ObjectArrayList<>();
+            this.unlockedDescriptions = new ObjectArrayList<>();
         }
     }
 
@@ -122,8 +128,8 @@ public class ResearchCognitionData {
                 techLevel,
                 requiredPoints,
                 minComputationPointPerTick,
-                Arrays.asList(descriptions),
-                Arrays.asList(unlockedDescriptions),
+                ObjectArrayList.wrap(descriptions),
+                ObjectArrayList.wrap(unlockedDescriptions),
                 dependencies);
     }
 
@@ -151,8 +157,8 @@ public class ResearchCognitionData {
                 techLevel,
                 requiredPoints,
                 minComputationPointPerTick,
-                Arrays.asList(descriptions),
-                Arrays.asList(unlockedDescriptions),
+                ObjectArrayList.wrap(descriptions),
+                ObjectArrayList.wrap(unlockedDescriptions),
                 dependencies,
                 maxCycle);
     }
@@ -218,7 +224,7 @@ public class ResearchCognitionData {
     }
 
     public List<String> getDescriptions() {
-        return Collections.unmodifiableList(descriptions);
+        return ObjectLists.unmodifiable(descriptions);
     }
 
     @ZenGetter("cycleResearch")

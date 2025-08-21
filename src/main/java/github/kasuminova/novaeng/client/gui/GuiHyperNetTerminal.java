@@ -26,6 +26,9 @@ import hellfirepvp.modularmachinery.common.util.IOInventory;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
 import io.netty.util.internal.ThrowableUtil;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -44,7 +47,13 @@ import net.minecraftforge.client.model.animation.Animation;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTerminal> {
@@ -73,11 +82,11 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
     private static ResearchDataContext currentCache = null;
 
     protected final TileHyperNetTerminal terminal;
-    protected final Set<ResearchCognitionData> unlockedData = new HashSet<>();
-    protected final List<ResearchCognitionData> lockedData = new ArrayList<>();
-    protected final List<ResearchCognitionData> unavailableData = new ArrayList<>();
+    protected final Set<ResearchCognitionData> unlockedData = new ObjectOpenHashSet<>();
+    protected final List<ResearchCognitionData> lockedData = new ObjectArrayList<>();
+    protected final List<ResearchCognitionData> unavailableData = new ObjectArrayList<>();
     protected final Object2DoubleOpenHashMap<ResearchCognitionData> researchingData = new Object2DoubleOpenHashMap<>();
-    protected final List<ResearchDataContext> renderingData = new ArrayList<>();
+    protected final List<ResearchDataContext> renderingData = new ObjectArrayList<>();
 
     protected boolean darkMode = true;
     protected boolean showLockedResearchDesc = false;
@@ -506,7 +515,7 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
     protected void updateRenderingData() {
         renderingData.clear();
 
-        Map<String, ResearchDataContext> tmp = new LinkedHashMap<>();
+        Map<String, ResearchDataContext> tmp = new Object2ObjectLinkedOpenHashMap<>();
 
         lockedData.sort(comparator);
         unavailableData.sort(comparator);

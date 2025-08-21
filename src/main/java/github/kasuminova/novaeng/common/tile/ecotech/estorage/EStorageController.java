@@ -20,7 +20,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class EStorageController extends EPartController<EStoragePart> {
 
@@ -76,8 +81,8 @@ public class EStorageController extends EPartController<EStoragePart> {
         if (part instanceof EStorageEnergyCell energyCell) {
             energyCellsMax.add(energyCell);
             energyCellsMin.add(energyCell);
-        } else if (part instanceof EStorageMEChannel channel) {
-            this.channel = channel;
+        } else if (part instanceof EStorageMEChannel c) {
+            this.channel = c;
         }
     }
 

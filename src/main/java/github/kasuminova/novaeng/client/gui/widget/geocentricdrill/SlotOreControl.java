@@ -16,14 +16,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 
 public class SlotOreControl extends SlotItemVirtualJEI {
 
     private final String oreName;
-    private float chance;
-    private boolean accelerated;
+    private final float chance;
+    private final boolean accelerated;
 
     public SlotOreControl(final String oreName, final ItemStack stackInSlot, float chance, boolean accelerated) {
         super(stackInSlot);

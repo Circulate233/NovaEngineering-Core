@@ -3,6 +3,8 @@ package github.kasuminova.novaeng.common.item;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -12,11 +14,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class ItemBasic extends Item {
 
-    protected static Map<String,ItemBasic> map = new HashMap<>();
+    protected static Map<String,ItemBasic> map = new Object2ObjectOpenHashMap<>();
 
     public static List<String> NAMES = Arrays.asList(
             MagicBreaking.MAGICBREAKING.getId() + "_stone"
@@ -30,7 +34,7 @@ public class ItemBasic extends Item {
     }
 
     public static List<Item> getAllItem() {
-        List<Item> ItemBasics = new LinkedList<>();
+        List<Item> ItemBasics = new ObjectArrayList<>();
         for (String name : NAMES){
             final ItemBasic item = new ItemBasic(name);
             ItemBasics.add(item);

@@ -1,20 +1,64 @@
 package github.kasuminova.novaeng.common.registry;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.block.*;
-import github.kasuminova.novaeng.common.block.ecotech.ecalculator.*;
-import github.kasuminova.novaeng.common.block.ecotech.efabricator.*;
-import github.kasuminova.novaeng.common.block.ecotech.estorage.*;
+import github.kasuminova.novaeng.common.block.BlockAngel;
+import github.kasuminova.novaeng.common.block.BlockDreamEnergyPort;
+import github.kasuminova.novaeng.common.block.BlockGeocentricDrillController;
+import github.kasuminova.novaeng.common.block.BlockHyperNetTerminal;
+import github.kasuminova.novaeng.common.block.BlockModularServerAssembler;
+import github.kasuminova.novaeng.common.block.BlockRedstoneLogicalPort;
+import github.kasuminova.novaeng.common.block.BlockSingularityCoreController;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorCasing;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorCellDrive;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorController;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorMEChannel;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorParallelProc;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorTail;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorThreadCore;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorThreadCoreHyper;
+import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculatorTransmitterBus;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorCasing;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorParallelProc;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorPatternBus;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorVent;
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorWorker;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageCasing;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageCellDrive;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageController;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageEnergyCell;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageMEChannel;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageVent;
 import github.kasuminova.novaeng.common.item.ItemBlockAngel;
 import github.kasuminova.novaeng.common.item.ItemBlockME;
-import github.kasuminova.novaeng.common.item.ecalculator.*;
-import github.kasuminova.novaeng.common.item.efabriactor.*;
+import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorCellDrive;
+import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorController;
+import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorMEChannel;
+import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorParallelProc;
+import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorThreadCore;
+import github.kasuminova.novaeng.common.item.efabriactor.ItemEFabricatorController;
+import github.kasuminova.novaeng.common.item.efabriactor.ItemEFabricatorMEChannel;
+import github.kasuminova.novaeng.common.item.efabriactor.ItemEFabricatorParallelProc;
+import github.kasuminova.novaeng.common.item.efabriactor.ItemEFabricatorPatternBus;
+import github.kasuminova.novaeng.common.item.efabriactor.ItemEFabricatorWorker;
 import github.kasuminova.novaeng.common.item.estorage.ItemEStorageController;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
-import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.*;
-import github.kasuminova.novaeng.common.tile.ecotech.efabricator.*;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorCellDrive;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorMEChannel;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorParallelProc;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorTail;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
+import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorTransmitterBus;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorTail;
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageEnergyCell;
@@ -27,6 +71,7 @@ import hellfirepvp.modularmachinery.common.block.BlockMachineComponent;
 import hellfirepvp.modularmachinery.common.item.ItemBlockCustomName;
 import hellfirepvp.modularmachinery.common.item.ItemBlockMachineComponent;
 import hellfirepvp.modularmachinery.common.item.ItemBlockMachineComponentCustomName;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -39,7 +84,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,7 +91,7 @@ import static hellfirepvp.modularmachinery.common.registry.RegistryBlocks.pendin
 
 @SuppressWarnings({"MethodMayBeStatic", "UnusedReturnValue"})
 public class RegistryBlocks {
-    public static final List<Block> BLOCK_MODEL_TO_REGISTER = new ArrayList<>();
+    public static final List<Block> BLOCK_MODEL_TO_REGISTER = new ObjectArrayList<>();
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {

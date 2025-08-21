@@ -10,6 +10,7 @@ import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -23,15 +24,18 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminalGuiData, IMessage> {
     // Client Only Cache Data
-    private static final List<ResearchCognitionData> UNLOCKED_DATA = new ArrayList<>();
+    private static final List<ResearchCognitionData> UNLOCKED_DATA = new ObjectArrayList<>();
     private static final Object2DoubleOpenHashMap<ResearchCognitionData> RESEARCHING_DATA = new Object2DoubleOpenHashMap<>();
-    private static final List<Database.Status> DATABASES = new ArrayList<>();
+    private static final List<Database.Status> DATABASES = new ObjectArrayList<>();
     private static ResearchStationType researchStationType = null;
     
     private NBTTagCompound tag;

@@ -12,6 +12,7 @@ import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.util.IEnergyHandlerAsync;
 import hellfirepvp.modularmachinery.common.util.IOInventory;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -21,7 +22,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TileHyperNetTerminal extends TileCustomController {
@@ -29,7 +29,7 @@ public class TileHyperNetTerminal extends TileCustomController {
     public static final int ENERGY_USAGE = 2_000;
 
     private final HyperNetTerminal nodeProxy = new HyperNetTerminal(this);
-    private final List<IEnergyHandlerAsync> energyHandlers = new ArrayList<>();
+    private final List<IEnergyHandlerAsync> energyHandlers = new ObjectArrayList<>();
 
     private IOInventory cardInventory;
 

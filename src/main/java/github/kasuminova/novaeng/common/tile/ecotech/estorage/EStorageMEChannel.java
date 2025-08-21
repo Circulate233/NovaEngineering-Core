@@ -6,7 +6,11 @@ import appeng.api.config.PowerMultiplier;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IAEPowerStorage;
-import appeng.api.networking.events.*;
+import appeng.api.networking.events.MENetworkCellArrayUpdate;
+import appeng.api.networking.events.MENetworkChannelsChanged;
+import appeng.api.networking.events.MENetworkEventSubscribe;
+import appeng.api.networking.events.MENetworkPowerStatusChange;
+import appeng.api.networking.events.MENetworkPowerStorage;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.ICellContainer;
@@ -88,7 +92,7 @@ public class EStorageMEChannel extends EStoragePart implements ICellContainer, I
             this.wasActive = currentActive;
             try {
                 this.proxy.getGrid().postEvent(new MENetworkCellArrayUpdate());
-            } catch (final GridAccessException e) {
+            } catch (final GridAccessException ignored) {
             }
         }
     }

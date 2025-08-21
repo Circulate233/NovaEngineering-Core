@@ -1,7 +1,11 @@
 package github.kasuminova.novaeng.common.hypernet.computer;
 
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
-import github.kasuminova.novaeng.common.hypernet.calculation.*;
+import github.kasuminova.novaeng.common.hypernet.calculation.Calculable;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateReply;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateRequest;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateType;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateTypes;
 import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierKeys;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvCPUConst;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvCalculateCardConst;
@@ -18,11 +22,17 @@ import github.kasuminova.novaeng.common.registry.ServerModuleRegistry;
 import github.kasuminova.novaeng.common.util.TileItemHandler;
 import hellfirepvp.modularmachinery.common.tiles.base.TileEntitySynchronized;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -37,10 +47,10 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
     protected final List<Extension> extensions = new LinkedList<>();
 
     protected final List<Calculable> calculables = new ArrayList<>();
-    protected final Map<CalculateType, PriorityQueue<Calculable>> calculableTypeSet = new HashMap<>();
+    protected final Map<CalculateType, PriorityQueue<Calculable>> calculableTypeSet = new Object2ObjectLinkedOpenHashMap<>();
 
-    protected final Map<Class<?>, List<Object>> typeModulesCache = new HashMap<>();
-    protected final Map<ServerModuleBase<?>, List<ServerModule>> baseModulesCache = new HashMap<>();
+    protected final Map<Class<?>, List<Object>> typeModulesCache = new Object2ObjectLinkedOpenHashMap<>();
+    protected final Map<ServerModuleBase<?>, List<ServerModule>> baseModulesCache = new Object2ObjectLinkedOpenHashMap<>();
 
     protected Consumer<ModularServer> onServerInvChangedListener = null;
 

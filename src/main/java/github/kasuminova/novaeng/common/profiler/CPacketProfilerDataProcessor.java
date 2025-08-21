@@ -6,6 +6,9 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
@@ -15,7 +18,10 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -92,12 +98,12 @@ public class CPacketProfilerDataProcessor {
 
         mergedPackets = result.mergedPackets().entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
+                .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
         mergedTileEntityPackets = result.mergedTileEntityPackets().entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
+                .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
 
-        List<ITextComponent> messages = new ArrayList<>();
+        List<ITextComponent> messages = new ObjectArrayList<>();
 
         messages.add(new TextComponentString(TextFormatting.GREEN + "收集任务完成，事件 ID: " + TextFormatting.YELLOW + currentEvent));
         messages.add(new TextComponentString(TextFormatting.GREEN + "已收集数据: " + TextFormatting.YELLOW + receivedPlayers + "/" + players));
@@ -131,7 +137,7 @@ public class CPacketProfilerDataProcessor {
     private ProcessedData getProcessedData() {
         Map<GameProfile, CPacketProfilerData> sorted = receivedData.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
+                .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
 
         double totalBandwidthPerSecond = sorted.values().stream()
                 .mapToDouble(CPacketProfilerData::getNetworkBandwidthPerSecond)
@@ -147,8 +153,8 @@ public class CPacketProfilerDataProcessor {
                 .max()
                 .orElse(0);
 
-        Map<String, CPacketProfilerData.PacketData> mergedPackets = new HashMap<>();
-        Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets = new HashMap<>();
+        Map<String, CPacketProfilerData.PacketData> mergedPackets = new Object2ObjectOpenHashMap<>();
+        Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets = new Object2ObjectOpenHashMap<>();
 
         for (CPacketProfilerData data : sorted.values()) {
             final Map<String, CPacketProfilerData.PacketData> finalMergedPackets = mergedPackets;

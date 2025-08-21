@@ -6,15 +6,31 @@ import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.client.gui.widget.container.ScrollingColumn;
 import github.kasuminova.mmce.client.gui.widget.event.GuiEvent;
 import github.kasuminova.novaeng.client.gui.widget.msa.event.AssemblerInvUpdateEvent;
-import github.kasuminova.novaeng.common.container.slot.*;
+import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
+import github.kasuminova.novaeng.common.container.slot.SlotCPUItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotCalculateCardItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotCapacitorItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotConditionItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotExtensionCardItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotPSUItemHandler;
+import github.kasuminova.novaeng.common.container.slot.SlotRAMItemHandler;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
-import github.kasuminova.novaeng.common.hypernet.calculation.*;
+import github.kasuminova.novaeng.common.hypernet.calculation.Calculable;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateRequest;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateStage;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateType;
+import github.kasuminova.novaeng.common.hypernet.calculation.CalculateTypes;
 import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierManager;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.util.TileItemHandler;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ServerInfoColumn extends ScrollingColumn {
@@ -52,7 +68,7 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     protected static void addUninstalledDependenciesTip(final TileItemHandler cpu, final AssemblySlotManager slotManager, final TileItemHandler calculateCard, final TileItemHandler extension, final TileItemHandler power, final List<String> errorTips) {
-        List<String> uninstalledDependenciesTip = new ArrayList<>();
+        List<String> uninstalledDependenciesTip = new ObjectArrayList<>();
         addUninstalledDependenciesTip(cpu, slotManager, "cpu", uninstalledDependenciesTip);
         addUninstalledDependenciesTip(calculateCard, slotManager, "calculate_card", uninstalledDependenciesTip);
         addUninstalledDependenciesTip(extension, slotManager, "extension", uninstalledDependenciesTip);
@@ -113,7 +129,7 @@ public class ServerInfoColumn extends ScrollingColumn {
 
     private void addModuleTips(final int totalInstalledModules, final int installedCPUModules, final int installedRAMModules, final int installedCalculateCardModules, final int installedExtensionCardModules, final int installedPSUModules, final int installedCapacitorModules) {
         addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.total_modules", totalInstalledModules))));
-        List<String> moduleTips = new ArrayList<>();
+        List<String> moduleTips = new ObjectArrayList<>();
         moduleTips.add(I18n.format("gui.modular_server_assembler.info.total_cpus", installedCPUModules));
         moduleTips.add(I18n.format("gui.modular_server_assembler.info.total_rams", installedRAMModules));
         moduleTips.add(I18n.format("gui.modular_server_assembler.info.total_calculate_cards", installedCalculateCardModules));
@@ -125,7 +141,7 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     protected void addHardwareBandwidthTips() {
-        List<String> hardwareBandwidthTips = new ArrayList<>();
+        List<String> hardwareBandwidthTips = new ObjectArrayList<>();
         int totalHardwareBandwidth = server.getTotalHardwareBandwidth();
         int usedHardwareBandwidth = server.getUsedHardwareBandwidth();
         hardwareBandwidthTips.add(I18n.format("gui.modular_server_assembler.info.total_hardware_bandwidth", totalHardwareBandwidth));
@@ -169,7 +185,7 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     protected void addExpectedCalculateTip() {
-        List<String> tip = new ArrayList<>();
+        List<String> tip = new ObjectArrayList<>();
         tip.add(I18n.format("gui.modular_server_assembler.calculate.expected"));
 
         for (final CalculateType type : CalculateTypes.getAvailableTypes().values()) {
@@ -178,7 +194,7 @@ public class ServerInfoColumn extends ScrollingColumn {
             ));
             tip.add(I18n.format("gui.modular_server_assembler.calculate.value",
                     type.format(server.calculate(
-                            new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new HashMap<>()))
+                            new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new Object2ObjectOpenHashMap<>()))
                             .generated()
                     ),
                     Calculable.formatEfficiency(server.getCalculateAvgEfficiency(type))

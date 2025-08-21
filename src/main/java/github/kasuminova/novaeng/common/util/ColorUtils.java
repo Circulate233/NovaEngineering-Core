@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.util;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class ColorUtils {
 

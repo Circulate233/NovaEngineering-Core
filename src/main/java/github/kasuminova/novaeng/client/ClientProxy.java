@@ -2,7 +2,15 @@ package github.kasuminova.novaeng.client;
 
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
-import github.kasuminova.novaeng.client.gui.*;
+import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
+import github.kasuminova.novaeng.client.gui.GuiEFabricatorController;
+import github.kasuminova.novaeng.client.gui.GuiEFabricatorPatternBus;
+import github.kasuminova.novaeng.client.gui.GuiEFabricatorPatternSearch;
+import github.kasuminova.novaeng.client.gui.GuiEStorageController;
+import github.kasuminova.novaeng.client.gui.GuiGeocentricDrill;
+import github.kasuminova.novaeng.client.gui.GuiHyperNetTerminal;
+import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
+import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
 import github.kasuminova.novaeng.client.handler.ClientEventHandler;
 import github.kasuminova.novaeng.client.handler.HyperNetClientEventHandler;
@@ -41,7 +49,8 @@ import slimeknights.tconstruct.library.book.TinkerBook;
 import javax.annotation.Nullable;
 import java.io.File;
 
-import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.*;
+import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.checkJavaVersion;
+import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isCleanroomLoader;
 
 @SuppressWarnings("MethodMayBeStatic")
 @Mod.EventBusSubscriber(Side.CLIENT)

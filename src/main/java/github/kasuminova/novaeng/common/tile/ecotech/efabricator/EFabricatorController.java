@@ -27,6 +27,7 @@ import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.client.ClientProxy;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,12 +40,19 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.*;
+import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L4;
+import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L6;
+import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L9;
 
 @SuppressWarnings({"FieldAccessedSynchronizedAndUnsynchronized", "unused"})
 public class EFabricatorController extends EPartController<EFabricatorPart> {
@@ -281,7 +289,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
                 .filter(modifier -> modifier.isBuff() || !activeCooling) // 主动冷却移除超频的负面效果。
                 .collect(Collectors.groupingBy(
                         Modifier::getType,
-                        () -> new TreeMap<>(Comparator.comparingInt(EFabricatorParallelProc.Type::getPriority)),
+                        () -> new Object2ObjectAVLTreeMap<>(Comparator.comparingInt(EFabricatorParallelProc.Type::getPriority)),
                         Collectors.toList())
                 );
 

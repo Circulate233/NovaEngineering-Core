@@ -12,12 +12,16 @@ import ic2.core.uu.UuGraph;
 import ink.ikx.rt.api.mods.jei.IJeiUtils;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @SideOnly(Side.CLIENT)
 public class ExJEI{
@@ -50,7 +54,7 @@ public class ExJEI{
     }
 
     public static void jeiRecipeRegister() {
-        Map<SimpleItem, ItemStack> uniqueKeys = new HashMap<>();
+        Map<SimpleItem, ItemStack> uniqueKeys = new Object2ObjectOpenHashMap<>();
 
         UuGraph.iterator().forEachRemaining(item -> {
             ItemStack stack = item.getKey().copy();

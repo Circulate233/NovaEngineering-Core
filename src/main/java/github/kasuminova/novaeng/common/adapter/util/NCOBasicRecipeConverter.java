@@ -12,7 +12,12 @@ import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import nc.recipe.BasicRecipe;
 import nc.recipe.NCRecipes;
-import nc.recipe.ingredient.*;
+import nc.recipe.ingredient.ChanceItemIngredient;
+import nc.recipe.ingredient.EmptyItemIngredient;
+import nc.recipe.ingredient.IFluidIngredient;
+import nc.recipe.ingredient.IItemIngredient;
+import nc.recipe.ingredient.ItemArrayIngredient;
+import nc.recipe.ingredient.OreIngredient;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 

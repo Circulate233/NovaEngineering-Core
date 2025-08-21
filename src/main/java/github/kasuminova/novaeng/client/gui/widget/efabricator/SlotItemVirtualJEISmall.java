@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class SlotItemVirtualJEISmall extends SlotItemVirtualJEI {
 
