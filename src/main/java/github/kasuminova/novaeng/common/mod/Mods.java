@@ -43,9 +43,7 @@ public enum Mods {
                 return loaded = false;
             }
         }
-    },
-    UNIDICT("unidict"),
-    ;
+    };
 
     protected final String modID;
     protected boolean loaded = false;

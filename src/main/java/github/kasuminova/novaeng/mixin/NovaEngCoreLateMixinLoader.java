@@ -1,7 +1,10 @@
 package github.kasuminova.novaeng.mixin;
 
+import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.common.Loader;
 import zone.rong.mixinbooter.ILateMixinLoader;
 
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
+import static github.kasuminova.novaeng.NovaEngineeringCore.MOD_ID;
 import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG;
 import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PREFIX;
 
@@ -45,6 +49,12 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_extrabotany.json","extrabotany");
         addModdedMixinCFG("mixins.novaeng_core_packagedauto.json","packagedauto");
         addModdedMixinCFG("mixins.novaeng_core_rftools.json","rftools");
+        addModdedMixinCFG("mixins.novaeng_core_advancedrocketry.json","advancedrocketry");
+
+        addMixinCFG("mixins.novaeng_core_botania_r.json",() -> {
+            ConfigManager.sync(MOD_ID, Config.Type.INSTANCE);
+            return modLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
+        });
 
         addMixinCFG("mixins.novaeng_core_forge_late.json");
         addMixinCFG("mixins.novaeng_core_dme.json",                               

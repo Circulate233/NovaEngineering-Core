@@ -1,0 +1,14 @@
+{
+  "package": "github.kasuminova.novaeng.mixin.botania_r",
+  "refmap": "mixins.novaeng_core.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinSubTileDandelifeon",
+    "MixinSubTileEntropinnyum",
+    "MixinSubTileGenerating",
+    "MixinSubTileMunchdew",
+    "MixinSubTileNarslimmus"
+  ]
+}

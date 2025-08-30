@@ -13,7 +13,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.22.5"
+version = "1.22.6"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -250,7 +250,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:botania-225643:3330934"))
     implementation(rfg.deobf("curse.maven:astral-sorcery-241721:3044416"))
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
-    implementation(rfg.deobf("curse.maven:zenutil-401178:6033519"))
+    implementation(rfg.deobf("curse.maven:zenutil-401178:6895021"))
     compileOnly(rfg.deobf("curse.maven:smooth-font-285742:3944565"))
     implementation(rfg.deobf("curse.maven:scalingguis-319656:2716334"))
     implementation(rfg.deobf("curse.maven:lolasm-460609:5257348"))
@@ -278,7 +278,6 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:lunatriuscore-225605:2489549"))
     compileOnly(rfg.deobf("curse.maven:immersive-engineering-231951:2974106"))
     compileOnly(rfg.deobf("curse.maven:ingame-info-xml-225604:2489566"))
-    compileOnly(rfg.deobf("curse.maven:unidict-244258:3553627"))
     compileOnly(rfg.deobf("curse.maven:wanionlib-253043:4623135"))
     compileOnly(rfg.deobf("curse.maven:dme-737252:5043404"))
     // Performance Test Tool
@@ -286,10 +285,8 @@ dependencies {
     // Optimization
     implementation(rfg.deobf("curse.maven:stellarcore-1064321:5952608"))
     implementation(rfg.deobf("curse.maven:configanytime-870276:5212709"))
-    implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
     implementation(rfg.deobf("curse.maven:AutoRegLib-250363:2746011"))
     implementation(rfg.deobf("curse.maven:Cucumber-272335:2645867"))
-    implementation(rfg.deobf("curse.maven:LibVulpes-236541:3801015"))
     implementation(rfg.deobf("curse.maven:extended-crafting-nomifactory-edition-398267:5778512"))
     implementation(rfg.deobf("curse.maven:techguns-244201:2958103"))
     implementation(rfg.deobf("curse.maven:legendary-tooltips-532127:5734973"))
@@ -300,6 +297,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
+    compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
+    compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
     implementation(kotlin("stdlib-jdk8"))
 }
 

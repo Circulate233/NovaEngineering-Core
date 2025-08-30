@@ -40,6 +40,15 @@ public class NovaEngCoreConfig {
         @Config.Name("ForceChunkHandler")
         public boolean ForceChunkHandler = true;
 
+
+        @Config.RequiresMcRestart
+        @Config.Name("SpecialMachine")
+        public boolean SpecialMachine = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("bot")
+        public boolean bot = true;
+
     }
 
     /*

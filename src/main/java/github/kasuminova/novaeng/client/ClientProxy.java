@@ -96,7 +96,7 @@ public class ClientProxy extends CommonProxy {
 
         TitleUtils.setRandomTitle("*Init*");
 
-        if (Loader.isModLoaded("ic2")) {
+        if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiCreate();
         }
     }
@@ -110,7 +110,7 @@ public class ClientProxy extends CommonProxy {
 
         TitleUtils.setRandomTitle("*PostInit*");
 
-        if (Loader.isModLoaded("ic2")) {
+        if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiRecipeRegister();
         }
 

@@ -15,6 +15,7 @@ import hellfirepvp.modularmachinery.common.integration.crafttweaker.event.MMEven
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,7 +27,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,7 +71,7 @@ public class HyperNetHelper {
                 node.readNBT();
             }
 
-            List<String> tips = new ArrayList<>();
+            List<String> tips = new ObjectArrayList<>();
             tips.add(I18n.format("gui.hypernet.controller.title"));
 
             if (node.isConnected()) {
