@@ -212,7 +212,7 @@ dependencies {
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
-    implementation(rfg.deobf("kasuminova:ModularMachinery-CE:2.1.6:dev"))
+    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:6945422"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
@@ -226,7 +226,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
     implementation(rfg.deobf("curse.maven:ctm-267602:2915363"))
 //    implementation(rfg.deobf("curse.maven:component-model-hider-940949:4885858"))
-    implementation(rfg.deobf("curse.maven:had-enough-items-557549:4810661"))
+    implementation(rfg.deobf("curse.maven:had-enough-items-557549:6930666"))
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
     implementation(rfg.deobf("curse.maven:FTB-Library-237167:2985811"))
     implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))

@@ -6,7 +6,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinBlockCustomOre",
-    "MixinPlayerAttributeMap"
+    "MixinPlayerAttributeMap",
+    "MixinTieredAltarRecipeTransferHandler"
   ],
   "server": [
     "AccessorResearchManager",
