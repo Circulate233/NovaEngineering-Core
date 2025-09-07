@@ -7,6 +7,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent;
 import github.kasuminova.novaeng.common.machine.IllumPool;
+import github.kasuminova.novaeng.common.util.Function;
 import hellfirepvp.astralsorcery.common.crafting.ItemHandle;
 import hellfirepvp.astralsorcery.common.crafting.infusion.AbstractInfusionRecipe;
 import hellfirepvp.astralsorcery.common.crafting.infusion.InfusionRecipeRegistry;
@@ -43,12 +44,7 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                                                       final List<RecipeModifier> modifiers,
                                                       final List<ComponentRequirement<?, ?>> additionalRequirements,
                                                       final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers,
-                                                      final List<String> recipeTooltips)
-    {
-        if (!owningMachineName.equals(IllumPool.REGISTRY_NAME)) {
-            throw new IllegalArgumentException("AdapterStarlightInfuser only can be used with IllumPool.");
-        }
-
+                                                      final List<String> recipeTooltips) {
         int ids = InfusionRecipeRegistry.recipes.size() + InfusionRecipeRegistry.mtRecipes.size();
 
         List<MachineRecipe> recipes = new ArrayList<>();
@@ -62,7 +58,7 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
             }
 
             MachineRecipe recipe = createRecipeShell(
-                    new ResourceLocation("astralsorcery",  "infusion_" + incId),
+                    new ResourceLocation("astralsorcery", "infusion_" + incId),
                     owningMachineName,
                     20, 0, false);
 
@@ -115,10 +111,11 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                 if (event.phase != Phase.START) return;
                 IllumPool.onRecipeTick(event, manaToConsume);
             });
-            recipe.addTooltip("魔力消耗：§b" + manaToConsume);
+            recipe.addTooltip(Function.getText("novaeng.illum_pool.input.mana", manaToConsume));
             addStarlightCatalystHandler(recipe);
-            recipe.addTooltip("辉光魔力池模式：§b星光");
-            recipe.addTooltip("消耗 §a1§f 点§e辉光魔力§f可替代 §a25%§f 的§b魔力消耗§f。");
+            recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
+                    Function.getText("top.illum_pool.mode.d")));
+            recipe.addTooltip("novaeng.illum_pool.input.illum");
 
             recipes.add(recipe);
             incId++;
@@ -140,11 +137,11 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                 hasCatalyst = true;
             }
             if (hasCatalyst) {
-                event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                event.setFailed("novaeng.illum_pool.failed.input");
                 return;
             }
             if (!controller.hasModifierReplacement(IllumPool.STARLIGHT_CATALYST)) {
-                event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                event.setFailed("novaeng.illum_pool.failed.input");
             }
         });
     }

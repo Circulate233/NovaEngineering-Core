@@ -51,7 +51,7 @@ public class ResearchStation extends NetNode {
     @ZenMethod
     public void onRecipeCheck(final RecipeCheckEvent event) {
         if (centerPos == null || center == null) {
-            event.setFailed("未连接至计算网络！");
+            event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
@@ -89,7 +89,7 @@ public class ResearchStation extends NetNode {
     @ZenMethod
     public void onWorkingTick(final FactoryRecipeTickEvent event) {
         if (centerPos == null) {
-            event.setFailed(true, "未连接至计算网络！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
         if (currentResearching == null) {
@@ -97,7 +97,7 @@ public class ResearchStation extends NetNode {
             return;
         }
         if (center == null) {
-            event.preventProgressing( "未连接至计算网络！");
+            event.preventProgressing( "novaeng.hypernet.prrocessor.link.false");
             return;
         }
 

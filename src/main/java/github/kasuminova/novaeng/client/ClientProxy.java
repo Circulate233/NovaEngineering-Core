@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.client;
 
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
+import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
 import github.kasuminova.novaeng.client.gui.GuiEFabricatorController;
@@ -19,6 +20,7 @@ import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
+import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
@@ -38,7 +40,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -47,7 +50,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import slimeknights.tconstruct.library.book.TinkerBook;
 
 import javax.annotation.Nullable;
-import java.io.File;
 
 import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.checkJavaVersion;
 import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isCleanroomLoader;
@@ -61,17 +63,21 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public boolean isClient(){
+        return true;
+    }
+
+    @Override
     public void construction() {
         super.construction();
 
-        var config = new Configuration(new File(Loader.instance().getConfigDir(), "novaeng_core.cfg"));
-        config.load();
-        if (config.getBoolean("javaCheck", Configuration.CATEGORY_GENERAL,true,"java1.8.0_51 is bad")) {
+        ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
+
+        if (NovaEngCoreConfig.javaCheck) {
             if (!isCleanroomLoader()){
                 checkJavaVersion();
             }
         }
-        config.save();
 
         TitleUtils.setRandomTitle("*Construction*");
     }

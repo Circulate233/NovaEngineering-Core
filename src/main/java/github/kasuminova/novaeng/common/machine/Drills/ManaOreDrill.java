@@ -1,15 +1,25 @@
 package github.kasuminova.novaeng.common.machine.Drills;
 
-import hellfirepvp.modularmachinery.ModularMachinery;
-import net.minecraft.util.ResourceLocation;
-
 public class ManaOreDrill extends Drill {
-
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "mana_ore_drill");
     public static final ManaOreDrill INSTANCE = new ManaOreDrill();
 
     @Override
-    public ResourceLocation getRegistryName() {
-        return REGISTRY_NAME;
+    protected String getCoreTheardName() {
+        return "novaeng.drill.thread.c";
+    }
+
+    @Override
+    protected String getMachineName() {
+        return "mana_ore_drill";
+    }
+
+    @Override
+    protected Type getType() {
+        return Type.SINGLE;
+    }
+
+    @Override
+    protected long getBaseEnergy() {
+        return 24576;
     }
 }

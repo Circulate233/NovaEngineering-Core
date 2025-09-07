@@ -6,6 +6,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.util.RandomUtils;
+import github.kasuminova.novaeng.common.util.StringUtils;
 import hellfirepvp.astralsorcery.AstralSorcery;
 import hellfirepvp.astralsorcery.common.item.crystal.CrystalProperties;
 import hellfirepvp.astralsorcery.common.lib.BlocksAS;
@@ -23,6 +24,7 @@ import hellfirepvp.modularmachinery.common.util.BlockArray;
 import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
 import ink.ikx.mmce.common.utils.StackUtils;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -43,11 +45,11 @@ import vazkii.botania.common.Botania;
 import vazkii.botania.common.block.ModBlocks;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static github.kasuminova.novaeng.common.util.Function.asList;
 
 public class IllumPool implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "illum_pool");
@@ -63,7 +65,7 @@ public class IllumPool implements MachineSpecial {
      * x x x x x
      *   x x x
      */
-    public static final List<BlockPos> CATALYST_POS_PRESET = Arrays.asList(
+    public static final List<BlockPos> CATALYST_POS_PRESET = asList(
             withXZ(1, 1), withXZ(0, 1), withXZ(-1, 1),
             withXZ(2, 2), withXZ(1, 2), withXZ(0, 2), withXZ(-1, 2), withXZ(-2, 2),
             withXZ(2, 3), withXZ(1, 3), withXZ(0, 3), withXZ(-1, 3), withXZ(-2, 3),
@@ -79,7 +81,7 @@ public class IllumPool implements MachineSpecial {
      * x x x x x x x
      * c x x x x x c
      */
-    public static final List<BlockPos> CRYSTAL_POS_PRESET = Arrays.asList(
+    public static final List<BlockPos> CRYSTAL_POS_PRESET = asList(
             new BlockPos(3, 2, 6), new BlockPos(-3, 2, 6),
             new BlockPos(3, 2, 0), new BlockPos(-3, 2, 0)
     );
@@ -96,9 +98,9 @@ public class IllumPool implements MachineSpecial {
 
     @Override
     public void init(final DynamicMachine machine) {
-        FactoryRecipeThread infusionThread = FactoryRecipeThread.createCoreThread("辉光转化术式");
+        FactoryRecipeThread infusionThread = FactoryRecipeThread.createCoreThread("novaeng.illum_pool.thread.name.illum");
         machine.addCoreThread(infusionThread);
-        FactoryRecipeThread manaInputThread = FactoryRecipeThread.createCoreThread("魔力注入术式");
+        FactoryRecipeThread manaInputThread = FactoryRecipeThread.createCoreThread("novaeng.illum_pool.thread.name.mana");
         machine.addCoreThread(manaInputThread);
 
         Block blockLiquidStarLight = BlocksAS.blockLiquidStarlight;
@@ -110,32 +112,32 @@ public class IllumPool implements MachineSpecial {
         // 普通模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(NORMAL_CATALYST,
                 buildModifierReplacementBlockArray(blockBifrostPerm, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
-                Collections.emptyList(),
-                Collections.singletonList("魔力池上方布满彩虹桥方块可使其激活§a普通模式§f，催化剂模式必须基于此模式。"),
+                ObjectLists.emptyList(),
+                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.e"),
                 StackUtils.getStackFromBlockState(blockBifrostPerm.getDefaultState())));
         // 炼金模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(ALCHEMY_CATALYST,
                 buildModifierReplacementBlockArray(blockAlchemyCatalyst, CATALYST_POS_PRESET),
-                Collections.emptyList(),
-                Collections.singletonList("将彩虹桥方块下方的§c所有方块§f替换为§e炼金催化器§f方块可使其激活§e炼金模式§f。"),
+                ObjectLists.emptyList(),
+                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.a"),
                 StackUtils.getStackFromBlockState(blockAlchemyCatalyst.getDefaultState())));
         // 炼造模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(CONJURATION_CATALYST,
                 buildModifierReplacementBlockArray(blockConjurationCatalyst, CATALYST_POS_PRESET),
-                Collections.emptyList(),
-                Collections.singletonList("将彩虹桥方块下方的§c所有方块§f替换为§d炼造催化器§f方块可使其激活§d炼造模式§f。"),
+                ObjectLists.emptyList(),
+                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.b"),
                 StackUtils.getStackFromBlockState(blockConjurationCatalyst.getDefaultState())));
         // 次元模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(DIMENSION_CATALYST,
                 buildModifierReplacementBlockArray(blockDimensionCatalyst, CATALYST_POS_PRESET),
-                Collections.emptyList(),
-                Collections.singletonList("将彩虹桥方块下方的§c所有方块§f替换为§5次元催化器§f方块可使其激活§5次元模式§f。"),
+                ObjectLists.emptyList(),
+                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.c"),
                 StackUtils.getStackFromBlockState(blockDimensionCatalyst.getDefaultState())));
         // 星光模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(STARLIGHT_CATALYST,
                 buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
-                Collections.emptyList(),
-                Collections.singletonList("魔力池上方倒满星能液可使其激活§b星光模式§f，与催化剂模式冲突。"),
+                ObjectLists.emptyList(),
+                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.d"),
                 StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));
 
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
@@ -207,7 +209,7 @@ public class IllumPool implements MachineSpecial {
 
         int required = Math.max(Math.round(manaRequired * manaConsumeRatio), 1);
         if (manaStored < required) {
-            event.setFailed("魔力存储不足或缺少物品输入！");
+            event.setFailed("novaeng.illum_pool.failed.mana.min.0");
             return;
         }
 
@@ -228,7 +230,7 @@ public class IllumPool implements MachineSpecial {
         int required = Math.round(((float) manaRequired / tickTime) * parallelism * manaConsumeRatio);
 
         if (manaStored < required) {
-            event.setFailed(false, "魔力存储不足！");
+            event.setFailed(false, "novaeng.illum_pool.failed.mana.min");
         } else {
             tag.setInteger("manaStored", manaStored - required);
         }
@@ -248,7 +250,7 @@ public class IllumPool implements MachineSpecial {
         NBTTagCompound tag = controller.getCustomDataTag();
         int manaStored = getManaStored(tag);
         if (manaStored + manaToAdd > MAX_MANA_STORE) {
-            event.setFailed("魔力存储已抵达极限！");
+            event.setFailed("novaeng.illum_pool.failed.mana.max");
             return;
         }
 
@@ -266,7 +268,7 @@ public class IllumPool implements MachineSpecial {
         NBTTagCompound tag = controller.getCustomDataTag();
         int manaStored = getManaStored(tag);
         if (manaStored + requireToAdd > MAX_MANA_STORE) {
-            event.setFailed(false, "魔力存储已抵达极限！");
+            event.setFailed(false, "novaeng.illum_pool.failed.mana.max");
         } else {
             tag.setInteger("manaStored", manaStored + requireToAdd);
         }
@@ -277,7 +279,7 @@ public class IllumPool implements MachineSpecial {
         NBTTagCompound tag = controller.getCustomDataTag();
         int illumStored = getIllumStored(tag);
         if (illumStored + illumToAdd > MAX_ILLUM_STORE) {
-            event.setFailed("辉光魔力存储已抵达极限！");
+            event.setFailed("novaeng.illum_pool.failed.illum.max");
             return;
         }
 
@@ -295,7 +297,7 @@ public class IllumPool implements MachineSpecial {
         NBTTagCompound tag = controller.getCustomDataTag();
         int illumStored = getIllumStored(tag);
         if (illumStored + requireToAdd > MAX_ILLUM_STORE) {
-            event.setFailed(false, "辉光魔力存储已抵达极限！");
+            event.setFailed(false, "novaeng.illum_pool.failed.illum.max");
         } else {
             tag.setInteger("illumStored", illumStored + requireToAdd);
         }
@@ -327,7 +329,7 @@ public class IllumPool implements MachineSpecial {
 
         int sparkleFXCount = 3;
         TileFactoryController factory = (TileFactoryController) controller;
-        FactoryRecipeThread recipeThread = factory.getCoreRecipeThreads().get("辉光转化术式");
+        FactoryRecipeThread recipeThread = factory.getCoreRecipeThreads().get("novaeng.illum_pool.thread.name.illum");
         if (recipeThread != null && recipeThread.getActiveRecipe() != null) {
             sparkleFXCount += Math.min(recipeThread.getActiveRecipe().getParallelism() / 40, 4);
         }
@@ -368,7 +370,7 @@ public class IllumPool implements MachineSpecial {
                 + NovaEngUtils.formatNumber(MAX_MANA_STORE)
                 + " (" + NovaEngUtils.formatFloat(manaPercent * 100, 2) + "%)";
         MachineSpecial.newBox(box).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.AQUA + "魔力存储:  ")
+                .text("{*top.illum_pool.mana.stored*}")
                 .progress(Math.round(manaPercent * 100), 100, probeInfo.defaultProgressStyle()
                         .prefix(manaPercentStr)
                         .filledColor(0xCC63B8FF)
@@ -387,7 +389,7 @@ public class IllumPool implements MachineSpecial {
                 + NovaEngUtils.formatNumber(MAX_ILLUM_STORE)
                 + " (" + NovaEngUtils.formatFloat(illumPercent * 100, 2) + "%)";
         MachineSpecial.newBox(box).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.YELLOW + "辉光魔力存储:  ")
+                .text("{*top.illum_pool.illum.stored*}")
                 .progress(Math.round(illumPercent * 100), 100, probeInfo.defaultProgressStyle()
                         .prefix(illumPercentStr)
                         .filledColor(0xCCFFFF00)
@@ -403,14 +405,14 @@ public class IllumPool implements MachineSpecial {
         IProbeInfo mid = MachineSpecial.newVertical(box);
         IProbeInfo right = MachineSpecial.newVertical(box);
 
-        left.text(TextFormatting.YELLOW + "辉光转换术式：");
+        left.text("§e{*novaeng.illum_pool.thread.name.illum*}：");
         switch (tag.getString("currentMode")) {
-            case ALCHEMY_CATALYST -> mid.text("§e炼金");
-            case CONJURATION_CATALYST -> mid.text("§d炼造");
-            case DIMENSION_CATALYST -> mid.text("§5次元");
-            case STARLIGHT_CATALYST -> mid.text("§b星光");
-            case NORMAL_CATALYST -> mid.text("§a普通");
-            default -> mid.text("§c未知");
+            case ALCHEMY_CATALYST -> mid.text("{*top.illum_pool.mode.a*}");
+            case CONJURATION_CATALYST -> mid.text("{*top.illum_pool.mode.b*}");
+            case DIMENSION_CATALYST -> mid.text("{*top.illum_pool.mode.c*}");
+            case STARLIGHT_CATALYST -> mid.text("{*top.illum_pool.mode.d*}");
+            case NORMAL_CATALYST -> mid.text("{*top.illum_pool.mode.e*}");
+            default -> mid.text("{*top.illum_pool.mode.null*}");
         }
         right.text("");
 
@@ -425,31 +427,31 @@ public class IllumPool implements MachineSpecial {
         float crystalPurityRatio = calculateCrystalPurityRatio(crystalPurity);
         float crystalCollectiveCapabilityRatio = calculateCrystalCollectiveCapabilityRatio(crystalCollectiveCapability);
 
-        left.text(TextFormatting.BLUE + "水晶石大小：");
-        mid.text(TextFormatting.AQUA + String.valueOf(crystalSize));
+        left.text("{*top.illum_pool.crystal.size*}");
+        mid.text(String.valueOf(crystalSize));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
                 maxParallelism, crystalSizeRatio * 100, maxParallelism = Math.round(maxParallelism * crystalSizeRatio)));
 
-        left.text(TextFormatting.BLUE + "水晶石纯度：");
-        mid.text(TextFormatting.AQUA + String.valueOf(crystalPurity));
+        left.text("{*top.illum_pool.crystal.purity*}");
+        mid.text(String.valueOf(crystalPurity));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
                 maxParallelism, crystalPurityRatio * 100, maxParallelism = Math.round(maxParallelism * crystalPurityRatio)) + ' ' +
                 TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalPurityEfficiency(crystalPurity) * 100));
 
-        left.text(TextFormatting.BLUE + "水晶石抛光：");
-        mid.text(TextFormatting.AQUA + String.valueOf(crystalCollectiveCapability));
+        left.text("{*top.illum_pool.crystal.polishing*}");
+        mid.text(String.valueOf(crystalCollectiveCapability));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
                 maxParallelism, crystalCollectiveCapabilityRatio * 100, Math.round(maxParallelism * crystalCollectiveCapabilityRatio)) + ' ' +
                 TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalCollectiveCapabilityEfficiency(crystalCollectiveCapability) * 100));
 
-        left.text(TextFormatting.BLUE + "最大并行数：");
-        mid.text(TextFormatting.DARK_GREEN + String.valueOf(parallelism));
+        left.text("§9{*top.max_parallelism*}：§2");
+        mid.text(String.valueOf(parallelism));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%.1f%%)", (parallelism / 256F) * 100));
 
-        left.text(TextFormatting.BLUE + "魔力消耗系数：");
-        mid.text((TextFormatting.DARK_AQUA) + String.format("%.1f%%", manaConsumeRatio * 100F));
+        left.text("{*top.illum_pool.mana.multiple*}");
+        mid.text(String.format("%.1f%%", manaConsumeRatio * 100F));
         if (illumStored > 0) {
-            right.text(TextFormatting.DARK_AQUA + String.format(" (200%% - %.1f%%)", (2 - manaConsumeRatio / 0.75F) * 100F) + TextFormatting.YELLOW + " x 0.75");
+            right.text(TextFormatting.DARK_AQUA + String.format(" (200%% - %.1f%%)", (2 - manaConsumeRatio / 0.75F) * 100F) + "§e x 0.75");
         } else {
             right.text(TextFormatting.DARK_AQUA + String.format(" (200%% - %.1f%%)", (2 - manaConsumeRatio) * 100F));
         }
@@ -496,7 +498,7 @@ public class IllumPool implements MachineSpecial {
     protected static BlockArray buildModifierReplacementBlockArray(final Block block, final List<BlockPos> posSet) {
         BlockArray blockArray = new BlockArray();
         IBlockStateDescriptor descriptor = new IBlockStateDescriptor(block);
-        posSet.forEach(pos -> blockArray.addBlock(pos, new BlockArray.BlockInformation(Collections.singletonList(descriptor))));
+        posSet.forEach(pos -> blockArray.addBlock(pos, new BlockArray.BlockInformation(ObjectLists.singleton(descriptor))));
         return blockArray;
     }
 

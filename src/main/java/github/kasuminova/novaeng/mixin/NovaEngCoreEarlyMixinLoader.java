@@ -85,10 +85,9 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
     }
 
     private static final String RESOURCE_BUNDLE = "messages";
-    static ResourceBundle bundler;
 
     public static String getString(String key){
-        return new String(bundler.getString(key).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        return new String(ResourceBundle.getBundle(RESOURCE_BUNDLE).getString(key).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     /**
@@ -103,7 +102,6 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         LOG.info(RESOURCE_BUNDLE + ".{}", version);
 
         try {
-            bundler = ResourceBundle.getBundle(RESOURCE_BUNDLE);
             String[] mainParts = version.split("\\.");
             if (mainParts.length < 3) {
                 logWarning(RESOURCE_BUNDLE + ".java.version.invalid", version);

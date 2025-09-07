@@ -30,14 +30,15 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
         super(spell);
     }
 
-    @Shadow public abstract void addToMetadata(SpellMetadata meta) throws SpellCompilationException;
+    @Shadow
+    public abstract void addToMetadata(SpellMetadata meta) throws SpellCompilationException;
 
     @Unique
     private static final double novaEngineering_Core$MAXPOWER = 5.0D;
     @Unique
     SpellContext novaEngineering_Core$context;
 
-    @Redirect(method = "addToMetadata",at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamEvaluation(Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;"))
+    @Redirect(method = "addToMetadata", at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamEvaluation(Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;"))
     public Object addToMetadataMixin(PieceTrickExplode instance, SpellParam spellParam) throws SpellCompilationException {
         Double powerVal = this.getParamEvaluation(this.power);
         if (powerVal != null && powerVal > novaEngineering_Core$MAXPOWER) {
@@ -46,20 +47,20 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
         return powerVal;
     }
 
-    @Inject(method = "execute",at = @At(value = "HEAD"))
-    public void execute(SpellContext context, CallbackInfoReturnable<Object> cir){
+    @Inject(method = "execute", at = @At(value = "HEAD"))
+    public void execute(SpellContext context, CallbackInfoReturnable<Object> cir) {
         novaEngineering_Core$context = context;
     }
 
-    @Redirect(method = "execute",at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamValue(Lvazkii/psi/api/spell/SpellContext;Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;",ordinal = 1))
+    @Redirect(method = "execute", at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamValue(Lvazkii/psi/api/spell/SpellContext;Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;", ordinal = 1))
     public Object executeRed(PieceTrickExplode instance, SpellContext spellContext, SpellParam spellParam) {
         Double powerVal = this.getParamValue(novaEngineering_Core$context, this.power);
-        if (novaEngineering_Core$context != null && powerVal != null && powerVal > novaEngineering_Core$MAXPOWER){
-            NovaEngineeringCore.log.info(spellContext.caster.getName() + "试图释放超过5的爆炸效果，已经修正");
-            if (NovaEngCoreConfig.CLIENT.piece){
+        if (NovaEngCoreConfig.CLIENT.piece) {
+            if (novaEngineering_Core$context != null && powerVal != null && powerVal > novaEngineering_Core$MAXPOWER) {
+                NovaEngineeringCore.log.info(spellContext.caster.getName() + "试图释放超过5的爆炸效果，已经修正");
                 spellContext.caster.world.playerEntities.forEach(player -> player.sendMessage(new TextComponentString(spellContext.caster.getName() + "[" + spellContext.caster.getUniqueID() + "]试图释放超过5的爆炸效果，已经修正")));
+                return novaEngineering_Core$MAXPOWER;
             }
-            return novaEngineering_Core$MAXPOWER;
         }
         return powerVal;
     }

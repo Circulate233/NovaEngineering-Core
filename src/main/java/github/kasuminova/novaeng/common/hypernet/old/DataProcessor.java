@@ -64,27 +64,27 @@ public class DataProcessor extends NetNode {
     @ZenMethod
     public void onRecipeCheck(RecipeCheckEvent event) {
         if (centerPos == null || center == null) {
-            event.setFailed("未连接至计算网络！");
+            event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
         if (overheat) {
-            event.setFailed("处理器过热！");
+            event.setFailed("novaeng.hypernet.prrocessor.overheat");
             return;
         }
 
         if (moduleCPUS.isEmpty() && moduleRAMS.isEmpty()) {
-            event.setFailed("未找到处理器和内存模块！");
+            event.setFailed("novaeng.hypernet.prrocessor.no_module");
             return;
         }
 
         if (moduleCPUS.isEmpty()) {
-            event.setFailed("至少需要安装一个 CPU 或 GPU 模块！");
+            event.setFailed("novaeng.hypernet.prrocessor.no_cpu");
             return;
         }
 
         if (moduleRAMS.isEmpty()) {
-            event.setFailed("至少需要安装一个内存模块！");
+            event.setFailed("novaeng.hypernet.prrocessor.no_ram");
         }
     }
 
@@ -130,27 +130,27 @@ public class DataProcessor extends NetNode {
 
     protected boolean workingCheck(final FactoryRecipeTickEvent event) {
         if (centerPos == null) {
-            event.setFailed(true, "未连接至计算网络！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return true;
         }
         if (center == null) {
-            event.preventProgressing("未连接至计算网络！");
+            event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return true;
         }
         if (overheat) {
-            event.setFailed(true, "处理器过热！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.overheat");
             return true;
         }
         if (moduleCPUS.isEmpty() && moduleRAMS.isEmpty()) {
-            event.setFailed(true, "未找到处理器和内存模块！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.no_module");
             return true;
         }
         if (moduleCPUS.isEmpty()) {
-            event.setFailed(true, "至少需要安装一个 CPU 或 GPU 模块！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.no_cpu");
             return true;
         }
         if (moduleRAMS.isEmpty()) {
-            event.setFailed(true, "至少需要安装一个内存模块！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.no_ram");
             return true;
         }
         return false;

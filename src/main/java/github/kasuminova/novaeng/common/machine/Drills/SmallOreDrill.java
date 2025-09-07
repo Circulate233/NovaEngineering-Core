@@ -1,16 +1,16 @@
 package github.kasuminova.novaeng.common.machine.Drills;
 
-public class VoidMiner extends Drill{
-    public static final VoidMiner INSTANCE = new VoidMiner();
+public class SmallOreDrill extends Drill {
+    public static final SmallOreDrill INSTANCE = new SmallOreDrill();
 
     @Override
     protected String getCoreTheardName() {
-        return "novaeng.drill.thread.b";
+        return "novaeng.drill.thread.a";
     }
 
     @Override
     protected String getMachineName() {
-        return "void_miner";
+        return "small_ore_drill";
     }
 
     @Override
@@ -21,10 +21,5 @@ public class VoidMiner extends Drill{
     @Override
     protected long getBaseEnergy() {
         return 24576;
-    }
-
-    @Override
-    protected float getRecipeTimeMultiple(){
-        return 1.5f;
     }
 }

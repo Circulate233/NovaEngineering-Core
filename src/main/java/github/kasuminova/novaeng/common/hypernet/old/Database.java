@@ -48,11 +48,11 @@ public class Database extends NetNode {
         event.getActiveRecipe().setTick(0);
 
         if (centerPos == null) {
-            event.setFailed(true, "未连接至计算网络！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
         if (center == null) {
-            event.preventProgressing("未连接至计算网络！");
+            event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 

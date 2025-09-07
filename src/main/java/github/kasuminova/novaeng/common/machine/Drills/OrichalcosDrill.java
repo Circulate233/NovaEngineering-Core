@@ -1,15 +1,30 @@
 package github.kasuminova.novaeng.common.machine.Drills;
 
-import hellfirepvp.modularmachinery.ModularMachinery;
-import net.minecraft.util.ResourceLocation;
-
 public class OrichalcosDrill extends Drill {
-
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "orichalcos_drill");
     public static final OrichalcosDrill INSTANCE = new OrichalcosDrill();
 
     @Override
-    public ResourceLocation getRegistryName() {
-        return REGISTRY_NAME;
+    protected String getCoreTheardName() {
+        return "novaeng.drill.thread.c";
+    }
+
+    @Override
+    protected String getMachineName() {
+        return "orichalcos_drill";
+    }
+
+    @Override
+    protected Type getType() {
+        return Type.RANGE;
+    }
+
+    @Override
+    protected float getAdvancedRecipeTimeMultiple(){
+        return 1.5f;
+    }
+
+    @Override
+    protected long getBaseEnergy() {
+        return 32768;
     }
 }

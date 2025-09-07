@@ -1,6 +1,12 @@
 package github.kasuminova.novaeng.common.util;
 
+import com.github.bsideup.jabel.Desugar;
+import github.kasuminova.novaeng.NovaEngineeringCore;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.util.text.translation.I18n;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -60,18 +66,20 @@ public class StringUtils {
         return matchRate;
     }
 
-    public static class MatchResult implements Comparable<MatchResult> {
-        private final String str;
-        private final int matchRate;
-
-        public MatchResult(final String str, final int matchRate) {
-            this.str = str;
-            this.matchRate = matchRate;
+    public static List<String> getText(String key,Object... objs){
+        if (NovaEngineeringCore.proxy.isClient()){
+            var s = I18n.translateToLocalFormatted(key, objs);
+            return new ObjectArrayList<>(s.split("\n"));
         }
+        return Collections.emptyList();
+    }
+
+    @Desugar
+    public record MatchResult(String str, int matchRate) implements Comparable<MatchResult> {
 
         @Override
-        public int compareTo(final MatchResult o) {
-            return Integer.compare(o.matchRate, matchRate);
+            public int compareTo(final MatchResult o) {
+                return Integer.compare(o.matchRate, matchRate);
+            }
         }
-    }
 }

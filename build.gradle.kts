@@ -13,7 +13,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.22.6"
+version = "1.22.7"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -198,13 +198,15 @@ dependencies {
         isTransitive = false
     }
     annotationProcessor("org.ow2.asm:asm-debug-all:5.2")
-    annotationProcessor("com.google.guava:guava:30.0-jre")
+    annotationProcessor("com.google.guava:guava:32.0.1-android")
     annotationProcessor("com.google.code.gson:gson:2.8.9")
     annotationProcessor (mixin) {
         isTransitive = false
     }
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
     annotationProcessor("org.jetbrains:annotations:24.1.0")
+    compileOnly("org.projectlombok:lombok:1.18.24")
+    annotationProcessor("org.projectlombok:lombok:1.18.24")
 
     // Performance Test Tool
 //    runtimeOnly(rfg.deobf("curse.maven:spark-361579:3542217"))

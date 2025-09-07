@@ -30,7 +30,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("爆炸")
-        public boolean piece = true;
+        public boolean piece = false;
 
     }
 

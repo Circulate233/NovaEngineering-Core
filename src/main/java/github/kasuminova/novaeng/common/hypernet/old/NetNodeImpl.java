@@ -51,7 +51,7 @@ public class NetNodeImpl extends NetNode {
                                       final ResearchCognitionData... researchRequired)
     {
         if (centerPos == null || center == null) {
-            event.setFailed("未连接至计算网络！");
+            event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
@@ -75,7 +75,7 @@ public class NetNodeImpl extends NetNode {
                               final ResearchCognitionData... researchRequired)
     {
         if (centerPos == null || center == null) {
-            event.setFailed("未连接至计算网络！");
+            event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
@@ -103,11 +103,11 @@ public class NetNodeImpl extends NetNode {
 
     public void onRecipePreTick(final RecipeTickEvent event, final double computation, final boolean triggerFailure) {
         if (centerPos == null) {
-            event.setFailed(true, "未连接至计算网络！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
         if (center == null) {
-            event.preventProgressing("未连接至计算网络！");
+            event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();
@@ -128,11 +128,11 @@ public class NetNodeImpl extends NetNode {
 
     public void onRecipePreTick(final FactoryRecipeTickEvent event, final double computation, final boolean triggerFailure) {
         if (centerPos == null) {
-            event.setFailed(true, "未连接至计算网络！");
+            event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
         if (center == null) {
-            event.preventProgressing("未连接至计算网络！");
+            event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();

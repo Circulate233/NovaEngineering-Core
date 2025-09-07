@@ -8,6 +8,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent;
 import github.kasuminova.novaeng.common.machine.IllumPool;
+import github.kasuminova.novaeng.common.util.Function;
 import hellfirepvp.modularmachinery.common.crafting.MachineRecipe;
 import hellfirepvp.modularmachinery.common.crafting.adapter.RecipeAdapter;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
@@ -42,10 +43,6 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                                                       final List<ComponentRequirement<?, ?>> additionalRequirements,
                                                       final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers,
                                                       final List<String> recipeTooltips) {
-        if (!owningMachineName.equals(IllumPool.REGISTRY_NAME)) {
-            throw new IllegalArgumentException("AdapterBotaniaManaPool only can be used with IllumPool.");
-        }
-
         List<MachineRecipe> recipes = new ArrayList<>();
         for (final RecipeManaInfusion infusionRecipe : BotaniaAPI.manaInfusionRecipes) {
             MachineRecipe recipe = createRecipeShell(
@@ -82,44 +79,48 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                 if (event.phase != Phase.START) return;
                 IllumPool.onRecipeTick(event, manaToConsume);
             });
-            recipe.addTooltip("魔力消耗：§b" + manaToConsume);
+            recipe.addTooltip(Function.getText("novaeng.illum_pool.input.mana",manaToConsume));
 
             // Catalyst
             IBlockState catalyst = infusionRecipe.getCatalyst();
             if (catalyst == null) {
                 addDefaultCatalystHandler(recipe);
-                recipe.addTooltip("辉光魔力池模式：§a普通");
+                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
+                        Function.getText("top.illum_pool.mode.e")));
             } else if (catalyst.equals(RecipeManaInfusion.conjurationState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
                     TileMultiblockMachineController controller = event.getController();
                     if (!controller.hasModifierReplacement(IllumPool.CONJURATION_CATALYST)) {
-                        event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                        event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip("辉光魔力池模式：§d炼造");
+                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
+                        Function.getText("top.illum_pool.mode.b")));
             } else if (catalyst.equals(RecipeManaInfusion.alchemyState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
                     TileMultiblockMachineController controller = event.getController();
                     if (!controller.hasModifierReplacement(IllumPool.ALCHEMY_CATALYST)) {
-                        event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                        event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip("辉光魔力池模式：§e炼金");
+                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
+                        Function.getText("top.illum_pool.mode.a")));
             } else if (catalyst.equals(ExtraBotanyAPI.dimensionState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
                     TileMultiblockMachineController controller = event.getController();
                     if (!controller.hasModifierReplacement(IllumPool.DIMENSION_CATALYST)) {
-                        event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                        event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip("辉光魔力池模式：§5次元");
+                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
+                        Function.getText("top.illum_pool.mode.c")));
             } else {
                 addDefaultCatalystHandler(recipe);
             }
-            recipe.addTooltip("消耗 §a1§f 点§e辉光魔力§f可替代 §a25%§f 的§b魔力消耗§f。");
+            recipe.addTooltip("novaeng.illum_pool.input.illum");
 
             recipes.add(recipe);
             incId++;
@@ -141,11 +142,11 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                 hasCatalyst = true;
             }
             if (hasCatalyst) {
-                event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                event.setFailed("novaeng.illum_pool.failed.input");
                 return;
             }
             if (!controller.hasModifierReplacement(IllumPool.NORMAL_CATALYST)) {
-                event.setFailed("辉光魔力池模式不匹配或缺少物品输入！");
+                event.setFailed("novaeng.illum_pool.failed.input");
             }
         });
     }

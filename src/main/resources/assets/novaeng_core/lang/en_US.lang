@@ -162,6 +162,37 @@ upgrade.data_processor.module.energy.tip=§9最大功耗:§c%s
 #upgrade.data_processor.module.durability.tip=§9耐久:§e%s / %s§a（%s）
 #upgrade.data_processor.module.durability.unknown.tip=§9最大耐久（等待计算机初始化）:§e%s ～ %s
 
+novaeng.illum_pool.thread.name.illum=辉光转化术式
+novaeng.illum_pool.thread.name.mana=魔力注入术式
+novaeng.illum_pool.failed.illum.max=辉光魔力存储已抵达极限！
+novaeng.illum_pool.failed.mana.max=魔力存储已抵达极限！
+novaeng.illum_pool.failed.mana.min=魔力存储不足！
+novaeng.illum_pool.failed.mana.min.0=魔力存储不足或缺少物品输入！
+novaeng.illum_pool.failed.input=辉光魔力池模式不匹配或缺少物品输入！
+novaeng.illum_pool.illum_pool.mode.a=将彩虹桥方块下方的§c所有方块§f替换为§e炼金催化器§f方块\n可使其激活§e炼金模式§f。
+novaeng.illum_pool.illum_pool.mode.b=将彩虹桥方块下方的§c所有方块§f替换为§d炼造催化器§f方块\n可使其激活§d炼造模式§f。
+novaeng.illum_pool.illum_pool.mode.c=将彩虹桥方块下方的§c所有方块§f替换为§5次元催化器§f方块\n可使其激活§5次元模式§f。
+novaeng.illum_pool.illum_pool.mode.d=魔力池上方倒满星能液可使其激活§b星光模式§f\n与催化剂模式冲突。
+novaeng.illum_pool.illum_pool.mode.e=魔力池上方布满彩虹桥方块可使其激活§a普通模式§f\n催化剂模式必须基于此模式。
+novaeng.illum_pool.illum_pool.mode=辉光魔力池模式：%s
+novaeng.illum_pool.input.illum=消耗 §a1§f 点§e辉光魔力§f可替代 §a25%§f 的§b魔力消耗§f。
+novaeng.illum_pool.input.mana=魔力消耗：§b%s
+
+novaeng.machine.failed.work=机器正在工作！
+
+top.illum_pool.illum.stored=§e辉光魔力存储:
+top.illum_pool.mana.stored=§b魔力存储:
+top.illum_pool.mode.a=§e炼金
+top.illum_pool.mode.b=§d炼造
+top.illum_pool.mode.c=§5次元
+top.illum_pool.mode.d=§b星光
+top.illum_pool.mode.e=§a普通
+top.illum_pool.mode.null=§c未知
+top.illum_pool.crystal.size=§9水晶石大小：§b
+top.illum_pool.crystal.purity=§9水晶石纯度：§b
+top.illum_pool.crystal.polishing=§9水晶石抛光：§b
+top.illum_pool.mana.multiple=§9魔力消耗系数：§3
+
 top.hypernet.online=§9HyperNet 网络状态:§a已连接
 top.hypernet.offline=§9HyperNet 网络状态:§c断开连接
 
@@ -308,6 +339,12 @@ gui.hypernet.controller.footer=§9/////////////////////////////////////////
 novaeng.hypernet.maintenance_controller=维护控制器
 novaeng.hypernet.data_forwarding_processor=数据转发处理器
 
+novaeng.hypernet.prrocessor.link.false=未连接至计算网络！
+novaeng.hypernet.prrocessor.overheat=处理器过热！
+novaeng.hypernet.prrocessor.no_module=未找到处理器和内存模块！
+novaeng.hypernet.prrocessor.no_cpu=至少需要安装一个 CPU 或 GPU 模块！
+novaeng.hypernet.prrocessor.no_ram=至少需要安装一个内存模块！
+
 novaeng.hypernet.craftcheck.durability.failed=电路板状态良好。
 novaeng.hypernet.craftcheck.heat_distribution.failed=当前无需使用冷却液散热。
 
@@ -332,9 +369,6 @@ novaeng.hypernet.research_station.overclocking.tooltip.1=§9最大极限:§a5
 novaeng.hypernet.repair.tooltip=完成时，修复 §a%s §f点耐久值。
 novaeng.hypernet.radiator.tooltip=工作时，每秒可以吸收 §c%sHU§f 内部热量。
 
-novaeng.space_generator.tooltip0=§r需要先展开能源核心
-novaeng.space_generator.tooltip1=§r允许近乎无穷的并行数量
-
 novaeng.hypernet.tech_level.1=§a1§a.
 novaeng.hypernet.tech_level.2=§a2§a.
 novaeng.hypernet.tech_level.3=§a3§a.
@@ -349,6 +383,57 @@ novaeng.hypernet.tech_level.11=§c11§c.
 novaeng.hypernet.tech_level.12=§c12§c.
 novaeng.hypernet.tech_level.13=§413§4.
 novaeng.hypernet.tech_level.14=§414§4.
+
+novaeng.space_generator.tooltip0=§r需要先展开能源核心
+novaeng.space_generator.tooltip1=§r允许近乎无穷的并行数量
+
+novaeng.drill.thread.up=核心升级程序
+novaeng.drill.thread.a=矿脉采掘单元
+novaeng.drill.thread.a.0=矿脉采掘单元#0
+novaeng.drill.thread.a.1=矿脉采掘单元#1
+novaeng.drill.thread.a.2=矿脉采掘单元#2
+novaeng.drill.thread.a.3=矿脉采掘单元#3
+novaeng.drill.thread.a.4=矿脉采掘单元#4
+novaeng.drill.thread.a.5=矿脉采掘单元#5
+novaeng.drill.thread.a.6=矿脉采掘单元#6
+novaeng.drill.thread.a.7=矿脉采掘单元#7
+novaeng.drill.thread.a.8=矿脉采掘单元#8
+novaeng.drill.thread.b=虚境映射组元
+novaeng.drill.thread.b.1=虚境映射组元#1
+novaeng.drill.thread.b.0=虚境映射组元#0
+novaeng.drill.thread.b.2=虚境映射组元#2
+novaeng.drill.thread.b.3=虚境映射组元#3
+novaeng.drill.thread.b.4=虚境映射组元#4
+novaeng.drill.thread.b.5=虚境映射组元#5
+novaeng.drill.thread.b.6=虚境映射组元#6
+novaeng.drill.thread.b.7=虚境映射组元#7
+novaeng.drill.thread.b.8=虚境映射组元#8
+novaeng.drill.thread.c=魔源化生灵核
+novaeng.drill.thread.c.0=魔源化生灵核#0
+novaeng.drill.thread.c.1=魔源化生灵核#1
+novaeng.drill.thread.c.2=魔源化生灵核#2
+novaeng.drill.thread.c.3=魔源化生灵核#3
+novaeng.drill.thread.c.4=魔源化生灵核#4
+novaeng.drill.thread.c.5=魔源化生灵核#5
+novaeng.drill.thread.c.6=魔源化生灵核#6
+novaeng.drill.thread.c.7=魔源化生灵核#7
+novaeng.drill.thread.c.8=魔源化生灵核#8
+
+novaeng.drill.mineral.name=§9当前区块矿脉:§6
+novaeng.drill.mineral.empyt.s=§9当前区块矿脉没有矿脉或是未开始运行
+novaeng.drill.mineral.empyt.r=§9%s号矿脉为空或是未开始运行
+novaeng.drill.mineral.empyt=§9当前区块矿脉没有矿脉
+novaeng.drill.mineral.depletion.s=§9当前矿脉剩余:§6
+novaeng.drill.mineral.depletion.r=§9%s号%s矿脉剩余:§6
+
+novaeng.drill.failed.pos=未录入坐标
+novaeng.drill.failed.mineral=无可用矿脉
+novaeng.drill.failed.mineral.empty=需要拥有矿脉
+novaeng.drill.failed.mineral.depletion=矿物已经被采掘一空
+
+top.drill.status=§6当前升级状态:
+top.drill.research_progress=§9研究进度：§6
+top.drill.components_amount=§9组件加装数量：§6
 
 novaeng.adapter.mc.furnace.exp=完成时，添加 §a%s §f点经验。
 

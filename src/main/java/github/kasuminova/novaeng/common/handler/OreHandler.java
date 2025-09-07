@@ -38,6 +38,10 @@ public class OreHandler {
 
     private OreHandler(){}
 
+    public static IItemStack getRawOre(@NotNull ItemStack ore){
+        return getRawOre(CraftTweakerMC.getIItemStack(ore));
+    }
+
     @ZenMethod
     public static IItemStack getRawOre(@NotNull IItemStack ore){
         if (rawOreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
@@ -45,6 +49,10 @@ public class OreHandler {
         } else {
             return null;
         }
+    }
+
+    public static IItemStack getOre(@NotNull ItemStack ore){
+        return getOre(CraftTweakerMC.getIItemStack(ore));
     }
 
     @ZenMethod

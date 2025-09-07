@@ -17,6 +17,7 @@ import github.kasuminova.novaeng.common.container.ContainerModularServerAssemble
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
+import github.kasuminova.novaeng.common.handler.DrillHandler;
 import github.kasuminova.novaeng.common.handler.ECalculatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EStorageEventHandler;
@@ -37,6 +38,7 @@ import github.kasuminova.novaeng.common.machine.Drills.DifferentWorld;
 import github.kasuminova.novaeng.common.machine.Drills.ManaOreDrill;
 import github.kasuminova.novaeng.common.machine.Drills.MineralExtractor;
 import github.kasuminova.novaeng.common.machine.Drills.OrichalcosDrill;
+import github.kasuminova.novaeng.common.machine.Drills.SmallOreDrill;
 import github.kasuminova.novaeng.common.machine.Drills.VoidMiner;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.machine.IllumPool;
@@ -84,6 +86,10 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(new RegistryItems());
     }
 
+    public boolean isClient(){
+        return false;
+    }
+
     public void construction() {
         if (Loader.isModLoaded("ecoaeextension")){
             throw new RuntimeException(NovaEngCoreEarlyMixinLoader.getString("mod.ecoae.warning"));
@@ -101,6 +107,10 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(WorldLoadedHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE);
+
+        if (NovaEngCoreConfig.SERVER.SpecialMachine) {
+            MinecraftForge.EVENT_BUS.register(DrillHandler.INSTANCE);
+        }
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();
@@ -143,6 +153,7 @@ public class CommonProxy implements IGuiHandler {
                 RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.INSTANCE);
                 RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.INSTANCE);
                 RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.INSTANCE);
+                RegistryMachineSpecial.registrySpecialMachine(SmallOreDrill.INSTANCE);
             }
         }
         if (Mods.AE2.isPresent()) {
