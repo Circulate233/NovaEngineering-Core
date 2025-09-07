@@ -536,8 +536,10 @@ public abstract class Drill implements MachineSpecial {
                                 data.setString("kmm" + k + kk, worldInfo.mineralOverride.name);
                             } else if (worldInfo.mineral != null) {
                                 data.setString("kmm" + k + kk, worldInfo.mineral.name);
+                            } else {
+                                data.setString("kmm" + k + kk, "empty");
                             }
-                            if (!data.getString("kmm" + k + kk).isEmpty()) {
+                            if (!data.getString("kmm" + k + kk).equals("empty")) {
                                 data.setInteger("depletion" + k + kk, worldInfo.depletion);
                             }
                         }
@@ -567,7 +569,15 @@ public abstract class Drill implements MachineSpecial {
             case SINGLE -> machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
                 var ctrl = event.getController();
                 var data = ctrl.getCustomDataTag();
+                var research_progress = data.getByte("research_progress");
+                var components_amount = data.getByte("components_amount");
                 List<String> info = new ObjectArrayList<>();
+                info.add(
+                        I18n.format("top.drill.status") + "§6[" +
+                                I18n.format("top.drill.research_progress") + research_progress + "|" +
+                                        I18n.format("top.drill.components_amount") + components_amount + "§6]"
+
+                );
                 var kmm = data.getString("kmm11");
                 var depletion = data.getInteger("depletion11");
                 if (!kmm.isEmpty() && !kmm.equals("empty"))
@@ -802,6 +812,7 @@ public abstract class Drill implements MachineSpecial {
                     .setParallelized(false)
                     .build();
         }
+        machine.addCoreThread(upThread);
     }
 
     @Override
@@ -814,8 +825,8 @@ public abstract class Drill implements MachineSpecial {
         var research_progress = data.getByte("research_progress");
         var components_amount = data.getByte("components_amount");
         MachineSpecial.newBox(probeInfo)
-                .text("{*top.drill.status*}")
-                .text("{*top.drill.research_progress*}" + research_progress)
+                .text("{*top.drill.status*}  ")
+                .text("{*top.drill.research_progress*}" + research_progress + "  ")
                 .text("{*top.drill.components_amount*}" + components_amount);
     }
 
