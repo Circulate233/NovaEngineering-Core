@@ -169,11 +169,11 @@ novaeng.illum_pool.failed.mana.max=魔力存储已抵达极限！
 novaeng.illum_pool.failed.mana.min=魔力存储不足！
 novaeng.illum_pool.failed.mana.min.0=魔力存储不足或缺少物品输入！
 novaeng.illum_pool.failed.input=辉光魔力池模式不匹配或缺少物品输入！
-novaeng.illum_pool.illum_pool.mode.a=将彩虹桥方块下方的§c所有方块§f替换为§e炼金催化器§f方块\n可使其激活§e炼金模式§f。
-novaeng.illum_pool.illum_pool.mode.b=将彩虹桥方块下方的§c所有方块§f替换为§d炼造催化器§f方块\n可使其激活§d炼造模式§f。
-novaeng.illum_pool.illum_pool.mode.c=将彩虹桥方块下方的§c所有方块§f替换为§5次元催化器§f方块\n可使其激活§5次元模式§f。
-novaeng.illum_pool.illum_pool.mode.d=魔力池上方倒满星能液可使其激活§b星光模式§f\n与催化剂模式冲突。
-novaeng.illum_pool.illum_pool.mode.e=魔力池上方布满彩虹桥方块可使其激活§a普通模式§f\n催化剂模式必须基于此模式。
+novaeng.illum_pool.illum_pool.mode.a=将彩虹桥方块下方的§c所有方块§f替换为§e炼金催化器§f方块&n可使其激活§e炼金模式§f。
+novaeng.illum_pool.illum_pool.mode.b=将彩虹桥方块下方的§c所有方块§f替换为§d炼造催化器§f方块&n可使其激活§d炼造模式§f。
+novaeng.illum_pool.illum_pool.mode.c=将彩虹桥方块下方的§c所有方块§f替换为§5次元催化器§f方块&n可使其激活§5次元模式§f。
+novaeng.illum_pool.illum_pool.mode.d=魔力池上方倒满星能液可使其激活§b星光模式§f&n与催化剂模式冲突。
+novaeng.illum_pool.illum_pool.mode.e=魔力池上方布满彩虹桥方块可使其激活§a普通模式§f&n催化剂模式必须基于此模式。
 novaeng.illum_pool.illum_pool.mode=辉光魔力池模式：%s
 novaeng.illum_pool.input.illum=消耗 §a1§f 点§e辉光魔力§f可替代 §a25%§f 的§b魔力消耗§f。
 novaeng.illum_pool.input.mana=魔力消耗：§b%s
@@ -384,7 +384,7 @@ novaeng.hypernet.tech_level.12=§c12§c.
 novaeng.hypernet.tech_level.13=§413§4.
 novaeng.hypernet.tech_level.14=§414§4.
 
-novaeng.space_generator.tooltip0=§r需要先展开能源核心
+novaeng.space_generator.tooltip0=§r需要先展开能量核心
 novaeng.space_generator.tooltip1=§r允许近乎无穷的并行数量
 
 novaeng.drill.thread.up=核心升级程序
@@ -468,19 +468,20 @@ novaeng.space_generator.gui.storge.energy=§9核心能源储量：§6
 
 novaeng.space_generator.recipe.ore.output.tooltips=§a仅用于标识结算时可能的产出
 
-novaeng.space_generator.recipe.space_fluid.tooltips=§r输入流体物质,每§61mb§r对应§6100§r矿石单位\n§r需要先展开奇点
-novaeng.space_generator.recipe.space_energy1.tooltips=§r输入能源,每§a%s§6RF§r对应§a1§r矿石单位\n§r能源将被保存在能量核心内\n§r允许使用别的手段向能源核心输入能量\n§r需要先展开奇点
-novaeng.space_generator.recipe.space_energy2.tooltips=§r输入能源,每§a%s§6RF§r对应§a1§r矿石单位\n§r每§a1mb§r液态能量对应§65GRF§r能量,不接受倍率调整,但是可以并行\n§r能源将被保存在能量核心内\n§r允许使用别的手段向能源核心输入能量\n§r需要先展开奇点
-novaeng.space_generator.recipe.hxzk1.tooltips=§r展开奇点,开始运行虚相物质操纵配方\n§r配方需要输入矿石,流体物质,能源\n§r流体物质,能源与矿石的比例将会决定最终产出比例\n§r每个周期结束时,紫晶素和电量与矿石单位对应的比例差值不超过§65%\n§r则分别可以提供的乘数为§62§r,基础值为§64§r,即为最高产出§616§r倍\n§r每偏差§65%§r降低§60.25§r乘数,如果偏差超过§625%§r,配方会失败,产出为§60\n§r有对应奇点而且数量足够时,会优先输出奇点然后输出锭,其余配方输出锭
-novaeng.space_generator.recipe.hxzk2.tooltips=§r展开能量核心,可以开始运行奇点操纵配方\n§r压缩奇点可以使用粒,锭,块中一种\n§r解压奇点相比于压缩,会损失§630%§r原材料
-novaeng.space_generator.recipe.ore.tooltips=§r输入矿石单位,每并行输入§61\n§r需要先展开奇点
-novaeng.space_generator.recipe.raw_ore.tooltips=§r输入矿石单位,每并行输入§62\n§63§r金属粗矿等价于§62§r原矿\n§r需要先展开奇点
-novaeng.space_generator.recipe.gem.tooltips=§r输入矿石单位,每并行输入§61\n§6宝石粗矿与原矿比例为1比1\n§r需要先展开奇点
+novaeng.space_generator.recipe.space_fluid.tooltips=§r输入流体物质,每§61mb§r对应§6100§r矿石单位&n§r需要先展开奇点
+novaeng.space_generator.recipe.space_energy1.tooltips=§r输入能源,每§a%s§6RF§r对应§a1§r矿石单位&n§r能源将被保存在能量核心内&n§r允许使用别的手段向能源核心输入能量&n§r需要先展开奇点
+novaeng.space_generator.recipe.space_energy2.tooltips=§r输入能源,每§a%s§6RF§r对应§a1§r矿石单位&n§r每§a1mb§r液态能量对应§65GRF§r能量,不接受倍率调整,但是可以并行&n§r能源将被保存在能量核心内&n§r允许使用别的手段向能源核心输入能量&n§r需要先展开奇点
+novaeng.space_generator.recipe.hxzk1.tooltips=§r展开奇点,开始运行虚相物质操纵配方&n§r配方需要输入矿石,流体物质,能源&n§r流体物质,能源与矿石的比例将会决定最终产出比例&n§r每个周期结束时,紫晶素和电量与矿石单位对应的比例差值不超过§65%&n§r则分别可以提供的乘数为§62§r,基础值为§64§r,即为最高产出§616§r倍&n§r每偏差§65%§r降低§60.25§r乘数,如果偏差超过§625%§r,配方会失败,产出为§60&n§r有对应奇点而且数量足够时,会优先输出奇点然后输出锭,其余配方输出锭
+novaeng.space_generator.recipe.hxzk2.tooltips=§r展开能量核心,可以开始运行奇点操纵配方&n§r压缩奇点可以使用粒,锭,块中一种&n§r解压奇点相比于压缩,会损失§630%§r原材料
+novaeng.space_generator.recipe.ore.tooltips=§r输入矿石单位,每并行输入§61&n§r需要先展开奇点
+novaeng.space_generator.recipe.raw_ore.tooltips=§r输入矿石单位,每并行输入§62&n§63§r金属粗矿等价于§62§r原矿&n§r需要先展开奇点
+novaeng.space_generator.recipe.gem.tooltips=§r输入矿石单位,每并行输入§61&n§6宝石粗矿与原矿比例为1比1&n§r需要先展开奇点
 
 novaeng.adapter.mc.furnace.exp=完成时，添加 §a%s §f点经验。
 
 gui.speed=速度：§a%sf
-gui.speed.range=速度范围：最低 §a%sf 倍§f,最高 §a%sf 倍
+gui.speed.range.0=速度范围：最低 §a%.0f 倍§f,最高 §a%.0f 倍
+gui.speed.range.2=速度范围：最低 §a%.2f 倍§f,最高 §a%.2f 倍
 gui.speed.failed=§a输入速度过载或过低！
 
 gui.toast.research.complete=HyperNet 研究已完成！
@@ -680,7 +681,7 @@ text.dream_energy_port.1=通量模式下,梦之能量核心将直接作为通量
 enchantment.magic_breaking=破魔
 enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
 modifier.magic_breaking.name=破魔
-modifier.magic_breaking.desc=§6§o众御皆虚§9\n对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
+modifier.magic_breaking.desc=§6§o众御皆虚§9&\n对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
 
 itemGroup.novaeng_core=新星工程:核心
 

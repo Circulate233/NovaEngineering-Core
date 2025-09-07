@@ -24,7 +24,7 @@ public class StringUtils {
      * <p>算法相对暴力...</p>
      *
      * @param source 要排序的数组
-     * @param filter      字符串
+     * @param filter 字符串
      * @return 排序后的列表
      */
     public static List<String> sortWithMatchRate(final Collection<String> source, final String filter) {
@@ -72,14 +72,27 @@ public class StringUtils {
     }
 
     @ZenMethod
-    public static String[] getTexts(String key,Object... objs){
-        return getText(key,objs).toArray(new String[0]);
+    public static String[] getTexts(String key, Object... objs) {
+        return getText(key, objs).toArray(new String[0]);
     }
 
-    public static List<String> getText(String key,Object... objs){
-        if (NovaEngineeringCore.proxy.isClient()){
+    @ZenMethod
+    public static String[] getTexts(String key) {
+        return getText(key).toArray(new String[0]);
+    }
+
+    public static List<String> getText(String key) {
+        if (NovaEngineeringCore.proxy.isClient()) {
+            var s = I18n.translateToLocal(key);
+            return new ObjectArrayList<>(s.split("&n"));
+        }
+        return Collections.emptyList();
+    }
+
+    public static List<String> getText(String key, Object... objs) {
+        if (NovaEngineeringCore.proxy.isClient()) {
             var s = I18n.translateToLocalFormatted(key, objs);
-            return new ObjectArrayList<>(s.split("\n"));
+            return new ObjectArrayList<>(s.split("&n"));
         }
         return Collections.emptyList();
     }
@@ -88,8 +101,8 @@ public class StringUtils {
     public record MatchResult(String str, int matchRate) implements Comparable<MatchResult> {
 
         @Override
-            public int compareTo(final MatchResult o) {
-                return Integer.compare(o.matchRate, matchRate);
-            }
+        public int compareTo(final MatchResult o) {
+            return Integer.compare(o.matchRate, matchRate);
         }
+    }
 }

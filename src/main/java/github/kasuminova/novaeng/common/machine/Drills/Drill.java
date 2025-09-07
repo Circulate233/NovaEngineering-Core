@@ -736,6 +736,7 @@ public abstract class Drill implements MachineSpecial {
                     , "research_mineral_utilization_" + fi)
                     .setParallelized(false)
                     .setThreadName(upThreadName)
+                    .setLoadJEI(false)
                     .build();
             requireResearch(
                     RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + fi, name, 100, 1)
@@ -764,62 +765,65 @@ public abstract class Drill implements MachineSpecial {
                     , "additional_component_loading_" + fi)
                     .setThreadName(upThreadName)
                     .setParallelized(false)
-                    .build();
-            upThread.addRecipe("additional_component_loading_" + name + "_3");
-            requireResearch(
-                    RecipeBuilder.newBuilder("additional_component_loading_" + name + "_3", name, 100, 1)
-                            .addItemInput(itemUtils.getItem("contenttweaker:additional_component_3", 0))
-                            .addPreCheckHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var research_progress = data.getByte("research_progress");
-                                var components_amount = data.getByte("components_amount");
-                                var additional_component_3 = data.getByte("additional_component_3");
-                                if (additional_component_3 == 1) {
-                                    event.setFailed("novaeng.machine.failed.work");
-                                }
-                            })
-                            .addFactoryFinishHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var components_amount = data.getByte("components_amount");
-                                var research_progress = data.getByte("research_progress");
-                                ctrl.addPermanentModifier("additional_ex", RecipeModifierBuilder.create("modularmachinery:energy", "input", 4, 1, false).build());
-                                ctrl.addPermanentModifier("additionalout", RecipeModifierBuilder.create("modularmachinery:item", "output", (float) (Math.pow(components_amount + 1, 3) * 2), 1, false).build());
-                                data.setBoolean("additional_component_3", true);
-                                data.setByte("components_amount", (byte) (components_amount + 1));
-                                data.setByte("research_progress", (byte) (research_progress + 1));
-                            })
-                            .setThreadName(upThreadName)
-                            .setParallelized(false)
-                    , "additional_component_loading_ex")
-                    .build();
-            upThread.addRecipe("additional_component_loading_" + name + "_raw_ore");
-            requireResearch(
-                    RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
-                            .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
-                            .addPreCheckHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var research_progress = data.getByte("research_progress");
-                                var components_amount = data.getByte("components_amount");
-                                var additional_component_raw_ore = data.getByte("additional_component_raw_ore");
-                                if (additional_component_raw_ore == 1) {
-                                    event.setFailed("novaeng.machine.failed.work");
-                                }
-                            })
-                            .addFactoryFinishHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                data.setBoolean("additional_component_raw_ore", true);
-                                ctrl.addPermanentModifier("additional_raw_ore", RecipeModifierBuilder.create("modularmachinery:energy", "input", 2, 1, false).build());
-                                ctrl.setCustomDataTag(data);
-                            })
-                    , "additional_component_loading_raw_ore")
-                    .setThreadName(upThreadName)
-                    .setParallelized(false)
+                    .setLoadJEI(false)
                     .build();
         }
+        upThread.addRecipe("additional_component_loading_" + name + "_3");
+        requireResearch(
+                RecipeBuilder.newBuilder("additional_component_loading_" + name + "_3", name, 100, 1)
+                        .addItemInput(itemUtils.getItem("contenttweaker:additional_component_3", 0))
+                        .addPreCheckHandler(event -> {
+                            var ctrl = event.getController();
+                            var data = ctrl.getCustomDataTag();
+                            var research_progress = data.getByte("research_progress");
+                            var components_amount = data.getByte("components_amount");
+                            var additional_component_3 = data.getByte("additional_component_3");
+                            if (additional_component_3 == 1) {
+                                event.setFailed("novaeng.machine.failed.work");
+                            }
+                        })
+                        .addFactoryFinishHandler(event -> {
+                            var ctrl = event.getController();
+                            var data = ctrl.getCustomDataTag();
+                            var components_amount = data.getByte("components_amount");
+                            var research_progress = data.getByte("research_progress");
+                            ctrl.addPermanentModifier("additional_ex", RecipeModifierBuilder.create("modularmachinery:energy", "input", 4, 1, false).build());
+                            ctrl.addPermanentModifier("additionalout", RecipeModifierBuilder.create("modularmachinery:item", "output", (float) (Math.pow(components_amount + 1, 3) * 2), 1, false).build());
+                            data.setBoolean("additional_component_3", true);
+                            data.setByte("components_amount", (byte) (components_amount + 1));
+                            data.setByte("research_progress", (byte) (research_progress + 1));
+                        })
+                        .setThreadName(upThreadName)
+                        .setParallelized(false)
+                        .setLoadJEI(false)
+                , "additional_component_loading_ex")
+                .build();
+        upThread.addRecipe("additional_component_loading_" + name + "_raw_ore");
+        requireResearch(
+                RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
+                        .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
+                        .addPreCheckHandler(event -> {
+                            var ctrl = event.getController();
+                            var data = ctrl.getCustomDataTag();
+                            var research_progress = data.getByte("research_progress");
+                            var components_amount = data.getByte("components_amount");
+                            var additional_component_raw_ore = data.getByte("additional_component_raw_ore");
+                            if (additional_component_raw_ore == 1) {
+                                event.setFailed("novaeng.machine.failed.work");
+                            }
+                        })
+                        .addFactoryFinishHandler(event -> {
+                            var ctrl = event.getController();
+                            var data = ctrl.getCustomDataTag();
+                            data.setBoolean("additional_component_raw_ore", true);
+                            ctrl.addPermanentModifier("additional_raw_ore", RecipeModifierBuilder.create("modularmachinery:energy", "input", 2, 1, false).build());
+                            ctrl.setCustomDataTag(data);
+                        })
+                , "additional_component_loading_raw_ore")
+                .setThreadName(upThreadName)
+                .setParallelized(false)
+                .setLoadJEI(false)
+                .build();
         machine.addCoreThread(upThread);
         machine.setMaxThreads(0);
     }

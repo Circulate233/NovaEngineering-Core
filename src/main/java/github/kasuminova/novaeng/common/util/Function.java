@@ -19,6 +19,14 @@ public class Function {
     }
 
     @ZenMethod
+    public static String getText(String key){
+        if (NovaEngineeringCore.proxy.isClient()){
+            return I18n.translateToLocal(key);
+        }
+        return "empty";
+    }
+
+    @ZenMethod
     public static String getText(String key,Object... objs){
         if (NovaEngineeringCore.proxy.isClient()){
             return I18n.translateToLocalFormatted(key, objs);
