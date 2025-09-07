@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+//TODO:处理硬编码
 @ZenRegister
 @ZenClass("novaeng.MMAltar")
 public class MMAltar implements MachineSpecial {

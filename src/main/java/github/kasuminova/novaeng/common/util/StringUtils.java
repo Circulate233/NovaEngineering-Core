@@ -1,9 +1,12 @@
 package github.kasuminova.novaeng.common.util;
 
 import com.github.bsideup.jabel.Desugar;
+import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.util.text.translation.I18n;
+import stanhebben.zenscript.annotations.ZenClass;
+import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +14,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
+@ZenRegister
+@ZenClass("novaeng.StringUtils")
 public class StringUtils {
 
     /**
@@ -64,6 +69,11 @@ public class StringUtils {
             return Integer.MAX_VALUE;
         }
         return matchRate;
+    }
+
+    @ZenMethod
+    public static String[] getTexts(String key,Object... objs){
+        return getText(key,objs).toArray(new String[0]);
     }
 
     public static List<String> getText(String key,Object... objs){

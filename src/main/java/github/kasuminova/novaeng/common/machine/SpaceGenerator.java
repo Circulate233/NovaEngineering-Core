@@ -4,9 +4,9 @@ import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.api.oredict.IOreDictEntry;
 import github.kasuminova.mmce.common.helper.IMachineController;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.util.RecipePrimerEx;
+import github.kasuminova.novaeng.common.util.StringUtils;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.IngredientArrayBuilder;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
@@ -64,7 +64,7 @@ public class SpaceGenerator implements MachineSpecial {
                                 var speed = data.getInteger("speed");
                                 var hxzt = data.getByte("hxzt");
                                 if (hxzt != 1) {
-                                    event.setFailed("当前模式无法输入矿石");
+                                    event.setFailed("novaeng.space_generator.failed.item.input");
                                 }
                             })
                             .addFactoryFinishHandler(event -> {
@@ -79,13 +79,10 @@ public class SpaceGenerator implements MachineSpecial {
                             })
                             .setMaxThreads(1)
                             .setParallelized(true)
-                            .addRecipeTooltip(
-                                    "§r输入矿石单位,每并行输入§61",
-                                    "§r需要先展开奇点"
-                            );
+                            .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.ore.tooltips"));
                     if (!singularity.isEmpty())
-                        RecipePrimerEx.setLore(rec0.addOutput(singularity.getFirstItem()).setChance(0), "§a仅用于标识结算时可能的产出");
-                    RecipePrimerEx.setLore(rec0.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "§a仅用于标识结算时可能的产出").build();
+                        RecipePrimerEx.setLore(rec0.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
+                    RecipePrimerEx.setLore(rec0.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();
                     if (!rawOre.isEmpty()) {
                         var rec1 = RecipeBuilder.newBuilder("space_Ore1" + ore, "space_generator", 20, 2)
                                 .addInput(rawOre.amount(3))
@@ -95,7 +92,7 @@ public class SpaceGenerator implements MachineSpecial {
                                     var speed = data.getInteger("speed");
                                     var hxzt = data.getByte("hxzt");
                                     if (hxzt != 1) {
-                                        event.setFailed("当前模式无法输入矿石");
+                                        event.setFailed("novaeng.space_generator.failed.item.input");
                                     }
                                 })
                                 .addFactoryFinishHandler(event -> {
@@ -110,14 +107,10 @@ public class SpaceGenerator implements MachineSpecial {
                                 })
                                 .setMaxThreads(1)
                                 .setParallelized(true)
-                                .addRecipeTooltip(
-                                        "§r输入矿石单位,每并行输入§62",
-                                        "§63§r金属粗矿等价于§62§r原矿",
-                                        "§r需要先展开奇点"
-                                );
+                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.raw_ore.tooltips"));
                         if (!singularity.isEmpty())
-                            RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "§a仅用于标识结算时可能的产出");
-                        RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "§a仅用于标识结算时可能的产出").build();
+                            RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
+                        RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();
                     }
                     if (!rawOreGem.isEmpty()) {
                         var rec1 = RecipeBuilder.newBuilder("space_Ore1" + ore, "space_generator", 20, 2)
@@ -128,7 +121,7 @@ public class SpaceGenerator implements MachineSpecial {
                                     var speed = Math.max(1, data.getInteger("speed"));
                                     var hxzt = data.getByte("hxzt");
                                     if (hxzt != 1) {
-                                        event.setFailed("当前模式无法输入矿石");
+                                        event.setFailed("novaeng.space_generator.failed.item.input");
                                     }
                                 })
                                 .addFactoryFinishHandler(event -> {
@@ -143,20 +136,15 @@ public class SpaceGenerator implements MachineSpecial {
                                 })
                                 .setMaxThreads(1)
                                 .setParallelized(true)
-                                .addRecipeTooltip(
-                                        "§r输入矿石单位,每并行输入§61",
-                                        "§6宝石粗矿与原矿比例为1比1",
-                                        "§r需要先展开奇点"
-                                );
+                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.gem.tooltips"));
                         if (!singularity.isEmpty())
-                            RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "§a仅用于标识结算时可能的产出");
-                        RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "§a仅用于标识结算时可能的产出").build();
+                            RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
+                        RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();
                     }
                 }
             }
             if (odName.startsWith(singularityOD) && !odName.equals(singularityOD)) {
                 var singularityname = odName.substring(singularityOD.length());
-                NovaEngineeringCore.log.info("registry singularity:{}",singularityname);
                 var s = OreHandler.OreDictHelper.getPriorityItemFromOreDict(odName);
                 if (s.isEmpty())continue;
                 var r = AvaritiaRecipeManager.getCompressorRecipeFromResult(s);
@@ -175,14 +163,14 @@ public class SpaceGenerator implements MachineSpecial {
 
         oreProcessing(orenames,singularitys);
 
-        machine.addCoreThread(FactoryRecipeThread.createCoreThread("核心展开器").addRecipe("hxzk1").addRecipe("hxzk2").addRecipe("hxzk3").addRecipe("hxzk4"));
-        machine.addCoreThread(FactoryRecipeThread.createCoreThread("能源操纵器").addRecipe("space_energy1").addRecipe("space_energy2"));
-        machine.addCoreThread(FactoryRecipeThread.createCoreThread("物质操作端口").addRecipe("space_fluid"));
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread("novaeng.space_generator.thread.core").addRecipe("hxzk1").addRecipe("hxzk2").addRecipe("hxzk3").addRecipe("hxzk4"));
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread("novaeng.space_generator.thread.energy").addRecipe("space_energy1").addRecipe("space_energy2"));
+        machine.addCoreThread(FactoryRecipeThread.createCoreThread("novaeng.space_generator.thread.fluid").addRecipe("space_fluid"));
 
         machine.setInternalParallelism(2000000000);
         machine.setMaxThreads(0);
         for(var i = 0;i < 10;i++){
-            machine.addCoreThread(FactoryRecipeThread.createCoreThread("物质输入端口#" + i));
+            machine.addCoreThread(FactoryRecipeThread.createCoreThread("novaeng.space_generator.thread.item.input." + i));
         }
     }
 
@@ -198,7 +186,7 @@ public class SpaceGenerator implements MachineSpecial {
                     var data = ctrl.getCustomDataTag();
                     var hxzt = data.getByte("hxzt");
                     if (hxzt != 3) {
-                        event.setFailed("非输出状态");
+                        event.setFailed("novaeng.space_generator.failed.no_output");
                     }
                 });
 
@@ -232,7 +220,7 @@ public class SpaceGenerator implements MachineSpecial {
                     data.setByte("hxzt", (byte) 0);
                 })
                 .setLoadJEI(false)
-                .setThreadName("核心展开器")
+                .setThreadName("novaeng.space_generator.thread.core")
                 .build();
     }
 
@@ -313,7 +301,7 @@ public class SpaceGenerator implements MachineSpecial {
                     var data = ctrl.getCustomDataTag();
                     var hxzt = data.getInteger("hxzt");
                     if (hxzt != 2) {
-                        event.setFailed("当前模式无法操作奇点");
+                        event.setFailed("novaeng.space_generator.failed.singularity");
                     }
                 })
                 .addOutput(singularity)
@@ -332,7 +320,7 @@ public class SpaceGenerator implements MachineSpecial {
                     var data = ctrl.getCustomDataTag();
                     var hxzt = data.getInteger("hxzt");
                     if (hxzt != 2) {
-                        event.setFailed("当前模式无法操作奇点");
+                        event.setFailed("novaeng.space_generator.failed.singularity");
                     }
                 })
                 .addOutputs(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName())).amount((int) (arg1 * arg2)))

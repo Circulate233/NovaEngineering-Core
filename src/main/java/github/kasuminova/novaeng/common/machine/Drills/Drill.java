@@ -592,7 +592,15 @@ public abstract class Drill implements MachineSpecial {
             case RANGE -> machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
                 var ctrl = event.getController();
                 var data = ctrl.getCustomDataTag();
+                var research_progress = data.getByte("research_progress");
+                var components_amount = data.getByte("components_amount");
                 List<String> info = new ObjectArrayList<>();
+                info.add(
+                        I18n.format("top.drill.status") + "§6[" +
+                                I18n.format("top.drill.research_progress") + research_progress + "|" +
+                                I18n.format("top.drill.components_amount") + components_amount + "§6]"
+
+                );
                 for (int i : tqsz) {
                     var k = i + 1;
                     for (int ii : tqsz) {
@@ -813,6 +821,7 @@ public abstract class Drill implements MachineSpecial {
                     .build();
         }
         machine.addCoreThread(upThread);
+        machine.setMaxThreads(0);
     }
 
     @Override

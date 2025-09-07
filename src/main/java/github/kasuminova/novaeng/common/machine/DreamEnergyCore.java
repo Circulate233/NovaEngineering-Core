@@ -33,6 +33,7 @@ import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.Bi
 import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.formatNumber;
 import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.isClient;
 
+//TODO:处理硬编码
 @ZenRegister
 @ZenClass("novaeng.DreamEnergyCore")
 public class DreamEnergyCore implements MachineSpecial{
