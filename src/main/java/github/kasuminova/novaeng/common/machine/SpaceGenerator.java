@@ -30,7 +30,7 @@ public class SpaceGenerator implements MachineSpecial {
     private static final String singularityOD = "singularity";
 
     @Override
-    public void init(final DynamicMachine machine) {
+    public void preInit(final DynamicMachine machine) {
         final List<String> orenames = new ArrayList<>();
         final Map<String, Long> singularitys = new HashMap<>();
 

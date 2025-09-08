@@ -65,7 +65,7 @@ public class MMAltar implements MachineSpecial {
     }
 
     @Override
-    public void init(final DynamicMachine machine) {
+    public void preInit(final DynamicMachine machine) {
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
             TileMultiblockMachineController controller = event.getController();
             controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC);

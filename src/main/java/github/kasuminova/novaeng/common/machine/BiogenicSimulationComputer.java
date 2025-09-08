@@ -39,7 +39,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
     };
 
     @Override
-    public void init(final DynamicMachine machine) {
+    public void preInit(final DynamicMachine machine) {
         MachineModifier.setMaxThreads(MachineID, 0);
         for (String i : inscriberModels) {
             MachineModifier.addCoreThread(MachineID, FactoryRecipeThread.createCoreThread(i));

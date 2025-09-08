@@ -20,7 +20,7 @@ public class MaterialSequenceProcessing implements MachineSpecial {
     public static final MaterialSequenceProcessing INSTANCE = new MaterialSequenceProcessing();
 
     @Override
-    public void init(final DynamicMachine machine) {
+    public void preInit(final DynamicMachine machine) {
         for (MetadataDataModel model : MetadataManager.getDataModelMetadataList()) {
             if (!model.isEnabled()) continue;
             var item = model.getPristineMatter();

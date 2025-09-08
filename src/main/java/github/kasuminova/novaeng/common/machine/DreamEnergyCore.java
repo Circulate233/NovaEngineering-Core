@@ -82,7 +82,7 @@ public class DreamEnergyCore implements MachineSpecial{
     }
 
     @Override
-    public void init(DynamicMachine machine) {
+    public void preInit(DynamicMachine machine) {
         SInit(machine);
         if (isClient) {
             CInit(machine);
