@@ -29,6 +29,9 @@ item.novaeng_core.horologium_compass.name=星晷罗盘
 item.novaeng_core.horologium_compass.tooltip.0=§9追寻时间之痕迹
 tile.horologium_compass.success=§6罗盘指示你:§9时间的屏障将在%s天后变得薄弱.
 
+item.novaeng_core.estorage_cell_drive.tooltip.0=§9可驱动存储矩阵。
+item.novaeng_core.estorage_cell_drive.tooltip.1=§9能够驱动的存储矩阵等级由主机决定。
+
 novaeng.ecalculator_cell.insert.tip=蹲下时手持矩阵并右击驱动器以插入晶阵。
 novaeng.ecalculator_cell.extract.tip=蹲下时空手并右击驱动器以取出晶阵。
 novaeng.ecalculator_cell.tip.0=§b闪存晶阵§7为§9计算子系统§7提供§a内存存储§7。
@@ -685,6 +688,54 @@ modifier.magic_breaking.desc=§6§o众御皆虚§9\n对于剩余血量大于10�
 
 itemGroup.novaeng_core=新星工程:核心
 
+new.difficulty.tooltip=§9难度:
+new.item.tooltip.engineering=§9按照工程部通用精密器械标准 %s 制造的机械材料。
+new.item.tooltip.fuel=§9按照工程部通用燃料标准 %s 制造的高能燃料。
+new.item.tooltip.fuel_storage=§9按照工程部可复用燃料容器标准 %s 制造的高能燃料容器
+new.item.core.rainbow=§b世界之色在于其中。
+new.item.core.mana=§b万千植物散发的魔力凝聚其中。
+new.item.core.element=§b世界合金元素在于其中。
+new.item.core.soul=§b世间生物之魂在于其中。
+new.item.core.eclipse=§8仅残存的一丝灰色象征着死亡。
+new.item.core.forgotten.0=容纳着另外一个世界的一个灵魂的核心。
+new.item.core.forgotten.1=§d纪念一个现实中逝去的灵魂。
+new.item.core.life_regeneration=吸收了生命力和所有奇点的力量让它拥有了再生的能力。
+new.item.map.horologium_star.tooltips=§f诡异的§e时钟座§f隐藏在时间的各个角落中,无法§b以普通形式§f观测&n§f利用六大星座的星图作为线索,你成功观测到了§e时钟座。&n§f吸纳了§5奥力哈钢§f的§e时钟座§6星图§f有着超越时间的力量,任何以它指引的星能机器将§b不分昼夜的运行。
+new.item.map.corvus_star.tooltips=§f只在§b新月§f时才可被观测到的§7乌鸦座&n§f贪婪的§7乌鸦§f窥探着世间一切的§b珍宝。
+new.item.map.lyra_star.tooltips=§f只在§b上弦月§f和§b下弦月§f时可被观测到的§3天琴座&n§f传说§6天琴§f琴声能浸润万物,就连那些最微小的粒子也不例外。&n§f§b相位构筑仪§f需此星图方能利用§3天琴座§f的力量。
+new.item.map.fornax_star.tooltips=§f只在§b亏凸月§f和§b盈凸月§f时可被观测到的§6天炉座&n§f在月亮背后绽放着§6烈火§f般的璀璨光彩。&n§b相位炼化棱镜§f需此星图方能利用§6天炉座§f的炽热高温。
+new.item.map.bootes_star.tooltips=§f只在§b残月§f和§b峨眉月§f时可被观测到的§a牧夫座&n§f天上的§a牧人§f不知疲倦的照料着芸芸众生。&n§b相位灌注机§f需此星图以§a滋养植物。
+new.item.map.monoceros_star.tooltips=§d麒麟座§f只会在§b新月§f出现。&n§f机敏的§d麒麟§f遨游宇宙,所有§9天体§f尽收眼底。&n§d相位§f引星塔需此星图从§9无垠宇宙中§f牵引§8陨石§f与§8陨铁§f。
+new.item.map.thunderbolt_star.tooltips=§f只在§b满月§f出现的§e天雷座&n§f传说神王§e宙斯§f的力量就藏在其中。&n§b星能发电机§f需以此星图定位§e天雷座。
+
+new.block.manaliquefaction.tooltips=§a§o已经被 §9§o[§6§oNEW§9§o]§a§o 修改&n§a按下shift查询新使用方法
+new.block.manaliquefaction.tooltips.shift=§6在其上方放置神话/永恒魔力池以启用新模式工作&n§9神话：§6在未被红石充能时,会尽可能向魔力池填充魔力&n§6将会瞬间将内部的液态魔力尽可能全部转换为魔力,并且向周围能够存储液体的容器抽入液态魔力&n§6在被红石充能时,会尽可能向魔力池抽取魔力&n§6将会瞬间将内部的魔力尽可能全部转换为液态魔力,并且向周围能够存储液体的容器输出液态魔力&n§9永恒：§6有红石信号时，魔力液化器的液态魔力和魔力每秒补满一次&n§6无红石信号时，魔力液化器的液态魔力和魔力清空一次
+new.block.blockparallelcontroller.tooltips=§o当机械控制器描述中存在 “§9§o最大并行数：§a§ox§7§o” 时,代表此机械可无损超频并行。&n§o当结构中存在至少超过一个并行控制器时,机械会自动并行。&n§o并行控制器的放置位置会在机械的结构预览中显示。
+new.block.blocksmartinterface.tooltips=§o当机械结构形成时,右键此方块可调节机械运行参数。&n§o输入运行参数后,按下回车写入参数&n§o某些机械结构中可能存在此方块。
+
+new.ctrl.tooltip.info=§e//////// 机械信息 / 等级 / 功能 ////////
+new.ctrl.tooltip.help=§9//////// 控制器提示 /////////
+new.ctrl.tooltip.base=§9§o每个机械的独立控制器,JEI 中左键以查看结构
+new.ctrl.tooltip.factory=§9§o控制器的工厂变种,包含特殊功能
+new.ctrl.tooltip.structure=§9§oJEI 中左键以查看结构
+
+new.energy.storge=§a能量缓存: %s
+new.energy.max_input=§a最大输入: %s
+new.energy.max_output=§a最大输出: %s
+
+new.as.tooltips=§9将%s放置在浮动水晶正上方&n§9消耗%s点浮动/聚能水晶尺寸以合成&n§9只有100%纯度的浮动/聚能水晶可以用于合成
+new.ftb.as.tooltip.0='§6探索§b'
+new.ftb.as.tooltip.1='§6共振§b'
+new.ftb.as.tooltip.2='§6星宿§b'
+new.ftb.as.tooltip.3='§6光辉§b'
+new.ftb.as.tooltip=§b%s的知识回响随着ftb队伍而传播....
+
+new.recipe.parallel=§a数量决定并行
+new.recipe.chemical_complex=催化配方以2倍速度运行
+new.recipe.bot_crafter.0=§e泰拉粉碎者内部存储的 Mana 将会决定具体的液态魔力消耗
+new.recipe.bot_crafter.1=§e粉碎者内存储的魔力可以降低配方时间和液态魔力消耗
+new.recipe.soul=§a可以是任意生物灵魂。
+
 new.chisel.tooltips1=§6不要质疑为什么凿子可以凭空改变物品的颜色
 new.chisel.tooltips2=§6通过精细的雕刻,凿痕足以达到让反射光的波长可控的程度
 new.astralsorcery.bulid.tooltips=§6和你的六分仪合成,让它自动搭建吧!
@@ -701,13 +752,15 @@ new.contenttweaker.chaostic.tooltips2=§6可以为机器提供一些强化,并�
 new.contenttweaker.zbk.tooltips=§a直接右键方块以绑定方块所在的坐标
 new.contenttweaker.tky.tooltips1=不要问这东西是怎么探矿的,问就是魔法
 new.contenttweaker.tky.tooltips2=当然,你知道的,这种劣质东西必然是一次性的
+new.orevisualdetector.tooltips0=如果连续打开时出现错误，请间隔一段时间或先打开其他GUI
 new.orevisualdetector.tooltips1=潜行右键从而切换矿石,矿脉,油田,岩芯四个模式
 new.orevisualdetector.tooltips2=§a在岩芯模式,右键会获取当前区块的岩芯样本
 new.orevisualdetector.advanced.tooltipsbasic=§6当前模式：§a
-new.orevisualdetector.advanced.tooltips1=矿石
-new.orevisualdetector.advanced.tooltips2=矿脉
-new.orevisualdetector.advanced.tooltips3=油田
-new.orevisualdetector.advanced.tooltips4=岩芯
+new.orevisualdetector.advanced.tooltips0=矿石
+new.orevisualdetector.advanced.tooltips1=矿脉
+new.orevisualdetector.advanced.tooltips2=油田
+new.orevisualdetector.advanced.tooltips3=岩芯
+new.orevisualdetector.scan=扫描 %s
 new.ae2.singularity.tooltips1=§4无密钥
 new.ae2.singularity.tooltips2=§a量子密钥：§6%s
 new.taiga.ingot.tooltips1=在末地的虚空上挖掘黑陨铁块拆解
@@ -773,6 +826,12 @@ new.ie.excavator.tooltips2=任何矿脉均可挖掘出
 new.ie.excavator.tooltips3=需要研究项目： %s 完成并且加装 %s 才能被挖掘
 new.ie.excavator.error0=§c出错了!出错了!
 new.ie.excavator.error1=§c所挖掘维度未加载或维度数据错误!
+new.ie.excavator.jei.tooltip.0=这并不是一个单独的矿脉
+new.ie.excavator.jei.tooltip.1=查询工程师手册'概念与资源'中'矿床'来了解更多!
+new.ie.excavator.jei.tooltip.2=产出数量仅供参考
+new.ie.excavator.jei.tooltip.ore_vein=§6这个矿脉并不自然生成,别去找了<也许可以通过别的方法生成？
+new.ie.excavator.jei.tooltip.ore_vein.black=§7这个矿脉在%s以外的维度生成
+new.ie.excavator.jei.tooltip.ore_vein.white=§7这个矿脉在%s维度生成
 new.upgrade.tooltips0=§c需要放入物品输入仓
 new.upgrade.tooltips1=§c需要放入模块总线
 new.upgrade.buddhistrelics=§6模块化特化：源初造物丨梦幻虚空

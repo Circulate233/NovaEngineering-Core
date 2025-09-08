@@ -282,6 +282,7 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:ingame-info-xml-225604:2489566"))
     compileOnly(rfg.deobf("curse.maven:wanionlib-253043:4623135"))
     compileOnly(rfg.deobf("curse.maven:dme-737252:5043404"))
+    compileOnly(rfg.deobf("curse.maven:ftbq-289412:3156637"))
     // Performance Test Tool
     runtimeOnly(rfg.deobf("curse.maven:spark-361579:3245793"))
     // Optimization

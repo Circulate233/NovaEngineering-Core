@@ -19,6 +19,8 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -28,10 +30,13 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class BlockEStorageCellDrive extends BlockEStoragePart {
@@ -149,6 +154,18 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
     @Nonnull
     public IBlockState getStateForPlacement(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         return this.getDefaultState().withProperty(FacingProp.HORIZONTALS, placer.getHorizontalFacing().getOpposite());
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void addInformation(@Nonnull final ItemStack stack,
+                               @Nullable final World worldIn,
+                               @Nonnull final List<String> tooltip,
+                               @Nonnull final ITooltipFlag flagIn)
+    {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        tooltip.add(I18n.format("item.novaeng_core.estorage_cell_drive.tooltip.0"));
+        tooltip.add(I18n.format("item.novaeng_core.estorage_cell_drive.tooltip.1"));
     }
 
     @Nonnull
