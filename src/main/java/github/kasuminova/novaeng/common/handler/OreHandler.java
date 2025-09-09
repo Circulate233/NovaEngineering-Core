@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static crafttweaker.CraftTweakerAPI.itemUtils;
+
 @ZenRegister
 @ZenClass("novaeng.hypernet.RawOre")
 public class OreHandler {
@@ -62,6 +64,25 @@ public class OreHandler {
         } else {
             return ore;
         }
+    }
+
+    public static final Map<String,String> VeinMap = new Object2ObjectOpenHashMap<>();
+    public static final Map<String,IItemStack> VeinItemMap = new Object2ObjectOpenHashMap<>();
+
+    @ZenMethod
+    public static void regOreVein(String name,String oreVeinItemName) {
+        VeinMap.put(name, oreVeinItemName);
+    }
+
+    @ZenMethod
+    public static IItemStack getOreVeinItem(String name){
+        var out = VeinItemMap.get(name);
+        if (out == null){
+            out = itemUtils.getItem("contenttweaker:" + VeinMap.get(name),0);
+            VeinMap.remove(name);
+            VeinItemMap.put(name,out);
+        }
+        return out;
     }
 
     public static void registry() {

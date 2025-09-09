@@ -848,8 +848,8 @@ public abstract class Drill implements MachineSpecial {
         RANGE
     }
 
-    protected static int chunkCoord(double posValue) {
-        return (int) (posValue / 16);
+    protected static int chunkCoord(int posValue) {
+        return posValue >> 4;
     }
 
     private static IItemStack getOreOutput(TileMultiblockMachineController ctrl, BlockPos pos, int worldid) {

@@ -17,7 +17,7 @@ import github.kasuminova.novaeng.common.container.ContainerModularServerAssemble
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
-import github.kasuminova.novaeng.common.handler.DrillHandler;
+import github.kasuminova.novaeng.common.handler.IEHandler;
 import github.kasuminova.novaeng.common.handler.ECalculatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EStorageEventHandler;
@@ -113,7 +113,7 @@ public class CommonProxy implements IGuiHandler {
             MinecraftForge.EVENT_BUS.register(FTBHandler.INSTANCE);
 
         if (NovaEngCoreConfig.SERVER.SpecialMachine)
-            MinecraftForge.EVENT_BUS.register(DrillHandler.INSTANCE);
+            MinecraftForge.EVENT_BUS.register(IEHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
             IntegrationIC2.preInit();

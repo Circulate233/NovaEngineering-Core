@@ -279,6 +279,7 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5237484"))
     compileOnly(rfg.deobf("curse.maven:lunatriuscore-225605:2489549"))
     compileOnly(rfg.deobf("curse.maven:immersive-engineering-231951:2974106"))
+    compileOnly(rfg.deobf("curse.maven:immersive-petroleum-268250:3382321"))
     compileOnly(rfg.deobf("curse.maven:ingame-info-xml-225604:2489566"))
     compileOnly(rfg.deobf("curse.maven:wanionlib-253043:4623135"))
     compileOnly(rfg.deobf("curse.maven:dme-737252:5043404"))
