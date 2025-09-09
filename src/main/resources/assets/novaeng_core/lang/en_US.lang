@@ -1161,6 +1161,30 @@ new.item.tooltip.gf.1=§a用于制作故障灌注锭
 new.item.tooltip.gii.0=§a把1个不稳定故障碎片,1个青金石,1个金锭扔进同一格水里
 new.item.tooltip.gii.1=§a会出现大量蓝色粒子效果,等不在出现蓝色粒子效果,三种材料就会变成故障灌注锭
 new.item.tooltip.gii.2=§a用于合成本Mod的强力装备
+new.item.tooltip.mets.universalalloyt1.0=§b高强度合金,在高级工业领域中很常见。
+new.item.tooltip.mets.universalalloyt2.0=§b超高强度合金。
+new.item.tooltip.mets.universalalloyt3.0=§b散发着耀眼的光芒,可以用来制作一些超级物品。
+new.item.tooltip.mets.crystalred.0=§b在各大星座的力量和反物质的异常波动下
+new.item.tooltip.mets.crystalred.1=§b你发现了异世界水晶
+new.item.tooltip.mets.crystalred.2=§b这种碎片的元素在你所认识的任何世界上都未曾相同
+new.item.tooltip.mets.crystalred.3=§c这或许有助于你了解异世界科技
+new.item.tooltip.mets.crystalpurple.0=§b在原子重置机不断的进行对异世界水晶进行原子重组的作用下
+new.item.tooltip.mets.crystalpurple.1=§b这颗水晶碎片变成了一种全新的水晶
+new.item.tooltip.mets.crystalpurple.2=§b这种碎片的元素在你所认识的任何世界上都未曾相同
+new.item.tooltip.mets.crystalpurple.3=§c这或许有助于你进一步了解异世界科技
+new.item.tooltip.mets.crystalgreen.0=§b在魔力聚合机对其进行注入魔力后
+new.item.tooltip.mets.crystalgreen.1=§b这颗碎片变成了一种颜色截然不同的碎片
+new.item.tooltip.mets.crystalgreen.2=§b这片碎片对之前的两种碎片发生了反应
+new.item.tooltip.mets.crystalgreen.3=§b或许可以将其合成一块完整的水晶
+new.item.tooltip.mets.crystalgreen.4=§c这将有助于你进一步了解异世界科技
+new.item.tooltip.mets.general_data_card.0=§9一张可以存储多种数据类型的通用存储卡。
+new.item.tooltip.mets.general_data_card.1=§9它使用的存储介质可以使其读写千亿次也不会损坏。
+new.item.tooltip.mets.dyson_cloud_pos_data_card.0=§6存储着一组戴森云的太空坐标。
+new.item.tooltip.mets.dyson_cloud_pos_data_card.1=§6由于§9奇点§6的特性,内部的坐标数据是§a实时同步§6的。
+new.item.tooltip.mets.dyson_cloud_operation_data_card.0=极速充电中§6戴森云能量接收器运行的产物。
+new.item.tooltip.mets.dyson_cloud_operation_data_card.1=§6里面包含大量的运行数据与环境数据。
+new.item.tooltip.mets.dyson_cloud_tuning_data_card.0=§6包含一组根据运行数据,经过调整优化的运行参数。
+new.item.tooltip.mets.dyson_cloud_tuning_data_card.1=§6将其输入到戴森云能量接收器,可以在短时间内大幅提升戴森云的发电效率。
 
 new.as.tooltips=§9将%s放置在浮动水晶正上方&n§9消耗%s点浮动/聚能水晶尺寸以合成&n§9只有100%纯度的浮动/聚能水晶可以用于合成
 new.ftb.as.tooltip.0='§6探索§b'
@@ -1411,7 +1435,12 @@ new.xihe_star_creation_device.tooltip3=§4鉴于科技所限,这颗恒星并不�
 new.xihe_star_creation_device.tooltip4=§4警惕爆炸!
 new.draconic_reactor.tooltip0=§6查看研究来了解使用说明
 new.draconic_reactor.tooltip1=§6如果结构中含有红石逻辑端口,将输出 15*已反应燃料*250k RF/当前稳定场数值 的红石信号
-
+new.ftf.recipe.name=流体转化
+new.ftf.recipe.tooltip.0=将%s投入世界中的%s后
+new.ftf.recipe.tooltip.1=有%s的概率将流体转换为%s
+new.ftf.recipe.tooltip.2=物品一定会被消耗
+new.ftf.recipe.tooltip.3=物品不会被消耗
+new.ftf.recipe.tooltip.4=有%s的概率消耗物品
 
 #沟槽小提示
 new.client.tooltip0=你知道吗,MEK的塑料方块可以被新月锤潜行右键拆卸!
