@@ -26,6 +26,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.formatPercent;
+
 public class HyperNetInfoProvider implements IProbeInfoProvider {
     public static final HyperNetInfoProvider INSTANCE = new HyperNetInfoProvider();
 
@@ -151,14 +153,14 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
                 " / " + NovaEngUtils.formatFLOPS(maxGeneration));
 
         leftInfo.text("{*top.hypernet.processor.load*}");
-        rightInfo.text(TextFormatting.AQUA + NovaEngUtils.formatPercent(load, maxGeneration));
+        rightInfo.text(TextFormatting.AQUA + formatPercent(load, maxGeneration));
 
         leftInfo.text("{*top.hypernet.processor.efficiency*}");
-        rightInfo.text(TextFormatting.GREEN + NovaEngUtils.formatPercent(efficiency, 1.0F));
+        rightInfo.text(TextFormatting.GREEN + formatPercent(efficiency, 1.0F));
 
         leftInfo.text("{*top.hypernet.processor.heat*}");
         rightInfo.text(TextFormatting.RED + MiscUtils.formatDecimal(storedHU) + "HU (" +
-                NovaEngUtils.formatPercent(heatPercent, 1.0F) + ")");
+                formatPercent(heatPercent, 1.0F) + ")");
     }
 
     private static IProbeInfo newVertical(final IProbeInfo probeInfo) {
@@ -228,8 +230,10 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
     {
         if (center.isWorking()) {
             probeInfo.text("{*top.hypernet.online*}");
+            probeInfo.text("{*top.hypernet.processor.circuit_durability*}" + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
         } else {
             probeInfo.text("{*top.hypernet.offline*}");
+            probeInfo.text("{*top.hypernet.processor.circuit_durability*}" + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
             return;
         }
 

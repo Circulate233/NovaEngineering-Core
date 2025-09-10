@@ -12,6 +12,7 @@ import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.TileFactoryController;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import lombok.Getter;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ComputationCenter {
     private static final Map<TileMultiblockMachineController, ComputationCenter> CACHED_COMPUTATION_CENTER = new WeakHashMap<>();
 
+    @Getter
     private final TileMultiblockMachineController owner;
     private final Map<Class<?>, Map<BlockPos, NetNode>> nodes = new ConcurrentHashMap<>();
 
@@ -43,6 +45,7 @@ public class ComputationCenter {
     // 计算点计数器，计算当前 Tick 总共消耗了多少算力。
     private final AtomicReference<Double> computationPointCounter = new AtomicReference<>(0D);
 
+    @Getter
     private UUID networkOwner = null;
 
     private int circuitDurability = 0;
@@ -295,10 +298,6 @@ public class ComputationCenter {
         writeNBT();
     }
 
-    public UUID getNetworkOwner() {
-        return networkOwner;
-    }
-
     public void setNetworkOwner(final UUID networkOwner) {
         this.networkOwner = networkOwner;
         writeNBT();
@@ -339,7 +338,4 @@ public class ComputationCenter {
         return sum;
     }
 
-    public TileMultiblockMachineController getOwner() {
-        return owner;
-    }
 }

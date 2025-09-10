@@ -23,7 +23,7 @@ public class Function {
         if (NovaEngineeringCore.proxy.isClient()){
             return I18n.translateToLocal(key);
         }
-        return "empty";
+        return key;
     }
 
     @ZenMethod
@@ -31,6 +31,6 @@ public class Function {
         if (NovaEngineeringCore.proxy.isClient()){
             return I18n.translateToLocalFormatted(key, objs);
         }
-        return "empty";
+        return key;
     }
 }
