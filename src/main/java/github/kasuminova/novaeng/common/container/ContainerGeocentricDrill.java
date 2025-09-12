@@ -2,23 +2,19 @@ package github.kasuminova.novaeng.common.container;
 
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import hellfirepvp.modularmachinery.common.container.ContainerBase;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 
 public class ContainerGeocentricDrill extends ContainerBase<GeocentricDrillController> {
 
+    @Setter
+    @Getter
     protected int tickExisted = 0;
 
     public ContainerGeocentricDrill(final GeocentricDrillController owner, final EntityPlayer opening) {
         super(owner, opening);
-    }
-
-    public int getTickExisted() {
-        return tickExisted;
-    }
-
-    public void setTickExisted(final int tickExisted) {
-        this.tickExisted = tickExisted;
     }
 
     @Override

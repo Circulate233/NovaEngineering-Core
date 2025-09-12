@@ -1,15 +1,11 @@
 package github.kasuminova.novaeng.common.hypernet;
 
+import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.util.WorldPos;
 import net.minecraft.tileentity.TileEntity;
 
-public class NetProxy implements NetNode {
-
-    private final TileEntity tile;
-
-    public NetProxy(final TileEntity tile) {
-        this.tile = tile;
-    }
+@Desugar
+public record NetProxy(TileEntity tile) implements NetNode {
 
     @Override
     public WorldPos getPos() {

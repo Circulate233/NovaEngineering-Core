@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.container.slot.SlotModularServer;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
 import hellfirepvp.modularmachinery.common.container.ContainerBase;
+import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,8 +14,10 @@ import javax.annotation.Nonnull;
 
 public class ContainerModularServerAssembler extends ContainerBase<TileModularServerAssembler> {
     protected final EntityPlayer opening;
+    @Getter
     protected final SlotModularServer slotModularServer;
 
+    @Getter
     protected AssemblySlotManager slotManager;
 
     public ContainerModularServerAssembler(final TileModularServerAssembler owner, final EntityPlayer opening) {
@@ -105,14 +108,6 @@ public class ContainerModularServerAssembler extends ContainerBase<TileModularSe
         }
 
         return itemstack;
-    }
-
-    public AssemblySlotManager getSlotManager() {
-        return slotManager;
-    }
-
-    public SlotModularServer getSlotModularServer() {
-        return slotModularServer;
     }
 
     @Override

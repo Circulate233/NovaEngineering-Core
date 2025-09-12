@@ -180,6 +180,8 @@ novaeng.illum_pool.illum_pool.mode.e=魔力池上方布满彩虹桥方块可使�
 novaeng.illum_pool.illum_pool.mode=辉光魔力池模式：%s
 novaeng.illum_pool.input.illum=消耗 §a1§f 点§e辉光魔力§f可替代 §a25%§f 的§b魔力消耗§f。
 novaeng.illum_pool.input.mana=魔力消耗：§b%s
+novaeng.illum_pool.recipe.mana=向辉光魔力池注入魔力，总计 §b%s§f 点。
+novaeng.illum_pool.recipe.illum=向辉光魔力池注入辉光魔力，总计 §e%s§f 点。
 
 novaeng.machine.failed.work=机器正在工作！
 
@@ -1579,8 +1581,6 @@ new.client.tooltip6=你知道吗,在这里MEK的机器也可以使用工作台�
 new.client.tooltip7=你知道吗,这个愚蠢的提示是使用纯粹的CrT实现的,虽然似乎没啥用()
 new.client.tooltip8=你知道吗,如果你的身上有无线终端,快捷栏里也行,你可以使用鼠标中键方块来直接从AE里抽出这个方块
 new.client.tooltip9=你知道吗,ae开始合成的界面右上角的锤子按钮也是可以点击的
-new.client.tooltip10=把JEI书签当成ME终端的拓展是个疯狂的主意,使用Crtl/Alt + 鼠标中键点击物品来这么做！
-new.client.tooltip11=只需要一个无线终端,你可以在任何GUI里通过JEI书签操作ME网络,使用Crtl/Alt + 鼠标中键点击物品来这么做！
 
 #cot
 fluid.crystalloid=紫晶素

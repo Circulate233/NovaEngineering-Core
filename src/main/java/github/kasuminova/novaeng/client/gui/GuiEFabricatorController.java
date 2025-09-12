@@ -13,6 +13,7 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUp
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController;
 import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import lombok.Getter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,6 +30,7 @@ public class GuiEFabricatorController extends GuiContainerDynamic<ContainerEFabr
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
             NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_elements.png");
 
+    @Getter
     private EFabricatorData data = null;
 
     public GuiEFabricatorController(final EFabricatorController controller, final EntityPlayer opening) {
@@ -59,10 +61,6 @@ public class GuiEFabricatorController extends GuiContainerDynamic<ContainerEFabr
     public void onDataUpdate(final EFabricatorData data) {
         this.data = data;
         this.widgetController.postGuiEvent(new EFGUIDataUpdateEvent(this));
-    }
-
-    public EFabricatorData getData() {
-        return data;
     }
 
 }

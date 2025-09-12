@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.util;
 
-
 import com.github.bsideup.jabel.Desugar;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

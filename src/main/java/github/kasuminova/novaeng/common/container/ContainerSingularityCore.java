@@ -2,23 +2,19 @@ package github.kasuminova.novaeng.common.container;
 
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
 import hellfirepvp.modularmachinery.common.container.ContainerBase;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 
 public class ContainerSingularityCore extends ContainerBase<SingularityCore> {
 
+    @Setter
+    @Getter
     protected int tickExisted = 0;
 
     public ContainerSingularityCore(final SingularityCore owner, final EntityPlayer opening) {
         super(owner, opening);
-    }
-
-    public int getTickExisted() {
-        return tickExisted;
-    }
-
-    public void setTickExisted(final int tickExisted) {
-        this.tickExisted = tickExisted;
     }
 
     @Override

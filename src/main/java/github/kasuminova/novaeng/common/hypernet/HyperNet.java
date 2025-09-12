@@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
 import github.kasuminova.novaeng.common.hypernet.perm.UserPerm;
 import github.kasuminova.novaeng.common.util.WorldPos;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -13,12 +15,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HyperNet {
 
+    @Getter
     private final UUID owner;
     private final Map<UUID, UserPerm> userPerms = new Object2ObjectLinkedOpenHashMap<>();
 
     private final Map<Class<? extends NetNode>, Map<WorldPos, NetNode>> onlineNodes = new ConcurrentHashMap<>();
 
+    @Setter
+    @Getter
     private String ownerName;
+    @Setter
+    @Getter
     private String name;
 
     public HyperNet(final EntityPlayer owner) {
@@ -63,26 +70,6 @@ public class HyperNet {
         tag.setString("name", name);
         tag.setString("ownerName", ownerName);
         return tag;
-    }
-
-    public UUID getOwner() {
-        return owner;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(final String ownerName) {
-        this.ownerName = ownerName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
 }

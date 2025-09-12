@@ -2,22 +2,18 @@ package github.kasuminova.novaeng.common.container;
 
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
 import hellfirepvp.modularmachinery.common.container.ContainerBase;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class ContainerECalculatorController extends ContainerBase<ECalculatorController> {
 
+    @Setter
+    @Getter
     protected int tickExisted = 0;
 
     public ContainerECalculatorController(final ECalculatorController owner, final EntityPlayer opening) {
         super(owner, opening);
-    }
-
-    public int getTickExisted() {
-        return tickExisted;
-    }
-
-    public void setTickExisted(final int tickExisted) {
-        this.tickExisted = tickExisted;
     }
 
     @Override

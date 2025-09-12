@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.handler;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import lombok.Setter;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -10,21 +11,15 @@ import sonar.fluxnetworks.common.connection.transfer.BasicTransferHandler;
 
 public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergyPort> {
     private long removed;
+    @Setter
     private BlockPos ctrlPos;
+    @Setter
     private World world;
 
     public DreamEnergyPortHandler(TileDreamEnergyPort device) {
         super(device);
         this.ctrlPos = device.getCtrlPos();
         this.world = device.getWorld();
-    }
-
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public void setCtrlPos(BlockPos ctrlPos) {
-        this.ctrlPos = ctrlPos;
     }
 
     @Override

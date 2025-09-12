@@ -3,9 +3,11 @@ package github.kasuminova.novaeng.common.item;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
+import lombok.Getter;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
+@Getter
 public class ItemServerModule extends Item {
 
     protected final ServerModuleBase<?> boundedModule;
@@ -20,7 +22,4 @@ public class ItemServerModule extends Item {
         this(registryName, null);
     }
 
-    public ServerModuleBase<?> getBoundedModule() {
-        return boundedModule;
-    }
 }

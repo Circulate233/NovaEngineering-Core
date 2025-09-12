@@ -12,6 +12,7 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFPatternSe
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import lombok.Getter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -29,6 +30,7 @@ public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEF
     public static final ResourceLocation TEXTURES_INVENTORY = new ResourceLocation(
             NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
 
+    @Getter
     private EFabricatorPatternData data = null;
 
     public GuiEFabricatorPatternSearch(final EFabricatorController controller, final EntityPlayer opening) {
@@ -60,10 +62,6 @@ public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEF
     public void onDataUpdate(final EFabricatorPatternData data, final boolean fullUpdate) {
         this.data = data;
         this.widgetController.postGuiEvent(new EFPatternSearchGUIUpdateEvent(this, fullUpdate));
-    }
-
-    public EFabricatorPatternData getData() {
-        return data;
     }
 
 }

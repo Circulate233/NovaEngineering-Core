@@ -6,6 +6,7 @@ import crafttweaker.api.world.IBlockPos;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
 import github.kasuminova.novaeng.common.hypernet.old.misc.ConnectResult;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import lombok.Getter;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -18,6 +19,7 @@ import javax.annotation.Nonnull;
 @ZenRegister
 @ZenClass("novaeng.hypernet.NetNode")
 public abstract class NetNode {
+    @Getter
     protected final TileMultiblockMachineController owner;
     protected ComputationCenter center = null;
     protected BlockPos centerPos = null;
@@ -158,7 +160,4 @@ public abstract class NetNode {
         return centerPos != null;
     }
 
-    public TileMultiblockMachineController getOwner() {
-        return owner;
-    }
 }
