@@ -303,7 +303,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
-    implementation(rfg.deobf("curse.maven:random-complement-1198138:6992147"))
+    implementation(rfg.deobf("curse.maven:random-complement-1198138:6993204"))
     implementation(kotlin("stdlib-jdk8"))
 }
 
