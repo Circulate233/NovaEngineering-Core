@@ -7,7 +7,6 @@
   "client": [
     "MixinAppEngClientPacketHandler",
     "MixinGuiCraftingStatus",
-    "MixinGuiInterface",
     "MixinGuiPatternTerm"
   ],
   "server": [
@@ -23,7 +22,6 @@
     "MixinCraftingCPUClusterTwo$AccessorTaskProgress",
     "MixinCraftingCPUStatus",
     "MixinCraftingGridCache",
-    "MixinDualityInterface",
     "MixinTileChestFilter",
     "MixinTileDriveFilter"
   ]
