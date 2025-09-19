@@ -14,9 +14,9 @@
   ],
   "mixins": [
     "AccessorAbstractCellInventory",
-    "AccessorCellRegistry",
     "AccessorContainerPatternEncoder",
     "MixinAppEngServerPacketHandler",
+    "AccessorCellRegistry",
     "MixinCraftingCPUCluster",
     "MixinCraftingCPUClusterTwo",
     "MixinCraftingCPUClusterTwo$AccessorTaskProgress",

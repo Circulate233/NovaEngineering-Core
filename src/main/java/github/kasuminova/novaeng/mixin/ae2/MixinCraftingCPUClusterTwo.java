@@ -72,8 +72,10 @@ public abstract class MixinCraftingCPUClusterTwo {
 
     @Shadow
     private int remainingOperations;
+
     @Shadow
     private MachineSource machineSrc;
+
     @Shadow
     private MECraftingInventory inventory;
 
@@ -126,14 +128,14 @@ public abstract class MixinCraftingCPUClusterTwo {
 
         while (i.hasNext()) {
             Map.Entry<ICraftingPatternDetails, AccessorTaskProgress> e = i.next();
-            var value = ((AccessorTaskProgress) e.getValue());
+            val value = ((AccessorTaskProgress) e.getValue());
             if (value.getValue() <= 0L) {
                 i.remove();
             } else {
-                var key = e.getKey();
+                val key = e.getKey();
 
                 long max = 0;
-                var list = (key.isCraftable() || key instanceof FluidCraftingPatternDetails) ? key.getCondensedOutputs() : key.getCondensedInputs();
+                val list = (key.isCraftable() || key instanceof FluidCraftingPatternDetails) ? key.getCondensedOutputs() : key.getCondensedInputs();
                 for (IAEItemStack stack1 : list) {
                     long size = stack1.getStackSize();
                     if (size > max) max = size;
@@ -152,7 +154,8 @@ public abstract class MixinCraftingCPUClusterTwo {
                     }
 
                     boolean didPatternCraft;
-                    doWhileCraftingLoop:do {
+                    doWhileCraftingLoop:
+                    do {
                         InventoryCrafting ic = null;
                         didPatternCraft = false;
 
@@ -181,7 +184,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                         double o = eg.extractAEPower(sum1, Actionable.SIMULATE, PowerMultiplier.CONFIG);
                                         if (o < sum1 - 0.01) {
                                             this.r$craftingFrequency = (long) (o / sum1 * this.r$craftingFrequency);
-                                            s = Math.max(1, this.r$craftingFrequency);
+                                            s = Math.max(s, this.r$craftingFrequency);
                                         }
                                     }
                                     energy = eg.extractAEPower(sum * s, Actionable.MODULATE, PowerMultiplier.CONFIG);
@@ -301,7 +304,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                     }
 
                                     for (IAEItemStack out : outputs) {
-                                        var iaeStack = out.copy();
+                                        val iaeStack = out.copy();
                                         if (mediumType != MediumType.NULL)
                                             iaeStack.setStackSize(iaeStack.getStackSize() * this.r$craftingFrequency);
                                         r$postProcessing(iaeStack);
@@ -380,7 +383,7 @@ public abstract class MixinCraftingCPUClusterTwo {
 
                 for (IAEItemStack input : details.getCondensedInputs()) {
                     long size = input.getStackSize() * this.r$craftingFrequency;
-                    var item = this.inventory.extractItems(input.copy().setStackSize(size), Actionable.SIMULATE, this.machineSrc);
+                    val item = this.inventory.extractItems(input.copy().setStackSize(size), Actionable.SIMULATE, this.machineSrc);
                     if (item == null) continue;
                     if (item.getStackSize() < size) {
                         this.r$craftingFrequency = Math.max(1, item.getStackSize() / input.getStackSize());
@@ -404,7 +407,7 @@ public abstract class MixinCraftingCPUClusterTwo {
             for (IAEItemStack input : details.getInputs()) {
                 if (input == null) continue;
                 long size = this.r$craftingFrequency;
-                var item = this.inventory.extractItems(input.copy().setStackSize(size), Actionable.SIMULATE, this.machineSrc);
+                val item = this.inventory.extractItems(input.copy().setStackSize(size), Actionable.SIMULATE, this.machineSrc);
                 if (item == null) continue;
                 if (item.getStackSize() < size) {
                     long size0 = item.getStackSize() / input.getStackSize();
@@ -442,25 +445,25 @@ public abstract class MixinCraftingCPUClusterTwo {
     }
 
     @WrapOperation(
-            method = {"injectItems"},
-            at = {@At(
+            method = "injectItems",
+            at = @At(
                     value = "INVOKE",
                     target = "Lappeng/crafting/CraftingLink;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;)Lappeng/api/storage/data/IAEItemStack;"
-            )}
+            )
     )
     protected IAEItemStack wrapInjectItems(CraftingLink link, IAEItemStack item, Actionable actionable, Operation<IAEItemStack> operation) {
-        return this.r$nae2$ghostInjecting ? null : (IAEItemStack) operation.call(link, item, actionable);
+        return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable);
     }
 
     @WrapOperation(
-            method = {"injectItems"},
-            at = {@At(
+            method = "injectItems",
+            at = @At(
                     value = "INVOKE",
                     target = "Lappeng/crafting/MECraftingInventory;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;Lappeng/api/networking/security/IActionSource;)Lappeng/api/storage/data/IAEItemStack;"
-            )}
+            )
     )
     protected IAEItemStack wrapInjectItems(MECraftingInventory link, IAEItemStack item, Actionable actionable, IActionSource source, Operation<IAEItemStack> operation) {
-        return this.r$nae2$ghostInjecting ? null : (IAEItemStack) operation.call(link, item, actionable, source);
+        return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable, source);
     }
 
     @Mixin(targets = "appeng.me.cluster.implementations.CraftingCPUCluster$TaskProgress", remap = false)

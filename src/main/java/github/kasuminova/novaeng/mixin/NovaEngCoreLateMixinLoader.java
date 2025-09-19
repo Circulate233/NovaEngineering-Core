@@ -23,41 +23,41 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
     private static final Map<String, BooleanSupplier> MIXIN_CONFIGS = new Object2ObjectLinkedOpenHashMap<>();
 
     static {
-        addModdedMixinCFG("mixins.novaeng_core_ae2.json",                  "appliedenergistics2");
-        addModdedMixinCFG("mixins.novaeng_core_astralsorcery.json",        "astralsorcery");
-        addModdedMixinCFG("mixins.novaeng_core_athenaeum.json",            "athenaeum");
-        addModdedMixinCFG("mixins.novaeng_core_cofhcore.json",             "cofhcore");
-        addModdedMixinCFG("mixins.novaeng_core_draconicevolution.json",    "draconicevolution");
-        addModdedMixinCFG("mixins.novaeng_core_ic2.json",                  "ic2");
+        addModdedMixinCFG("mixins.novaeng_core_ae2.json", "appliedenergistics2");
+        addModdedMixinCFG("mixins.novaeng_core_astralsorcery.json", "astralsorcery");
+        addModdedMixinCFG("mixins.novaeng_core_athenaeum.json", "athenaeum");
+        addModdedMixinCFG("mixins.novaeng_core_cofhcore.json", "cofhcore");
+        addModdedMixinCFG("mixins.novaeng_core_draconicevolution.json", "draconicevolution");
+        addModdedMixinCFG("mixins.novaeng_core_ic2.json", "ic2");
         addModdedMixinCFG("mixins.novaeng_core_immersiveengineering.json", "immersiveengineering");
-        addModdedMixinCFG("mixins.novaeng_core_mets.json",                 "mets");
-        addModdedMixinCFG("mixins.novaeng_core_nae2.json",                 "nae2");
-        addModdedMixinCFG("mixins.novaeng_core_botania.json",              "botania");
-        addModdedMixinCFG("mixins.novaeng_core_jetif.json",                "jetif");
-        addModdedMixinCFG("mixins.novaeng_core_opticheck.json",            "opticheck");
-        addModdedMixinCFG("mixins.novaeng_core_electroblobs.json",         "ebwizardry");
-        addModdedMixinCFG("mixins.novaeng_core_psi.json",                  "psi");
-        addModdedMixinCFG("mixins.novaeng_core_libvulpes.json",                  "libvulpes");
-        addModdedMixinCFG("mixins.novaeng_core_techguns.json",                  "techguns");
-        addModdedMixinCFG("mixins.novaeng_core_codechickenlib.json","codechickenlib");
-        addModdedMixinCFG("mixins.novaeng_core_legendarytooltips.json","legendarytooltips");
-        addModdedMixinCFG("mixins.novaeng_core_avaritia.json","avaritia");
-        addModdedMixinCFG("mixins.novaeng_core_betterp2p.json","betterp2p");
-        addModdedMixinCFG("mixins.novaeng_core_nco.json","nuclearcraft");
-        addModdedMixinCFG("mixins.novaeng_core_lootoverhaul.json","lootoverhaul");
-        addModdedMixinCFG("mixins.novaeng_core_fluxnetworks.json","fluxnetworks");
-        addModdedMixinCFG("mixins.novaeng_core_extrabotany.json","extrabotany");
-        addModdedMixinCFG("mixins.novaeng_core_packagedauto.json","packagedauto");
-        addModdedMixinCFG("mixins.novaeng_core_rftools.json","rftools");
-        addModdedMixinCFG("mixins.novaeng_core_advancedrocketry.json","advancedrocketry");
+        addModdedMixinCFG("mixins.novaeng_core_mets.json", "mets");
+        addModdedMixinCFG("mixins.novaeng_core_nae2.json", "nae2");
+        addModdedMixinCFG("mixins.novaeng_core_botania.json", "botania", "psi");
+        addModdedMixinCFG("mixins.novaeng_core_jetif.json", "jetif");
+        addModdedMixinCFG("mixins.novaeng_core_opticheck.json", "opticheck");
+        addModdedMixinCFG("mixins.novaeng_core_electroblobs.json", "ebwizardry");
+        addModdedMixinCFG("mixins.novaeng_core_psi.json", "psi");
+        addModdedMixinCFG("mixins.novaeng_core_libvulpes.json", "libvulpes");
+        addModdedMixinCFG("mixins.novaeng_core_techguns.json", "techguns");
+        addModdedMixinCFG("mixins.novaeng_core_codechickenlib.json", "codechickenlib");
+        addModdedMixinCFG("mixins.novaeng_core_legendarytooltips.json", "legendarytooltips");
+        addModdedMixinCFG("mixins.novaeng_core_avaritia.json", "avaritia");
+        addModdedMixinCFG("mixins.novaeng_core_betterp2p.json", "betterp2p");
+        addModdedMixinCFG("mixins.novaeng_core_nco.json", "nuclearcraft");
+        addModdedMixinCFG("mixins.novaeng_core_lootoverhaul.json", "lootoverhaul");
+        addModdedMixinCFG("mixins.novaeng_core_fluxnetworks.json", "fluxnetworks");
+        addModdedMixinCFG("mixins.novaeng_core_extrabotany.json", "extrabotany");
+        addModdedMixinCFG("mixins.novaeng_core_packagedauto.json", "packagedauto");
+        addModdedMixinCFG("mixins.novaeng_core_rftools.json", "rftools");
+        addModdedMixinCFG("mixins.novaeng_core_advancedrocketry.json", "advancedrocketry");
 
-        addMixinCFG("mixins.novaeng_core_botania_r.json",() -> {
+        addMixinCFG("mixins.novaeng_core_botania_r.json", () -> {
             ConfigManager.sync(MOD_ID, Config.Type.INSTANCE);
             return modLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
         });
 
         addMixinCFG("mixins.novaeng_core_forge_late.json");
-        addMixinCFG("mixins.novaeng_core_dme.json",                               
+        addMixinCFG("mixins.novaeng_core_dme.json",
                 () -> Loader.isModLoaded("deepmoblearning") && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution"));
     }
 

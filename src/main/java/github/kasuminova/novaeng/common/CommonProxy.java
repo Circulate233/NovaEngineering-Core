@@ -236,7 +236,6 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public enum GuiType {
-
         HYPERNET_TERMINAL(TileHyperNetTerminal.class),
         MODULAR_SERVER_ASSEMBLER(TileModularServerAssembler.class),
         ESTORAGE_CONTROLLER(EStorageController.class),
