@@ -305,6 +305,7 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
     implementation(rfg.deobf("curse.maven:random-complement-1198138:6995821"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
+    implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
     implementation(kotlin("stdlib-jdk8"))
 }
 

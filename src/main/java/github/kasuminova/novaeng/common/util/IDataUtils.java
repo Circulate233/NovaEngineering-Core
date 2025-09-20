@@ -111,6 +111,22 @@ public class IDataUtils {
     }
 
     @ZenMethod
+    public static byte[] getByteArray(IData data, String path, @Optional byte[] defaultValue) {
+        if (check(data, path)) {
+            return get(data).get(path).asByteArray();
+        }
+        return defaultValue;
+    }
+
+    @ZenMethod
+    public static int[] getIntArray(IData data, String path, @Optional int[] defaultValue) {
+        if (check(data, path)) {
+            return get(data).get(path).asIntArray();
+        }
+        return defaultValue;
+    }
+
+    @ZenMethod
     public static boolean check(IData data, String... path){
         final var nbt = get(data);
         for (String key : path) {

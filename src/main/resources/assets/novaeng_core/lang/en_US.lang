@@ -439,6 +439,7 @@ novaeng.drill.failed.mineral.depletion=矿物已经被采掘一空
 top.drill.status=§6当前升级状态:
 top.drill.research_progress=§9研究进度：§6
 top.drill.components_amount=§9组件加装数量：§6
+top.drill.components_raw_ore=§6已插入碎岩组件
 
 novaeng.space_generator.thread.core=核心展开器
 novaeng.space_generator.thread.energy=能源操纵器

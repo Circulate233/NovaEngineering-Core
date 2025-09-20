@@ -13,6 +13,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.machine.MachineSpecial;
+import github.kasuminova.novaeng.common.util.IDataUtils;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeModifierBuilder;
@@ -38,6 +39,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static crafttweaker.CraftTweakerAPI.itemUtils;
@@ -202,13 +204,10 @@ public abstract class Drill implements MachineSpecial {
                                     chunkCoord(x),
                                     chunkCoord(z)
                             );
-                            if (worldInfo.mineralOverride != null) {
-                                if (!kmm.equals(worldInfo.mineralOverride.name)) {
-                                    data.setString("kmm11", worldInfo.mineralOverride.name);
-                                }
-                            } else if (worldInfo.mineral != null) {
-                                if (!kmm.equals(worldInfo.mineral.name)) {
-                                    data.setString("kmm11", worldInfo.mineral.name);
+                            var mineral = getUsableMix(worldInfo);
+                            if (mineral != null) {
+                                if (!kmm.equals(mineral.name)) {
+                                    data.setString("kmm11", mineral.name);
                                 }
                             } else {
                                 data.setString("kmm11", "empty");
@@ -297,13 +296,10 @@ public abstract class Drill implements MachineSpecial {
                                     chunkCoord(x),
                                     chunkCoord(z)
                             );
-                            if (worldInfo.mineralOverride != null) {
-                                if (!kmm.equals(worldInfo.mineralOverride.name)) {
-                                    data.setString("kmm11", worldInfo.mineralOverride.name);
-                                }
-                            } else if (worldInfo.mineral != null) {
-                                if (!kmm.equals(worldInfo.mineral.name)) {
-                                    data.setString("kmm11", worldInfo.mineral.name);
+                            var mineral = getUsableMix(worldInfo);
+                            if (mineral != null) {
+                                if (!kmm.equals(mineral.name)) {
+                                    data.setString("kmm11", mineral.name);
                                 }
                             } else {
                                 data.setString("kmm11", "empty");
@@ -364,7 +360,7 @@ public abstract class Drill implements MachineSpecial {
                                 .addFactoryStartHandler(event -> {
                                     var ctrl = event.getController();
                                     var data = ctrl.getCustomDataTag();
-                                    var kmm = data.getString("kmm" + k + kk);
+                                    data.getString("kmm" + k + kk);
                                     int x;
                                     int z;
                                     World world;
@@ -384,10 +380,9 @@ public abstract class Drill implements MachineSpecial {
                                             (chunkCoord(x) + i),
                                             (chunkCoord(z) + ii)
                                     );
-                                    if (worldInfo.mineralOverride != null) {
-                                        data.setString("kmm" + k + kk, worldInfo.mineralOverride.name);
-                                    } else if (worldInfo.mineral != null) {
-                                        data.setString("kmm" + k + kk, worldInfo.mineral.name);
+                                    var mineral = getUsableMix(worldInfo);
+                                    if (mineral != null) {
+                                        data.setString("kmm" + k + kk, mineral.name);
                                     }
                                     data.setInteger("sfsh", 8000);
                                     data.setInteger("bxs" + k + kk, bxs);
@@ -436,7 +431,7 @@ public abstract class Drill implements MachineSpecial {
                                 .addFactoryStartHandler(event -> {
                                     var ctrl = event.getController();
                                     var data = ctrl.getCustomDataTag();
-                                    var kmm = data.getString("kmm" + k + kk);
+                                    data.getString("kmm" + k + kk);
                                     int x;
                                     int z;
                                     World world;
@@ -456,10 +451,9 @@ public abstract class Drill implements MachineSpecial {
                                             (chunkCoord(x) + i),
                                             (chunkCoord(z) + ii)
                                     );
-                                    if (worldInfo.mineralOverride != null) {
-                                        data.setString("kmm" + k + kk, worldInfo.mineralOverride.name);
-                                    } else if (worldInfo.mineral != null) {
-                                        data.setString("kmm" + k + kk, worldInfo.mineral.name);
+                                    var mineral = getUsableMix(worldInfo);
+                                    if (mineral != null) {
+                                        data.setString("kmm" + k + kk, mineral.name);
                                     }
                                     data.setInteger("sfsh", 6000);
                                     data.setInteger("bxs" + k + kk, bxs);
@@ -505,13 +499,10 @@ public abstract class Drill implements MachineSpecial {
                             chunkCoord(x),
                             chunkCoord(z)
                     );
-                    if (worldInfo.mineralOverride != null) {
-                        if (!kmm.equals(worldInfo.mineralOverride.name)) {
-                            data.setString("kmm11", worldInfo.mineralOverride.name);
-                        }
-                    } else if (worldInfo.mineral != null) {
-                        if (!kmm.equals(worldInfo.mineral.name)) {
-                            data.setString("kmm11", worldInfo.mineral.name);
+                    var mineral = getUsableMix(worldInfo);
+                    if (mineral != null) {
+                        if (!kmm.equals(mineral.name)) {
+                            data.setString("kmm11", mineral.name);
                         }
                     } else {
                         data.setString("kmm11", "empty");
@@ -532,10 +523,9 @@ public abstract class Drill implements MachineSpecial {
                                     chunkCoord(x) + i,
                                     chunkCoord(z) + ii
                             );
-                            if (worldInfo.mineralOverride != null) {
-                                data.setString("kmm" + k + kk, worldInfo.mineralOverride.name);
-                            } else if (worldInfo.mineral != null) {
-                                data.setString("kmm" + k + kk, worldInfo.mineral.name);
+                            var mineral = getUsableMix(worldInfo);
+                            if (mineral != null) {
+                                data.setString("kmm" + k + kk, mineral.name);
                             } else {
                                 data.setString("kmm" + k + kk, "empty");
                             }
@@ -550,14 +540,14 @@ public abstract class Drill implements MachineSpecial {
         //旧版本的兼容，将旧的研究进度和组件nbt转为新的
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
             var data = event.getController().getCustomDataTag();
-            if (data.hasKey("yjjd")){
+            if (data.hasKey("yjjd")) {
                 val yjjd = data.getByte("yjjd");
-                data.setByte("research_progress",yjjd);
+                data.setByte("research_progress", yjjd);
                 data.removeTag("yjjd");
             }
-            if (data.hasKey("zzsl")){
+            if (data.hasKey("zzsl")) {
                 val zzsl = data.getByte("zzsl");
-                data.setByte("components_amount",zzsl);
+                data.setByte("components_amount", zzsl);
                 data.removeTag("zzsl");
             }
         });
@@ -575,9 +565,10 @@ public abstract class Drill implements MachineSpecial {
                 info.add(
                         I18n.format("top.drill.status") + "§6[" +
                                 I18n.format("top.drill.research_progress") + research_progress + "|" +
-                                        I18n.format("top.drill.components_amount") + components_amount + "§6]"
+                                I18n.format("top.drill.components_amount") + components_amount + "§6]"
 
                 );
+                if (data.hasKey("additional_component_raw_ore")) info.add(I18n.format("top.drill.components_raw_ore"));
                 var kmm = data.getString("kmm11");
                 var depletion = data.getInteger("depletion11");
                 if (!kmm.isEmpty() && !kmm.equals("empty"))
@@ -601,6 +592,7 @@ public abstract class Drill implements MachineSpecial {
                                 I18n.format("top.drill.components_amount") + components_amount + "§6]"
 
                 );
+                if (data.hasKey("additional_component_raw_ore")) info.add(I18n.format("top.drill.components_raw_ore"));
                 for (int i : tqsz) {
                     var k = i + 1;
                     for (int ii : tqsz) {
@@ -641,7 +633,7 @@ public abstract class Drill implements MachineSpecial {
                         if (!data.hasKey("binding")) {
                             return false;
                         }
-                        var pos = item.getTag().asMap().get("pos").asIntArray();
+                        var pos = IDataUtils.getIntArray(item.getTag(),"pos",null);
                         if (pos == null) {
                             return false;
                         }
@@ -651,9 +643,6 @@ public abstract class Drill implements MachineSpecial {
                     .addOutput(itemUtils.getItem("contenttweaker:zbk", 0))
                     .addPreCheckHandler(event -> {
                         var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
-                        var research_progress = data.getByte("research_progress");
-                        var components_amount = data.getByte("components_amount");
                         if (ctrl.isWorking()) {
                             event.setFailed(translateToLocalFormatted("novaeng.machine.failed.work"));
                         }
@@ -670,10 +659,9 @@ public abstract class Drill implements MachineSpecial {
                                         chunkCoord(poss[0]),
                                         chunkCoord(poss[2])
                                 );
-                                if (worldInfo.mineralOverride != null) {
-                                    data.setString("kmm11", worldInfo.mineralOverride.name);
-                                } else if (worldInfo.mineral != null) {
-                                    data.setString("kmm11", worldInfo.mineral.name);
+                                var mineral = getUsableMix(worldInfo);
+                                if (mineral != null) {
+                                    data.setString("kmm11", mineral.name);
                                 }
                                 if (!data.getString("kmm11").isEmpty()) {
                                     data.setInteger("depletion11", worldInfo.depletion);
@@ -689,10 +677,9 @@ public abstract class Drill implements MachineSpecial {
                                                 chunkCoord(poss[0]) + i,
                                                 chunkCoord(poss[2]) + ii
                                         );
-                                        if (worldInfo.mineralOverride != null) {
-                                            data.setString("kmm" + k + kk, worldInfo.mineralOverride.name);
-                                        } else if (worldInfo.mineral != null) {
-                                            data.setString("kmm" + k + kk, worldInfo.mineral.name);
+                                        var mineral = getUsableMix(worldInfo);
+                                        if (mineral != null) {
+                                            data.setString("kmm" + k + kk, mineral.name);
                                         }
                                         if (!data.getString("kmm" + k + kk).isEmpty()) {
                                             data.setInteger("depletion" + k + kk, worldInfo.depletion);
@@ -717,10 +704,10 @@ public abstract class Drill implements MachineSpecial {
                             .addPreCheckHandler(event -> {
                                 var ctrl = event.getController();
                                 var data = ctrl.getCustomDataTag();
-                                var research_progress = data.getByte("research_progress");
-                                var components_amount = data.getByte("components_amount");
-                                var component = data.getByte("research_mineral_" + fi);
-                                if (component == 1) {
+                                data.getByte("research_progress");
+                                data.getByte("components_amount");
+                                var component = data.getBoolean("research_mineral_" + fi);
+                                if (component) {
                                     event.setFailed("novaeng.machine.failed.work");
                                 }
                             })
@@ -730,7 +717,7 @@ public abstract class Drill implements MachineSpecial {
                                 var research_progress = data.getByte("research_progress");
 
                                 ctrl.addPermanentModifier("research" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.2 * (fi + 1))), 1, false).build());
-                                data.setByte("research_mineral_" + fi, (byte) 1);
+                                data.setBoolean("research_mineral_" + fi, true);
                                 data.setByte("research_progress", (byte) (research_progress + 1));
                             })
                     , "research_mineral_utilization_" + fi)
@@ -744,10 +731,10 @@ public abstract class Drill implements MachineSpecial {
                             .addPreCheckHandler(event -> {
                                 var ctrl = event.getController();
                                 var data = ctrl.getCustomDataTag();
-                                var research_progress = data.getByte("research_progress");
-                                var components_amount = data.getByte("components_amount");
-                                var component = data.getByte("additional_component_" + fi);
-                                if (component == 1) {
+                                data.getByte("research_progress");
+                                data.getByte("components_amount");
+                                var component = data.getBoolean("additional_component_" + fi);
+                                if (component) {
                                     event.setFailed("novaeng.machine.failed.work");
                                 }
                             })
@@ -775,10 +762,10 @@ public abstract class Drill implements MachineSpecial {
                         .addPreCheckHandler(event -> {
                             var ctrl = event.getController();
                             var data = ctrl.getCustomDataTag();
-                            var research_progress = data.getByte("research_progress");
-                            var components_amount = data.getByte("components_amount");
-                            var additional_component_3 = data.getByte("additional_component_3");
-                            if (additional_component_3 == 1) {
+                            data.getByte("research_progress");
+                            data.getByte("components_amount");
+                            var additional_component_3 = data.getBoolean("additional_component_3");
+                            if (additional_component_3) {
                                 event.setFailed("novaeng.machine.failed.work");
                             }
                         })
@@ -805,10 +792,10 @@ public abstract class Drill implements MachineSpecial {
                         .addPreCheckHandler(event -> {
                             var ctrl = event.getController();
                             var data = ctrl.getCustomDataTag();
-                            var research_progress = data.getByte("research_progress");
-                            var components_amount = data.getByte("components_amount");
-                            var additional_component_raw_ore = data.getByte("additional_component_raw_ore");
-                            if (additional_component_raw_ore == 1) {
+                            data.getByte("research_progress");
+                            data.getByte("components_amount");
+                            var additional_component_raw_ore = data.getBoolean("additional_component_raw_ore");
+                            if (additional_component_raw_ore) {
                                 event.setFailed("novaeng.machine.failed.work");
                             }
                         })
@@ -830,10 +817,10 @@ public abstract class Drill implements MachineSpecial {
 
     @Override
     public void onTOPInfo(final ProbeMode probeMode,
-                           final IProbeInfo probeInfo,
-                           final EntityPlayer player,
-                           final IProbeHitData ipData,
-                           final TileMultiblockMachineController controller) {
+                          final IProbeInfo probeInfo,
+                          final EntityPlayer player,
+                          final IProbeHitData ipData,
+                          final TileMultiblockMachineController controller) {
         var data = controller.getCustomDataTag();
         var research_progress = data.getByte("research_progress");
         var components_amount = data.getByte("components_amount");
@@ -868,7 +855,6 @@ public abstract class Drill implements MachineSpecial {
         var bxs = data.getInteger("bxs" + (k + 1) + (kk + 1)) * (1 + Math.pow(components_amount, 2.5));
         var component_raw_ore = data.getByte("additional_component_raw_ore");
         var random = ctrl.getWorld().rand.nextInt(10000);
-        var kmrandom = ctrl.getWorld().rand;
         var worldInfo = ExcavatorHandler.getMineralWorldInfo(
                 world,
                 (chunkCoord(pos.getX()) + k),
@@ -889,20 +875,9 @@ public abstract class Drill implements MachineSpecial {
             data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion);
             ctrl.setCustomDataTag(data);
         }
-        if (worldInfo.mineralOverride != null) {
-            var iore = worldInfo.mineralOverride.getRandomOre(world.rand);
-            if (component_raw_ore == 1) {
-                var rawore = OreHandler.getRawOre(iore);
-                if (rawore == null) {
-                    return OreHandler.getOre(iore);
-                } else {
-                    random = world.rand.nextInt(6);
-                    return rawore.amount(Math.max(random, 1));
-                }
-            }
-            return OreHandler.getOre(iore);
-        } else if (worldInfo.mineral != null) {
-            var iore = worldInfo.mineral.getRandomOre(world.rand);
+        var mineral = getUsableMix(worldInfo);
+        if (mineral != null) {
+            var iore = mineral.getRandomOre(world.rand);
             if (component_raw_ore == 1) {
                 var rawore = OreHandler.getRawOre(iore);
                 if (rawore == null) {
@@ -940,6 +915,15 @@ public abstract class Drill implements MachineSpecial {
             return cjc.get(random);
         } else {
             return stone;
+        }
+    }
+
+    @Nullable
+    private static ExcavatorHandler.MineralMix getUsableMix(ExcavatorHandler.MineralWorldInfo worldInfo){
+        if (worldInfo.mineralOverride != null){
+            return worldInfo.mineralOverride;
+        } else {
+            return worldInfo.mineral;
         }
     }
 }
