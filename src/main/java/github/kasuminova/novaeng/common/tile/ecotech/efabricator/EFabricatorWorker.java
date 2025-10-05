@@ -1,7 +1,10 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
+import appeng.api.config.Actionable;
+import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.me.GridAccessException;
 import appeng.util.item.AEItemStack;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus;
@@ -43,7 +46,7 @@ public class EFabricatorWorker extends EFabricatorPart {
     public EFabricatorWorker() {
     }
 
-    public int getRemainingSpace(){
+    public int getRemainingSpace() {
         return this.getQueueDepth() - this.queue.size();
     }
 
@@ -56,7 +59,18 @@ public class EFabricatorWorker extends EFabricatorPart {
         } else {
             energyUsage = ENERGY_USAGE;
         }
-        int parallelism = Math.min(Math.max(controller.getAvailableParallelism(), 1), energyCache / energyUsage);
+        double energy = this.energyCache;
+        var c = controller.getChannel();
+        IEnergyGrid grid = null;
+        if (c != null) {
+            try {
+                grid = c.proxy.getGrid().getCache(IEnergyGrid.class);
+                energy += grid.getStoredPower();
+            } catch (GridAccessException ignored) {
+
+            }
+        }
+        int parallelism = (int) Math.min(Math.max(controller.getAvailableParallelism(), 1), energy / energyUsage);
         if (controller.isActiveCooling()) {
             parallelism = Math.min(parallelism, coolantCache / COOLANT_USAGE);
         }
@@ -69,7 +83,7 @@ public class EFabricatorWorker extends EFabricatorPart {
                 var workSize = parallelism - completed;
                 final var size = craftWork.size;
                 final CraftWork out;
-                if (size > workSize){
+                if (size > workSize) {
                     out = craftWork.split(workSize);
                     queue.add(craftWork);
                 } else {
@@ -87,7 +101,18 @@ public class EFabricatorWorker extends EFabricatorPart {
         }
 
         if (completed > 0) {
-            energyCache -= energyUsage * completed;
+            int in = energyUsage * completed;
+            if (in > energyCache) {
+                energyCache = 0;
+                in -= energyCache;
+                if (grid != null) {
+                    synchronized (grid) {
+                        grid.injectPower(in, Actionable.MODULATE);
+                    }
+                }
+            } else {
+                energyCache -= in;
+            }
             if (controller.isActiveCooling()) {
                 controller.consumeCoolant(COOLANT_USAGE * completed);
             }
@@ -317,10 +342,10 @@ public class EFabricatorWorker extends EFabricatorPart {
         private final ItemStack output;
         private int size;
 
-        public CraftWork(final ItemStack[] remaining, final ItemStack output,final int size) {
+        public CraftWork(final ItemStack[] remaining, final ItemStack output, final int size) {
             this.remaining = remaining;
             this.output = output;
-            this.size = Math.max(1,size);
+            this.size = Math.max(1, size);
         }
 
         public CraftWork(final NBTTagCompound nbt, final List<ItemStack> stackSet) {
@@ -330,11 +355,11 @@ public class EFabricatorWorker extends EFabricatorPart {
                 remaining[remainIdx] = setIdx == -1 ? ItemStack.EMPTY : stackSet.get(setIdx);
             }
             output = stackSet.get(nbt.getInteger(OUTPUT_TAG));
-            size = Math.max(1,nbt.getInteger(SIZE));
+            size = Math.max(1, nbt.getInteger(SIZE));
         }
 
-        public CraftWork split(int amount){
-            final var i = Math.min(amount,this.size);
+        public CraftWork split(int amount) {
+            final var i = Math.min(amount, this.size);
             if (i > 0) {
                 final var inputs = new ItemStack[this.remaining.length];
                 for (int ii = 0; ii < remaining.length; ii++) {
@@ -387,13 +412,13 @@ public class EFabricatorWorker extends EFabricatorPart {
 
             stackSet.add(output);
             nbt.setShort(OUTPUT_TAG, (short) (stackSet.size() - 1));
-            nbt.setInteger(SIZE,size);
+            nbt.setInteger(SIZE, size);
             return nbt;
         }
 
         public CraftWork copy() {
             ItemStack[] remaining = Arrays.stream(this.remaining).map(ItemStack::copy).toArray(ItemStack[]::new);
-            return new CraftWork(remaining, output.copy(),this.size);
+            return new CraftWork(remaining, output.copy(), this.size);
         }
 
         @Override
