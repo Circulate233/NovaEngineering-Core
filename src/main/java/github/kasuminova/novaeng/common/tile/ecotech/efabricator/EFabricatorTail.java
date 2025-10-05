@@ -1,16 +1,14 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
+import lombok.Getter;
 import net.minecraft.nbt.NBTTagCompound;
 
+@Getter
 public class EFabricatorTail extends EFabricatorPart {
 
     protected boolean formed = false;
 
     public EFabricatorTail() {
-    }
-
-    public boolean isFormed() {
-        return formed;
     }
 
     @Override

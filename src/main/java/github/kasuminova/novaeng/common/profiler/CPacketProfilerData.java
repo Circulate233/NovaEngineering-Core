@@ -1,16 +1,18 @@
 package github.kasuminova.novaeng.common.profiler;
 
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
 
-    private final Map<String, PacketData> packets = new HashMap<>();
-    private final Map<String, PacketData> tileEntityPackets = new HashMap<>();
+    private final Map<String, PacketData> packets = new Object2ObjectOpenHashMap<>();
+    private final Map<String, PacketData> tileEntityPackets = new Object2ObjectOpenHashMap<>();
 
     private final float networkBandwidthPerSecond;
 
@@ -24,18 +26,6 @@ public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
 
     public void addTileEntityPacket(final String packetName, final int count, final long totalSize) {
         tileEntityPackets.putIfAbsent(packetName, new PacketData(count, totalSize));
-    }
-
-    public Map<String, PacketData> getPackets() {
-        return packets;
-    }
-
-    public Map<String, PacketData> getTileEntityPackets() {
-        return tileEntityPackets;
-    }
-
-    public float getNetworkBandwidthPerSecond() {
-        return networkBandwidthPerSecond;
     }
 
     public void writeToBuffer(final ByteBuf buf) {

@@ -152,11 +152,8 @@ public class MMAltar implements MachineSpecial {
                     var data = ctrl.getCustomDataTag();
                     var xycc = data.getLong("xycc");
                     var jtdj = data.getInteger("jtdj");
-                    var sdfw = data.getInteger("sdfw");
                     var cpdj = data.getInteger("cpdj");
                     var ccjx = data.getInteger("ccjx");
-                    var yzfb = Math.pow(0.95, cpdj);
-                    var sjneed = (0.2 * sdfw + 1.00) * (need * 1.00);
                     var bx = Math.min(Math.pow(4, cpdj), ((double) ccjx / need));
 
                     if (xycc < need) {
@@ -181,15 +178,12 @@ public class MMAltar implements MachineSpecial {
                     var ctrl = event.getController();
                     var data = ctrl.getCustomDataTag();
                     var xycc = data.getLong("xycc");
-                    var jtdj = data.getInteger("jtdj");
+                    data.getInteger("jtdj");
                     var hcjd = data.getInteger("hcjd");
                     var hcjdmax = data.getInteger("hcjdmax");
                     var sdfwxg = 0.2 * data.getInteger("sdfw");
-                    var cpdj = data.getInteger("cpdj");
-                    var yzfb = Math.pow(0.95, cpdj);
                     var thread = event.getFactoryRecipeThread();
                     var bx = thread.getActiveRecipe().getParallelism();
-                    var tick = thread.getActiveRecipe().getTick();
                     var totalTick = thread.getActiveRecipe().getTotalTick();
                     var sjneed = need * bx;
 

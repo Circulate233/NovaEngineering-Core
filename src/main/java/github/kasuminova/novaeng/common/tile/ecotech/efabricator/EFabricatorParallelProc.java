@@ -1,6 +1,8 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
+import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -11,6 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class EFabricatorParallelProc extends EFabricatorPart {
 
     protected final List<Modifier> modifiers = new ArrayList<>();
@@ -22,14 +25,6 @@ public class EFabricatorParallelProc extends EFabricatorPart {
     public EFabricatorParallelProc(List<Modifier> modifiers, List<Modifier> overclockModifiers) {
         this.modifiers.addAll(modifiers);
         this.overclockModifiers.addAll(overclockModifiers);
-    }
-
-    public List<Modifier> getModifiers() {
-        return modifiers;
-    }
-
-    public List<Modifier> getOverclockModifiers() {
-        return overclockModifiers;
     }
 
     @Override
@@ -56,21 +51,8 @@ public class EFabricatorParallelProc extends EFabricatorPart {
         compound.setTag("overclockModifiers", overclockModifiersTag);
     }
 
-    public static final class Modifier {
-
-        private final Type type;
-        private final double value;
-        private final boolean debuff;
-
-        public Modifier(final Type type, final double value, final boolean debuff) {
-            this.type = type;
-            this.value = value;
-            this.debuff = debuff;
-        }
-
-        public Type getType() {
-            return type;
-        }
+    @Desugar
+    public record Modifier(Type type, double value, boolean debuff) {
 
         public double apply(final double parallelism) {
             return type.apply(value, parallelism);
@@ -78,10 +60,6 @@ public class EFabricatorParallelProc extends EFabricatorPart {
 
         public boolean isBuff() {
             return !debuff;
-        }
-
-        public boolean isDebuff() {
-            return debuff;
         }
 
         public NBTTagCompound writeToNBT() {
@@ -101,14 +79,14 @@ public class EFabricatorParallelProc extends EFabricatorPart {
             switch (type) {
                 case ADD -> {
                     return isBuff()
-                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.add", value) 
+                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.add", value)
                             : I18n.format("novaeng.efabricator_parallel_proc.modifier.sub", Math.abs(value));
                 }
                 case MULTIPLY -> {
                     return isBuff()
-                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.mul", 
-                            NovaEngUtils.formatDouble((1D - value) * 100, 1)) 
-                            : I18n.format("novaeng.efabricator_parallel_proc.modifier.mul.debuff", 
+                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.mul",
+                            NovaEngUtils.formatDouble((1D - value) * 100, 1))
+                            : I18n.format("novaeng.efabricator_parallel_proc.modifier.mul.debuff",
                             NovaEngUtils.formatDouble(Math.abs(1D - value) * 100, 1));
                 }
             }
@@ -116,6 +94,7 @@ public class EFabricatorParallelProc extends EFabricatorPart {
         }
     }
 
+    @Getter
     public enum Type {
 
         ADD(0),
@@ -125,10 +104,6 @@ public class EFabricatorParallelProc extends EFabricatorPart {
 
         Type(int priority) {
             this.priority = priority;
-        }
-
-        public int getPriority() {
-            return priority;
         }
 
         public double apply(final double value, final double parallelism) {

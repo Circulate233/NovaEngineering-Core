@@ -113,10 +113,9 @@ public class NetNodeImpl extends NetNode {
         double required = computation * event.getActiveRecipe().getParallelism();
         recipeConsumers.put(event.getRecipeThread(), required);
 
-        double consumed = center.consumeComputationPoint(required);
-        if (consumed < required) {
-            String failureMessage = String.format("算力不足！预期：%s，当前：%s",
-                    NovaEngUtils.formatFLOPS(required), NovaEngUtils.formatFLOPS(consumed));
+        if (!center.consumeComputationPoint(required)) {
+            String failureMessage = "算力不足！预期需求：" +
+                    NovaEngUtils.formatFLOPS(required);
 
             if (triggerFailure) {
                 event.setFailed(event.getActiveRecipe().getRecipe().doesCancelRecipeOnPerTickFailure(), failureMessage);
@@ -138,10 +137,9 @@ public class NetNodeImpl extends NetNode {
         double required = computation * event.getActiveRecipe().getParallelism();
         recipeConsumers.put(event.getRecipeThread(), required);
 
-        double consumed = center.consumeComputationPoint(required);
-        if (consumed < required) {
-            String failureMessage = String.format("算力不足！预期：%s，当前：%s",
-                    NovaEngUtils.formatFLOPS(required), NovaEngUtils.formatFLOPS(consumed));
+        if (!center.consumeComputationPoint(required)) {
+            String failureMessage = "算力不足！预期需求：" +
+                    NovaEngUtils.formatFLOPS(required);
 
             if (triggerFailure) {
                 event.setFailed(event.getActiveRecipe().getRecipe().doesCancelRecipeOnPerTickFailure(), failureMessage);

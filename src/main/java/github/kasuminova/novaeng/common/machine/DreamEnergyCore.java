@@ -296,12 +296,6 @@ public class DreamEnergyCore implements MachineSpecial{
         return ENERGY_STORED_CACHE.computeIfAbsent(num, BigInteger::new);
     }
 
-    private static final String longmax = Long.toString(Long.MAX_VALUE);
-
-    private String change(TileMultiblockMachineController ctrl){
-        return change(ctrl,getEnergyInfo(ctrl.getWorld(),ctrl.getPos()).getFirst());
-    }
-
     private String change(TileMultiblockMachineController ctrl,String newtime){
         FixedSizeDeque<String> energy = getEnergyInfo(ctrl.getWorld(),ctrl.getPos());
         var oldtime = energy.getLast();

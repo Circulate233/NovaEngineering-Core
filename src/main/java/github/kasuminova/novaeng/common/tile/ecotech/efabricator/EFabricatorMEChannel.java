@@ -25,6 +25,7 @@ import com.glodblock.github.util.FluidCraftingPatternDetails;
 import github.kasuminova.mmce.common.util.PatternItemFilter;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
 import hellfirepvp.modularmachinery.ModularMachinery;
+import lombok.Getter;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -38,6 +39,7 @@ import java.util.List;
 public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingProvider, IActionHost, IGridProxyable {
 
     protected final AENetworkProxy proxy = new AENetworkProxy(this, "channel", getVisualItemStack(), true);
+    @Getter
     protected final IActionSource source = new MachineSource(this);
 
     private boolean wasActive = false;
@@ -45,10 +47,6 @@ public class EFabricatorMEChannel extends EFabricatorPart implements ICraftingPr
     public EFabricatorMEChannel() {
         this.proxy.setIdlePowerUsage(1.0D);
         this.proxy.setFlags(GridFlags.REQUIRE_CHANNEL, GridFlags.DENSE_CAPACITY);
-    }
-
-    public IActionSource getSource() {
-        return source;
     }
 
     public ItemStack getVisualItemStack() {

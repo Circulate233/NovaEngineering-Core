@@ -28,6 +28,7 @@ import hellfirepvp.modularmachinery.client.ClientProxy;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -92,27 +93,36 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
     protected final List<IFluidHandler> coolantOutputHandlers = new ArrayList<>();
 
     protected final IItemStorageChannel itemChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
+    @Getter
     protected IItemList<IAEItemStack> outputBuffer = new ItemList();
 
+    @Getter
     protected BlockEFabricatorController parentController = null;
     protected double idleDrain = 64;
 
+    @Getter
     protected EFabricatorMEChannel channel = null;
 
+    @Getter
     protected int length = 0;
 
     protected int workDelay = WORK_DELAY;
     protected int maxWorkDelay = WORK_DELAY;
 
+    @Getter
     protected int parallelism = 0;
     protected int consumedParallelism = 0;
 
+    @Getter
     protected int coolantCache = 0;
 
+    @Getter
     protected long totalCrafted = 0;
 
     protected boolean speedupApplied = false;
+    @Getter
     protected boolean overclocked = false;
+    @Getter
     protected boolean activeCooling = false;
 
     protected PktEFabricatorGUIData guiDataPacket = null;
@@ -288,7 +298,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
                 .flatMap(proc -> overclocked ? Stream.concat(proc.modifiers.stream(), proc.overclockModifiers.stream()) : proc.modifiers.stream()) // 超频额外添加超频修正器
                 .filter(modifier -> modifier.isBuff() || !activeCooling) // 主动冷却移除超频的负面效果。
                 .collect(Collectors.groupingBy(
-                        Modifier::getType,
+                        Modifier::type,
                         () -> new Object2ObjectAVLTreeMap<>(Comparator.comparingInt(EFabricatorParallelProc.Type::getPriority)),
                         Collectors.toList())
                 );
@@ -299,7 +309,7 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
                 .forEach(modifier -> parallelism[0] = modifier.apply(parallelism[0]));
         modifierMap.values().stream()
                 .flatMap(Collection::stream)
-                .filter(Modifier::isDebuff)
+                .filter(Modifier::debuff)
                 .forEach(modifier -> parallelism[0] = modifier.apply(parallelism[0]));
 
         this.parallelism = (int) Math.round(parallelism[0]);
@@ -403,16 +413,8 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
         return guiDataPacket;
     }
 
-    public long getTotalCrafted() {
-        return totalCrafted;
-    }
-
     public double getEnergyConsumePerTick() {
         return idleDrain;
-    }
-
-    public int getLength() {
-        return length;
     }
 
     public Levels getLevel() {
@@ -429,10 +431,6 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
         return Levels.L4;
     }
 
-    public EFabricatorMEChannel getChannel() {
-        return channel;
-    }
-
     public List<EFabricatorWorker> getWorkers() {
         return parts.getParts(EFabricatorWorker.class);
     }
@@ -445,20 +443,8 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
         return parts.getParts(EFabricatorParallelProc.class);
     }
 
-    public int getParallelism() {
-        return parallelism;
-    }
-
     public int getAvailableParallelism() {
         return Math.max(0, parallelism - consumedParallelism);
-    }
-
-    public IItemList<IAEItemStack> getOutputBuffer() {
-        return outputBuffer;
-    }
-
-    public boolean isOverclocked() {
-        return overclocked;
     }
 
     public EFabricatorController setOverclocked(final boolean overclocked) {
@@ -466,10 +452,6 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
         updateParallelism();
         updateGUIDataPacket();
         return this;
-    }
-
-    public boolean isActiveCooling() {
-        return activeCooling;
     }
 
     public EFabricatorController setActiveCooling(final boolean activeCooling) {
@@ -482,10 +464,6 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
 
     public int getEnergyStored() {
         return getWorkers().stream().mapToInt(EFabricatorWorker::getEnergyCache).sum();
-    }
-
-    public int getCoolantCache() {
-        return coolantCache;
     }
 
     public void consumeCoolant(final int amount) {
@@ -552,10 +530,6 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
             }
         }
         return total;
-    }
-
-    public BlockEFabricatorController getParentController() {
-        return parentController;
     }
 
     @Override

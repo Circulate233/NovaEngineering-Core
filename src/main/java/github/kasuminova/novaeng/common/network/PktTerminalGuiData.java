@@ -11,6 +11,7 @@ import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -36,8 +37,9 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
     private static final List<ResearchCognitionData> UNLOCKED_DATA = new ObjectArrayList<>();
     private static final Object2DoubleOpenHashMap<ResearchCognitionData> RESEARCHING_DATA = new Object2DoubleOpenHashMap<>();
     private static final List<Database.Status> DATABASES = new ObjectArrayList<>();
+    @Getter
     private static ResearchStationType researchStationType = null;
-    
+
     private NBTTagCompound tag;
 
     // Server Only
@@ -61,10 +63,6 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
 
     public static List<Database.Status> getDatabases() {
         return DATABASES;
-    }
-
-    public static ResearchStationType getResearchStationType() {
-        return researchStationType;
     }
 
     @Override
@@ -165,7 +163,10 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
             if (data == null) {
                 return;
             }
-            RESEARCHING_DATA.put(data, tagAt.getDouble("progress"));
+            double p = tagAt.getDouble("progress");
+            if (p > 0.1D && p < data.getRequiredPoints()) {
+                RESEARCHING_DATA.put(data, p);
+            }
         });
 
         NBTTagList databases = tag.getTagList("databases", Constants.NBT.TAG_COMPOUND);

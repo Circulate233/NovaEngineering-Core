@@ -11,6 +11,7 @@ import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineContr
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenExpansion;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -26,7 +27,6 @@ public class RecipePrimerHyperNet {
      * 为一个配方添加算力要求。
      * 用法：{@code requireComputationPoint(1.0F);}
      */
-    @ZenMethod
     public static RecipePrimer requireComputationPoint(final RecipePrimer primer,
                                                        final float required)
     {
@@ -36,7 +36,7 @@ public class RecipePrimerHyperNet {
     @ZenMethod
     public static RecipePrimer requireComputationPoint(final RecipePrimer primer,
                                                        final float required,
-                                                       final boolean triggerFailure)
+                                                       @Optional final boolean triggerFailure)
     {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             primer.addRecipeTooltip(

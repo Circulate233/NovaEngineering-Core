@@ -302,10 +302,6 @@ public class IllumPool implements MachineSpecial {
         }
     }
 
-    public static void checkCatalyst(final RecipeCheckEvent event, final String requiredCatalyst) {
-
-    }
-
     @Override
     @SideOnly(Side.CLIENT)
     public void onClientTick(final TileMultiblockMachineController controller) {

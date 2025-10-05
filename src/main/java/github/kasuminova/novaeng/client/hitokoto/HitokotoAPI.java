@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.hitokoto;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.Getter;
 import net.minecraft.util.JsonUtils;
 
 import java.io.BufferedReader;
@@ -15,15 +16,12 @@ import java.nio.charset.StandardCharsets;
 public class HitokotoAPI {
     public static final String API_URL = "https://v1.hitokoto.cn/";
 
+    @Getter
     public static String hitokotoCache = null;
 
     private static final Gson DESERIALIZER = new GsonBuilder()
             .registerTypeHierarchyAdapter(HitokotoResult.class, new HitokotoDeserializer())
             .create();
-
-    public static String getHitokotoCache() {
-        return hitokotoCache;
-    }
 
     public static String getRandomHitokoto() {
         if (hitokotoCache != null) {

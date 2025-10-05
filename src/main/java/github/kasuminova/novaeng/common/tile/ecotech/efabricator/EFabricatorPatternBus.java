@@ -15,6 +15,7 @@ import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorPatternSearchGUIUpdate;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,6 +38,7 @@ public class EFabricatorPatternBus extends EFabricatorPart implements IAEAppEngI
 
     public static final int PATTERN_SLOTS = 12 * 6;
 
+    @Getter
     protected final AppEngInternalInventory patterns = new AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE);
     protected final List<ICraftingPatternDetails> details = new ObjectArrayList<>(PATTERN_SLOTS);
 
@@ -65,10 +67,6 @@ public class EFabricatorPatternBus extends EFabricatorPart implements IAEAppEngI
         if (detail != null && (detail.isCraftable() || detail instanceof FluidCraftingPatternDetails)) {
             details.set(slot, detail);
         }
-    }
-
-    public AppEngInternalInventory getPatterns() {
-        return patterns;
     }
 
     public List<ICraftingPatternDetails> getDetails() {

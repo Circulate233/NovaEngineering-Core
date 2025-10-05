@@ -16,6 +16,7 @@ import hellfirepvp.modularmachinery.common.crafting.helper.CraftingStatus;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.TileFactoryController;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -38,6 +39,7 @@ public class ResearchStation extends NetNode {
     private final ResearchStationType type;
     private ResearchCognitionData currentResearching = null;
     private UUID taskProvider = null;
+    @Setter
     private double completedPoints = 0;
     private double consumption = 0;
 
@@ -106,7 +108,7 @@ public class ResearchStation extends NetNode {
         }
 
         double required = Math.min(getComputationLeft(), currentResearching.getMinComputationPointPerTick());
-        double consumed = center.consumeComputationPoint(required);
+        double consumed = center.researchConsumeComputationPoint(required);
         if (consumed < required) {
             event.preventProgressing("算力不足！预期："
                     + NovaEngUtils.formatFLOPS(required) + "，当前："
@@ -159,7 +161,7 @@ public class ResearchStation extends NetNode {
     protected void doExtraResearch(final double maxConsumption) {
         if (maxConsumption > 0) {
             if (center != null) {
-                double consumed = center.consumeComputationPoint(maxConsumption);
+                double consumed = center.researchConsumeComputationPoint(maxConsumption);
                 completedPoints += consumed;
                 consumption += consumed;
             }
@@ -217,6 +219,7 @@ public class ResearchStation extends NetNode {
             return;
         }
 
+        if (center == null)return;
         for (Database database : center.getNode(Database.class)) {
             if (database.writeResearchingData(currentResearching, completedPoints)) {
                 break;
@@ -332,11 +335,6 @@ public class ResearchStation extends NetNode {
     @ZenGetter("completedPoints")
     public double getCompletedPoints() {
         return completedPoints;
-    }
-
-    public ResearchStation setCompletedPoints(final double completedPoints) {
-        this.completedPoints = completedPoints;
-        return this;
     }
 
     @ZenGetter("progressPercent")

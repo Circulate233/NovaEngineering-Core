@@ -230,10 +230,12 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
     {
         if (center.isWorking()) {
             probeInfo.text("{*top.hypernet.online*}");
-            probeInfo.text("{*top.hypernet.processor.circuit_durability*}" + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
+            IProbeInfo box = newBox(probeInfo);
+            box.text("{*top.hypernet.processor.circuit_durability*}" + TextFormatting.GREEN + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
         } else {
             probeInfo.text("{*top.hypernet.offline*}");
-            probeInfo.text("{*top.hypernet.processor.circuit_durability*}" + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
+            IProbeInfo box = newBox(probeInfo);
+            box.text("{*top.hypernet.processor.circuit_durability*}" + TextFormatting.GREEN + center.getCircuitDurability() + "（" + formatPercent(center.getCircuitDurability(), center.getType().getCircuitDurability()) + "）");
             return;
         }
 

@@ -23,6 +23,7 @@ import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineContr
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import lombok.val;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -383,6 +384,8 @@ public abstract class Drill implements MachineSpecial {
                                     var mineral = getUsableMix(worldInfo);
                                     if (mineral != null) {
                                         data.setString("kmm" + k + kk, mineral.name);
+                                    } else {
+                                        data.setString("kmm" + k + kk, "empty");
                                     }
                                     data.setInteger("sfsh", 8000);
                                     data.setInteger("bxs" + k + kk, bxs);
@@ -454,6 +457,8 @@ public abstract class Drill implements MachineSpecial {
                                     var mineral = getUsableMix(worldInfo);
                                     if (mineral != null) {
                                         data.setString("kmm" + k + kk, mineral.name);
+                                    } else {
+                                        data.setString("kmm" + k + kk, "empty");
                                     }
                                     data.setInteger("sfsh", 6000);
                                     data.setInteger("bxs" + k + kk, bxs);
@@ -570,6 +575,8 @@ public abstract class Drill implements MachineSpecial {
                 );
                 if (data.hasKey("additional_component_raw_ore")) info.add(I18n.format("top.drill.components_raw_ore"));
                 var kmm = data.getString("kmm11");
+                val i18nkmm = I18n.format("desc.immersiveengineering.info.mineral." + kmm);
+                if (!i18nkmm.startsWith("desc"))kmm = i18nkmm;
                 var depletion = data.getInteger("depletion11");
                 if (!kmm.isEmpty() && !kmm.equals("empty"))
                     info.add(I18n.format("novaeng.drill.mineral.name") + kmm);
@@ -598,6 +605,8 @@ public abstract class Drill implements MachineSpecial {
                     for (int ii : tqsz) {
                         var kk = ii + 1;
                         var kmm = data.getString("kmm" + k + kk);
+                        val i18nkmm = I18n.format("desc.immersiveengineering.info.mineral." + kmm);
+                        if (!i18nkmm.startsWith("desc"))kmm = i18nkmm;
                         var depletion = data.getInteger("depletion" + k + kk);
                         if (!kmm.isEmpty() && !kmm.equals("empty"))
                             info.add(
@@ -899,7 +908,8 @@ public abstract class Drill implements MachineSpecial {
         var world = ctrl.getWorld();
         var research_progress = data.getByte("research_progress");
         if (research_progress > 0) {
-            List<IItemStack> cjc = new ObjectArrayList<>();
+            List<IItemStack> cjc = new ReferenceArrayList<>();
+            cjc.add(itemUtils.getItem("environmentaltech:litherite_crystal", 0));
             cjc.add(itemUtils.getItem("environmentaltech:erodium_crystal", 0));
             if (research_progress > 1) {
                 cjc.add(itemUtils.getItem("environmentaltech:kyronite_crystal", 0));
@@ -911,7 +921,7 @@ public abstract class Drill implements MachineSpecial {
                     }
                 }
             }
-            var random = world.rand.nextInt(cjc.size() - 1);
+            var random = world.rand.nextInt(cjc.size());
             return cjc.get(random);
         } else {
             return stone;

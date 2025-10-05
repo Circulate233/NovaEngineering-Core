@@ -17,7 +17,6 @@ import github.kasuminova.novaeng.common.container.ContainerModularServerAssemble
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
-import github.kasuminova.novaeng.common.handler.IEHandler;
 import github.kasuminova.novaeng.common.handler.ECalculatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EStorageEventHandler;
@@ -25,6 +24,7 @@ import github.kasuminova.novaeng.common.handler.EnchantmentHandler;
 import github.kasuminova.novaeng.common.handler.FTBHandler;
 import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
 import github.kasuminova.novaeng.common.handler.HyperNetMachineEventHandler;
+import github.kasuminova.novaeng.common.handler.IEHandler;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetTerminal;
@@ -60,7 +60,6 @@ import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.trait.Register;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
-import github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader;
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
@@ -69,6 +68,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -93,7 +93,7 @@ public class CommonProxy implements IGuiHandler {
 
     public void construction() {
         if (Loader.isModLoaded("ecoaeextension")){
-            throw new RuntimeException(NovaEngCoreEarlyMixinLoader.getString("mod.ecoae.warning"));
+            throw new RuntimeException(I18n.translateToLocal("mod.ecoae.warning"));
         }
     }
 

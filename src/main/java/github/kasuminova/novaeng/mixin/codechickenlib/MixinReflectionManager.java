@@ -15,11 +15,6 @@ public abstract class MixinReflectionManager {
     @Shadow
     private static Field modifiersField;
 
-    @Shadow
-    public static Class<?> findClass(String name) {
-        return null;
-    }
-
     /**
      * @author circulation
      * @reason 防止无限递归的出现

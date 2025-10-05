@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -28,6 +29,7 @@ public class ResearchCognitionData {
     private final String researchName;
     private final String translatedName;
 
+    @Getter
     private final ItemStack previewStack;
 
     private final float techLevel;
@@ -43,6 +45,7 @@ public class ResearchCognitionData {
     private final ObjectList<String> unlockedDescriptions;
     private final List<ResearchCognitionData> dependencies;
 
+    @Getter
     private final Object2IntOpenHashMap<ResearchCognitionData> cycleDependencies = new Object2IntOpenHashMap<>();
 
     public ResearchCognitionData(final String researchName,
@@ -188,10 +191,6 @@ public class ResearchCognitionData {
         return translatedName;
     }
 
-    public ItemStack getPreviewStack() {
-        return previewStack;
-    }
-
     @ZenGetter("previewStack")
     public IItemStack getPreviewStackCT() {
         return CraftTweakerMC.getIItemStack(previewStack);
@@ -253,10 +252,6 @@ public class ResearchCognitionData {
 
     public List<ResearchCognitionData> getDependencies() {
         return Collections.unmodifiableList(dependencies);
-    }
-
-    public Object2IntOpenHashMap<ResearchCognitionData> getCycleDependencies() {
-        return cycleDependencies;
     }
 
     @Override

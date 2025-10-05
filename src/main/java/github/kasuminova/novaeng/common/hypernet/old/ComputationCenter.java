@@ -116,7 +116,7 @@ public class ComputationCenter {
         }
         float consumeChance =
                 (float) ((double) getConnectedMachineryCount() / type.getMaxConnections() +
-                                        getComputationPointGeneration() / type.getMaxComputationPointCarrying());
+                        getComputationPointGeneration() / type.getMaxComputationPointCarrying());
         if (!(RandomUtils.nextFloat() <= Math.max(type.getCircuitConsumeChance() * consumeChance, 0.01F))) {
             return;
         }
@@ -201,49 +201,91 @@ public class ComputationCenter {
     }
 
     /**
-     * 消耗计算点，返回已消耗的数量。
+     * 消耗计算点，原：返回已消耗的数量。
+     * 现：直接返回是否成功
      */
-    public double consumeComputationPoint(final double required) {
+    public boolean consumeComputationPoint(final double required) {
         if (!isWorking() || type.getMaxComputationPointCarrying() < required || computationPointCounter.get() < required) {
-            return 0;
+            return false;
         }
 
-        final double[] polledCounter = {0};
+        final boolean[] successful = {false};
         computationPointCounter.updateAndGet(counter -> {
             if (counter < required) {
                 return counter;
             }
-            return counter - (polledCounter[0] = required);
+            successful[0] = true;
+            return counter - required;
         });
-        if (polledCounter[0] < required) {
-            computationPointCounter.updateAndGet(counter -> counter + polledCounter[0]);
+        if (successful[0]) {
+            double totalGenerated = 0F;
+            calculate:
+            for (Map<BlockPos, NetNode> nodes : nodes.values()) {
+                for (NetNode node : nodes.values()) {
+                    double generated = node.requireComputationPoint(required - totalGenerated, true);
+                    totalGenerated += generated;
+                    if (totalGenerated >= required) {
+                        break calculate;
+                    }
+                }
+            }
+
+            boolean su = totalGenerated + 0.1D >= required;
+            if (su) {
+                double finalTotalGenerated = totalGenerated;
+                computationPointCounter.updateAndGet(counter -> counter + required - finalTotalGenerated);
+            } else {
+                computationPointCounter.updateAndGet(counter -> counter + required);
+            }
+            return su;
+        }
+        return false;
+    }
+
+    /**
+     * 计算研究站的额外点数消耗
+     */
+    public double researchConsumeComputationPoint(final double required) {
+        if (!isWorking() || type.getMaxComputationPointCarrying() < required || computationPointCounter.get() < required) {
             return 0;
         }
 
-        double totalGenerated = 0F;
-
-        calculate:
-        for (Map<BlockPos, NetNode> nodes : nodes.values()) {
-            for (NetNode node : nodes.values()) {
-                double generated = node.requireComputationPoint(required - totalGenerated, true);
-                totalGenerated += generated;
-                if (totalGenerated >= required) {
-                    break calculate;
-                }
+        final boolean[] successful = {false};
+        computationPointCounter.updateAndGet(counter -> {
+            if (counter < required) {
+                return counter;
             }
+            successful[0] = true;
+            return counter - required;
+        });
+
+        final double[] finalTotalGenerated = new double[1];
+        if (successful[0]) {
+            computationPointCounter.updateAndGet(counter -> {
+                double totalGenerated = 0F;
+                for (Map<BlockPos, NetNode> nodes : nodes.values()) {
+                    for (NetNode node : nodes.values()) {
+                        double generated = node.requireComputationPoint(required - totalGenerated, true);
+                        totalGenerated += generated;
+                        if (totalGenerated >= required) {
+                            break;
+                        }
+                    }
+                }
+                return counter + required - (finalTotalGenerated[0] = totalGenerated);
+            });
+        } else {
+            return 0;
         }
 
-        final double finalTotalGenerated = totalGenerated;
-        computationPointCounter.updateAndGet(counter -> counter + (polledCounter[0] - finalTotalGenerated));
-
-        if (required > totalGenerated) {
+        if (required > finalTotalGenerated[0]) {
             // 修复精度有概率不准确的问题
-            if (totalGenerated + 0.1D > required) {
+            if (finalTotalGenerated[0] + 0.1D > required) {
                 return required;
             }
         }
 
-        return totalGenerated;
+        return finalTotalGenerated[0];
     }
 
     public boolean isWorking() {

@@ -61,7 +61,6 @@ public class SpaceGenerator implements MachineSpecial {
                             .addPreCheckHandler(event -> {
                                 var ctrl = event.getController();
                                 var data = ctrl.getCustomDataTag();
-                                var speed = data.getInteger("speed");
                                 var hxzt = data.getByte("hxzt");
                                 if (hxzt != 1) {
                                     event.setFailed("novaeng.space_generator.failed.item.input");
@@ -89,7 +88,6 @@ public class SpaceGenerator implements MachineSpecial {
                                 .addPreCheckHandler(event -> {
                                     var ctrl = event.getController();
                                     var data = ctrl.getCustomDataTag();
-                                    var speed = data.getInteger("speed");
                                     var hxzt = data.getByte("hxzt");
                                     if (hxzt != 1) {
                                         event.setFailed("novaeng.space_generator.failed.item.input");
@@ -118,7 +116,6 @@ public class SpaceGenerator implements MachineSpecial {
                                 .addPreCheckHandler(event -> {
                                     var ctrl = event.getController();
                                     var data = ctrl.getCustomDataTag();
-                                    var speed = Math.max(1, data.getInteger("speed"));
                                     var hxzt = data.getByte("hxzt");
                                     if (hxzt != 1) {
                                         event.setFailed("novaeng.space_generator.failed.item.input");
@@ -193,7 +190,6 @@ public class SpaceGenerator implements MachineSpecial {
         for (String orename : orenames) {
             var singularityname = orename.substring(oreOD.length());
             var singularity = oreDict.get(singularityOD + singularityname);
-            var rawOre = oreDict.get("rawOre" + singularityname);
             if (!singularity.isEmpty()) {
                 rec.addOutput(singularity.getFirstItem()).addItemModifier((ctrl, item) -> output(orename, ctrl, item, singularitys.get(singularityname)));
             }

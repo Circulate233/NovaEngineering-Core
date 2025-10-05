@@ -176,7 +176,6 @@ repositories {
 //mixin {
 //    add sourceSets.main, "mixins.novaeng_core.refmap.json"
 //}
-
 dependencies {
     annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
     compileOnly("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
@@ -208,6 +207,9 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 
+    //kt
+    implementation("io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0")
+
     // Performance Test Tool
 //    runtimeOnly(rfg.deobf("curse.maven:spark-361579:3542217"))
 
@@ -224,6 +226,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:tinkers-construct-74072:2902483"))
     implementation(rfg.deobf("curse.maven:not-enough-energistics-515565:5234732"))
     implementation(rfg.deobf("curse.maven:psi-241665:3085917"))
+    implementation(rfg.deobf("curse.maven:psio-339394:3077697"))
     implementation(rfg.deobf("curse.maven:RandomTweaker-514170:5528753"))
     implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
     implementation(rfg.deobf("curse.maven:ctm-267602:2915363"))
@@ -306,7 +309,6 @@ dependencies {
     implementation(rfg.deobf("curse.maven:random-complement-1198138:6995821"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 // Publishing to a Maven repository

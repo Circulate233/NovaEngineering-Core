@@ -31,8 +31,7 @@ public class MixinMetadataManager {
         try {
             fileReader = new UTF8FileReader(file);
         } catch (FileNotFoundException var9) {
-            FileNotFoundException e = var9;
-            DMLRelearned.logger.error("Config file \"{}\" not found! Error message: {}", filename, e.getMessage());
+            DMLRelearned.logger.error("Config file \"{}\" not found! Error message: {}", filename, var9.getMessage());
             return Optional.empty();
         }
 
@@ -56,13 +55,12 @@ public class MixinMetadataManager {
 
             reader.close();
         } catch (Exception var10) {
-            Exception e = var10;
-            if (e instanceof IOException) {
-                DMLRelearned.logger.error("Error reading config file \"{}\"! Error message: {}", filename, e.getMessage());
-            } else if (e instanceof JsonSyntaxException) {
-                DMLRelearned.logger.error("Invalid JSON in config file \"{}\"! Error message: {}", filename, e.getMessage());
+            if (var10 instanceof IOException) {
+                DMLRelearned.logger.error("Error reading config file \"{}\"! Error message: {}", filename, var10.getMessage());
+            } else if (var10 instanceof JsonSyntaxException) {
+                DMLRelearned.logger.error("Invalid JSON in config file \"{}\"! Error message: {}", filename, var10.getMessage());
             } else {
-                DMLRelearned.logger.error("Exception while reading config file \"{}\"! Error message: {}", filename, e.getMessage());
+                DMLRelearned.logger.error("Exception while reading config file \"{}\"! Error message: {}", filename, var10.getMessage());
             }
 
             return Optional.empty();
