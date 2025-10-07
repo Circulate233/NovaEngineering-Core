@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common.item;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
@@ -16,27 +15,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
 import static github.kasuminova.novaeng.common.registry.RegistryItems.ITEMS_TO_REGISTER;
 
-public class ItemRawOre extends Item {
+public final class ItemRawOre extends Item {
 
     private static final CreativeTabs rawOreTab = new CreativeTabs("raw_ore") {
-        private static ItemStack Icon;
-
-        @Override
-        @NotNull
-        public ItemStack createIcon() {
-            if (Icon == null) {
-                for (var value : allItemRawOre.values()) {
-                    return Icon = new ItemStack(value);
-                }
-            }
-            return Icon;
-        }
-    };
-    private static final CreativeTabs rawOreBlockTab = new CreativeTabs("raw_ore_block") {
         private static ItemStack Icon;
 
         @Override
@@ -75,6 +61,7 @@ public class ItemRawOre extends Item {
         partOD = type.name().toLowerCase() + name;
         allItemRawOre.put(this.name, this);
         allItemRawBlock.put(this.name, new BlockRawOre(name));
+        OreDictionary.registerOre(this.getRawOD(),this);
     }
 
     public static ItemRawOre getRawOre(String name) {
@@ -135,17 +122,22 @@ public class ItemRawOre extends Item {
     @Getter
     public class BlockRawOre extends Block {
 
+        @Getter
+        private final String rawOD;
+        @Getter
         private final Type type = Type.BLOCK;
+        @Getter
         private final ItemBlock item;
 
         private BlockRawOre(String name) {
             super(Material.ROCK);
             this.setResistance(10.0F);
             this.setSoundType(SoundType.STONE);
-            this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
+            this.setCreativeTab(rawOreTab);
             this.setDefaultState(this.blockState.getBaseState());
             this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "raw_block_" + ItemRawOre.this.name);
             this.setRegistryName(NovaEngineeringCore.getRL("raw_block_" + ItemRawOre.this.name));
+            this.rawOD = type.getOdName(name);
             this.item = new ItemBLockRawOre();
         }
 
@@ -153,16 +145,14 @@ public class ItemRawOre extends Item {
             return ItemRawOre.this.partOD;
         }
 
-        public String getRawOD() {
-            return ItemRawOre.this.rawOD;
-        }
-
         public class ItemBLockRawOre extends ItemBlock {
 
             private ItemBLockRawOre() {
                 super(BlockRawOre.this);
+                this.setCreativeTab(rawOreTab);
                 this.setTranslationKey(BlockRawOre.this.getTranslationKey());
                 this.setRegistryName(BlockRawOre.this.getRegistryName());
+                OreDictionary.registerOre(BlockRawOre.this.getRawOD(),this);
             }
 
             public String getPartOD() {

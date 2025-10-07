@@ -33,7 +33,6 @@ import github.kasuminova.novaeng.common.hypernet.old.recipe.HyperNetRecipeManage
 import github.kasuminova.novaeng.common.integration.IntegrationCRT;
 import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
-import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.machine.BiogenicSimulationComputer;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.machine.Drills.DifferentWorld;
@@ -76,7 +75,6 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -168,12 +166,6 @@ public class CommonProxy implements IGuiHandler {
         if (Mods.AE2.isPresent()) {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
-        }
-        for (var rawOre : ItemRawOre.getRawOres()) {
-            OreDictionary.registerOre(rawOre.getRawOD(), rawOre);
-        }
-        for (var rawBlock : ItemRawOre.getRawBlocks()) {
-            OreDictionary.registerOre(rawBlock.getRawOD(), rawBlock.getItem());
         }
         Register.TRAITREGISTER.registerModifiers();
     }
