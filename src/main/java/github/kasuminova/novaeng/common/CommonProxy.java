@@ -33,6 +33,7 @@ import github.kasuminova.novaeng.common.hypernet.old.recipe.HyperNetRecipeManage
 import github.kasuminova.novaeng.common.integration.IntegrationCRT;
 import github.kasuminova.novaeng.common.integration.ic2.IntegrationIC2;
 import github.kasuminova.novaeng.common.integration.theoneprobe.IntegrationTOP;
+import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.machine.BiogenicSimulationComputer;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.machine.Drills.DifferentWorld;
@@ -75,6 +76,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -87,12 +89,16 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(new RegistryItems());
     }
 
-    public boolean isClient(){
+    public void setColor(String od, int color) {
+
+    }
+
+    public boolean isClient() {
         return false;
     }
 
     public void construction() {
-        if (Loader.isModLoaded("ecoaeextension")){
+        if (Loader.isModLoaded("ecoaeextension")) {
             throw new RuntimeException(I18n.translateToLocal("mod.ecoae.warning"));
         }
     }
@@ -163,6 +169,12 @@ public class CommonProxy implements IGuiHandler {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
         }
+        for (var rawOre : ItemRawOre.getRawOres()) {
+            OreDictionary.registerOre(rawOre.getRawOD(), rawOre);
+        }
+        for (var rawBlock : ItemRawOre.getRawBlocks()) {
+            OreDictionary.registerOre(rawBlock.getRawOD(), rawBlock.getItem());
+        }
         Register.TRAITREGISTER.registerModifiers();
     }
 
@@ -193,9 +205,11 @@ public class CommonProxy implements IGuiHandler {
 
         return switch (type) {
             case HYPERNET_TERMINAL -> new ContainerHyperNetTerminal((TileHyperNetTerminal) present, player);
-            case MODULAR_SERVER_ASSEMBLER -> new ContainerModularServerAssembler((TileModularServerAssembler) present, player);
+            case MODULAR_SERVER_ASSEMBLER ->
+                    new ContainerModularServerAssembler((TileModularServerAssembler) present, player);
             case ESTORAGE_CONTROLLER -> new ContainerEStorageController((EStorageController) present, player);
-            case SINGULARITY_CORE -> new ContainerSingularityCore((github.kasuminova.novaeng.common.tile.machine.SingularityCore) present, player);
+            case SINGULARITY_CORE ->
+                    new ContainerSingularityCore((github.kasuminova.novaeng.common.tile.machine.SingularityCore) present, player);
             case EFABRICATOR_CONTROLLER -> {
                 EFabricatorController efController = (EFabricatorController) present;
                 if (efController.getChannel() != null && ModIntegrationAE2.securityCheck(player, efController.getChannel().getProxy())) {
@@ -218,7 +232,8 @@ public class CommonProxy implements IGuiHandler {
                 }
                 yield new ContainerEFabricatorPatternBus(efPatternBus, player);
             }
-            case GEOCENTRIC_DRILL_CONTROLLER -> new ContainerGeocentricDrill((GeocentricDrillController) present, player);
+            case GEOCENTRIC_DRILL_CONTROLLER ->
+                    new ContainerGeocentricDrill((GeocentricDrillController) present, player);
             case ECALCULATOR_CONTROLLER -> {
                 ECalculatorController ecController = (ECalculatorController) present;
                 if (ecController.getChannel() != null && ModIntegrationAE2.securityCheck(player, ecController.getChannel().getProxy())) {

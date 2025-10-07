@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.util.text.translation.I18n;
+import org.jetbrains.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -95,6 +96,33 @@ public class StringUtils {
             return new ObjectArrayList<>(s.split("&n"));
         }
         return ObjectLists.singleton(key);
+    }
+
+    @NotNull
+    public static String camelToSnake(@NotNull String str) {
+        if (str == null || str.isEmpty()) return str;
+        int len = str.length();
+        char[] buffer = new char[len * 2];
+        int index = 0;
+        boolean prevWasLower = false;
+
+        for (int i = 0; i < len; i++) {
+            char c = str.charAt(i);
+            boolean isUpper = (c >= 'A' && c <= 'Z');
+            boolean isLower = (c >= 'a' && c <= 'z');
+
+            if (isUpper) {
+                if (prevWasLower) {
+                    buffer[index++] = '_';
+                }
+                buffer[index++] = (char)(c + 32);
+                prevWasLower = false;
+            } else {
+                buffer[index++] = c;
+                prevWasLower = isLower;
+            }
+        }
+        return new String(buffer, 0, index);
     }
 
     @Desugar

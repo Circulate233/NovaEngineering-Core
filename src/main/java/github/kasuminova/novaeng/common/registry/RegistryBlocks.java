@@ -33,6 +33,7 @@ import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageVent
 import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.item.ItemBlockAngel;
 import github.kasuminova.novaeng.common.item.ItemBlockME;
+import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorCellDrive;
 import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorController;
 import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorMEChannel;
@@ -98,6 +99,7 @@ public class RegistryBlocks {
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
 
+        ItemRawOre.regAll();
         registerBlocks();
         registerTileEntities();
 
@@ -235,11 +237,12 @@ public class RegistryBlocks {
     }
 
     public static <T extends ItemBlock> T prepareItemBlockRegister(T item) {
-        Block block = item.getBlock();
-        ResourceLocation registryName = Objects.requireNonNull(block.getRegistryName());
-        String translationKey = block.getTranslationKey();
-
-        item.setRegistryName(registryName).setTranslationKey(translationKey);
+        if (item.getRegistryName() == null) {
+            Block block = item.getBlock();
+            ResourceLocation registryName = Objects.requireNonNull(block.getRegistryName());
+            String translationKey = block.getTranslationKey();
+            item.setRegistryName(registryName).setTranslationKey(translationKey);
+        }
         RegistryItems.ITEMS_TO_REGISTER.add(item);
         return item;
     }

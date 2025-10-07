@@ -22,6 +22,7 @@ import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Getter;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -40,6 +41,7 @@ import java.util.Set;
 @ZenRegister
 @ZenClass("novaeng.hypernet.RegistryHyperNet")
 public class RegistryHyperNet {
+    @Getter
     private static Item hyperNetConnectCard = Items.AIR;
 
     private static final Set<ResourceLocation> SUPPORTED_MACHINERY = new ObjectOpenHashSet<>();
@@ -223,10 +225,6 @@ public class RegistryHyperNet {
 
     public static void setHyperNetConnectCard(final Item hyperNetConnectCard) {
         RegistryHyperNet.hyperNetConnectCard = hyperNetConnectCard;
-    }
-
-    public static Item getHyperNetConnectCard() {
-        return hyperNetConnectCard;
     }
 
     @ZenMethod

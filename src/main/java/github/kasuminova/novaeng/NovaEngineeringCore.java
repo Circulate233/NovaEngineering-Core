@@ -27,6 +27,7 @@ import github.kasuminova.novaeng.common.network.PktTerminalGuiData;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -77,6 +78,14 @@ public class NovaEngineeringCore {
     @SidedProxy(clientSide = CLIENT_PROXY, serverSide = COMMON_PROXY)
     public static CommonProxy proxy = null;
     public static Logger log = LogManager.getLogger(MOD_ID);
+
+    public static ResourceLocation getRL(String path){
+        return new ResourceLocation(MOD_ID,path);
+    }
+
+    public static String getRLStr(String path){
+        return MOD_ID + ":" + path;
+    }
 
     static {
         if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {

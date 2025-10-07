@@ -1879,6 +1879,11 @@ item.contenttweaker.guilt.name=原罪符文
 contenttweaker.part.raw_ore=粗%s
 contenttweaker.part.raw_ore_gem=未雕琢的%s
 contenttweaker.part.raw_block=粗%s块
+
+novaeng.part.raw_ore=粗%s
+novaeng.part.raw_ore_gem=未雕琢的%s
+novaeng.part.raw_block=粗%s块
+
 base.material.ancient_debris=下界合金碎片
 base.material.astral_starmetal=星辉
 base.material.boron=硼
