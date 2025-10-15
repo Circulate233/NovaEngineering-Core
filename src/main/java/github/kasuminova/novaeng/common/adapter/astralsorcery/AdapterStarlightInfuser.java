@@ -7,7 +7,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent;
 import github.kasuminova.novaeng.common.machine.IllumPool;
-import github.kasuminova.novaeng.common.util.Function;
+import github.kasuminova.novaeng.common.util.Functions;
 import hellfirepvp.astralsorcery.common.crafting.ItemHandle;
 import hellfirepvp.astralsorcery.common.crafting.infusion.AbstractInfusionRecipe;
 import hellfirepvp.astralsorcery.common.crafting.infusion.InfusionRecipeRegistry;
@@ -111,10 +111,10 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                 if (event.phase != Phase.START) return;
                 IllumPool.onRecipeTick(event, manaToConsume);
             });
-            recipe.addTooltip(Function.getText("novaeng.illum_pool.input.mana", manaToConsume));
+            recipe.addTooltip(Functions.getText("novaeng.illum_pool.input.mana", manaToConsume));
             addStarlightCatalystHandler(recipe);
-            recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
-                    Function.getText("top.illum_pool.mode.d")));
+            recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
+                    Functions.getText("top.illum_pool.mode.d")));
             recipe.addTooltip("novaeng.illum_pool.input.illum");
 
             recipes.add(recipe);

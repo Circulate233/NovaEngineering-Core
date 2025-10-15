@@ -3,7 +3,7 @@ package github.kasuminova.novaeng.common.crafttweaker.expansion;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.machine.IllumPool;
-import github.kasuminova.novaeng.common.util.Function;
+import github.kasuminova.novaeng.common.util.Functions;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipePrimer;
 import stanhebben.zenscript.annotations.ZenExpansion;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -16,7 +16,7 @@ public class RecipePrimerIllumPool {
     public static RecipePrimer addIllumPoolManaAddHandler(RecipePrimer primer, int amount) {
         primer.addPreCheckHandler(event -> IllumPool.onAddManaRecipeCheck(event, amount));
         primer.addFactoryPreTickHandler(event -> IllumPool.onAddManaRecipeTick(event, amount));
-        primer.addRecipeTooltip(Function.getText("novaeng.illum_pool.recipe.mana", NovaEngUtils.formatDecimal(amount)));
+        primer.addRecipeTooltip(Functions.getText("novaeng.illum_pool.recipe.mana", NovaEngUtils.formatDecimal(amount)));
         return primer;
     }
 
@@ -24,7 +24,7 @@ public class RecipePrimerIllumPool {
     public static RecipePrimer addIllumPoolIllumAddHandler(RecipePrimer primer, int amount) {
         primer.addPreCheckHandler(event -> IllumPool.onAddIllumRecipeCheck(event, amount));
         primer.addFactoryPreTickHandler(event -> IllumPool.onAddIllumRecipeTick(event, amount));
-        primer.addRecipeTooltip(Function.getText("novaeng.illum_pool.recipe.illum", NovaEngUtils.formatDecimal(amount)));
+        primer.addRecipeTooltip(Functions.getText("novaeng.illum_pool.recipe.illum", NovaEngUtils.formatDecimal(amount)));
         return primer;
     }
 

@@ -5,7 +5,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeFinishEvent;
 import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
-import github.kasuminova.novaeng.common.util.Function;
+import github.kasuminova.novaeng.common.util.Functions;
 import github.kasuminova.novaeng.common.util.RandomUtils;
 import github.kasuminova.novaeng.common.util.StringUtils;
 import hellfirepvp.astralsorcery.AstralSorcery;
@@ -64,7 +64,7 @@ public class IllumPool implements MachineSpecial {
      * x x x x x
      *   x x x
      */
-    public static final List<BlockPos> CATALYST_POS_PRESET = Function.asList(
+    public static final List<BlockPos> CATALYST_POS_PRESET = Functions.asList(
             withXZ(1, 1), withXZ(0, 1), withXZ(-1, 1),
             withXZ(2, 2), withXZ(1, 2), withXZ(0, 2), withXZ(-1, 2), withXZ(-2, 2),
             withXZ(2, 3), withXZ(1, 3), withXZ(0, 3), withXZ(-1, 3), withXZ(-2, 3),
@@ -80,7 +80,7 @@ public class IllumPool implements MachineSpecial {
      * x x x x x x x
      * c x x x x x c
      */
-    public static final List<BlockPos> CRYSTAL_POS_PRESET = Function.asList(
+    public static final List<BlockPos> CRYSTAL_POS_PRESET = Functions.asList(
             new BlockPos(3, 2, 6), new BlockPos(-3, 2, 6),
             new BlockPos(3, 2, 0), new BlockPos(-3, 2, 0)
     );

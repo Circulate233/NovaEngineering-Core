@@ -8,7 +8,7 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent;
 import github.kasuminova.novaeng.common.machine.IllumPool;
-import github.kasuminova.novaeng.common.util.Function;
+import github.kasuminova.novaeng.common.util.Functions;
 import hellfirepvp.modularmachinery.common.crafting.MachineRecipe;
 import hellfirepvp.modularmachinery.common.crafting.adapter.RecipeAdapter;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
@@ -79,14 +79,14 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                 if (event.phase != Phase.START) return;
                 IllumPool.onRecipeTick(event, manaToConsume);
             });
-            recipe.addTooltip(Function.getText("novaeng.illum_pool.input.mana",manaToConsume));
+            recipe.addTooltip(Functions.getText("novaeng.illum_pool.input.mana",manaToConsume));
 
             // Catalyst
             IBlockState catalyst = infusionRecipe.getCatalyst();
             if (catalyst == null) {
                 addDefaultCatalystHandler(recipe);
-                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
-                        Function.getText("top.illum_pool.mode.e")));
+                recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
+                        Functions.getText("top.illum_pool.mode.e")));
             } else if (catalyst.equals(RecipeManaInfusion.conjurationState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -95,8 +95,8 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                         event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
-                        Function.getText("top.illum_pool.mode.b")));
+                recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
+                        Functions.getText("top.illum_pool.mode.b")));
             } else if (catalyst.equals(RecipeManaInfusion.alchemyState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -105,8 +105,8 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                         event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
-                        Function.getText("top.illum_pool.mode.a")));
+                recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
+                        Functions.getText("top.illum_pool.mode.a")));
             } else if (catalyst.equals(ExtraBotanyAPI.dimensionState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -115,8 +115,8 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                         event.setFailed("novaeng.illum_pool.failed.input");
                     }
                 });
-                recipe.addTooltip(Function.getText("novaeng.illum_pool.illum_pool.mode",
-                        Function.getText("top.illum_pool.mode.c")));
+                recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
+                        Functions.getText("top.illum_pool.mode.c")));
             } else {
                 addDefaultCatalystHandler(recipe);
             }

@@ -36,28 +36,26 @@ public class StringUtils {
         for (final String s : source) {
             String str = s.replace(" ", "").toLowerCase();
 
-            char[] targetCharArr = str.toCharArray();
-
-            int matchRate = getMatchRate(filterCharArr, targetCharArr);
+            int matchRate = getMatchRate(filterCharArr, str);
             if (matchRate > 0) {
                 sorted.add(new MatchResult(s, matchRate));
             }
         }
 
-        return sorted.stream().map(e -> e.str).collect(Collectors.toList());
+        return sorted.stream().map(e -> e.str).collect(Collectors.toCollection(ObjectArrayList::new));
     }
 
-    private static int getMatchRate(final char[] filterCharArr, final char[] targetCharArr) {
+    private static int getMatchRate(final char[] filterCharArr, final String targetCharArr) {
         int matchRate = 0;
         int matchedCharCount = 0;
         int targetIndex = 0;
 
         filter:
-        for (final char c : filterCharArr) {
-            for (int i = targetIndex; i < targetCharArr.length; i++) {
-                char tc = targetCharArr[i];
+        for (char c : filterCharArr) {
+            for (int i = targetIndex; i < targetCharArr.length(); i++) {
+                char tc = targetCharArr.charAt(i);
                 if (c == tc) {
-                    matchRate += targetCharArr.length - targetIndex + 1;
+                    matchRate += targetCharArr.length() - targetIndex + 1;
 
                     targetIndex++;
                     matchedCharCount++;
@@ -66,7 +64,7 @@ public class StringUtils {
             }
         }
 
-        if (targetCharArr.length >= filterCharArr.length && matchedCharCount == filterCharArr.length) {
+        if (targetCharArr.length() >= filterCharArr.length && matchedCharCount == filterCharArr.length) {
             return Integer.MAX_VALUE;
         }
         return matchRate;
@@ -98,6 +96,11 @@ public class StringUtils {
         return ObjectLists.singleton(key);
     }
 
+    /**
+     * @param str 驼峰结构的字符串
+     * @return 蛇形结构的字符串
+     */
+    @ZenMethod
     @NotNull
     public static String camelToSnake(@NotNull String str) {
         if (str == null || str.isEmpty()) return str;
@@ -115,7 +118,7 @@ public class StringUtils {
                 if (prevWasLower) {
                     buffer[index++] = '_';
                 }
-                buffer[index++] = (char)(c + 32);
+                buffer[index++] = (char) (c + 32);
                 prevWasLower = false;
             } else {
                 buffer[index++] = c;

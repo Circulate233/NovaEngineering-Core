@@ -19,7 +19,7 @@ public class BookTransformerAppendModifiers extends SectionTransformer {
     private final boolean armour;
     private final List<Modifier> modCollector;
     public static BookTransformerAppendModifiers INSTANCE_FALSE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), false, Register.TRAITREGISTER.modifierTraitsF);
-    public static BookTransformerAppendModifiers INSTANCE_TRUE= new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), true, Register.TRAITREGISTER.modifierTraitsT);
+    public static BookTransformerAppendModifiers INSTANCE_TRUE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), true, Register.TRAITREGISTER.modifierTraitsT);
 
     public BookTransformerAppendModifiers(BookRepository source, boolean armour, List<Modifier> modCollector) {
         super("modifiers");

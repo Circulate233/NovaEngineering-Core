@@ -36,7 +36,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 
 @ZenRegister
 @ZenClass("novaeng.Function")
-public class Function {
+public class Functions {
 
     @SafeVarargs
     public static <T> ObjectList<T> asList(T... s){

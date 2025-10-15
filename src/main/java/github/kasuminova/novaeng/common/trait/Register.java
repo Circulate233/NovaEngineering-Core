@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.trait;
 
-import com.google.common.collect.Lists;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
 import github.kasuminova.novaeng.common.item.ItemBasic;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.tools.AbstractToolPulse;
 
@@ -11,8 +11,8 @@ import java.util.List;
 public class Register extends AbstractToolPulse {
 
     public static Register TRAITREGISTER = new Register();
-    public List<Modifier> modifierTraitsF = Lists.newLinkedList();
-    public List<Modifier> modifierTraitsT = Lists.newLinkedList();
+    public List<Modifier> modifierTraitsF = new ObjectArrayList<>();
+    public List<Modifier> modifierTraitsT = new ObjectArrayList<>();
 
     public void registerModifiers() {
         TraitMagicBreaking traitMagicBreaking = registerModifier(new TraitMagicBreaking());
