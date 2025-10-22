@@ -25,6 +25,7 @@ import github.kasuminova.novaeng.common.handler.FTBHandler;
 import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
 import github.kasuminova.novaeng.common.handler.HyperNetMachineEventHandler;
 import github.kasuminova.novaeng.common.handler.IEHandler;
+import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetTerminal;
@@ -111,11 +112,12 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(WorldLoadedHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler.INSTANCE);
 
         if (Loader.isModLoaded("ftbquests"))
             MinecraftForge.EVENT_BUS.register(FTBHandler.INSTANCE);
 
-        if (NovaEngCoreConfig.SERVER.SpecialMachine)
+        if (NovaEngCoreConfig.SERVER.specialMachine)
             MinecraftForge.EVENT_BUS.register(IEHandler.INSTANCE);
 
         if (Loader.isModLoaded("ic2")) {
@@ -134,7 +136,7 @@ public class CommonProxy implements IGuiHandler {
         RecipeAdapterExtended.registerAdapter();
         AssemblyLine.registerNetNode();
         HyperNetRecipeManager.registerRecipes();
-        if (NovaEngCoreConfig.SERVER.SpecialMachine) {
+        if (NovaEngCoreConfig.SERVER.specialMachine) {
             if (Mods.ASTRAL_SORCERY.isPresent() && Mods.BOTANIA.isPresent()) {
                 RegistryMachineSpecial.registrySpecialMachine(IllumPool.INSTANCE);
             }

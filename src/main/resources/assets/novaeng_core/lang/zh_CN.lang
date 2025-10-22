@@ -7,6 +7,8 @@ java.version.warning.confirm=是否继续运行？
 java.version.blocked=检测到不兼容的Java版本
 mod.ecoae.warning=重复添加的MOD:ECOAEExtension
 
+key.novaeng.item_display.tooltip=按下 §6%s§r 将物品发送至聊天栏
+
 item.hypernet_connect_card.tooltip.1=§9这张存储卡可以储存一个 HyperNet 网络的频段和坐标信息，存储的密钥经过重重加密。
 item.hypernet_connect_card.tooltip.2=§9右击支持 HyperNet 的机械控制器，即可自动解析存储卡并连接至 HyperNet 计算网络。
 item.hypernet_connect_card.tooltip.3=§a存储卡可以重复使用。

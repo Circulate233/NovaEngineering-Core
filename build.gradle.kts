@@ -231,7 +231,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:jetif-303122:2919936"))
     implementation(rfg.deobf("curse.maven:ctm-267602:2915363"))
 //    implementation(rfg.deobf("curse.maven:component-model-hider-940949:4885858"))
-    implementation(rfg.deobf("curse.maven:had-enough-items-557549:6930666"))
+    implementation(rfg.deobf("curse.maven:had-enough-items-557549:7057606"))
     implementation(rfg.deobf("curse.maven:the-one-probe-245211:2667280"))
     implementation(rfg.deobf("curse.maven:FTB-Library-237167:2985811"))
     implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))
@@ -306,7 +306,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
-    implementation(rfg.deobf("curse.maven:random-complement-1198138:6995821"))
+    implementation(rfg.deobf("curse.maven:random-complement-1198138:7133485"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
 }

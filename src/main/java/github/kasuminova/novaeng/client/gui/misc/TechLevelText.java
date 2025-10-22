@@ -1,9 +1,11 @@
 package github.kasuminova.novaeng.client.gui.misc;
 
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Getter
 @SideOnly(Side.CLIENT)
 public class TechLevelText {
     private final String levelText;
@@ -34,11 +36,4 @@ public class TechLevelText {
         return new String[]{levelText, subLevelText.replace(".", "")};
     }
 
-    public String getLevelText() {
-        return levelText;
-    }
-
-    public String getSubLevelText() {
-        return subLevelText;
-    }
 }

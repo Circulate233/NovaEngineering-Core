@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.util.text.TextFormatting;
@@ -15,7 +16,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class ClientEventHandler {
 
     public static int debugPacketProfilerMessageLimit = 5;
     public static int debugTEPacketProfilerMessageLimit = 5;
-    private final List<String> debugMessageCache = new ArrayList<>();
+    private final List<String> debugMessageCache = new ObjectArrayList<>();
     private long clientTick = 0;
     private boolean debugMessageUpdateRequired = true;
 

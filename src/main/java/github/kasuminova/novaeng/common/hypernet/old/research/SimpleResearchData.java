@@ -1,10 +1,13 @@
 package github.kasuminova.novaeng.common.hypernet.old.research;
 
+import com.github.bsideup.jabel.Desugar;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"FeatureEnvy", "unused"})
+@Desugar
 public record SimpleResearchData(String researchName, float techLevel, double requiredPoints,
                                  double minComputationPointPerTick, List<String> descriptions,
                                  List<String> unlockedDescriptions, List<String> dependencies) implements Serializable {

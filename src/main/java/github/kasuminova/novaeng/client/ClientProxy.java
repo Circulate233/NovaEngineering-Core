@@ -39,6 +39,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -46,6 +48,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -82,6 +85,8 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isClea
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
 
+    @Getter
+    private static List<String> itemDisplayTooltip;
     private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
     public static List<Item> items = new ObjectArrayList<>();
     public static List<Block> blocks = new ObjectArrayList<>();
@@ -167,6 +172,8 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(HyperNetClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
+
+        itemDisplayTooltip = ObjectLists.singleton(I18n.format("key.novaeng.item_display.tooltip", "Ctrl + L"));
 
         if (Mods.GECKOLIB.isPresent()) {
             ClientRegistry.bindTileEntitySpecialRenderer(SingularityCore.class, MachineControllerRenderer.INSTANCE);

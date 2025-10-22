@@ -71,7 +71,7 @@ public class WorldLoadedHandler {
     public void onServerTick(TickEvent.ServerTickEvent event) {
         switch (event.phase) {
             case START -> {
-                if (SERVER.ForceChunkHandler) {
+                if (SERVER.forceChunkHandler) {
                     if (time % 100 == 0) {
                         request(Universe.get().server);
                     }

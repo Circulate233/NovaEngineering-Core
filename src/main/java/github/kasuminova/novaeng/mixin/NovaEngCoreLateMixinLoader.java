@@ -33,6 +33,7 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_mets.json", "mets");
         addModdedMixinCFG("mixins.novaeng_core_nae2.json", "nae2");
         addModdedMixinCFG("mixins.novaeng_core_botania.json", "botania", "psi");
+        addModdedMixinCFG("mixins.novaeng_core_jei.json", "jei");
         addModdedMixinCFG("mixins.novaeng_core_jetif.json", "jetif");
         addModdedMixinCFG("mixins.novaeng_core_opticheck.json", "opticheck");
         addModdedMixinCFG("mixins.novaeng_core_electroblobs.json", "ebwizardry");
