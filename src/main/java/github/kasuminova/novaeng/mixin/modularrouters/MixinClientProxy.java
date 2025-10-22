@@ -9,7 +9,7 @@ import vazkii.psi.common.Psi;
 /*
   来自Psi的调用方法,解决一些内存泄露问题
  */
-@Mixin(value = ClientProxy.class,remap = false)
+@Mixin(value = ClientProxy.class, remap = false)
 public class MixinClientProxy {
 
     /**

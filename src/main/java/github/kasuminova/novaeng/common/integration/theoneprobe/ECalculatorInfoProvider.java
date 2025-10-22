@@ -29,8 +29,8 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
 
     public static final ECalculatorInfoProvider INSTANCE = new ECalculatorInfoProvider();
 
-    public static final Color LOW_COLOR  = new Color(0xCC54FF9F);
-    public static final Color MID_COLOR  = new Color(0xCCFFFF00);
+    public static final Color LOW_COLOR = new Color(0xCC54FF9F);
+    public static final Color MID_COLOR = new Color(0xCCFFFF00);
     public static final Color FULL_COLOR = new Color(0xCCFF4500);
 
     private static final int CPU_USAGE_GREEN_THRESHOLD = 400;
@@ -44,26 +44,11 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
     private ECalculatorInfoProvider() {
     }
 
-    @Override
-    public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "ecalculator_info_provider";
-    }
-
-    @Override
-    public void addProbeInfo(final ProbeMode mode, final IProbeInfo probeInfo, final EntityPlayer player, final World world, final IBlockState blockState, final IProbeHitData data) {
-        final TileEntity te = world.getTileEntity(data.getPos());
-        if (te instanceof final ECalculatorController controller) {
-            processControllerInfo(probeInfo, controller);
-        } else if (te instanceof final ECalculatorThreadCore threadCore) {
-            processThreadCoreInfo(probeInfo, threadCore);
-        }
-    }
-
     private static void processThreadCoreInfo(final IProbeInfo probeInfo, final ECalculatorThreadCore threadCore) {
         final boolean online = threadCore.getController() != null;
         IProbeInfo box = newBox(probeInfo);
-        box.text("{*top.ecalculator.thread_core.status*}" + 
-                 (online ? "{*top.ecalculator.thread_core.status.online*}" : "{*top.ecalculator.thread_core.status.offline*}")
+        box.text("{*top.ecalculator.thread_core.status*}" +
+                (online ? "{*top.ecalculator.thread_core.status.online*}" : "{*top.ecalculator.thread_core.status.offline*}")
         );
         if (!online) {
             return;
@@ -214,8 +199,6 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         rightInfo.text(cpuUsageColor + NovaEngUtils.formatDecimal(totalCPUUsagePerSecond) + "µs/t");
     }
 
-    // Utility methods to darken and lighten colors
-
     private static int darkenColor(int color) {
         int a = (color >> 24) & 0xFF;
         int r = (int) (((color >> 16) & 0xFF) * 0.8);
@@ -232,12 +215,29 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
+    // Utility methods to darken and lighten colors
+
     private static IProbeInfo newVertical(final IProbeInfo probeInfo) {
         return probeInfo.vertical(probeInfo.defaultLayoutStyle().spacing(0));
     }
 
     private static IProbeInfo newBox(final IProbeInfo info) {
         return info.horizontal(info.defaultLayoutStyle().borderColor(0x801E90FF));
+    }
+
+    @Override
+    public String getID() {
+        return NovaEngineeringCore.MOD_ID + ':' + "ecalculator_info_provider";
+    }
+
+    @Override
+    public void addProbeInfo(final ProbeMode mode, final IProbeInfo probeInfo, final EntityPlayer player, final World world, final IBlockState blockState, final IProbeHitData data) {
+        final TileEntity te = world.getTileEntity(data.getPos());
+        if (te instanceof final ECalculatorController controller) {
+            processControllerInfo(probeInfo, controller);
+        } else if (te instanceof final ECalculatorThreadCore threadCore) {
+            processThreadCoreInfo(probeInfo, threadCore);
+        }
     }
 
 }

@@ -22,8 +22,7 @@ public class ResearchStationType extends NetNodeType {
 
     public ResearchStationType(final String typeName,
                                final long energyUsage,
-                               final float maxTechLevel)
-    {
+                               final float maxTechLevel) {
         super(typeName, energyUsage);
         this.maxTechLevel = maxTechLevel;
     }
@@ -31,8 +30,7 @@ public class ResearchStationType extends NetNodeType {
     @ZenMethod
     public static ResearchStationType create(final String typeName,
                                              final long energyUsage,
-                                             final float maxTechLevel)
-    {
+                                             final float maxTechLevel) {
         return new ResearchStationType(typeName, energyUsage, maxTechLevel);
     }
 
@@ -66,7 +64,7 @@ public class ResearchStationType extends NetNodeType {
                         .setValueInfo(I18n.translateToLocalFormatted("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
                         .setFooterInfo("novaeng.hypernet.research_station.overclocking.tooltip.1")
         );
-        MMEvents.onMachinePostTick(name,event -> {
+        MMEvents.onMachinePostTick(name, event -> {
             var ctrl = event.getController();
             var data = ctrl.getCustomDataTag();
             var nullable = ctrl.getSmartInterfaceData("overclocking");
@@ -76,7 +74,7 @@ public class ResearchStationType extends NetNodeType {
             } else if (overclocking > 5) {
                 nullable.setValue(5);
             }
-            data.setShort("overclocking",overclocking);
+            data.setShort("overclocking", overclocking);
         });
     }
 

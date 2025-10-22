@@ -82,20 +82,63 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isClea
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
 
+    private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
     public static List<Item> items = new ObjectArrayList<>();
     public static List<Block> blocks = new ObjectArrayList<>();
-    private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
 
     static {
         colorCache.defaultReturnValue(-1);
     }
 
-    public void setColor(String od, int color) {
-        colorCache.put(od, color);
-    }
-
     public ClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    public static int getColorForODFirst(String odName) {
+        var color = colorCache.getInt(odName);
+        if (color < 0) {
+            var od = OreDictionary.getOres(odName);
+            if (!od.isEmpty()) {
+                var stack = od.get(0);
+                var item = stack.getItem();
+                color = getColorForItemStack(od.get(0)).getRGB();
+            } else {
+                color = Color.WHITE.getRGB();
+            }
+            colorCache.put(odName, color);
+        }
+        return color;
+    }
+
+    public static Color getColorForItemStack(ItemStack stack) {
+        try {
+            TextureAtlasSprite sprite;
+            if (stack.getItem() instanceof ItemBlock) {
+                Minecraft mc = Minecraft.getMinecraft();
+                IBlockState state = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(mc.world,
+                        new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, stack.getMetadata(), mc.player);
+                List<BakedQuad> quads = mc.getBlockRendererDispatcher().getModelForState(state).getQuads(state, EnumFacing.NORTH, 0);
+                if (quads.isEmpty()) return Color.WHITE;
+                sprite = quads.get(0).getSprite();
+            } else sprite = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null)
+                    .getQuads(null, null, 0).get(0).getSprite();
+            IntList colours = new IntArrayList();
+            for (int[] rows : sprite.getFrameTextureData(0))
+                for (int colour : rows) if ((colour & 0xFF) > 0) colours.add(colour);
+            long r = 0, g = 0, b = 0;
+            for (int colour : colours) {
+                r += (colour >> 16) & 0xFF;
+                g += (colour >> 8) & 0xFF;
+                b += colour & 0xFF;
+            }
+            return new Color((int) r / colours.size(), (int) g / colours.size(), (int) b / colours.size(), 255);
+        } catch (Exception e) {
+            return Color.WHITE;
+        }
+    }
+
+    public void setColor(String od, int color) {
+        colorCache.put(od, color);
     }
 
     @Override
@@ -223,49 +266,6 @@ public class ClientProxy extends CommonProxy {
             case GEOCENTRIC_DRILL_CONTROLLER -> new GuiGeocentricDrill((GeocentricDrillController) present, player);
             case ECALCULATOR_CONTROLLER -> new GuiECalculatorController((ECalculatorController) present, player);
         };
-    }
-
-    public static int getColorForODFirst(String odName) {
-        var color = colorCache.getInt(odName);
-        if (color < 0) {
-            var od = OreDictionary.getOres(odName);
-            if (!od.isEmpty()) {
-                var stack = od.get(0);
-                var item = stack.getItem();
-                color = getColorForItemStack(od.get(0)).getRGB();
-            } else {
-                color = Color.WHITE.getRGB();
-            }
-            colorCache.put(odName, color);
-        }
-        return color;
-    }
-
-    public static Color getColorForItemStack(ItemStack stack) {
-        try {
-            TextureAtlasSprite sprite;
-            if (stack.getItem() instanceof ItemBlock) {
-                Minecraft mc = Minecraft.getMinecraft();
-                IBlockState state = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(mc.world,
-                        new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, stack.getMetadata(), mc.player);
-                List<BakedQuad> quads = mc.getBlockRendererDispatcher().getModelForState(state).getQuads(state, EnumFacing.NORTH, 0);
-                if (quads.isEmpty()) return Color.WHITE;
-                sprite = quads.get(0).getSprite();
-            } else sprite = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null)
-                    .getQuads(null, null, 0).get(0).getSprite();
-            IntList colours = new IntArrayList();
-            for (int[] rows : sprite.getFrameTextureData(0))
-                for (int colour : rows) if ((colour & 0xFF) > 0) colours.add(colour);
-            long r = 0, g = 0, b = 0;
-            for (int colour : colours) {
-                r += (colour >> 16) & 0xFF;
-                g += (colour >> 8) & 0xFF;
-                b += colour & 0xFF;
-            }
-            return new Color((int) r / colours.size(), (int) g / colours.size(), (int) b / colours.size(), 255);
-        } catch (Exception e) {
-            return Color.WHITE;
-        }
     }
 
 }

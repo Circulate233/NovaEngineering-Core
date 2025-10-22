@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mixin(value = ItemRenderHack.class,remap = false)
+@Mixin(value = ItemRenderHack.class, remap = false)
 public class MixinItemRenderHack {
 
     @Unique

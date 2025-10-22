@@ -26,9 +26,11 @@ import java.util.UUID;
  */
 @Mixin(PlayerProgress.class)
 public abstract class MixinPlayerProgress {
-    @Shadow(remap = false) public abstract Collection<AbstractPerk> getAppliedPerks();
+    @Shadow(remap = false)
+    public abstract Collection<AbstractPerk> getAppliedPerks();
 
-    @Shadow(remap = false) public abstract List<AbstractPerk> getSealedPerks();
+    @Shadow(remap = false)
+    public abstract List<AbstractPerk> getSealedPerks();
 
     @Inject(method = "load", at = @At("HEAD"), remap = false)
     private void onLoadPre(final NBTTagCompound compound, final CallbackInfo ci) {

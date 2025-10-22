@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.container.slot;
 
 import github.kasuminova.novaeng.common.util.TileItemHandler;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,14 +14,17 @@ import java.util.List;
 
 public abstract class SlotConditionItemHandler extends SlotItemHandler {
     protected final int displayID;
-
-    protected boolean enabled = false;
-    protected boolean hovered = false;
-
+    @Getter
     protected final List<SlotConditionItemHandler> dependencies = new LinkedList<>();
+    @Getter
     protected final List<SlotConditionItemHandler> dependents = new LinkedList<>();
+    @Getter
     protected final List<SlotConditionItemHandler> softDependents = new LinkedList<>();
+    @Getter
     protected final List<SlotConditionItemHandler> softDependencies = new LinkedList<>();
+    protected boolean enabled = false;
+    @Getter
+    protected boolean hovered = false;
 
     public SlotConditionItemHandler(final TileItemHandler inventoryIn, final int index, final int displayID) {
         super(inventoryIn, index, 0, 0);
@@ -139,22 +143,6 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
 
     public abstract String getSlotDescription();
 
-    public List<SlotConditionItemHandler> getDependencies() {
-        return dependencies;
-    }
-
-    public List<SlotConditionItemHandler> getDependents() {
-        return dependents;
-    }
-
-    public List<SlotConditionItemHandler> getSoftDependents() {
-        return softDependents;
-    }
-
-    public List<SlotConditionItemHandler> getSoftDependencies() {
-        return softDependencies;
-    }
-
     @Override
     public TileItemHandler getItemHandler() {
         return (TileItemHandler) super.getItemHandler();
@@ -163,10 +151,6 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
     public boolean isInvalid() {
         ItemStack stackInSlot = getStack();
         return !stackInSlot.isEmpty() && !isItemValid(stackInSlot);
-    }
-
-    public boolean isHovered() {
-        return hovered;
     }
 
     public SlotConditionItemHandler setHovered(final boolean hovered) {

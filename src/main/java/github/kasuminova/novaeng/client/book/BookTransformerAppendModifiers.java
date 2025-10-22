@@ -15,11 +15,11 @@ import java.util.List;
 // adapted from Tinkers' MEMES BookTransformerAppendModifiers
 public class BookTransformerAppendModifiers extends SectionTransformer {
 
+    public static BookTransformerAppendModifiers INSTANCE_FALSE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), false, Register.TRAITREGISTER.modifierTraitsF);
+    public static BookTransformerAppendModifiers INSTANCE_TRUE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), true, Register.TRAITREGISTER.modifierTraitsT);
     private final BookRepository source;
     private final boolean armour;
     private final List<Modifier> modCollector;
-    public static BookTransformerAppendModifiers INSTANCE_FALSE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), false, Register.TRAITREGISTER.modifierTraitsF);
-    public static BookTransformerAppendModifiers INSTANCE_TRUE = new BookTransformerAppendModifiers(new FileRepository("tconstruct:book"), true, Register.TRAITREGISTER.modifierTraitsT);
 
     public BookTransformerAppendModifiers(BookRepository source, boolean armour, List<Modifier> modCollector) {
         super("modifiers");

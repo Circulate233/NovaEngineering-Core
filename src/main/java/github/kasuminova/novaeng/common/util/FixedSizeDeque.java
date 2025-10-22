@@ -38,14 +38,14 @@ public class FixedSizeDeque<E> implements Iterable<E> {
     }
 
     public E getFirst() {
-        if (deque.isEmpty()){
+        if (deque.isEmpty()) {
             return null;
         }
         return deque.getFirst();
     }
 
-    public E getLast(){
-        if (deque.isEmpty()){
+    public E getLast() {
+        if (deque.isEmpty()) {
             return null;
         }
         return deque.getLast();

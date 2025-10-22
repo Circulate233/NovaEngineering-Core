@@ -20,10 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.EnumMap;
 
 @Mixin(FMLEventChannel.class)
-@SuppressWarnings("VulnerableCodeUsages")
+@SuppressWarnings({"VulnerableCodeUsages", "UnusedMixin"})
 public class MixinFMLEventChannel {
 
-    @Shadow(remap = false) private EnumMap<Side, FMLEmbeddedChannel> channels;
+    @Shadow(remap = false)
+    private EnumMap<Side, FMLEmbeddedChannel> channels;
 
     @Inject(method = "sendToAll", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectSendToAll(final FMLProxyPacket pkt, final CallbackInfo ci) {

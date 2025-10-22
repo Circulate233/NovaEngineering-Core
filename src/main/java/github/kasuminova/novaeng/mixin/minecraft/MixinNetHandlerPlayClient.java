@@ -13,5 +13,6 @@ public class MixinNetHandlerPlayClient {
      * @reason 废弃服务端到客户端的配方书同步
      */
     @Overwrite
-    public void handleRecipeBook(SPacketRecipeBook packetIn) {}
+    public void handleRecipeBook(SPacketRecipeBook packetIn) {
+    }
 }

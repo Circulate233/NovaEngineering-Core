@@ -1,12 +1,13 @@
 package github.kasuminova.novaeng.common.machine.Drills;
 
-public class MineralExtractor extends Drill{
+public class MineralExtractor extends Drill {
     public static final MineralExtractor INSTANCE = new MineralExtractor();
 
     @Override
     protected String getCoreTheardName() {
         return "novaeng.drill.thread.a";
     }
+
     @Override
     protected String getMachineName() {
         return "mineral_extractor";
@@ -18,7 +19,7 @@ public class MineralExtractor extends Drill{
     }
 
     @Override
-    protected float getAdvancedRecipeTimeMultiple(){
+    protected float getAdvancedRecipeTimeMultiple() {
         return 1.5f;
     }
 

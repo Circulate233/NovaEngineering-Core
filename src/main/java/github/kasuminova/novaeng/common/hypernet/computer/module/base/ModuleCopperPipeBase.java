@@ -1,4 +1,3 @@
-
 package github.kasuminova.novaeng.common.hypernet.computer.module.base;
 
 import crafttweaker.annotations.ZenRegister;

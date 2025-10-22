@@ -12,7 +12,7 @@ public class ECalculatorParallelProc extends ECalculatorPart {
     }
 
     public int getParallelism() {
-         return ((BlockECalculatorParallelProc)this.getBlock()).getParallelism();
+        return ((BlockECalculatorParallelProc) this.getBlock()).getParallelism();
     }
 
     public Block getBlock() {

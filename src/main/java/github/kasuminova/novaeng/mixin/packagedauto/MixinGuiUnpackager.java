@@ -15,9 +15,9 @@ public abstract class MixinGuiUnpackager extends GuiContainerTileBase<ContainerU
         super(containerUnpackager);
     }
 
-    @Redirect(method = "initGui",at = @At(value = "INVOKE", target = "Lthelm/packagedauto/client/gui/GuiUnpackager;addButton(Lnet/minecraft/client/gui/GuiButton;)Lnet/minecraft/client/gui/GuiButton;"))
+    @Redirect(method = "initGui", at = @At(value = "INVOKE", target = "Lthelm/packagedauto/client/gui/GuiUnpackager;addButton(Lnet/minecraft/client/gui/GuiButton;)Lnet/minecraft/client/gui/GuiButton;"))
     public GuiButton initGui(GuiUnpackager instance, GuiButton guiButton) {
-        if (guiButton.getClass().getSimpleName().equals("GuiButtonTracker")){
+        if (guiButton.getClass().getSimpleName().equals("GuiButtonTracker")) {
             return null;
         }
         return this.addButton(guiButton);

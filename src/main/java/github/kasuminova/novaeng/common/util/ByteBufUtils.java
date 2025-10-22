@@ -5,12 +5,12 @@ import io.netty.buffer.ByteBuf;
 public class ByteBufUtils {
 
     private static final short SHORT = (0xFF - 1);
-    private static final short INT   = (0xFF - 2);
-    private static final short LONG  = (0xFF - 3);
+    private static final short INT = (0xFF - 2);
+    private static final short LONG = (0xFF - 3);
 
-    private static final long  UINT_MAX   = 0xFFFFFFFFL;
-    private static final int   USHORT_MAX = 0xFFFF;
-    private static final short UBYTE_MAX  = 0xFF - 4;
+    private static final long UINT_MAX = 0xFFFFFFFFL;
+    private static final int USHORT_MAX = 0xFFFF;
+    private static final short UBYTE_MAX = 0xFF - 4;
 
     public static void writeVarLong(ByteBuf buf, long value) {
         if (value > UINT_MAX) {

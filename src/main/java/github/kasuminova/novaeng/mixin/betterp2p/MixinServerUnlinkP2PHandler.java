@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@Mixin(value = ServerUnlinkP2PHandler.class,remap = false)
+@Mixin(value = ServerUnlinkP2PHandler.class, remap = false)
 public class MixinServerUnlinkP2PHandler {
 
     /**
@@ -25,7 +25,7 @@ public class MixinServerUnlinkP2PHandler {
 
         var player = ctx.getServerHandler().player;
         var cache = ModNetwork.INSTANCE.getPlayerState().get(player.getUniqueID());
-        if (cache == null){
+        if (cache == null) {
             return null;
         }
         player.getServer().addScheduledTask(() -> {

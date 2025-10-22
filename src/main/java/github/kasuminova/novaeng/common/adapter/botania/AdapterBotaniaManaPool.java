@@ -36,6 +36,28 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
         super(new ResourceLocation("botania", "pool"));
     }
 
+    protected static void addDefaultCatalystHandler(final MachineRecipe recipe) {
+        recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
+            if (event.phase != Phase.START) return;
+            TileMultiblockMachineController controller = event.getController();
+            boolean hasCatalyst = false;
+            if (controller.hasModifierReplacement(IllumPool.ALCHEMY_CATALYST)) {
+                hasCatalyst = true;
+            } else if (controller.hasModifierReplacement(IllumPool.CONJURATION_CATALYST)) {
+                hasCatalyst = true;
+            } else if (controller.hasModifierReplacement(IllumPool.DIMENSION_CATALYST)) {
+                hasCatalyst = true;
+            }
+            if (hasCatalyst) {
+                event.setFailed("novaeng.illum_pool.failed.input");
+                return;
+            }
+            if (!controller.hasModifierReplacement(IllumPool.NORMAL_CATALYST)) {
+                event.setFailed("novaeng.illum_pool.failed.input");
+            }
+        });
+    }
+
     @Nonnull
     @Override
     public Collection<MachineRecipe> createRecipesFor(final ResourceLocation owningMachineName,
@@ -46,7 +68,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
         List<MachineRecipe> recipes = new ArrayList<>();
         for (final RecipeManaInfusion infusionRecipe : BotaniaAPI.manaInfusionRecipes) {
             MachineRecipe recipe = createRecipeShell(
-                    new ResourceLocation("botania",  "mana_infusion_" + incId),
+                    new ResourceLocation("botania", "mana_infusion_" + incId),
                     owningMachineName,
                     20, 0, false);
 
@@ -79,7 +101,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                 if (event.phase != Phase.START) return;
                 IllumPool.onRecipeTick(event, manaToConsume);
             });
-            recipe.addTooltip(Functions.getText("novaeng.illum_pool.input.mana",manaToConsume));
+            recipe.addTooltip(Functions.getText("novaeng.illum_pool.input.mana", manaToConsume));
 
             // Catalyst
             IBlockState catalyst = infusionRecipe.getCatalyst();
@@ -127,28 +149,6 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
         }
 
         return recipes;
-    }
-
-    protected static void addDefaultCatalystHandler(final MachineRecipe recipe) {
-        recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
-            if (event.phase != Phase.START) return;
-            TileMultiblockMachineController controller = event.getController();
-            boolean hasCatalyst = false;
-            if (controller.hasModifierReplacement(IllumPool.ALCHEMY_CATALYST)) {
-                hasCatalyst = true;
-            } else if (controller.hasModifierReplacement(IllumPool.CONJURATION_CATALYST)) {
-                hasCatalyst = true;
-            } else if (controller.hasModifierReplacement(IllumPool.DIMENSION_CATALYST)) {
-                hasCatalyst = true;
-            }
-            if (hasCatalyst) {
-                event.setFailed("novaeng.illum_pool.failed.input");
-                return;
-            }
-            if (!controller.hasModifierReplacement(IllumPool.NORMAL_CATALYST)) {
-                event.setFailed("novaeng.illum_pool.failed.input");
-            }
-        });
     }
 
 }

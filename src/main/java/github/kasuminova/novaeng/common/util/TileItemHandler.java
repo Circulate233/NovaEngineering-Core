@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.util;
 import hellfirepvp.modularmachinery.common.tiles.base.TileEntitySynchronized;
 import hellfirepvp.modularmachinery.common.util.IItemHandlerImpl;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagByte;
@@ -19,11 +20,18 @@ import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 public class TileItemHandler extends IItemHandlerImpl {
+    @Getter
     protected final String invName;
     protected final BitSet availableSlots = new BitSet();
     protected final TileEntitySynchronized owner;
 
     private IntConsumer onChangedListener = null;
+
+    public TileItemHandler(final TileEntitySynchronized owner, final int[] inSlots, final int[] outSlots, final String invName) {
+        super(inSlots, outSlots);
+        this.owner = owner;
+        this.invName = invName;
+    }
 
     public static TileItemHandler create(final TileEntitySynchronized owner, final int slotCount, final String invName) {
         int[] slotIDs = new int[slotCount];
@@ -31,12 +39,6 @@ public class TileItemHandler extends IItemHandlerImpl {
             slotIDs[slotID] = slotID;
         }
         return new TileItemHandler(owner, slotIDs, slotIDs, invName).setAllSlotAvailable().updateSlotLimits();
-    }
-
-    public TileItemHandler(final TileEntitySynchronized owner, final int[] inSlots, final int[] outSlots, final String invName) {
-        super(inSlots, outSlots);
-        this.owner = owner;
-        this.invName = invName;
     }
 
     public TileItemHandler updateInOutSlots() {
@@ -89,10 +91,6 @@ public class TileItemHandler extends IItemHandlerImpl {
 
     public IntStream getAvailableSlotsStream() {
         return availableSlots.stream();
-    }
-
-    public String getInvName() {
-        return invName;
     }
 
     @Override

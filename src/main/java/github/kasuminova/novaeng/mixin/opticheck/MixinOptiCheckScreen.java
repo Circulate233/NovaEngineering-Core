@@ -41,15 +41,15 @@ public class MixinOptiCheckScreen extends GuiScreen {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRenderer, Utils.color(I18n.format("text.tooltip.title")), this.width / 2, this.height / 2 - 100, 16777215);
         int i = 0;
-        for (String text: novaEngineering_Core$getString()){
-            Utils.handleGuiText(Utils.color(text), this.fontRenderer, this, this.width, this.height + i*20);
+        for (String text : novaEngineering_Core$getString()) {
+            Utils.handleGuiText(Utils.color(text), this.fontRenderer, this, this.width, this.height + i * 20);
             i++;
         }
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     @Unique
-    public String[] novaEngineering_Core$getString(){
+    public String[] novaEngineering_Core$getString() {
         return I18n.format("text.tooltip.message").split("#n");
     }
 

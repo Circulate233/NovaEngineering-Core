@@ -2,8 +2,8 @@ package github.kasuminova.novaeng.common.block.ecotech.efabricator.prop;
 
 public enum Levels {
 
-    L4(4,  4),
-    L6(8,  8),
+    L4(4, 4),
+    L6(8, 8),
     L9(16, 16);
 
     private final int queueDepthMul;

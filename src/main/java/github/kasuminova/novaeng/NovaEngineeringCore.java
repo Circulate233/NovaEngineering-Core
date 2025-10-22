@@ -48,14 +48,14 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG;
 import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PREFIX;
 
 @Mod(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_NAME, version = NovaEngineeringCore.VERSION,
-        dependencies = "required-after:forge@[14.23.5.2847,);" + 
-                       "required-after:modularmachinery@[2.1.0,);" + 
-                       "required:theoneprobe@[1.12-1.4.28,);" + 
-                       "required:appliedenergistics2@[v0.56.4,);" +
-                       "required:ae2fc@[2.6.3-r,);" +
-                       "required:configanytime@[2.0,);" + 
-                       "required:mixinbooter@[8.0,);" +
-                       "required:lumenized@[1.0.2,);",
+        dependencies = "required-after:forge@[14.23.5.2847,);" +
+                "required-after:modularmachinery@[2.1.0,);" +
+                "required:theoneprobe@[1.12-1.4.28,);" +
+                "required:appliedenergistics2@[v0.56.4,);" +
+                "required:ae2fc@[2.6.3-r,);" +
+                "required:configanytime@[2.0,);" +
+                "required:mixinbooter@[8.0,);" +
+                "required:lumenized@[1.0.2,);",
         acceptedMinecraftVersions = "[1.12, 1.13)",
         acceptableRemoteVersions = "[1.21.7, 1.23.0)"
 )
@@ -79,14 +79,6 @@ public class NovaEngineeringCore {
     public static CommonProxy proxy = null;
     public static Logger log = LogManager.getLogger(MOD_ID);
 
-    public static ResourceLocation getRL(String path){
-        return new ResourceLocation(MOD_ID,path);
-    }
-
-    public static String getRLStr(String path){
-        return MOD_ID + ":" + path;
-    }
-
     static {
         if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
             Thread thread = new Thread(() -> {
@@ -99,6 +91,14 @@ public class NovaEngineeringCore {
             thread.setName("NovaEng Core Hitokoto Initializer");
             thread.start();
         }
+    }
+
+    public static ResourceLocation getRL(String path) {
+        return new ResourceLocation(MOD_ID, path);
+    }
+
+    public static String getRLStr(String path) {
+        return MOD_ID + ":" + path;
     }
 
     @Mod.EventHandler

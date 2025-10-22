@@ -35,6 +35,8 @@ import github.kasuminova.novaeng.common.item.estorage.EStorageCellItem;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -56,15 +58,19 @@ import static appeng.helpers.ItemStackHelper.stackWriteToNBT;
 @SuppressWarnings("rawtypes")
 public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IAEAppEngInventory {
 
+    @Getter
     protected final AppEngCellInventory driveInv = new AppEngCellInventory(this, 1);
     protected final Map<IStorageChannel<? extends IAEStack<?>>, IMEInventoryHandler<?>> inventoryHandlers = new Reference2ObjectOpenHashMap<>();
 
     protected EStorageCellHandler cellHandler = null;
+    @Getter
     protected ECellDriveWatcher<IAEItemStack> watcher = null;
 
     protected boolean isCached = false;
 
     protected long lastWriteTick = 0;
+    @Setter
+    @Getter
     protected boolean writing = false;
 
     public EStorageCellDrive() {
@@ -104,6 +110,42 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
                 case C -> EStorageCellGas.LEVEL_C.getBytes(ItemStack.EMPTY);
             } : 0;
         };
+    }
+
+    public static DriveStorageType getCellType(final EStorageCell<?> cell) {
+        DriveStorageType type;
+        if (cell instanceof EStorageCellItem) {
+            type = DriveStorageType.ITEM;
+        } else if (cell instanceof EStorageCellFluid) {
+            type = DriveStorageType.FLUID;
+        } else if (Mods.MEKENG.isPresent() && cell instanceof EStorageCellGas) {
+            type = DriveStorageType.GAS;
+        } else {
+            return null;
+        }
+        return type;
+    }
+
+    public static DriveStorageCapacity getCapacity(final ICellInventoryHandler cellInvHandler) {
+        if (cellInvHandler == null) {
+            return DriveStorageCapacity.EMPTY;
+        }
+        ICellInventory cellInv = cellInvHandler.getCellInv();
+        if (cellInv == null) {
+            return DriveStorageCapacity.EMPTY;
+        }
+        long totalTypes = cellInv.getTotalItemTypes();
+        long storedTypes = cellInv.getStoredItemTypes();
+        if (storedTypes == 0) {
+            return DriveStorageCapacity.EMPTY;
+        }
+        if (cellInv.getFreeBytes() <= 0) {
+            return DriveStorageCapacity.FULL;
+        }
+        if (storedTypes >= totalTypes) {
+            return DriveStorageCapacity.TYPE_MAX;
+        }
+        return DriveStorageCapacity.EMPTY;
     }
 
     public void updateWriteState() {
@@ -210,43 +252,6 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         markForUpdate();
     }
 
-    public static DriveStorageType getCellType(final EStorageCell<?> cell) {
-        DriveStorageType type;
-        if (cell instanceof EStorageCellItem) {
-            type = DriveStorageType.ITEM;
-        } else if (cell instanceof EStorageCellFluid) {
-            type = DriveStorageType.FLUID;
-        } else if (Mods.MEKENG.isPresent() && cell instanceof EStorageCellGas) {
-            type = DriveStorageType.GAS;
-        } else {
-            return null;
-        }
-        return type;
-    }
-
-    public static DriveStorageCapacity getCapacity(final ICellInventoryHandler cellInvHandler) {
-        if (cellInvHandler == null) {
-            return DriveStorageCapacity.EMPTY;
-        }
-        ICellInventory cellInv = cellInvHandler.getCellInv();
-        if (cellInv == null) {
-            return DriveStorageCapacity.EMPTY;
-        }
-        long totalTypes = cellInv.getTotalItemTypes();
-        long storedTypes = cellInv.getStoredItemTypes();
-        if (storedTypes == 0) {
-            return DriveStorageCapacity.EMPTY;
-        }
-        if (cellInv.getFreeBytes() <= 0) {
-            return DriveStorageCapacity.FULL;
-        }
-        if (storedTypes >= totalTypes) {
-            return DriveStorageCapacity.TYPE_MAX;
-        }
-        return DriveStorageCapacity.EMPTY;
-    }
-
-    @SuppressWarnings("unchecked")
     public <T extends IAEStack<T>> IMEInventoryHandler<T> getHandler(final IStorageChannel<T> channel) {
         updateHandler(false);
         if (driveInv.getStackInSlot(0).getItem() instanceof EStorageCell<?> cell && isCellSupported(cell.getLevel())) {
@@ -315,7 +320,6 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void postChanges(final IStorageGrid gs, final ItemStack removed, final ItemStack added, final IActionSource src) {
         if (cellHandler == null) {
             return;
@@ -342,24 +346,8 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         }
     }
 
-    public AppEngCellInventory getDriveInv() {
-        return driveInv;
-    }
-
-    public ECellDriveWatcher<IAEItemStack> getWatcher() {
-        return watcher;
-    }
-
     public void onWriting() {
         this.lastWriteTick = world.getTotalWorldTime();
-    }
-
-    public boolean isWriting() {
-        return writing;
-    }
-
-    public void setWriting(final boolean writing) {
-        this.writing = writing;
     }
 
     @Override

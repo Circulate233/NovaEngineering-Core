@@ -161,8 +161,7 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
     public void addInformation(@Nonnull final ItemStack stack,
                                @Nullable final World worldIn,
                                @Nonnull final List<String> tooltip,
-                               @Nonnull final ITooltipFlag flagIn)
-    {
+                               @Nonnull final ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         tooltip.add(I18n.format("item.novaeng_core.estorage_cell_drive.tooltip.0"));
         tooltip.add(I18n.format("item.novaeng_core.estorage_cell_drive.tooltip.1"));

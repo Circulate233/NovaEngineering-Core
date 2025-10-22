@@ -38,6 +38,28 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
         super(new ResourceLocation("astralsorcery", "starlight_infuser"));
     }
 
+    protected static void addStarlightCatalystHandler(final MachineRecipe recipe) {
+        recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
+            if (event.phase != Phase.START) return;
+            TileMultiblockMachineController controller = event.getController();
+            boolean hasCatalyst = false;
+            if (controller.hasModifierReplacement(IllumPool.ALCHEMY_CATALYST)) {
+                hasCatalyst = true;
+            } else if (controller.hasModifierReplacement(IllumPool.CONJURATION_CATALYST)) {
+                hasCatalyst = true;
+            } else if (controller.hasModifierReplacement(IllumPool.DIMENSION_CATALYST)) {
+                hasCatalyst = true;
+            }
+            if (hasCatalyst) {
+                event.setFailed("novaeng.illum_pool.failed.input");
+                return;
+            }
+            if (!controller.hasModifierReplacement(IllumPool.STARLIGHT_CATALYST)) {
+                event.setFailed("novaeng.illum_pool.failed.input");
+            }
+        });
+    }
+
     @Nonnull
     @Override
     public Collection<MachineRecipe> createRecipesFor(final ResourceLocation owningMachineName,
@@ -122,27 +144,5 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
         }
 
         return recipes;
-    }
-
-    protected static void addStarlightCatalystHandler(final MachineRecipe recipe) {
-        recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
-            if (event.phase != Phase.START) return;
-            TileMultiblockMachineController controller = event.getController();
-            boolean hasCatalyst = false;
-            if (controller.hasModifierReplacement(IllumPool.ALCHEMY_CATALYST)) {
-                hasCatalyst = true;
-            } else if (controller.hasModifierReplacement(IllumPool.CONJURATION_CATALYST)) {
-                hasCatalyst = true;
-            } else if (controller.hasModifierReplacement(IllumPool.DIMENSION_CATALYST)) {
-                hasCatalyst = true;
-            }
-            if (hasCatalyst) {
-                event.setFailed("novaeng.illum_pool.failed.input");
-                return;
-            }
-            if (!controller.hasModifierReplacement(IllumPool.STARLIGHT_CATALYST)) {
-                event.setFailed("novaeng.illum_pool.failed.input");
-            }
-        });
     }
 }

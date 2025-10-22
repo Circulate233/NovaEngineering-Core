@@ -16,7 +16,9 @@ import java.awt.Color;
 @Mixin(FontRenderer.class)
 public class MixinFontRenderer {
 
-    @Shadow @Final private int[] colorCode;
+    @Shadow
+    @Final
+    private int[] colorCode;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void onInit(final GameSettings gameSettingsIn, final ResourceLocation location, final TextureManager textureManagerIn, final boolean unicode, final CallbackInfo ci) {

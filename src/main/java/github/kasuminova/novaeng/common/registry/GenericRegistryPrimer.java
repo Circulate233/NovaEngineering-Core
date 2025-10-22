@@ -11,11 +11,10 @@ import java.util.Map;
 
 public class GenericRegistryPrimer {
     public static final GenericRegistryPrimer INSTANCE = new GenericRegistryPrimer();
+    private final Map<Type, List<IForgeRegistryEntry<?>>> primed = new Object2ObjectOpenHashMap<>();
 
     private GenericRegistryPrimer() {
     }
-
-    private final Map<Type, List<IForgeRegistryEntry<?>>> primed = new Object2ObjectOpenHashMap<>();
 
     public <V extends IForgeRegistryEntry<V>> V register(V entry) {
         Class<V> type = entry.getRegistryType();

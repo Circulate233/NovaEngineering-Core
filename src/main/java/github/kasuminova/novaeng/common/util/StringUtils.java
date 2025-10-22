@@ -28,7 +28,7 @@ public class StringUtils {
      * @param filter 字符串
      * @return 排序后的列表
      */
-    public static List<String> sortWithMatchRate(final Collection<String> source, final String filter) {
+    public static List<String> sortWithMatchRate(final String filter, final Collection<String> source) {
         PriorityQueue<MatchResult> sorted = new PriorityQueue<>();
 
         char[] filterCharArr = filter.replace(" ", "").toLowerCase().toCharArray();
@@ -72,12 +72,20 @@ public class StringUtils {
 
     @ZenMethod
     public static String[] getTexts(String key, Object... objs) {
-        return getText(key, objs).toArray(new String[0]);
+        if (NovaEngineeringCore.proxy.isClient()) {
+            var s = I18n.translateToLocalFormatted(key, objs);
+            return s.split("&n");
+        }
+        return new String[]{key};
     }
 
     @ZenMethod
     public static String[] getTexts(String key) {
-        return getText(key).toArray(new String[0]);
+        if (NovaEngineeringCore.proxy.isClient()) {
+            var s = I18n.translateToLocal(key);
+            return s.split("&n");
+        }
+        return new String[]{key};
     }
 
     public static List<String> getText(String key) {

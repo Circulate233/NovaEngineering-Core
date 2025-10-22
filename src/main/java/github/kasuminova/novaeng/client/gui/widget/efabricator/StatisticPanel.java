@@ -15,6 +15,7 @@ import github.kasuminova.novaeng.client.gui.widget.SizedRow;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUpdateEvent;
 import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 
 import java.util.Collections;
@@ -50,7 +51,7 @@ public class StatisticPanel extends SizedRow {
         TEXTURE_BACKGROUND.render(renderPos, gui);
         super.preRenderInternal(gui, renderSize, renderPos, mousePos);
     }
-    
+
     public static class Modules extends SizedColumn {
 
         public static final int WIDTH = 40;
@@ -59,6 +60,7 @@ public class StatisticPanel extends SizedRow {
                 GuiEFabricatorController.TEXTURES_ELEMENTS, 1, 186, WIDTH, HEIGHT
         );
 
+        @Getter
         private final Level level = new Level();
         private final MultiLineLabel patternBusCount;
         private final MultiLineLabel parallelProcCount;
@@ -112,16 +114,13 @@ public class StatisticPanel extends SizedRow {
             return super.onGuiEvent(event);
         }
 
-        public Level getLevel() {
-            return level;
-        }
-
         @Override
         protected void preRenderInternal(final WidgetGui gui, final RenderSize renderSize, final RenderPos renderPos, final MousePos mousePos) {
             TEXTURE_BACKGROUND.render(renderPos, gui);
             super.preRenderInternal(gui, renderSize, renderPos, mousePos);
         }
 
+        @Getter
         public static class Level extends DynamicWidget {
 
             public static final TextureProperties LEVEL = new TextureProperties(
@@ -139,7 +138,7 @@ public class StatisticPanel extends SizedRow {
             public static final TextureProperties L9 = new TextureProperties(
                     GuiEFabricatorController.TEXTURES_ELEMENTS, 209, 1, 5, 9
             );
-            
+
             private TextureProperties texture = L0;
 
             public Level() {
@@ -169,10 +168,6 @@ public class StatisticPanel extends SizedRow {
                 texture.renderIfPresent(renderPos.add(new RenderPos(LEVEL.width() + 1 /* padding */, 0)), gui);
             }
 
-            public TextureProperties getTexture() {
-                return texture;
-            }
-
             public Level setTexture(final TextureProperties texture) {
                 this.texture = texture;
                 return this;
@@ -189,7 +184,7 @@ public class StatisticPanel extends SizedRow {
         public static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
                 GuiEFabricatorController.TEXTURES_ELEMENTS, 42, 186, WIDTH, HEIGHT
         );
-        
+
         private final Info info;
         private final ProgressBar queueStatisticsBar;
 
@@ -274,7 +269,7 @@ public class StatisticPanel extends SizedRow {
 
             public Info setProgress(int prog, int max) {
                 progressPercent.setContents(Collections.singletonList(
-                        I18n.format("gui.efabricator.crafting_progress.0",  max <= 0 ? 0 : prog * 100 / max)
+                        I18n.format("gui.efabricator.crafting_progress.0", max <= 0 ? 0 : prog * 100 / max)
                 ));
                 progress.setContents(Collections.singletonList(
                         I18n.format("gui.efabricator.crafting_progress.1", prog, max)
@@ -293,7 +288,7 @@ public class StatisticPanel extends SizedRow {
         public static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
                 GuiEFabricatorController.TEXTURES_ELEMENTS, 94, 186, WIDTH, HEIGHT
         );
-        
+
         private final Info info;
         private final ProgressBar parallelismBar;
 
@@ -348,7 +343,7 @@ public class StatisticPanel extends SizedRow {
 
             public static final int WIDTH = 51;
             public static final int HEIGHT = 32;
-            
+
             private final MultiLineLabel parallelism;
             private final MultiLineLabel parallelismLimit;
             private final MultiLineLabel parallelismOverflow;

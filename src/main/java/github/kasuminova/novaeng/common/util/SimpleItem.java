@@ -17,6 +17,7 @@ import java.util.function.Function;
 @Desugar
 public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
 
+    public static final SimpleItem empty = new SimpleItem(ItemStack.EMPTY);
     private static final NBTTagCompound NullNbt = new NBTTagCompound() {
         @Override
         public boolean equals(Object nbt) {
@@ -28,14 +29,12 @@ public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
             return Integer.MIN_VALUE;
         }
     };
+    private static final Reference2ObjectMap<Item, Int2ObjectOpenHashMapS> chane = Reference2ObjectMaps.synchronize(new Reference2ObjectOpenHashMap<>());
+    private static final Function<Item, Int2ObjectOpenHashMapS> intMap = item -> new Int2ObjectOpenHashMapS();
 
     private SimpleItem(ItemStack stack) {
         this(stack.getItem(), stack.getItemDamage(), stack.getTagCompound());
     }
-
-    public static final SimpleItem empty = new SimpleItem(ItemStack.EMPTY);
-    private static final Reference2ObjectMap<Item, Int2ObjectOpenHashMapS> chane = Reference2ObjectMaps.synchronize(new Reference2ObjectOpenHashMap<>());
-    private static final Function<Item, Int2ObjectOpenHashMapS> intMap = item -> new Int2ObjectOpenHashMapS();
 
     public static SimpleItem getInstance(final ItemStack stack) {
         if (stack.isEmpty()) return empty;

@@ -38,44 +38,44 @@ public class DreamEnergyPortHandler extends BasicTransferHandler<TileDreamEnergy
 
     public void addToBuffer(long energy) {
         if (energy > 0L) {
-            DreamEnergyCore.receiveEnergy(getCtrl(),1,energy);
-            ((TileDreamEnergyPort)this.device).markServerEnergyChanged();
+            DreamEnergyCore.receiveEnergy(getCtrl(), 1, energy);
+            ((TileDreamEnergyPort) this.device).markServerEnergyChanged();
         }
     }
 
     public long removeFromBuffer(long energy) {
-        long a = Math.min(Math.min(energy, this.getBuffer()), Math.max(Long.MAX_VALUE - this.removed,0));
+        long a = Math.min(Math.min(energy, this.getBuffer()), Math.max(Long.MAX_VALUE - this.removed, 0));
         if (a <= 0L) {
             return 0L;
         } else {
-            DreamEnergyCore.extractEnergy(getCtrl(),1,a);
+            DreamEnergyCore.extractEnergy(getCtrl(), 1, a);
             this.removed += a;
-            ((TileDreamEnergyPort)this.device).markServerEnergyChanged();
+            ((TileDreamEnergyPort) this.device).markServerEnergyChanged();
             return a;
         }
     }
 
     @Override
     public long getRequest() {
-        if (!getCtrlStructureFormed()){
+        if (!getCtrlStructureFormed()) {
             return 0;
         }
         return Long.MAX_VALUE;
     }
 
-    public TileMultiblockMachineController getCtrl(){
-        if (ctrlPos == null || this.world == null){
+    public TileMultiblockMachineController getCtrl() {
+        if (ctrlPos == null || this.world == null) {
             return null;
         }
         if (this.world.getTileEntity(ctrlPos) instanceof TileMultiblockMachineController ctrl) {
-            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)){
+            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)) {
                 return ctrl;
             }
         }
         return null;
     }
 
-    public boolean getCtrlStructureFormed(){
+    public boolean getCtrlStructureFormed() {
         var ctrl = getCtrl();
         if (ctrl != null) {
             return ctrl.isStructureFormed();

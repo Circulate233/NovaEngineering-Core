@@ -18,13 +18,17 @@ import vazkii.psi.api.spell.SpellParam;
 import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.spell.trick.PieceTrickExplode;
 
-@Mixin(value = PieceTrickExplode.class,remap = false)
+@Mixin(value = PieceTrickExplode.class, remap = false)
 public abstract class MixinPieceTrickExplode extends PieceTrick {
 
+    @Unique
+    private static final double novaEngineering_Core$MAXPOWER = 5.0D;
     @Shadow
     SpellParam position;
     @Shadow
     SpellParam power;
+    @Unique
+    SpellContext novaEngineering_Core$context;
 
     public MixinPieceTrickExplode(Spell spell) {
         super(spell);
@@ -32,11 +36,6 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
 
     @Shadow
     public abstract void addToMetadata(SpellMetadata meta) throws SpellCompilationException;
-
-    @Unique
-    private static final double novaEngineering_Core$MAXPOWER = 5.0D;
-    @Unique
-    SpellContext novaEngineering_Core$context;
 
     @Redirect(method = "addToMetadata", at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamEvaluation(Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;"))
     public Object addToMetadataMixin(PieceTrickExplode instance, SpellParam spellParam) throws SpellCompilationException {

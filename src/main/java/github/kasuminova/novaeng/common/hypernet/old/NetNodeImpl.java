@@ -48,8 +48,7 @@ public class NetNodeImpl extends NetNode {
     @ZenMethod
     public void checkComputationPoint(final RecipeCheckEvent event,
                                       final double pointRequired,
-                                      final ResearchCognitionData... researchRequired)
-    {
+                                      final ResearchCognitionData... researchRequired) {
         if (centerPos == null || center == null) {
             event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
@@ -72,8 +71,7 @@ public class NetNodeImpl extends NetNode {
 
     @ZenMethod
     public void checkResearch(final RecipeCheckEvent event,
-                              final ResearchCognitionData... researchRequired)
-    {
+                              final ResearchCognitionData... researchRequired) {
         if (centerPos == null || center == null) {
             event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;

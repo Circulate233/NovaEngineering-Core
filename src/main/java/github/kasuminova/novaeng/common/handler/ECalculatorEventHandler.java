@@ -34,6 +34,21 @@ public class ECalculatorEventHandler {
 
     public static final int UPDATE_INTERVAL = 10;
 
+    private static boolean canInteract(final EntityPlayer player, final IGridProxyable proxyable) {
+        final IGridNode gn = proxyable.getProxy().getNode();
+        if (gn != null) {
+            final IGrid g = gn.getGrid();
+            final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
+            if (!eg.isNetworkPowered()) {
+                return true;
+            }
+
+            final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
+            return sg.hasPermission(player, SecurityPermissions.BUILD);
+        }
+        return true;
+    }
+
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.START || event.side == Side.CLIENT) {
@@ -53,21 +68,6 @@ public class ECalculatorEventHandler {
         }
         ECalculatorController controller = containerECController.getOwner();
         NovaEngineeringCore.NET_CHANNEL.sendTo(controller.getGuiDataPacket(), player);
-    }
-
-    private static boolean canInteract(final EntityPlayer player, final IGridProxyable proxyable) {
-        final IGridNode gn = proxyable.getProxy().getNode();
-        if (gn != null) {
-            final IGrid g = gn.getGrid();
-            final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-            if (!eg.isNetworkPowered()) {
-                return true;
-            }
-
-            final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-            return sg.hasPermission(player, SecurityPermissions.BUILD);
-        }
-        return true;
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

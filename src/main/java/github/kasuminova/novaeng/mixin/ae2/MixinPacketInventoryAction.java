@@ -20,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PacketInventoryAction.class)
 public class MixinPacketInventoryAction {
 
-    @Shadow(remap = false) @Final
+    @Shadow(remap = false)
+    @Final
     private InventoryAction action;
 
     @Inject(method = "serverPacketData", at = @At("HEAD"), cancellable = true, remap = false)

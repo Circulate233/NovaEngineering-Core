@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DrillMonitor extends SizedColumn {
-    
+
     public static final int WIDTH = 162;
     public static final int HEIGHT = 45;
 
@@ -56,7 +56,7 @@ public class DrillMonitor extends SizedColumn {
                 NovaEngUtils.formatDecimal(controller.getTargetDepth())
         );
         subContents.addAll(fr.listFormattedStringToWidth(depth, TEXT_WIDTH));
-        String outputMultiplier = I18n.format("gui.geocentric_drill.monitor.output_multiplier", 
+        String outputMultiplier = I18n.format("gui.geocentric_drill.monitor.output_multiplier",
                 (int) controller.getDepth() / GeocentricDrill.PARALLELISM_PER_DEPTH
         );
         subContents.addAll(fr.listFormattedStringToWidth(outputMultiplier, TEXT_WIDTH));

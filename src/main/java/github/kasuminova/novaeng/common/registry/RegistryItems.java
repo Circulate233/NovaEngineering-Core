@@ -40,36 +40,6 @@ public class RegistryItems {
     public static final List<Item> ITEM_MODELS_TO_REGISTER = new LinkedList<>();
     public static final Map<String, Item> ITEM_CUSTOM_MODELS_TO_REGISTER = new Object2ObjectLinkedOpenHashMap<>();
 
-
-    @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
-        GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
-
-        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_A);
-        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_B);
-        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_C);
-        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_A);
-        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_B);
-        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_C);
-        if (Mods.MEKENG.isPresent()) {
-            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_A);
-            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_B);
-            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_C);
-        }
-        ITEMS_TO_REGISTER.add(ECalculatorCell.L4);
-        ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
-        ITEMS_TO_REGISTER.add(ECalculatorCell.L9);
-        if (Mods.ASTRAL_SORCERY.isPresent()) {
-            ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
-        }
-
-        ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
-
-        registerItems();
-
-        GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
-    }
-
     public static void registerItems() {
         ITEMS_TO_REGISTER.forEach(RegistryItems::registerItem);
         ITEMS_TO_REGISTER.clear();
@@ -148,5 +118,34 @@ public class RegistryItems {
         }
 
         NovaEngineeringCore.log.debug("REGISTERED ITEM MODEL: {}", modelLocation);
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
+
+        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_A);
+        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_B);
+        ITEMS_TO_REGISTER.add(EStorageCellItem.LEVEL_C);
+        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_A);
+        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_B);
+        ITEMS_TO_REGISTER.add(EStorageCellFluid.LEVEL_C);
+        if (Mods.MEKENG.isPresent()) {
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_A);
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_B);
+            ITEMS_TO_REGISTER.add(EStorageCellGas.LEVEL_C);
+        }
+        ITEMS_TO_REGISTER.add(ECalculatorCell.L4);
+        ITEMS_TO_REGISTER.add(ECalculatorCell.L6);
+        ITEMS_TO_REGISTER.add(ECalculatorCell.L9);
+        if (Mods.ASTRAL_SORCERY.isPresent()) {
+            ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
+        }
+
+        ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
+
+        registerItems();
+
+        GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
     }
 }

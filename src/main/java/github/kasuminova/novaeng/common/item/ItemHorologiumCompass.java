@@ -16,28 +16,12 @@ import java.util.Random;
 
 public class ItemHorologiumCompass extends ItemBasic {
 
-    public static ItemHorologiumCompass INSTANCE = new ItemHorologiumCompass();
-
-    private ItemHorologiumCompass(){
-        super("horologium_compass");
-    }
-
     private static final long dayTime = Config.dayLength;
     private static final int cycle = 36;
+    public static ItemHorologiumCompass INSTANCE = new ItemHorologiumCompass();
 
-    @Override
-    @NotNull
-    public ActionResult<ItemStack> onItemRightClick(@NotNull World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
-        if (!world.isRemote) return super.onItemRightClick(world, player, hand);
-
-        Optional<Long> testSeed = ConstellationSkyHandler.getInstance().getSeedIfPresent(world);
-        if (testSeed.isPresent()) {
-            int actualDay = getActualDay(world, testSeed.get());
-            player.sendMessage(new TextComponentTranslation("tile.horologium_compass.success", actualDay));
-            player.getCooldownTracker().setCooldown(player.getHeldItem(hand).getItem(), 1200);
-        }
-
-        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
+    private ItemHorologiumCompass() {
+        super("horologium_compass");
     }
 
     private static int getActualDay(@NotNull World world, long seed) {
@@ -58,6 +42,21 @@ public class ItemHorologiumCompass extends ItemBasic {
             actualDay += 36;
         }
         return actualDay;
+    }
+
+    @Override
+    @NotNull
+    public ActionResult<ItemStack> onItemRightClick(@NotNull World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
+        if (!world.isRemote) return super.onItemRightClick(world, player, hand);
+
+        Optional<Long> testSeed = ConstellationSkyHandler.getInstance().getSeedIfPresent(world);
+        if (testSeed.isPresent()) {
+            int actualDay = getActualDay(world, testSeed.get());
+            player.sendMessage(new TextComponentTranslation("tile.horologium_compass.success", actualDay));
+            player.getCooldownTracker().setCooldown(player.getHeldItem(hand).getItem(), 1200);
+        }
+
+        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }
 
 }

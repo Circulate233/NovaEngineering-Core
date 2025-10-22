@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = FluidTileWrapper.class,remap = false)
+@Mixin(value = FluidTileWrapper.class, remap = false)
 public class MixinFluidTileWrapper {
 
-    @Inject(method = "drain(Lnet/minecraftforge/fluids/FluidStack;Z)Lnet/minecraftforge/fluids/FluidStack;",at = @At("HEAD"), cancellable = true)
-    public void drainMixin(FluidStack resource, boolean doDrain, CallbackInfoReturnable<FluidStack> cir){
-        if (resource == null){
+    @Inject(method = "drain(Lnet/minecraftforge/fluids/FluidStack;Z)Lnet/minecraftforge/fluids/FluidStack;", at = @At("HEAD"), cancellable = true)
+    public void drainMixin(FluidStack resource, boolean doDrain, CallbackInfoReturnable<FluidStack> cir) {
+        if (resource == null) {
             cir.setReturnValue(null);
         }
     }

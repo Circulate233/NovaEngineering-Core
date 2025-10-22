@@ -98,12 +98,11 @@ public class GuiSingularityCore extends GuiContainerDynamic<ContainerSingularity
 
     public void preRenderBloom() {
         Framebuffer fbo = mc.getFramebuffer();
-        
+
         if (bloomFBO == null ||
-            bloomFBO.framebufferWidth != fbo.framebufferWidth ||
-            bloomFBO.framebufferHeight != fbo.framebufferHeight ||
-            (fbo.isStencilEnabled() && !bloomFBO.isStencilEnabled()))
-        {
+                bloomFBO.framebufferWidth != fbo.framebufferWidth ||
+                bloomFBO.framebufferHeight != fbo.framebufferHeight ||
+                (fbo.isStencilEnabled() && !bloomFBO.isStencilEnabled())) {
             if (bloomFBO == null) {
                 bloomFBO = new Framebuffer(fbo.framebufferWidth, fbo.framebufferHeight, false);
                 bloomFBO.setFramebufferColor(0, 0, 0, 0);

@@ -34,40 +34,9 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
     private HyperNetInfoProvider() {
     }
 
-    @Override
-    public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "hypernet_info_provider";
-    }
-
-    @Override
-    public void addProbeInfo(final ProbeMode probeMode,
-                             final IProbeInfo probeInfo,
-                             final EntityPlayer player,
-                             final World world,
-                             final IBlockState blockState,
-                             final IProbeHitData data)
-    {
-        if (!blockState.getBlock().hasTileEntity(blockState)) {
-            return;
-        }
-
-        TileEntity te = world.getTileEntity(data.getPos());
-        if (!(te instanceof final TileMultiblockMachineController ctrl)) {
-            return;
-        }
-
-        DynamicMachine foundMachine = ctrl.getFoundMachine();
-        if (!RegistryHyperNet.isHyperNetSupported(foundMachine)) {
-            return;
-        }
-
-        processHyperNetTOP(foundMachine, ctrl, probeInfo);
-    }
-
     private static void processHyperNetTOP(final DynamicMachine foundMachine,
                                            final TileMultiblockMachineController ctrl,
-                                           final IProbeInfo info)
-    {
+                                           final IProbeInfo info) {
         ResourceLocation registryName = foundMachine.getRegistryName();
         if (RegistryHyperNet.isComputationCenter(registryName)) {
             ComputationCenter center = ComputationCenter.from(ctrl);
@@ -140,8 +109,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
     private static void processDataProcessorTOP(final DataProcessor processor,
                                                 final IProbeInfo leftInfo,
-                                                final IProbeInfo rightInfo)
-    {
+                                                final IProbeInfo rightInfo) {
         double maxGeneration = processor.getMaxGeneration();
         double load = Math.min(processor.getComputationalLoad(), maxGeneration);
         float efficiency = processor.getEfficiency();
@@ -170,8 +138,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
     private static void processResearchStationTOP(final ResearchStation station,
                                                   final IProbeInfo leftInfo,
                                                   final IProbeInfo rightInfo,
-                                                  final IProbeInfo probeInfo)
-    {
+                                                  final IProbeInfo probeInfo) {
         ResearchCognitionData researching = station.getCurrentResearching();
         if (researching == null) {
             leftInfo.text("{*top.hypernet.research_station.current.empty*}");
@@ -207,13 +174,12 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
                         .backgroundColor(0xFF000000)
                         .numberFormat(NumberFormat.NONE)
                         .width(120)
-        );
+                );
     }
 
     private static void processDatabaseTOP(final Database database,
                                            final IProbeInfo leftInfo,
-                                           final IProbeInfo rightInfo)
-    {
+                                           final IProbeInfo rightInfo) {
         if (!database.isWorking()) {
             return;
         }
@@ -226,8 +192,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
         );
     }
 
-    private static void processCenterTOP(final ComputationCenter center, final IProbeInfo probeInfo)
-    {
+    private static void processCenterTOP(final ComputationCenter center, final IProbeInfo probeInfo) {
         if (center.isWorking()) {
             probeInfo.text("{*top.hypernet.online*}");
             IProbeInfo box = newBox(probeInfo);
@@ -245,8 +210,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
     private static void processCenterStatusTOP(final ComputationCenter center,
                                                final IProbeInfo leftInfo,
-                                               final IProbeInfo rightInfo)
-    {
+                                               final IProbeInfo rightInfo) {
         int connections = center.getConnectedMachineryCount();
         int maxConnections = center.getType().getMaxConnections();
         leftInfo.text("{*top.hypernet.connected*}");
@@ -258,5 +222,34 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
         leftInfo.text("{*top.hypernet.computation_point.total*}");
         rightInfo.text(TextFormatting.AQUA +
                 NovaEngUtils.formatFLOPS(consumption) + " / " + NovaEngUtils.formatFLOPS(generation));
+    }
+
+    @Override
+    public String getID() {
+        return NovaEngineeringCore.MOD_ID + ':' + "hypernet_info_provider";
+    }
+
+    @Override
+    public void addProbeInfo(final ProbeMode probeMode,
+                             final IProbeInfo probeInfo,
+                             final EntityPlayer player,
+                             final World world,
+                             final IBlockState blockState,
+                             final IProbeHitData data) {
+        if (!blockState.getBlock().hasTileEntity(blockState)) {
+            return;
+        }
+
+        TileEntity te = world.getTileEntity(data.getPos());
+        if (!(te instanceof final TileMultiblockMachineController ctrl)) {
+            return;
+        }
+
+        DynamicMachine foundMachine = ctrl.getFoundMachine();
+        if (!RegistryHyperNet.isHyperNetSupported(foundMachine)) {
+            return;
+        }
+
+        processHyperNetTOP(foundMachine, ctrl, probeInfo);
     }
 }

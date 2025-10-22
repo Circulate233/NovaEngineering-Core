@@ -68,7 +68,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -97,7 +96,7 @@ public class CommonProxy implements IGuiHandler {
 
     public void construction() {
         if (Loader.isModLoaded("ecoaeextension")) {
-            throw new RuntimeException(I18n.translateToLocal("mod.ecoae.warning"));
+            throw new RuntimeException("Repeatedly added MOD:ECOAEExtension");
         }
     }
 

@@ -18,8 +18,7 @@ public class MagicBreaking extends Enchantment {
     }
 
     @Override
-    public boolean isTreasureEnchantment()
-    {
+    public boolean isTreasureEnchantment() {
         return true;
     }
 

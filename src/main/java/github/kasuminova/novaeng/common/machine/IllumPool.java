@@ -58,11 +58,11 @@ public class IllumPool implements MachineSpecial {
     public static final int MAX_ILLUM_STORE = 10_000;
 
     /**
-     *   x x x
+     * x x x
      * x x x x x
      * x x x x x
      * x x x x x
-     *   x x x
+     * x x x
      */
     public static final List<BlockPos> CATALYST_POS_PRESET = Functions.asList(
             withXZ(1, 1), withXZ(0, 1), withXZ(-1, 1),
@@ -93,6 +93,190 @@ public class IllumPool implements MachineSpecial {
     public static final String STARLIGHT_CATALYST = "starlightCatalyst";
 
     protected IllumPool() {
+    }
+
+    public static void onRecipeCheck(final RecipeCheckEvent event, final int manaRequired) {
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int manaStored = getManaStored(tag);
+        float manaConsumeRatio = getManaConsumeRatio(tag);
+
+        int required = Math.max(Math.round(manaRequired * manaConsumeRatio), 1);
+        if (manaStored < required) {
+            event.setFailed("novaeng.illum_pool.failed.mana.min.0");
+            return;
+        }
+
+        int maxParallelism = manaStored / required;
+        int extraParallelism = controller.getCustomDataTag().getInteger("poolExtraParallelism");
+        event.getActiveRecipe().setMaxParallelism(Math.max(1, Math.min(extraParallelism, maxParallelism)));
+    }
+
+    public static void onRecipeTick(final FactoryRecipeTickEvent event, final int manaRequired) {
+        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
+        int parallelism = activeRecipe.getParallelism();
+        int tickTime = activeRecipe.getTotalTick();
+
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int manaStored = getManaStored(tag);
+        float manaConsumeRatio = getManaConsumeRatio(tag);
+        int required = Math.round(((float) manaRequired / tickTime) * parallelism * manaConsumeRatio);
+
+        if (manaStored < required) {
+            event.setFailed(false, "novaeng.illum_pool.failed.mana.min");
+        } else {
+            tag.setInteger("manaStored", manaStored - required);
+        }
+    }
+
+    public static void onRecipeFinished(final FactoryRecipeFinishEvent event) {
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int illumStored = getIllumStored(tag);
+        if (illumStored > 0) {
+            tag.setInteger("illumStored", illumStored - 1);
+        }
+    }
+
+    public static void onAddManaRecipeCheck(final RecipeCheckEvent event, final int manaToAdd) {
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int manaStored = getManaStored(tag);
+        if (manaStored + manaToAdd > MAX_MANA_STORE) {
+            event.setFailed("novaeng.illum_pool.failed.mana.max");
+            return;
+        }
+
+        int maxParallelism = (MAX_MANA_STORE - manaStored) / manaToAdd;
+        event.getActiveRecipe().setMaxParallelism(Math.max(1, maxParallelism));
+    }
+
+    public static void onAddManaRecipeTick(final FactoryRecipeTickEvent event, final int manaToAdd) {
+        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
+        int parallelism = activeRecipe.getParallelism();
+        int tickTime = activeRecipe.getTotalTick();
+        int requireToAdd = (manaToAdd / tickTime) * parallelism;
+
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int manaStored = getManaStored(tag);
+        if (manaStored + requireToAdd > MAX_MANA_STORE) {
+            event.setFailed(false, "novaeng.illum_pool.failed.mana.max");
+        } else {
+            tag.setInteger("manaStored", manaStored + requireToAdd);
+        }
+    }
+
+    public static void onAddIllumRecipeCheck(final RecipeCheckEvent event, final int illumToAdd) {
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int illumStored = getIllumStored(tag);
+        if (illumStored + illumToAdd > MAX_ILLUM_STORE) {
+            event.setFailed("novaeng.illum_pool.failed.illum.max");
+            return;
+        }
+
+        int maxParallelism = (MAX_ILLUM_STORE - illumStored) / illumToAdd;
+        event.getActiveRecipe().setMaxParallelism(Math.max(1, maxParallelism));
+    }
+
+    public static void onAddIllumRecipeTick(final FactoryRecipeTickEvent event, final int illumToAdd) {
+        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
+        int parallelism = activeRecipe.getParallelism();
+        int tickTime = activeRecipe.getTotalTick();
+        int requireToAdd = (illumToAdd / tickTime) * parallelism;
+
+        TileMultiblockMachineController controller = event.getController();
+        NBTTagCompound tag = controller.getCustomDataTag();
+        int illumStored = getIllumStored(tag);
+        if (illumStored + requireToAdd > MAX_ILLUM_STORE) {
+            event.setFailed(false, "novaeng.illum_pool.failed.illum.max");
+        } else {
+            tag.setInteger("illumStored", illumStored + requireToAdd);
+        }
+    }
+
+    protected static int getIllumStored(final NBTTagCompound tag) {
+        return tag.getInteger("illumStored");
+    }
+
+    protected static int getManaStored(final NBTTagCompound tag) {
+        return tag.getInteger("manaStored");
+    }
+
+    protected static float getManaConsumeRatio(final NBTTagCompound tag) {
+        float ratio = tag.getFloat("manaConsumeRatio");
+        return ratio == 0 ? 2 : ratio;
+    }
+
+    protected static float calculateCrystalCollectiveCapabilityRatio(final float collectiveCapability) {
+        return Math.max(Math.min(collectiveCapability / 35, 1F), .75F);
+    }
+
+    protected static float calculateCrystalPurityRatio(final float purity) {
+        return Math.max(Math.min(purity / 80, 1F), .5F);
+    }
+
+    protected static float calculateCrystalSizeRatio(final float size) {
+        return Math.max(Math.min(size / 700, 1F), .2F);
+    }
+
+    public static float calculateCrystalPurityEfficiency(final float purity) {
+        return (purity / 100) * 0.6F;
+    }
+
+    protected static float calculateCrystalCollectiveCapabilityEfficiency(final float collectiveCapability) {
+        return (collectiveCapability / 100) * 0.9F;
+    }
+
+    protected static BlockArray buildModifierReplacementBlockArray(final Block block, final List<BlockPos> posSet) {
+        BlockArray blockArray = new BlockArray();
+        IBlockStateDescriptor descriptor = new IBlockStateDescriptor(block);
+        posSet.forEach(pos -> blockArray.addBlock(pos, new BlockArray.BlockInformation(ObjectLists.singleton(descriptor))));
+        return blockArray;
+    }
+
+    protected static BlockPos withXZ(final int x, final int z) {
+        return new BlockPos(x, 0, z);
+    }
+
+    @SuppressWarnings("StandardVariableNames")
+    protected static void sparkleFX(final TileMultiblockMachineController controller, final BlockPos center, final float size, final int lifeTime) {
+        double x = center.getX() + .5 + RandomUtils.nextFloat(4) - 2;
+        double y = center.getY() + .5 + RandomUtils.nextFloat(1);
+        double z = center.getZ() + .5 + RandomUtils.nextFloat(4) - 2;
+
+        boolean starlightMode = controller.getCustomDataTag().getString("currentMode").equals(STARLIGHT_CATALYST);
+        float r = starlightMode ? 0.9F : RandomUtils.nextFloat();
+        float g = starlightMode ? 0.9F : RandomUtils.nextFloat();
+        float b = starlightMode ? 1F : RandomUtils.nextFloat();
+
+        sparkleFX(x, y, z, r, g, b, size, lifeTime);
+    }
+
+    @SuppressWarnings("StandardVariableNames")
+    protected static void wispFX(final TileMultiblockMachineController controller, final BlockPos center, final float size, final float lifeTime) {
+        double x = center.getX() + .5 + RandomUtils.nextFloat(4) - 2;
+        double y = center.getY() + .5 + RandomUtils.nextFloat(1);
+        double z = center.getZ() + .5 + RandomUtils.nextFloat(4) - 2;
+
+        boolean starlightMode = controller.getCustomDataTag().getString("currentMode").equals(STARLIGHT_CATALYST);
+        float r = starlightMode ? 0.9F : RandomUtils.nextFloat();
+        float g = starlightMode ? 0.9F : RandomUtils.nextFloat();
+        float b = starlightMode ? 1F : RandomUtils.nextFloat();
+
+        float gravity = RandomUtils.nextFloat() / 15F;
+
+        wispFX(x, y, z, r, g, b, size, gravity, lifeTime);
+    }
+
+    protected static void sparkleFX(double x, double y, double z, float r, float g, float b, float size, int lifetime) {
+        Botania.proxy.sparkleFX(x, y, z, r, g, b, size, lifetime);
+    }
+
+    protected static void wispFX(double x, double y, double z, float r, float g, float b, float size, float gravity, float lifetime) {
+        Botania.proxy.wispFX(x, y, z, r, g, b, size, -gravity, lifetime);
     }
 
     @Override
@@ -200,108 +384,6 @@ public class IllumPool implements MachineSpecial {
         });
     }
 
-    public static void onRecipeCheck(final RecipeCheckEvent event, final int manaRequired) {
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int manaStored = getManaStored(tag);
-        float manaConsumeRatio = getManaConsumeRatio(tag);
-
-        int required = Math.max(Math.round(manaRequired * manaConsumeRatio), 1);
-        if (manaStored < required) {
-            event.setFailed("novaeng.illum_pool.failed.mana.min.0");
-            return;
-        }
-
-        int maxParallelism = manaStored / required;
-        int extraParallelism = controller.getCustomDataTag().getInteger("poolExtraParallelism");
-        event.getActiveRecipe().setMaxParallelism(Math.max(1, Math.min(extraParallelism, maxParallelism)));
-    }
-
-    public static void onRecipeTick(final FactoryRecipeTickEvent event, final int manaRequired) {
-        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
-        int parallelism = activeRecipe.getParallelism();
-        int tickTime = activeRecipe.getTotalTick();
-
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int manaStored = getManaStored(tag);
-        float manaConsumeRatio = getManaConsumeRatio(tag);
-        int required = Math.round(((float) manaRequired / tickTime) * parallelism * manaConsumeRatio);
-
-        if (manaStored < required) {
-            event.setFailed(false, "novaeng.illum_pool.failed.mana.min");
-        } else {
-            tag.setInteger("manaStored", manaStored - required);
-        }
-    }
-
-    public static void onRecipeFinished(final FactoryRecipeFinishEvent event) {
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int illumStored = getIllumStored(tag);
-        if (illumStored > 0) {
-            tag.setInteger("illumStored", illumStored - 1);
-        }
-    }
-
-    public static void onAddManaRecipeCheck(final RecipeCheckEvent event, final int manaToAdd) {
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int manaStored = getManaStored(tag);
-        if (manaStored + manaToAdd > MAX_MANA_STORE) {
-            event.setFailed("novaeng.illum_pool.failed.mana.max");
-            return;
-        }
-
-        int maxParallelism = (MAX_MANA_STORE - manaStored) / manaToAdd;
-        event.getActiveRecipe().setMaxParallelism(Math.max(1, maxParallelism));
-    }
-
-    public static void onAddManaRecipeTick(final FactoryRecipeTickEvent event, final int manaToAdd) {
-        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
-        int parallelism = activeRecipe.getParallelism();
-        int tickTime = activeRecipe.getTotalTick();
-        int requireToAdd = (manaToAdd / tickTime) * parallelism;
-
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int manaStored = getManaStored(tag);
-        if (manaStored + requireToAdd > MAX_MANA_STORE) {
-            event.setFailed(false, "novaeng.illum_pool.failed.mana.max");
-        } else {
-            tag.setInteger("manaStored", manaStored + requireToAdd);
-        }
-    }
-
-    public static void onAddIllumRecipeCheck(final RecipeCheckEvent event, final int illumToAdd) {
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int illumStored = getIllumStored(tag);
-        if (illumStored + illumToAdd > MAX_ILLUM_STORE) {
-            event.setFailed("novaeng.illum_pool.failed.illum.max");
-            return;
-        }
-
-        int maxParallelism = (MAX_ILLUM_STORE - illumStored) / illumToAdd;
-        event.getActiveRecipe().setMaxParallelism(Math.max(1, maxParallelism));
-    }
-
-    public static void onAddIllumRecipeTick(final FactoryRecipeTickEvent event, final int illumToAdd) {
-        ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
-        int parallelism = activeRecipe.getParallelism();
-        int tickTime = activeRecipe.getTotalTick();
-        int requireToAdd = (illumToAdd / tickTime) * parallelism;
-
-        TileMultiblockMachineController controller = event.getController();
-        NBTTagCompound tag = controller.getCustomDataTag();
-        int illumStored = getIllumStored(tag);
-        if (illumStored + requireToAdd > MAX_ILLUM_STORE) {
-            event.setFailed(false, "novaeng.illum_pool.failed.illum.max");
-        } else {
-            tag.setInteger("illumStored", illumStored + requireToAdd);
-        }
-    }
-
     @Override
     @SideOnly(Side.CLIENT)
     public void onClientTick(final TileMultiblockMachineController controller) {
@@ -351,8 +433,7 @@ public class IllumPool implements MachineSpecial {
                           final IProbeInfo probeInfo,
                           final EntityPlayer player,
                           final IProbeHitData data,
-                          final TileMultiblockMachineController controller)
-    {
+                          final TileMultiblockMachineController controller) {
         NBTTagCompound tag = controller.getCustomDataTag();
 
         IProbeInfo box = probeInfo;
@@ -455,88 +536,6 @@ public class IllumPool implements MachineSpecial {
     @Override
     public ResourceLocation getRegistryName() {
         return REGISTRY_NAME;
-    }
-
-    protected static int getIllumStored(final NBTTagCompound tag) {
-        return tag.getInteger("illumStored");
-    }
-
-    protected static int getManaStored(final NBTTagCompound tag) {
-        return tag.getInteger("manaStored");
-    }
-
-    protected static float getManaConsumeRatio(final NBTTagCompound tag) {
-        float ratio = tag.getFloat("manaConsumeRatio");
-        return ratio == 0 ? 2 : ratio;
-    }
-
-    protected static float calculateCrystalCollectiveCapabilityRatio(final float collectiveCapability) {
-        return Math.max(Math.min(collectiveCapability / 35, 1F), .75F);
-    }
-
-    protected static float calculateCrystalPurityRatio(final float purity) {
-        return Math.max(Math.min(purity / 80, 1F), .5F);
-    }
-
-    protected static float calculateCrystalSizeRatio(final float size) {
-        return Math.max(Math.min(size / 700, 1F), .2F);
-    }
-
-    public static float calculateCrystalPurityEfficiency(final float purity) {
-        return (purity / 100) * 0.6F;
-    }
-
-    protected static float calculateCrystalCollectiveCapabilityEfficiency(final float collectiveCapability) {
-        return (collectiveCapability / 100) * 0.9F;
-    }
-
-    protected static BlockArray buildModifierReplacementBlockArray(final Block block, final List<BlockPos> posSet) {
-        BlockArray blockArray = new BlockArray();
-        IBlockStateDescriptor descriptor = new IBlockStateDescriptor(block);
-        posSet.forEach(pos -> blockArray.addBlock(pos, new BlockArray.BlockInformation(ObjectLists.singleton(descriptor))));
-        return blockArray;
-    }
-
-    protected static BlockPos withXZ(final int x, final int z) {
-        return new BlockPos(x, 0, z);
-    }
-
-    @SuppressWarnings("StandardVariableNames")
-    protected static void sparkleFX(final TileMultiblockMachineController controller, final BlockPos center, final float size, final int lifeTime) {
-        double x = center.getX() + .5 + RandomUtils.nextFloat(4) - 2;
-        double y = center.getY() + .5 + RandomUtils.nextFloat(1);
-        double z = center.getZ() + .5 + RandomUtils.nextFloat(4) - 2;
-
-        boolean starlightMode = controller.getCustomDataTag().getString("currentMode").equals(STARLIGHT_CATALYST);
-        float r = starlightMode ? 0.9F : RandomUtils.nextFloat();
-        float g = starlightMode ? 0.9F : RandomUtils.nextFloat();
-        float b = starlightMode ? 1F : RandomUtils.nextFloat();
-
-        sparkleFX(x, y, z, r, g, b, size, lifeTime);
-    }
-
-    @SuppressWarnings("StandardVariableNames")
-    protected static void wispFX(final TileMultiblockMachineController controller, final BlockPos center, final float size, final float lifeTime) {
-        double x = center.getX() + .5 + RandomUtils.nextFloat(4) - 2;
-        double y = center.getY() + .5 + RandomUtils.nextFloat(1);
-        double z = center.getZ() + .5 + RandomUtils.nextFloat(4) - 2;
-
-        boolean starlightMode = controller.getCustomDataTag().getString("currentMode").equals(STARLIGHT_CATALYST);
-        float r = starlightMode ? 0.9F : RandomUtils.nextFloat();
-        float g = starlightMode ? 0.9F : RandomUtils.nextFloat();
-        float b = starlightMode ? 1F : RandomUtils.nextFloat();
-
-        float gravity = RandomUtils.nextFloat() / 15F;
-
-        wispFX(x, y, z, r, g, b, size, gravity, lifeTime);
-    }
-
-    protected static void sparkleFX(double x, double y, double z, float r, float g, float b, float size, int lifetime) {
-        Botania.proxy.sparkleFX(x, y, z, r, g, b, size, lifetime);
-    }
-
-    protected static void wispFX(double x, double y, double z, float r, float g, float b, float size, float gravity, float lifetime) {
-        Botania.proxy.wispFX(x, y, z, r, g, b, size, -gravity, lifetime);
     }
 
 }

@@ -19,7 +19,7 @@ public class HyperNetTerminal extends NetNode {
             HyperNetConnectCardInfo info = HyperNetHelper.readConnectCardInfo(terminal, stack);
 
             if (info != null) {
-                centerPos = info.getPos();
+                centerPos = info.pos();
             } else {
                 centerPos = null;
             }

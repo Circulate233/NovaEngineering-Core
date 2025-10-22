@@ -22,21 +22,24 @@ public class MixinRecipeBookServer {
      * @reason 废弃原版配方书
      */
     @Overwrite
-    public void add(List<IRecipe> recipesIn, EntityPlayerMP player) {}
+    public void add(List<IRecipe> recipesIn, EntityPlayerMP player) {
+    }
 
     /**
      * @author circulation
      * @reason 废弃原版配方书
      */
     @Overwrite
-    public void remove(List<IRecipe> recipesIn, EntityPlayerMP player) {}
+    public void remove(List<IRecipe> recipesIn, EntityPlayerMP player) {
+    }
 
     /**
      * @author circulation
      * @reason 废弃原版配方书
      */
     @Overwrite
-    private void sendPacket(SPacketRecipeBook.State state, EntityPlayerMP player, List<IRecipe> recipesIn) {}
+    private void sendPacket(SPacketRecipeBook.State state, EntityPlayerMP player, List<IRecipe> recipesIn) {
+    }
 
     /**
      * @author circulation
@@ -52,13 +55,14 @@ public class MixinRecipeBookServer {
      * @reason 废弃原版配方书
      */
     @Overwrite
-    public void read(NBTTagCompound tag) {}
+    public void read(NBTTagCompound tag) {
+    }
 
     /**
      * @author circulation
      * @reason 废弃原版配方书
      */
-    @Inject(method = "getRecipes",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getRecipes", at = @At("HEAD"), cancellable = true)
     public void getRecipes(CallbackInfoReturnable<List<IRecipe>> cir) {
         cir.setReturnValue(Collections.emptyList());
     }
@@ -77,6 +81,7 @@ public class MixinRecipeBookServer {
      * @reason 废弃原版配方书
      */
     @Overwrite
-    public void init(EntityPlayerMP player) {}
+    public void init(EntityPlayerMP player) {
+    }
 
 }

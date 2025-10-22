@@ -8,14 +8,14 @@ import sonar.fluxnetworks.api.network.ITransferHandler;
 import sonar.fluxnetworks.common.connection.FluxNetworkBase;
 import sonar.fluxnetworks.common.connection.FluxNetworkServer;
 
-@Mixin(value = FluxNetworkServer.class,remap = false)
+@Mixin(value = FluxNetworkServer.class, remap = false)
 public abstract class MixinFluxNetworkServer extends FluxNetworkBase {
 
     @Shadow
     public long bufferLimiter;
 
-    @Redirect(method = "onEndServerTick", at = @At(value = "INVOKE", target = "Lsonar/fluxnetworks/api/network/ITransferHandler;getRequest()J",ordinal = 1))
-    public long getRequest(ITransferHandler instance){
+    @Redirect(method = "onEndServerTick", at = @At(value = "INVOKE", target = "Lsonar/fluxnetworks/api/network/ITransferHandler;getRequest()J", ordinal = 1))
+    public long getRequest(ITransferHandler instance) {
         long i = instance.getRequest();
         if (this.bufferLimiter == Long.MAX_VALUE) {
             return 0;

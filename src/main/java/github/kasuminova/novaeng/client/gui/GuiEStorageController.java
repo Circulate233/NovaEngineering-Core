@@ -59,7 +59,7 @@ public class GuiEStorageController extends GuiContainerDynamic<ContainerEStorage
     public void onGraphFocusUpdate(final Graph graph) {
         this.widgetController.postGuiEvent(new ESGraphFocusUpdateEvent(graph));
     }
-    
+
     public WidgetController getWidgetController() {
         return widgetController;
     }

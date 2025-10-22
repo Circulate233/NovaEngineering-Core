@@ -15,13 +15,11 @@ import java.nio.charset.StandardCharsets;
 
 public class HitokotoAPI {
     public static final String API_URL = "https://v1.hitokoto.cn/";
-
-    @Getter
-    public static String hitokotoCache = null;
-
     private static final Gson DESERIALIZER = new GsonBuilder()
             .registerTypeHierarchyAdapter(HitokotoResult.class, new HitokotoDeserializer())
             .create();
+    @Getter
+    public static String hitokotoCache = null;
 
     public static String getRandomHitokoto() {
         if (hitokotoCache != null) {

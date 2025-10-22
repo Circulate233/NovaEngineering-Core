@@ -41,6 +41,39 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
         energyData = new EStorageEnergyData(controller.getEnergyStored(), controller.getMaxEnergyStore(), controller.getEnergyConsumePerTick());
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktEStorageGUIData message) {
+        List<EStorageCellData> dataList = message.dataList;
+        EStorageEnergyData energyData = message.energyData;
+        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
+        if (!(cur instanceof GuiEStorageController)) {
+            return;
+        }
+        List<EStorageCellData> sorted = dataList.stream()
+                .sorted((o1, o2) -> {
+                    int byteResult = Long.compare(o2.usedBytes(), o1.usedBytes());
+                    if (byteResult != 0) {
+                        return byteResult;
+                    }
+                    int typeResult = Integer.compare(o2.usedTypes(), o1.usedTypes());
+                    if (typeResult != 0) {
+                        return typeResult;
+                    }
+                    return Integer.compare(o2.level().ordinal(), o1.level().ordinal());
+                })
+                .collect(Collectors.toList());
+
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
+            if (!(currentScreen instanceof GuiEStorageController controllerGUI)) {
+                return;
+            }
+            controllerGUI.setCellDataList(sorted);
+            controllerGUI.setEnergyData(energyData);
+            controllerGUI.onDataReceived();
+        });
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         int size = buf.readInt();
@@ -78,39 +111,6 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
             processPacket(message);
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktEStorageGUIData message) {
-        List<EStorageCellData> dataList = message.dataList;
-        EStorageEnergyData energyData = message.energyData;
-        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
-        if (!(cur instanceof GuiEStorageController)) {
-            return;
-        }
-        List<EStorageCellData> sorted = dataList.stream()
-                .sorted((o1, o2) -> {
-                    int byteResult = Long.compare(o2.usedBytes(), o1.usedBytes());
-                    if (byteResult != 0) {
-                        return byteResult;
-                    }
-                    int typeResult = Integer.compare(o2.usedTypes(), o1.usedTypes());
-                    if (typeResult != 0) {
-                        return typeResult;
-                    }
-                    return Integer.compare(o2.level().ordinal(), o1.level().ordinal());
-                })
-                .collect(Collectors.toList());
-
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
-            if (!(currentScreen instanceof GuiEStorageController controllerGUI)) {
-                return;
-            }
-            controllerGUI.setCellDataList(sorted);
-            controllerGUI.setEnergyData(energyData);
-            controllerGUI.onDataReceived();
-        });
     }
 
 }

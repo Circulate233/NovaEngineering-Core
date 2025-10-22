@@ -13,8 +13,8 @@ import java.text.NumberFormat;
 @ZenRegister
 @ZenClass("novaeng.NovaEngUtils")
 public class NovaEngUtils {
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
     public static final BigInteger BigLongMax = BigInteger.valueOf(Long.MAX_VALUE);
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
     public static boolean isClient = FMLCommonHandler.instance().getEffectiveSide().isClient();
 
     static {
@@ -63,14 +63,14 @@ public class NovaEngUtils {
         var BigValue = num.abs();
         long big = BigValue.compareTo(BigLongMax) >= 0 ? Long.MAX_VALUE : BigValue.longValue();
         StringBuilder zf = new StringBuilder();
-        if (value.startsWith("-")){
+        if (value.startsWith("-")) {
             zf.append("-");
         }
-        if (big != (Long.MAX_VALUE)){
-            return zf.append(formatNumber(big,1)).toString();
+        if (big != (Long.MAX_VALUE)) {
+            return zf.append(formatNumber(big, 1)).toString();
         } else {
             int cfs = value.length() - 1;
-            float cft = (1.00f * Integer.parseInt(value.substring(0,3))) / 100;
+            float cft = (1.00f * Integer.parseInt(value.substring(0, 3))) / 100;
 
             return zf.append(cft).append(" * 10 ^ ").append(cfs).toString();
         }

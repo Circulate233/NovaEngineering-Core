@@ -101,17 +101,17 @@ public abstract class AssemblyInvToggleable extends AssemblyInv {
             int openedInvBgTexHeight;
 
             if (this.currentColumn == this.slotColumn) {
-                openedBgTexLocation   = this.openedBgTexLocation;
+                openedBgTexLocation = this.openedBgTexLocation;
                 openedInvBgTexOffsetX = this.openedInvBgTexOffsetX;
                 openedInvBgTexOffsetY = this.openedInvBgTexOffsetY;
-                openedInvBgTexWidth   = this.openedInvBgTexWidth;
-                openedInvBgTexHeight  = this.openedInvBgTexHeight;
+                openedInvBgTexWidth = this.openedInvBgTexWidth;
+                openedInvBgTexHeight = this.openedInvBgTexHeight;
             } else if (this.currentColumn == this.secondSlotColumn) {
-                openedBgTexLocation   = this.secondOpenedBgTexLocation;
+                openedBgTexLocation = this.secondOpenedBgTexLocation;
                 openedInvBgTexOffsetX = this.secondOpenedInvBgTexOffsetX;
                 openedInvBgTexOffsetY = this.secondOpenedInvBgTexOffsetY;
-                openedInvBgTexWidth   = this.secondOpenedInvBgTexWidth;
-                openedInvBgTexHeight  = this.secondOpenedInvBgTexHeight;
+                openedInvBgTexWidth = this.secondOpenedInvBgTexWidth;
+                openedInvBgTexHeight = this.secondOpenedInvBgTexHeight;
             } else {
                 return;
             }

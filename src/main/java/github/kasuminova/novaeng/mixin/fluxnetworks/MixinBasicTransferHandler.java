@@ -12,16 +12,16 @@ import java.math.BigInteger;
 
 import static github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils.BigLongMax;
 
-@Mixin(value = BasicTransferHandler.class,remap = false)
+@Mixin(value = BasicTransferHandler.class, remap = false)
 public class MixinBasicTransferHandler {
 
     @Inject(method = "getBuffer", at = @At("HEAD"), cancellable = true)
     public final void getBufferMixin(CallbackInfoReturnable<Long> cir) {
-        if ((Object)this instanceof DreamEnergyPortHandler handler){
+        if ((Object) this instanceof DreamEnergyPortHandler handler) {
             var ctrl = handler.getCtrl();
-            if (ctrl != null){
+            if (ctrl != null) {
                 BigInteger energy = DreamEnergyCore.getEnergyStored(ctrl);
-                if (energy.compareTo(BigLongMax) >= 0){
+                if (energy.compareTo(BigLongMax) >= 0) {
                     cir.setReturnValue(Long.MAX_VALUE);
                 } else {
                     cir.setReturnValue(energy.longValue());

@@ -58,17 +58,19 @@ public class PatternPanel extends SizedColumn {
     private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§.");
 
     private final Map<BlockPos, Int2ObjectMap<PatternSlot>> patterns = new Object2ObjectLinkedOpenHashMap<>();
+    private final InternalColumn internal = new InternalColumn();
     private ISearchStorage<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
     private ISearchStorage<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
-
     private String inputSearchContent = "";
     private String outputSearchContent = "";
-
-    private final InternalColumn internal = new InternalColumn();
 
     public PatternPanel() {
         setWidthHeight(WIDTH, HEIGHT);
         addWidget(internal);
+    }
+
+    private static String getClearColorName(final IAEItemStack input) {
+        return COLOR_CODE_PATTERN.matcher(input.getDefinition().getDisplayName()).replaceAll("");
     }
 
     @Override
@@ -248,10 +250,6 @@ public class PatternPanel extends SizedColumn {
         internal.addWidget(
                 row.setUseScissor(false).setMarginDown(3)
         );
-    }
-
-    private static String getClearColorName(final IAEItemStack input) {
-        return COLOR_CODE_PATTERN.matcher(input.getDefinition().getDisplayName()).replaceAll("");
     }
 
     private static class InternalColumn extends ScrollingColumn {

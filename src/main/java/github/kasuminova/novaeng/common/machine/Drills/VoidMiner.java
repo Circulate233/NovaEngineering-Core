@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.machine.Drills;
 
-public class VoidMiner extends Drill{
+public class VoidMiner extends Drill {
     public static final VoidMiner INSTANCE = new VoidMiner();
 
     @Override
@@ -24,7 +24,7 @@ public class VoidMiner extends Drill{
     }
 
     @Override
-    protected float getRecipeTimeMultiple(){
+    protected float getRecipeTimeMultiple() {
         return 1.5f;
     }
 }

@@ -112,6 +112,29 @@ public class BlockPos2ValueMap<V> implements Map<BlockPos, V> {
         return internal.hashCode();
     }
 
+    public static class Entry<V> implements Map.Entry<BlockPos, V> {
+        private final Long2ObjectMap.Entry<V> parent;
+
+        public Entry(Long2ObjectMap.Entry<V> parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public BlockPos getKey() {
+            return BlockPos.fromLong(parent.getLongKey());
+        }
+
+        @Override
+        public V getValue() {
+            return parent.getValue();
+        }
+
+        @Override
+        public V setValue(final V value) {
+            return parent.setValue(value);
+        }
+    }
+
     public class EntrySet extends AbstractSet<Map.Entry<BlockPos, V>> {
         @Override
         public int size() {
@@ -143,28 +166,5 @@ public class BlockPos2ValueMap<V> implements Map<BlockPos, V> {
             return internal.size();
         }
 
-    }
-
-    public static class Entry<V> implements Map.Entry<BlockPos, V> {
-        private final Long2ObjectMap.Entry<V> parent;
-
-        public Entry(Long2ObjectMap.Entry<V> parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        public BlockPos getKey() {
-            return BlockPos.fromLong(parent.getLongKey());
-        }
-
-        @Override
-        public V getValue() {
-            return parent.getValue();
-        }
-
-        @Override
-        public V setValue(final V value) {
-            return parent.setValue(value);
-        }
     }
 }

@@ -25,7 +25,7 @@ public class RecipePrimerAssemblyLine {
         if (!machineName.equals(ASSEMBLY_LINE)) {
             CraftTweakerAPI.logError(
                     "Cannot proxy AssemblyLine recipe for `" + primer.getRecipeRegistryName() +
-                    "`, because parent machine is not `assembly_line`!");
+                            "`, because parent machine is not `assembly_line`!");
             return primer;
         }
 

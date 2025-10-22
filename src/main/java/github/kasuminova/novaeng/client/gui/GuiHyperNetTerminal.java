@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -57,47 +58,49 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@ExtensionMethod(StringUtils.class)
 public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTerminal> {
+    protected static final Comparator<ResearchCognitionData> comparator =
+            (o1, o2) -> {
+                float a = o1.getTechLevel();
+                float b = o2.getTechLevel();
+                if (a == b) {
+                    return 0;
+                } else {
+                    return a > b ? 1 : -1;
+                }
+            };
     private static final ResourceLocation TEXTURES_TERMINAL = new ResourceLocation(
             NovaEngineeringCore.MOD_ID, "textures/gui/guiterminal.png");
     private static final ResourceLocation TEXTURES_TERMINAL_ELEMENTS = new ResourceLocation(
             NovaEngineeringCore.MOD_ID, "textures/gui/guiterminalelement.png");
-
     private static final int TERMINAL_ELEMENT_WIDTH = 92;
     private static final int TERMINAL_ELEMENT_HEIGHT = 22;
-
     private static final float FONT_SCALE = 0.72F;
     private static final int DATA_SCROLL_BAR_LEFT = 100;
     private static final int DATA_SCROLL_BAR_TOP = 44;
     private static final int DATA_SCROLL_BAR_HEIGHT = 198;
     private static final int MAX_PAGE_ELEMENTS = 9;
-
     private static final int SCREEN_SCROLL_BAR_LEFT = 336;
     private static final int SCREEN_SCROLL_BAR_TOP = 44;
     private static final int SCREEN_SCROLL_BAR_HEIGHT = 118;
-
     private static final int SCREEN_TEXT_MAX_LINES = 11;
     private static final int SCREEN_TEXT_MAX_WIDTH = 217;
-
     private static String searchTextCache = "";
     private static ResearchDataContext currentCache = null;
-
     protected final TileHyperNetTerminal terminal;
     protected final Set<ResearchCognitionData> unlockedData = new ObjectOpenHashSet<>();
     protected final List<ResearchCognitionData> lockedData = new ObjectArrayList<>();
     protected final List<ResearchCognitionData> unavailableData = new ObjectArrayList<>();
     protected final Object2DoubleOpenHashMap<ResearchCognitionData> researchingData = new Object2DoubleOpenHashMap<>();
     protected final List<ResearchDataContext> renderingData = new ObjectArrayList<>();
-
     protected boolean darkMode = true;
     protected boolean showLockedResearchDesc = false;
-
     protected GuiTextField searchTextField = null;
     protected GuiScrollbarThin dataScrollbar = null;
     protected GuiScrollbarThin screenScrollbar = null;
     protected GuiButtonImage startResearch = null;
     protected GuiButtonImage toggleResearchDesc = null;
-
     protected ResearchDataContext current = null;
 
     public GuiHyperNetTerminal(TileHyperNetTerminal terminal, EntityPlayer opening) {
@@ -500,17 +503,6 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         );
     }
 
-    protected static final Comparator<ResearchCognitionData> comparator =
-            (o1, o2) -> {
-                float a = o1.getTechLevel();
-                float b = o2.getTechLevel();
-                if (a == b) {
-                    return 0;
-                } else {
-                    return a > b ? 1 : -1;
-                }
-            };
-
     protected void updateRenderingData() {
         renderingData.clear();
 
@@ -550,7 +542,7 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
 
         String searchFilter = searchTextField.getText();
         if (!searchFilter.isEmpty()) {
-            List<String> filtered = StringUtils.sortWithMatchRate(tmp.keySet(), searchFilter);
+            List<String> filtered = searchFilter.sortWithMatchRate(tmp.keySet());
             if (filtered.isEmpty()) {
                 searchTextField.setTextColor(0xFF0000);
             } else {

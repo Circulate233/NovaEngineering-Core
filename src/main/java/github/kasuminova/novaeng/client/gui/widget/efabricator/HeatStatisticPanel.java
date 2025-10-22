@@ -16,6 +16,7 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUp
 import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class HeatStatisticPanel extends SizedColumn {
     public static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
             GuiEFabricatorController.TEXTURES_ELEMENTS, 204, 24, WIDTH, HEIGHT
     );
-    
+
     private final BackgroundLabel energyUsage;
     private final BackgroundLabel activeCooling;
     private final ProgressBar energyUsageBar;
@@ -108,10 +109,10 @@ public class HeatStatisticPanel extends SizedColumn {
             if (data == null) {
                 return super.onGuiEvent(event);
             }
-            
+
             this.activeCooling.getLabel()
                     .setContents(Collections.singletonList(
-                            I18n.format("gui.efabricator.active_cooling", data.activeCooling() 
+                            I18n.format("gui.efabricator.active_cooling", data.activeCooling()
                                     ? I18n.format("gui.efabricator.active_cooling.on")
                                     : I18n.format("gui.efabricator.active_cooling.off")
                             )
@@ -124,7 +125,7 @@ public class HeatStatisticPanel extends SizedColumn {
             }
 
             int maxEnergy = EFabricatorWorker.MAX_ENERGY_CACHE * length;
-            this.energyUsageBar.setMaxProgress(maxEnergy) 
+            this.energyUsageBar.setMaxProgress(maxEnergy)
                     .setProgress(data.energyStored());
 
             int energyUsage = EFabricatorWorker.ENERGY_USAGE * length * queueDepth;
@@ -154,7 +155,9 @@ public class HeatStatisticPanel extends SizedColumn {
 
     public static class BackgroundLabel extends Column {
 
+        @Getter
         private final MultiLineLabel label;
+        @Getter
         private TextureProperties background = TextureProperties.EMPTY;
         private Function<BackgroundLabel, List<String>> tooltipFunction = null;
 
@@ -169,17 +172,9 @@ public class HeatStatisticPanel extends SizedColumn {
             super.preRenderInternal(gui, renderSize, renderPos, mousePos);
         }
 
-        public TextureProperties getBackground() {
-            return background;
-        }
-
         public BackgroundLabel setBackground(final TextureProperties background) {
             this.background = background;
             return this;
-        }
-
-        public MultiLineLabel getLabel() {
-            return label;
         }
 
         public BackgroundLabel setPadding(final int padding) {

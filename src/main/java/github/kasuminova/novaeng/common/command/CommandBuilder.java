@@ -14,7 +14,7 @@ public class CommandBuilder extends CommandBase {
     public boolean isTickWork = false;
     public boolean isQuarryWork = false;
 
-    private CommandBuilder(){
+    private CommandBuilder() {
 
     }
 
@@ -30,8 +30,8 @@ public class CommandBuilder extends CommandBase {
 
     @Override
     public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String @NotNull [] args) {
-        if (args.length >= 2){
-            switch (args[0]){
+        if (args.length >= 2) {
+            switch (args[0]) {
                 case "tick" -> isTickWork = args[1].equals("true");
                 case "quarry" -> isQuarryWork = args[1].equals("true");
             }
@@ -41,12 +41,12 @@ public class CommandBuilder extends CommandBase {
     public @NotNull List<String> getTabCompletions(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args,
-                    "tick","quarry"
+                    "tick", "quarry"
             );
         }
         if (args.length == 2) {
             return getListOfStringsMatchingLastWord(args,
-                    "true","false"
+                    "true", "false"
             );
         }
         return super.getTabCompletions(server, sender, args, targetPos);

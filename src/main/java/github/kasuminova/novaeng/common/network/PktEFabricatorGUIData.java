@@ -47,6 +47,19 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
     public PktEFabricatorGUIData() {
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktEFabricatorGUIData message) {
+        EFabricatorData data = message.data;
+        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
+        if (!(cur instanceof GuiEFabricatorController efGUI)) {
+            return;
+        }
+        if (data == null) {
+            return;
+        }
+        efGUI.onDataUpdate(data);
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         data = EFabricatorData.read(buf);
@@ -63,19 +76,6 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
             Minecraft.getMinecraft().addScheduledTask(() -> processPacket(message));
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktEFabricatorGUIData message) {
-        EFabricatorData data = message.data;
-        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
-        if (!(cur instanceof GuiEFabricatorController efGUI)) {
-            return;
-        }
-        if (data == null) {
-            return;
-        }
-        efGUI.onDataUpdate(data);
     }
 
 }

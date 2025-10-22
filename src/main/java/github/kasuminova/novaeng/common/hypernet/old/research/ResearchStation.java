@@ -82,8 +82,7 @@ public class ResearchStation extends NetNode {
 
         if (nodes.stream()
                 .map(Database.class::cast)
-                .noneMatch(database -> database.hasDatabaseSpace(currentResearching)))
-        {
+                .noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
             event.setFailed("网络中所有的数据库存储已满！");
         }
     }
@@ -99,7 +98,7 @@ public class ResearchStation extends NetNode {
             return;
         }
         if (center == null) {
-            event.preventProgressing( "novaeng.hypernet.prrocessor.link.false");
+            event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
@@ -145,7 +144,7 @@ public class ResearchStation extends NetNode {
         double baseConsumption = currentResearching.getMinComputationPointPerTick();
         consumption = Math.min(baseConsumption, getComputationLeft());
 
-        final short overclockingValue = (short) Math.max(0,event.getController().getCustomDataTag().getShort("overclocking") - 1);
+        final short overclockingValue = (short) Math.max(0, event.getController().getCustomDataTag().getShort("overclocking") - 1);
 
         ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
         int totalTick = activeRecipe.getTotalTick();
@@ -219,7 +218,7 @@ public class ResearchStation extends NetNode {
             return;
         }
 
-        if (center == null)return;
+        if (center == null) return;
         for (Database database : center.getNode(Database.class)) {
             if (database.writeResearchingData(currentResearching, completedPoints)) {
                 break;

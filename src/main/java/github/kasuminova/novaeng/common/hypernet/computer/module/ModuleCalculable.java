@@ -9,12 +9,17 @@ import github.kasuminova.novaeng.common.hypernet.computer.HardwareBandwidthConsu
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.hypernet.computer.exception.ModularServerException;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
+import lombok.Getter;
+import lombok.Setter;
 import stanhebben.zenscript.annotations.ZenClass;
 
+@Setter
 @ZenRegister
 @ZenClass("novaeng.hypernet.server.module.ModuleCalculable")
 public abstract class ModuleCalculable extends ServerModule implements Calculable, HardwareBandwidthConsumer {
+    @Getter
     protected double baseGeneration;
+    @Getter
     protected double energyConsumeRatio;
     protected int hardwareBandwidth;
 
@@ -30,7 +35,7 @@ public abstract class ModuleCalculable extends ServerModule implements Calculabl
         double efficiency = getCalculateTypeEfficiency(request.type());
 
         ModifierManager modifier = request.modifier();
-        double maxCanGenerated = modifier.apply(ModifierKeys.GLOBAL_CALCULATE_EFFICIENCY, 
+        double maxCanGenerated = modifier.apply(ModifierKeys.GLOBAL_CALCULATE_EFFICIENCY,
                 modifier.apply(request.type().getModifierKey(), baseGeneration * efficiency)
         );
 
@@ -45,26 +50,6 @@ public abstract class ModuleCalculable extends ServerModule implements Calculabl
     @Override
     public int getHardwareBandwidth() {
         return hardwareBandwidth;
-    }
-
-    public void setHardwareBandwidth(final int hardwareBandwidth) {
-        this.hardwareBandwidth = hardwareBandwidth;
-    }
-
-    public double getBaseGeneration() {
-        return baseGeneration;
-    }
-
-    public void setBaseGeneration(final double baseGeneration) {
-        this.baseGeneration = baseGeneration;
-    }
-
-    public double getEnergyConsumeRatio() {
-        return energyConsumeRatio;
-    }
-
-    public void setEnergyConsumeRatio(final double energyConsumeRatio) {
-        this.energyConsumeRatio = energyConsumeRatio;
     }
 
 }

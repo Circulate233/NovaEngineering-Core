@@ -10,6 +10,7 @@ import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent;
 import github.kasuminova.mmce.common.event.machine.MachineStructureFormedEvent;
 import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.machine.MachineSpecial;
@@ -24,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+import lombok.experimental.ExtensionMethod;
 import lombok.val;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -49,17 +51,16 @@ import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrim
 import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet.requireResearch;
 import static net.minecraft.util.text.translation.I18n.translateToLocalFormatted;
 
+@ExtensionMethod(RecipePrimerHyperNet.class)
 public abstract class Drill implements MachineSpecial {
-    public final ResourceLocation REGISTRY_NAME;
-
     protected static final int[] tqsz = {-1, 0, 1};
     protected static final Object2IntMap<String> tqdzb = new Object2IntOpenHashMap<>();
-    protected static int basicMineralMix;
-    protected static int MMMineralMix;
     static final IItemStack errorStone;
     static final IItemStack stone = itemUtils.getItem("minecraft:stone", 0);
     static final IOreDictEntry circuit_0 = oreDict.get("programmingCircuit");
     static final IOreDictEntry dust = oreDict.get("itemPulsatingPowder");
+    protected static int basicMineralMix;
+    protected static int MMMineralMix;
 
     static {
         int j = 0;
@@ -78,8 +79,103 @@ public abstract class Drill implements MachineSpecial {
         errorStone = CraftTweakerMC.getIItemStack(item);
     }
 
+    public final ResourceLocation REGISTRY_NAME;
+
     protected Drill() {
         REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, getMachineName());
+    }
+
+    protected static int chunkCoord(int posValue) {
+        return posValue >> 4;
+    }
+
+    private static IItemStack getOreOutput(TileMultiblockMachineController ctrl, BlockPos pos, int worldid) {
+        return getOreOutput(ctrl, pos, worldid, 0, 0);
+    }
+
+    private static IItemStack getOreOutput(TileMultiblockMachineController ctrl, BlockPos pos, int worldid, int k, int kk) {
+        var world = DimensionManager.getWorld(worldid);
+        if (world == null) {
+            return errorStone.mutable().copy();
+        }
+        var data = ctrl.getCustomDataTag();
+        var research_progress = data.getByte("research_progress");
+        var components_amount = data.getByte("components_amount");
+        var sfsh = Math.max((data.hasKey("sfsh") ? data.getInteger("sfsh") : 10000) - (1000 * Math.pow(research_progress, 1.6)), 0);
+        var bxs = data.getInteger("bxs" + (k + 1) + (kk + 1)) * (1 + Math.pow(components_amount, 2.5));
+        var component_raw_ore = data.getByte("additional_component_raw_ore");
+        var random = ctrl.getWorld().rand.nextInt(10000);
+        var worldInfo = ExcavatorHandler.getMineralWorldInfo(
+                world,
+                (chunkCoord(pos.getX()) + k),
+                (chunkCoord(pos.getZ()) + kk)
+        );
+        if (sfsh < 10000) {
+            if (sfsh > random) {
+                worldInfo.depletion += (int) bxs;
+                data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion);
+                ctrl.setCustomDataTag(data);
+            }
+        } else {
+            var sl = Math.floor(1.0f * sfsh) / 10000;
+            worldInfo.depletion += (int) (bxs * sl);
+            if ((sfsh - (10000 * sl)) > random) {
+                worldInfo.depletion += (int) bxs;
+            }
+            data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion);
+            ctrl.setCustomDataTag(data);
+        }
+        var mineral = getUsableMix(worldInfo);
+        if (mineral != null) {
+            var iore = mineral.getRandomOre(world.rand);
+            if (component_raw_ore == 1) {
+                var rawore = OreHandler.getRawOre(iore);
+                if (rawore == null) {
+                    return OreHandler.getOre(iore);
+                } else {
+                    random = world.rand.nextInt(6);
+                    return rawore.amount(Math.max(random, 1));
+                }
+            }
+            return OreHandler.getOre(iore);
+        } else {
+            data.setString("kmm" + (k + 1) + (kk + 1), "empty");
+            return stone;
+        }
+    }
+
+    private static IItemStack getCcrystalOutput(TileMultiblockMachineController ctrl) {
+        var data = ctrl.getCustomDataTag();
+        var world = ctrl.getWorld();
+        var research_progress = data.getByte("research_progress");
+        if (research_progress > 0) {
+            List<IItemStack> cjc = new ReferenceArrayList<>();
+            cjc.add(itemUtils.getItem("environmentaltech:litherite_crystal", 0));
+            cjc.add(itemUtils.getItem("environmentaltech:erodium_crystal", 0));
+            if (research_progress > 1) {
+                cjc.add(itemUtils.getItem("environmentaltech:kyronite_crystal", 0));
+                cjc.add(itemUtils.getItem("environmentaltech:pladium_crystal", 0));
+                if (research_progress > 2) {
+                    cjc.add(itemUtils.getItem("environmentaltech:ionite_crystal", 0));
+                    if (research_progress > 3) {
+                        cjc.add(itemUtils.getItem("environmentaltech:aethium_crystal", 0));
+                    }
+                }
+            }
+            var random = world.rand.nextInt(cjc.size());
+            return cjc.get(random);
+        } else {
+            return stone;
+        }
+    }
+
+    @Nullable
+    private static ExcavatorHandler.MineralMix getUsableMix(ExcavatorHandler.MineralWorldInfo worldInfo) {
+        if (worldInfo.mineralOverride != null) {
+            return worldInfo.mineralOverride;
+        } else {
+            return worldInfo.mineral;
+        }
     }
 
     @Override
@@ -576,7 +672,7 @@ public abstract class Drill implements MachineSpecial {
                 if (data.hasKey("additional_component_raw_ore")) info.add(I18n.format("top.drill.components_raw_ore"));
                 var kmm = data.getString("kmm11");
                 val i18nkmm = I18n.format("desc.immersiveengineering.info.mineral." + kmm);
-                if (!i18nkmm.startsWith("desc"))kmm = i18nkmm;
+                if (!i18nkmm.startsWith("desc")) kmm = i18nkmm;
                 var depletion = data.getInteger("depletion11");
                 if (!kmm.isEmpty() && !kmm.equals("empty"))
                     info.add(I18n.format("novaeng.drill.mineral.name") + kmm);
@@ -606,7 +702,7 @@ public abstract class Drill implements MachineSpecial {
                         var kk = ii + 1;
                         var kmm = data.getString("kmm" + k + kk);
                         val i18nkmm = I18n.format("desc.immersiveengineering.info.mineral." + kmm);
-                        if (!i18nkmm.startsWith("desc"))kmm = i18nkmm;
+                        if (!i18nkmm.startsWith("desc")) kmm = i18nkmm;
                         var depletion = data.getInteger("depletion" + k + kk);
                         if (!kmm.isEmpty() && !kmm.equals("empty"))
                             info.add(
@@ -642,7 +738,7 @@ public abstract class Drill implements MachineSpecial {
                         if (!data.hasKey("binding")) {
                             return false;
                         }
-                        var pos = IDataUtils.getIntArray(item.getTag(),"pos",null);
+                        var pos = IDataUtils.getIntArray(item.getTag(), "pos", null);
                         if (pos == null) {
                             return false;
                         }
@@ -708,57 +804,55 @@ public abstract class Drill implements MachineSpecial {
             var fi = i;
             upThread.addRecipe("research_mineral_utilization_" + name + "_" + fi);
             upThread.addRecipe("additional_component_loading_" + name + "_" + fi);
-            requireResearch(
-                    RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + fi, name, 10)
-                            .addPreCheckHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                data.getByte("research_progress");
-                                data.getByte("components_amount");
-                                var component = data.getBoolean("research_mineral_" + fi);
-                                if (component) {
-                                    event.setFailed("novaeng.machine.failed.work");
-                                }
-                            })
-                            .addFactoryFinishHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var research_progress = data.getByte("research_progress");
 
-                                ctrl.addPermanentModifier("research" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.2 * (fi + 1))), 1, false).build());
-                                data.setBoolean("research_mineral_" + fi, true);
-                                data.setByte("research_progress", (byte) (research_progress + 1));
-                            })
-                    , "research_mineral_utilization_" + fi)
+            RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + fi, name, 10)
+                    .addPreCheckHandler(event -> {
+                        var ctrl = event.getController();
+                        var data = ctrl.getCustomDataTag();
+                        data.getByte("research_progress");
+                        data.getByte("components_amount");
+                        var component = data.getBoolean("research_mineral_" + fi);
+                        if (component) {
+                            event.setFailed("novaeng.machine.failed.work");
+                        }
+                    })
+                    .addFactoryFinishHandler(event -> {
+                        var ctrl = event.getController();
+                        var data = ctrl.getCustomDataTag();
+                        var research_progress = data.getByte("research_progress");
+
+                        ctrl.addPermanentModifier("research" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.2 * (fi + 1))), 1, false).build());
+                        data.setBoolean("research_mineral_" + fi, true);
+                        data.setByte("research_progress", (byte) (research_progress + 1));
+                    }).requireResearch("research_mineral_utilization_" + fi)
                     .setParallelized(false)
                     .setThreadName(upThreadName)
                     .setLoadJEI(false)
                     .build();
-            requireResearch(
-                    RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + fi, name, 100, 1)
-                            .addItemInput(itemUtils.getItem("contenttweaker:additional_component_" + fi, 0))
-                            .addPreCheckHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                data.getByte("research_progress");
-                                data.getByte("components_amount");
-                                var component = data.getBoolean("additional_component_" + fi);
-                                if (component) {
-                                    event.setFailed("novaeng.machine.failed.work");
-                                }
-                            })
-                            .addFactoryFinishHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var components_amount = data.getByte("components_amount");
+            RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + fi, name, 100, 1)
+                    .addItemInput(itemUtils.getItem("contenttweaker:additional_component_" + fi, 0))
+                    .addPreCheckHandler(event -> {
+                        var ctrl = event.getController();
+                        var data = ctrl.getCustomDataTag();
+                        data.getByte("research_progress");
+                        data.getByte("components_amount");
+                        var component = data.getBoolean("additional_component_" + fi);
+                        if (component) {
+                            event.setFailed("novaeng.machine.failed.work");
+                        }
+                    })
+                    .addFactoryFinishHandler(event -> {
+                        var ctrl = event.getController();
+                        var data = ctrl.getCustomDataTag();
+                        var components_amount = data.getByte("components_amount");
 
-                                ctrl.addPermanentModifier("additional" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.3 * (fi + 1))), 1, false).build());
-                                ctrl.addPermanentModifier("additionalout", RecipeModifierBuilder.create("modularmachinery:item", "output", (float) (Math.pow(components_amount + 1, 3) * 2), 1, false).build());
+                        ctrl.addPermanentModifier("additional" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.3 * (fi + 1))), 1, false).build());
+                        ctrl.addPermanentModifier("additionalout", RecipeModifierBuilder.create("modularmachinery:item", "output", (float) (Math.pow(components_amount + 1, 3) * 2), 1, false).build());
 
-                                data.setBoolean("additional_component_" + fi, true);
-                                data.setByte("additional_component_" + fi, (byte) (components_amount + 1));
-                            })
-                    , "additional_component_loading_" + fi)
+                        data.setBoolean("additional_component_" + fi, true);
+                        data.setByte("additional_component_" + fi, (byte) (components_amount + 1));
+                    })
+                    .requireResearch("additional_component_loading_" + fi)
                     .setThreadName(upThreadName)
                     .setParallelized(false)
                     .setLoadJEI(false)
@@ -795,27 +889,27 @@ public abstract class Drill implements MachineSpecial {
                 , "additional_component_loading_ex")
                 .build();
         upThread.addRecipe("additional_component_loading_" + name + "_raw_ore");
-        requireResearch(
-                RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
-                        .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
-                        .addPreCheckHandler(event -> {
-                            var ctrl = event.getController();
-                            var data = ctrl.getCustomDataTag();
-                            data.getByte("research_progress");
-                            data.getByte("components_amount");
-                            var additional_component_raw_ore = data.getBoolean("additional_component_raw_ore");
-                            if (additional_component_raw_ore) {
-                                event.setFailed("novaeng.machine.failed.work");
-                            }
-                        })
-                        .addFactoryFinishHandler(event -> {
-                            var ctrl = event.getController();
-                            var data = ctrl.getCustomDataTag();
-                            data.setBoolean("additional_component_raw_ore", true);
-                            ctrl.addPermanentModifier("additional_raw_ore", RecipeModifierBuilder.create("modularmachinery:energy", "input", 2, 1, false).build());
-                            ctrl.setCustomDataTag(data);
-                        })
-                , "additional_component_loading_raw_ore")
+
+        RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
+                .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
+                .addPreCheckHandler(event -> {
+                    var ctrl = event.getController();
+                    var data = ctrl.getCustomDataTag();
+                    data.getByte("research_progress");
+                    data.getByte("components_amount");
+                    var additional_component_raw_ore = data.getBoolean("additional_component_raw_ore");
+                    if (additional_component_raw_ore) {
+                        event.setFailed("novaeng.machine.failed.work");
+                    }
+                })
+                .addFactoryFinishHandler(event -> {
+                    var ctrl = event.getController();
+                    var data = ctrl.getCustomDataTag();
+                    data.setBoolean("additional_component_raw_ore", true);
+                    ctrl.addPermanentModifier("additional_raw_ore", RecipeModifierBuilder.create("modularmachinery:energy", "input", 2, 1, false).build());
+                    ctrl.setCustomDataTag(data);
+                })
+                .requireResearch("additional_component_loading_raw_ore")
                 .setThreadName(upThreadName)
                 .setParallelized(false)
                 .setLoadJEI(false)
@@ -842,98 +936,5 @@ public abstract class Drill implements MachineSpecial {
     protected enum Type {
         SINGLE,
         RANGE
-    }
-
-    protected static int chunkCoord(int posValue) {
-        return posValue >> 4;
-    }
-
-    private static IItemStack getOreOutput(TileMultiblockMachineController ctrl, BlockPos pos, int worldid) {
-        return getOreOutput(ctrl, pos, worldid, 0, 0);
-    }
-
-    private static IItemStack getOreOutput(TileMultiblockMachineController ctrl, BlockPos pos, int worldid, int k, int kk) {
-        var world = DimensionManager.getWorld(worldid);
-        if (world == null) {
-            return errorStone.mutable().copy();
-        }
-        var data = ctrl.getCustomDataTag();
-        var research_progress = data.getByte("research_progress");
-        var components_amount = data.getByte("components_amount");
-        var sfsh = Math.max((data.hasKey("sfsh") ? data.getInteger("sfsh") : 10000) - (1000 * Math.pow(research_progress, 1.6)), 0);
-        var bxs = data.getInteger("bxs" + (k + 1) + (kk + 1)) * (1 + Math.pow(components_amount, 2.5));
-        var component_raw_ore = data.getByte("additional_component_raw_ore");
-        var random = ctrl.getWorld().rand.nextInt(10000);
-        var worldInfo = ExcavatorHandler.getMineralWorldInfo(
-                world,
-                (chunkCoord(pos.getX()) + k),
-                (chunkCoord(pos.getZ()) + kk)
-        );
-        if (sfsh < 10000) {
-            if (sfsh > random) {
-                worldInfo.depletion += (int) bxs;
-                data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion);
-                ctrl.setCustomDataTag(data);
-            }
-        } else {
-            var sl = Math.floor(1.0f * sfsh) / 10000;
-            worldInfo.depletion += (int) (bxs * sl);
-            if ((sfsh - (10000 * sl)) > random) {
-                worldInfo.depletion += (int) bxs;
-            }
-            data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion);
-            ctrl.setCustomDataTag(data);
-        }
-        var mineral = getUsableMix(worldInfo);
-        if (mineral != null) {
-            var iore = mineral.getRandomOre(world.rand);
-            if (component_raw_ore == 1) {
-                var rawore = OreHandler.getRawOre(iore);
-                if (rawore == null) {
-                    return OreHandler.getOre(iore);
-                } else {
-                    random = world.rand.nextInt(6);
-                    return rawore.amount(Math.max(random, 1));
-                }
-            }
-            return OreHandler.getOre(iore);
-        } else {
-            data.setString("kmm" + (k + 1) + (kk + 1), "empty");
-            return stone;
-        }
-    }
-
-    private static IItemStack getCcrystalOutput(TileMultiblockMachineController ctrl) {
-        var data = ctrl.getCustomDataTag();
-        var world = ctrl.getWorld();
-        var research_progress = data.getByte("research_progress");
-        if (research_progress > 0) {
-            List<IItemStack> cjc = new ReferenceArrayList<>();
-            cjc.add(itemUtils.getItem("environmentaltech:litherite_crystal", 0));
-            cjc.add(itemUtils.getItem("environmentaltech:erodium_crystal", 0));
-            if (research_progress > 1) {
-                cjc.add(itemUtils.getItem("environmentaltech:kyronite_crystal", 0));
-                cjc.add(itemUtils.getItem("environmentaltech:pladium_crystal", 0));
-                if (research_progress > 2) {
-                    cjc.add(itemUtils.getItem("environmentaltech:ionite_crystal", 0));
-                    if (research_progress > 3) {
-                        cjc.add(itemUtils.getItem("environmentaltech:aethium_crystal", 0));
-                    }
-                }
-            }
-            var random = world.rand.nextInt(cjc.size());
-            return cjc.get(random);
-        } else {
-            return stone;
-        }
-    }
-
-    @Nullable
-    private static ExcavatorHandler.MineralMix getUsableMix(ExcavatorHandler.MineralWorldInfo worldInfo){
-        if (worldInfo.mineralOverride != null){
-            return worldInfo.mineralOverride;
-        } else {
-            return worldInfo.mineral;
-        }
     }
 }

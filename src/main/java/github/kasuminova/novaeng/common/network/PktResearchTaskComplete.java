@@ -23,6 +23,11 @@ public class PktResearchTaskComplete implements IMessage, IMessageHandler<PktRes
         this.researchTask = researchTask;
     }
 
+    @SideOnly(Side.CLIENT)
+    private static void showToast(ResearchCognitionData researchData) {
+        Minecraft.getMinecraft().getToastGui().add(new ResearchCompleteToast(researchData));
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         NBTTagCompound tag = ByteBufUtils.readTag(buf);
@@ -43,11 +48,6 @@ public class PktResearchTaskComplete implements IMessage, IMessageHandler<PktRes
     public IMessage onMessage(final PktResearchTaskComplete message, final MessageContext ctx) {
         showToast(message.researchTask);
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static void showToast(ResearchCognitionData researchData) {
-        Minecraft.getMinecraft().getToastGui().add(new ResearchCompleteToast(researchData));
     }
 
 }

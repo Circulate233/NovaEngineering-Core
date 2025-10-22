@@ -154,7 +154,7 @@ public class AssemblyLine extends NetNodeImpl {
          * 配方线程尝试占用一个装配线片。
          *
          * @param thread 配方线程
-         * @param index 装配线片位置
+         * @param index  装配线片位置
          * @return true 为占用成功或目标已经被自己占用，false 则代表目标片已被其他线程占用。
          */
         public boolean lock(final RecipeThread thread, final int index) {
@@ -194,6 +194,7 @@ public class AssemblyLine extends NetNodeImpl {
 
         /**
          * 检查目标片是否被占用。
+         *
          * @param index 片位置
          * @return true 为被占用，false 为未被占用。
          */

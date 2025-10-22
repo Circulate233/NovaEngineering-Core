@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import vazkii.botania.api.subtile.SubTileGenerating;
 
-@Mixin(value = SubTileGenerating.class,remap = false)
+@Mixin(value = SubTileGenerating.class, remap = false)
 public class MixinSubTileGenerating {
 
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lvazkii/botania/api/subtile/SubTileGenerating;isPassiveFlower()Z"))

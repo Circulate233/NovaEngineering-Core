@@ -90,44 +90,6 @@ public class GeocentricDrill implements MachineSpecial {
         }
     }
 
-    @Override
-    public void preInit(final DynamicMachine machine) {
-        HyperNetHelper.proxyMachineForHyperNet(machine.getRegistryName());
-        machine.setInternalParallelism(MAX_PARALLELISM);
-
-        Map<String, ItemStack> rawOres = new Object2ObjectLinkedOpenHashMap<>();
-        Arrays.stream(OreDictionary.getOreNames())
-                .filter(oreName -> oreName.startsWith("rawOre"))
-                .forEach(oreName -> {
-                    NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
-                    if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
-                        ItemStack stack = ores.get(0).copy();
-                        stack.setCount(ORE_COUNT);
-                        rawOres.put(oreName, stack);
-                    }
-                });
-
-        addOres(rawOres);
-        addGeocentricQuartzCrystalOre(rawOres);
-
-        this.rawOres.clear();
-        this.rawOres.putAll(rawOres);
-
-        RecipePrimer primer = RecipeBuilder.newBuilder(RECIPE_REGISTRY_NAME.getPath(), REGISTRY_NAME.getPath(), 20);
-        primer.addEnergyPerTickInput(ENERGY_PER_TICK);
-
-        float chance = 1F / rawOres.size();
-        List<ComponentRequirement<?, ?>> components = primer.getComponents();
-        for (final ItemStack ore : rawOres.values()) {
-            RequirementItem output = new RequirementItem(IOType.OUTPUT, ore.copy());
-            output.setChance(chance);
-            components.add(output);
-        }
-
-        RecipePrimerHyperNet.requireComputationPoint(primer, COMPUTATION_POINT_PER_PARALLELISM);
-        primer.build();
-    }
-
     private static void addGeocentricQuartzCrystalOre(final Map<String, ItemStack> rawOres) {
         Item geocentricCrystal = Item.REGISTRY.getObject(new ResourceLocation("contenttweaker", "geocentric_crystal"));
         if (geocentricCrystal != null) {
@@ -172,7 +134,45 @@ public class GeocentricDrill implements MachineSpecial {
         if (!crystalAethium.isEmpty()) {
             rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.get(0), 2));
         }
-        rawOres.put("glowstone_dust", new ItemStack(Items.GLOWSTONE_DUST,24));
+        rawOres.put("glowstone_dust", new ItemStack(Items.GLOWSTONE_DUST, 24));
+    }
+
+    @Override
+    public void preInit(final DynamicMachine machine) {
+        HyperNetHelper.proxyMachineForHyperNet(machine.getRegistryName());
+        machine.setInternalParallelism(MAX_PARALLELISM);
+
+        Map<String, ItemStack> rawOres = new Object2ObjectLinkedOpenHashMap<>();
+        Arrays.stream(OreDictionary.getOreNames())
+                .filter(oreName -> oreName.startsWith("rawOre"))
+                .forEach(oreName -> {
+                    NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
+                    if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
+                        ItemStack stack = ores.get(0).copy();
+                        stack.setCount(ORE_COUNT);
+                        rawOres.put(oreName, stack);
+                    }
+                });
+
+        addOres(rawOres);
+        addGeocentricQuartzCrystalOre(rawOres);
+
+        this.rawOres.clear();
+        this.rawOres.putAll(rawOres);
+
+        RecipePrimer primer = RecipeBuilder.newBuilder(RECIPE_REGISTRY_NAME.getPath(), REGISTRY_NAME.getPath(), 20);
+        primer.addEnergyPerTickInput(ENERGY_PER_TICK);
+
+        float chance = 1F / rawOres.size();
+        List<ComponentRequirement<?, ?>> components = primer.getComponents();
+        for (final ItemStack ore : rawOres.values()) {
+            RequirementItem output = new RequirementItem(IOType.OUTPUT, ore.copy());
+            output.setChance(chance);
+            components.add(output);
+        }
+
+        RecipePrimerHyperNet.requireComputationPoint(primer, COMPUTATION_POINT_PER_PARALLELISM);
+        primer.build();
     }
 
     public Map<String, ItemStack> getRawOres() {

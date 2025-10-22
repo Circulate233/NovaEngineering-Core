@@ -18,24 +18,6 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
                               Levels level,
                               List<WorkerStatus> workers) {
 
-    public void write(final ByteBuf buf) {
-        buf.writeInt(length);
-        buf.writeBoolean(overclocked);
-        buf.writeBoolean(activeCooling);
-        buf.writeInt(maxParallelism);
-        buf.writeInt(coolant);
-        buf.writeInt(maxCoolant);
-        buf.writeInt(hotCoolant);
-        buf.writeInt(maxHotCoolant);
-        buf.writeInt(energyStored);
-        buf.writeLong(totalCrafted);
-        buf.writeByte(level.ordinal());
-        workers.forEach(worker -> {
-            ByteBufUtils.writeItemStack(buf, worker.crafting);
-            buf.writeInt(worker.queueLength);
-        });
-    }
-
     public static EFabricatorData read(final ByteBuf buf) {
         int len = buf.readInt();
         boolean overclocked = buf.readBoolean();
@@ -53,6 +35,24 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
                 .mapToObj(i -> ByteBufUtils.readItemStack(buf))
                 .forEach(crafting -> workers.add(new WorkerStatus(crafting, buf.readInt())));
         return new EFabricatorData(len, overclocked, activeCooling, maxParallelism, coolant, maxCoolant, hotCoolant, maxHotCoolant, energyStored, totalCrafted, level, workers);
+    }
+
+    public void write(final ByteBuf buf) {
+        buf.writeInt(length);
+        buf.writeBoolean(overclocked);
+        buf.writeBoolean(activeCooling);
+        buf.writeInt(maxParallelism);
+        buf.writeInt(coolant);
+        buf.writeInt(maxCoolant);
+        buf.writeInt(hotCoolant);
+        buf.writeInt(maxHotCoolant);
+        buf.writeInt(energyStored);
+        buf.writeLong(totalCrafted);
+        buf.writeByte(level.ordinal());
+        workers.forEach(worker -> {
+            ByteBufUtils.writeItemStack(buf, worker.crafting);
+            buf.writeInt(worker.queueLength);
+        });
     }
 
     @Desugar

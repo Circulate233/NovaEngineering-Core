@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.lang.reflect.Field;
 
-@Mixin(value = ReflectionManager.class,remap = false)
+@Mixin(value = ReflectionManager.class, remap = false)
 public abstract class MixinReflectionManager {
 
     @Shadow
@@ -19,7 +19,7 @@ public abstract class MixinReflectionManager {
      * @author circulation
      * @reason 防止无限递归的出现
      */
-    @Inject(method = "removeFinal",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "removeFinal", at = @At("HEAD"), cancellable = true)
     private static void removeFinal(Field field, CallbackInfo ci) {
         if ((field.getModifiers() & 16) != 0) {
             try {

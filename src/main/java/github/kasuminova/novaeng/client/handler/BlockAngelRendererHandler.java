@@ -26,30 +26,6 @@ public class BlockAngelRendererHandler {
     private BlockAngelRendererHandler() {
     }
 
-    @SubscribeEvent
-    public void onRenderLast(final RenderWorldLastEvent ignored) {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        WorldClient world = Minecraft.getMinecraft().world;
-        ItemStack held = player.getHeldItemMainhand();
-        if (held.isEmpty() && (held = player.getHeldItemOffhand()).isEmpty() || !(held.getItem() instanceof ItemBlockAngel)) {
-            return;
-        }
-        if (world == null) {
-            return;
-        }
-
-        BlockPos renderPos = new BlockPos(player.posX, player.posY + player.eyeHeight, player.posZ);
-        if (!player.isSneaking()) {
-            renderPos = renderPos.offset(player.getAdjustedHorizontalFacing(), 2);
-        } else {
-            renderPos = renderPos.add(0, -player.height, 0);
-        }
-        IBlockState block = world.getBlockState(renderPos);
-        if (block.getBlock().isReplaceable(world, renderPos)) {
-            renderAngelBlockToWorld(renderPos);
-        }
-    }
-
     protected static void renderAngelBlockToWorld(final BlockPos renderPos) {
         Entity view = getViewEntity();
 
@@ -92,6 +68,30 @@ public class BlockAngelRendererHandler {
         Minecraft mc = Minecraft.getMinecraft();
         Entity rView = mc.getRenderViewEntity();
         return rView == null ? mc.player : rView;
+    }
+
+    @SubscribeEvent
+    public void onRenderLast(final RenderWorldLastEvent ignored) {
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        WorldClient world = Minecraft.getMinecraft().world;
+        ItemStack held = player.getHeldItemMainhand();
+        if (held.isEmpty() && (held = player.getHeldItemOffhand()).isEmpty() || !(held.getItem() instanceof ItemBlockAngel)) {
+            return;
+        }
+        if (world == null) {
+            return;
+        }
+
+        BlockPos renderPos = new BlockPos(player.posX, player.posY + player.eyeHeight, player.posZ);
+        if (!player.isSneaking()) {
+            renderPos = renderPos.offset(player.getAdjustedHorizontalFacing(), 2);
+        } else {
+            renderPos = renderPos.add(0, -player.height, 0);
+        }
+        IBlockState block = world.getBlockState(renderPos);
+        if (block.getBlock().isReplaceable(world, renderPos)) {
+            renderAngelBlockToWorld(renderPos);
+        }
     }
 
 }

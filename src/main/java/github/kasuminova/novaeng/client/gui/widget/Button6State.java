@@ -6,9 +6,11 @@ import github.kasuminova.mmce.client.gui.util.RenderSize;
 import github.kasuminova.mmce.client.gui.util.TextureProperties;
 import github.kasuminova.mmce.client.gui.widget.Button5State;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
+import lombok.Getter;
 
 import java.util.Optional;
 
+@Getter
 public class Button6State extends Button5State {
 
     protected TextureProperties clickedMouseDownTexture = TextureProperties.EMPTY;
@@ -41,17 +43,13 @@ public class Button6State extends Button5State {
         texture.render(textureLocation, renderPos, renderSize, gui);
     }
 
-    public TextureProperties getClickedMouseDownTexture() {
-        return clickedMouseDownTexture;
+    public Button6State setClickedMouseDownTexture(final TextureProperties clickedMouseDownTexture) {
+        this.clickedMouseDownTexture = Optional.ofNullable(clickedMouseDownTexture).orElse(TextureProperties.EMPTY);
+        return this;
     }
 
     public Button6State setClickedMouseDownTexture(final int clickedTextureX, final int clickedTextureY) {
         return setClickedMouseDownTexture(TextureProperties.of(clickedTextureX, clickedTextureY));
-    }
-
-    public Button6State setClickedMouseDownTexture(final TextureProperties clickedMouseDownTexture) {
-        this.clickedMouseDownTexture = Optional.ofNullable(clickedMouseDownTexture).orElse(TextureProperties.EMPTY);
-        return this;
     }
 
 }

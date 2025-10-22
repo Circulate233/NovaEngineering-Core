@@ -7,11 +7,23 @@ import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 
-@Mixin(value = DimensionProperties.class,remap = false)
+@Mixin(value = DimensionProperties.class, remap = false)
 public abstract class MixinDimensionProperties {
 
     @Shadow
     public int averageTemperature;
+    @Shadow
+    public double prevOrbitalTheta;
+    @Shadow
+    public double orbitTheta;
+    @Shadow
+    public int orbitalDist;
+    @Shadow
+    public double baseOrbitTheta;
+    @Shadow
+    public boolean isRetrograde;
+    @Shadow
+    public float[] fogColor;
 
     @Shadow
     public abstract StellarBody getStar();
@@ -23,27 +35,10 @@ public abstract class MixinDimensionProperties {
     public abstract int getAtmosphereDensity();
 
     @Shadow
-    public double prevOrbitalTheta;
-
-    @Shadow
-    public double orbitTheta;
-
-    @Shadow
     public abstract boolean isMoon();
 
     @Shadow
-    public int orbitalDist;
-
-    @Shadow
     public abstract DimensionProperties getParentProperties();
-
-    @Shadow
-    public double baseOrbitTheta;
-
-    @Shadow
-    public boolean isRetrograde;
-
-    @Shadow public float[] fogColor;
 
     /**
      * @author c

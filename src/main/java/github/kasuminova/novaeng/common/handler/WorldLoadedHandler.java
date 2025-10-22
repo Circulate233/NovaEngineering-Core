@@ -25,51 +25,51 @@ import static github.kasuminova.novaeng.common.config.NovaEngCoreConfig.SERVER;
 public class WorldLoadedHandler {
 
     public static final WorldLoadedHandler INSTANCE = new WorldLoadedHandler();
+    public static final Map<Integer, ForgeChunkManager.Ticket> map = new Object2ObjectOpenHashMap<>();
+    public static final IntSet REGISTERED_DIMENSIONS = new IntLinkedOpenHashSet();
+    public static final IntSet ERRORWROLD = new IntLinkedOpenHashSet();
+    public static boolean init = true;
     static Random random = new Random();
     static final int randomX = random.nextInt(100000) + 150000;
     static final int randomY = random.nextInt(100000) + 150000;
     public static final ChunkPos chunk = new ChunkPos(randomX, randomY);
     int time = 0;
-    public static final Map<Integer,ForgeChunkManager.Ticket> map = new Object2ObjectOpenHashMap<>();
-    public static final IntSet REGISTERED_DIMENSIONS = new IntLinkedOpenHashSet();
-    public static final IntSet ERRORWROLD = new IntLinkedOpenHashSet();
-    public static boolean init = true;
 
-    private void request(MinecraftServer server) {
-        if (init){
-            loadWorld(0,1,-1);
-            init = false;
-        } else {
-            REGISTERED_DIMENSIONS.forEach(WorldLoadedHandler::loadWorld);
-        }
-    }
-
-    public static void loadWorld(int... id){
+    public static void loadWorld(int... id) {
         for (int i : id) {
             loadWorld(i);
         }
     }
 
     @ZenMethod
-    public static void loadWorld(int id){
-        if (ERRORWROLD.contains(id))return;
+    public static void loadWorld(int id) {
+        if (ERRORWROLD.contains(id)) return;
         REGISTERED_DIMENSIONS.add(id);
         if (DimensionManager.isDimensionRegistered(id)) {
-            WorldServer worldServer = DimensionManager.getWorld(id,true);
-            if (worldServer == null){
+            WorldServer worldServer = DimensionManager.getWorld(id, true);
+            if (worldServer == null) {
                 DimensionManager.initDimension(id);
             }
-            if (worldServer != null){
-                DimensionManager.keepDimensionLoaded(id,true);
+            if (worldServer != null) {
+                DimensionManager.keepDimensionLoaded(id, true);
             } else {
                 ERRORWROLD.add(id);
             }
         }
     }
 
+    private void request(MinecraftServer server) {
+        if (init) {
+            loadWorld(0, 1, -1);
+            init = false;
+        } else {
+            REGISTERED_DIMENSIONS.forEach(WorldLoadedHandler::loadWorld);
+        }
+    }
+
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        switch (event.phase){
+        switch (event.phase) {
             case START -> {
                 if (SERVER.ForceChunkHandler) {
                     if (time % 100 == 0) {

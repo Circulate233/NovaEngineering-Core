@@ -16,10 +16,11 @@ import java.util.Set;
 @Mixin(TaskExecutor.class)
 public abstract class MixinTaskExecutor implements ITaskExecutor {
 
-    @Shadow(remap = false) public abstract int executeActions();
-
     @Unique
     private final Set<TileEntity> novaeng$requireMarkDirtyTEQueue = Sets.newIdentityHashSet();
+
+    @Shadow(remap = false)
+    public abstract int executeActions();
 
 //    @Inject(
 //            method = "onServerTick",

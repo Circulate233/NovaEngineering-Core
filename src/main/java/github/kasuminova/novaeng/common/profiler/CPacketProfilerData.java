@@ -20,6 +20,25 @@ public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
         this.networkBandwidthPerSecond = networkBandwidthPerSecond;
     }
 
+    public static CPacketProfilerData readFromBuffer(final ByteBuf buf) {
+        CPacketProfilerData data = new CPacketProfilerData(buf.readFloat());
+        int packetCount = buf.readInt();
+        for (int i = 0; i < packetCount; i++) {
+            String packetName = buf.readCharSequence(buf.readShort(), StandardCharsets.UTF_8).toString();
+            int count = buf.readInt();
+            long totalSize = buf.readLong();
+            data.addPacket(packetName, count, totalSize);
+        }
+        int tileEntityPacketCount = buf.readInt();
+        for (int i = 0; i < tileEntityPacketCount; i++) {
+            String packetName = buf.readCharSequence(buf.readShort(), StandardCharsets.UTF_8).toString();
+            int count = buf.readInt();
+            long totalSize = buf.readLong();
+            data.addTileEntityPacket(packetName, count, totalSize);
+        }
+        return data;
+    }
+
     public void addPacket(final String packetName, final int count, final long totalSize) {
         packets.putIfAbsent(packetName, new PacketData(count, totalSize));
     }
@@ -44,25 +63,6 @@ public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
             buf.writeInt(entry.getValue().count());
             buf.writeLong(entry.getValue().totalSize());
         }
-    }
-
-    public static CPacketProfilerData readFromBuffer(final ByteBuf buf) {
-        CPacketProfilerData data = new CPacketProfilerData(buf.readFloat());
-        int packetCount = buf.readInt();
-        for (int i = 0; i < packetCount; i++) {
-            String packetName = buf.readCharSequence(buf.readShort(), StandardCharsets.UTF_8).toString();
-            int count = buf.readInt();
-            long totalSize = buf.readLong();
-            data.addPacket(packetName, count, totalSize);
-        }
-        int tileEntityPacketCount = buf.readInt();
-        for (int i = 0; i < tileEntityPacketCount; i++) {
-            String packetName = buf.readCharSequence(buf.readShort(), StandardCharsets.UTF_8).toString();
-            int count = buf.readInt();
-            long totalSize = buf.readLong();
-            data.addTileEntityPacket(packetName, count, totalSize);
-        }
-        return data;
     }
 
     @Override
@@ -95,8 +95,8 @@ public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
         @Override
         public String toString() {
             return "PacketData[" +
-                   "count=" + count + ", " +
-                   "totalSize=" + totalSize + ']';
+                    "count=" + count + ", " +
+                    "totalSize=" + totalSize + ']';
         }
 
         @Override

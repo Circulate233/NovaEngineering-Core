@@ -39,74 +39,74 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class Functions {
 
     @SafeVarargs
-    public static <T> ObjectList<T> asList(T... s){
+    public static <T> ObjectList<T> asList(T... s) {
         return ObjectArrayList.wrap(s);
     }
 
-    public static IntList asList(int... s){
+    public static IntList asList(int... s) {
         return IntArrayList.wrap(s);
     }
 
-    public static LongList asList(long... s){
+    public static LongList asList(long... s) {
         return LongArrayList.wrap(s);
     }
 
-    public static ShortList asList(short... s){
+    public static ShortList asList(short... s) {
         return ShortArrayList.wrap(s);
     }
 
-    public static FloatList asList(float... s){
+    public static FloatList asList(float... s) {
         return FloatArrayList.wrap(s);
     }
 
-    public static DoubleList asList(double... s){
+    public static DoubleList asList(double... s) {
         return DoubleArrayList.wrap(s);
     }
 
-    public static CharList asList(char... s){
+    public static CharList asList(char... s) {
         return CharArrayList.wrap(s);
     }
 
     @SafeVarargs
-    public static <T> ObjectSet<T> asSet(T... s){
+    public static <T> ObjectSet<T> asSet(T... s) {
         return new ObjectOpenHashSet<>(s);
     }
 
-    public static IntSet asSet(int... s){
+    public static IntSet asSet(int... s) {
         return new IntOpenHashSet(s);
     }
 
-    public static LongSet asSet(long... s){
+    public static LongSet asSet(long... s) {
         return new LongOpenHashSet(s);
     }
 
-    public static ShortSet asSet(short... s){
+    public static ShortSet asSet(short... s) {
         return new ShortOpenHashSet(s);
     }
 
-    public static FloatSet asSet(float... s){
+    public static FloatSet asSet(float... s) {
         return new FloatOpenHashSet(s);
     }
 
-    public static DoubleSet asSet(double... s){
+    public static DoubleSet asSet(double... s) {
         return new DoubleOpenHashSet(s);
     }
 
-    public static CharSet asSet(char... s){
+    public static CharSet asSet(char... s) {
         return new CharOpenHashSet(s);
     }
 
     @ZenMethod
-    public static String getText(String key){
-        if (NovaEngineeringCore.proxy.isClient()){
+    public static String getText(String key) {
+        if (NovaEngineeringCore.proxy.isClient()) {
             return I18n.translateToLocal(key);
         }
         return key;
     }
 
     @ZenMethod
-    public static String getText(String key,Object... objs){
-        if (NovaEngineeringCore.proxy.isClient()){
+    public static String getText(String key, Object... objs) {
+        if (NovaEngineeringCore.proxy.isClient()) {
             return I18n.translateToLocalFormatted(key, objs);
         }
         return key;

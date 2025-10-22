@@ -15,8 +15,7 @@ public class ProcessorModuleRAMType extends ProcessorModuleType {
     private final double computationPointGenerationLimit;
 
     public ProcessorModuleRAMType(final long energyConsumption,
-                                  final double computationPointGenerationLimit)
-    {
+                                  final double computationPointGenerationLimit) {
         super(energyConsumption);
         this.computationPointGenerationLimit = computationPointGenerationLimit;
     }
@@ -29,15 +28,13 @@ public class ProcessorModuleRAMType extends ProcessorModuleType {
     public static ProcessorModuleRAMType create(final int minDurability,
                                                 final int maxDurability,
                                                 final long energyConsumption,
-                                                final double computationPointGenerationLimit)
-    {
+                                                final double computationPointGenerationLimit) {
         return new ProcessorModuleRAMType(energyConsumption, computationPointGenerationLimit);
     }
 
     @ZenMethod
     public static ProcessorModuleRAMType create(final long energyConsumption,
-                                                final double computationPointGenerationLimit)
-    {
+                                                final double computationPointGenerationLimit) {
         return new ProcessorModuleRAMType(energyConsumption, computationPointGenerationLimit);
     }
 

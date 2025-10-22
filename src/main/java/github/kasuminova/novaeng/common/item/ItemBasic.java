@@ -20,11 +20,10 @@ import java.util.Map;
 
 public class ItemBasic extends Item {
 
-    protected static Map<String,ItemBasic> map = new Object2ObjectOpenHashMap<>();
-
     public static List<String> NAMES = Arrays.asList(
             MagicBreaking.MAGICBREAKING.getId() + "_stone"
     );
+    protected static Map<String, ItemBasic> map = new Object2ObjectOpenHashMap<>();
 
     public ItemBasic(final String name) {
         this.setMaxStackSize(1);
@@ -35,10 +34,10 @@ public class ItemBasic extends Item {
 
     public static List<Item> getAllItem() {
         List<Item> ItemBasics = new ObjectArrayList<>();
-        for (String name : NAMES){
+        for (String name : NAMES) {
             final ItemBasic item = new ItemBasic(name);
             ItemBasics.add(item);
-            map.put(name,item);
+            map.put(name, item);
         }
         return ItemBasics;
     }
@@ -49,9 +48,9 @@ public class ItemBasic extends Item {
 
     @SideOnly(Side.CLIENT)
     @SuppressWarnings("DataFlowIssue")
-    protected void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips){
+    protected void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips) {
         int i = 0;
-        while (I18n.hasKey(this.getTranslationKey() + ".tooltip." + i)){
+        while (I18n.hasKey(this.getTranslationKey() + ".tooltip." + i)) {
             lines.add(I18n.format(this.getTranslationKey() + ".tooltip." + i));
             i++;
         }

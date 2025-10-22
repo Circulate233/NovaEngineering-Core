@@ -7,6 +7,7 @@ import github.kasuminova.mmce.client.gui.widget.base.DynamicWidget;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.novaeng.common.util.BiFunction2Bool;
 import github.kasuminova.novaeng.common.util.NumberUtils;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
@@ -27,8 +28,10 @@ public class InputBox extends DynamicWidget {
 
     protected final GuiTextField field = new GuiTextField(-1, Minecraft.getMinecraft().fontRenderer, 0, 0, 100, 14);
 
+    @Getter
     protected InputType inputType = InputType.STRING;
 
+    @Getter
     protected String prompt = "";
 
     protected BiFunction2Bool<InputBox, Character> onUserKeyTyped = null;
@@ -40,6 +43,13 @@ public class InputBox extends DynamicWidget {
     protected BiConsumer<InputBox, String> onContentChange = null;
 
     protected Function<InputBox, List<String>> tooltipFunction = null;
+
+    protected static int getActiveBase(String input) {
+        if (input.startsWith("0x") || input.startsWith("0X")) return 16;
+        if (input.startsWith("0b") || input.startsWith("0B")) return 2;
+        if (input.startsWith("0o") || input.startsWith("0O")) return 8;
+        return 10;
+    }
 
     @Override
     public void render(final WidgetGui gui, final RenderSize renderSize, final RenderPos renderPos, final MousePos mousePos) {
@@ -77,16 +87,15 @@ public class InputBox extends DynamicWidget {
         }
 
         if (GuiScreen.isKeyComboCtrlC(keyCode) ||
-            GuiScreen.isKeyComboCtrlV(keyCode) ||
-            GuiScreen.isKeyComboCtrlX(keyCode) ||
-            GuiScreen.isKeyComboCtrlA(keyCode) ||
-            keyCode == Keyboard.KEY_BACK ||
-            keyCode == Keyboard.KEY_DELETE ||
-            keyCode == Keyboard.KEY_LEFT ||
-            keyCode == Keyboard.KEY_RIGHT ||
-            keyCode == Keyboard.KEY_HOME ||
-            keyCode == Keyboard.KEY_END)
-        {
+                GuiScreen.isKeyComboCtrlV(keyCode) ||
+                GuiScreen.isKeyComboCtrlX(keyCode) ||
+                GuiScreen.isKeyComboCtrlA(keyCode) ||
+                keyCode == Keyboard.KEY_BACK ||
+                keyCode == Keyboard.KEY_DELETE ||
+                keyCode == Keyboard.KEY_LEFT ||
+                keyCode == Keyboard.KEY_RIGHT ||
+                keyCode == Keyboard.KEY_HOME ||
+                keyCode == Keyboard.KEY_END) {
             final String prev = field.getText();
             final boolean success = field.textboxKeyTyped(typedChar, keyCode);
             if (success && !prev.equals(field.getText())) {
@@ -158,6 +167,8 @@ public class InputBox extends DynamicWidget {
         return false;
     }
 
+    // Text
+
     protected boolean processUserConfirm(final String text) {
         if (inputType == InputType.STRING) {
             if (onUserConfirm != null && onUserConfirm.apply(this, text)) {
@@ -193,35 +204,25 @@ public class InputBox extends DynamicWidget {
         return false;
     }
 
-    // Text
+    // Input type
 
     public String getText() {
         return field.getText();
     }
 
-    // Input type
-
-    public InputType getInputType() {
-        return inputType;
-    }
+    // Prompt
 
     public InputBox setInputType(final InputType inputType) {
         this.inputType = inputType;
         return this;
     }
 
-    // Prompt
-
-    public String getPrompt() {
-        return prompt;
-    }
+    // Properties
 
     public InputBox setPrompt(final String prompt) {
         this.prompt = prompt;
         return this;
     }
-
-    // Properties
 
     @Override
     public InputBox setWidth(final int width) {
@@ -242,12 +243,12 @@ public class InputBox extends DynamicWidget {
         return this;
     }
 
+    // Functions
+
     public InputBox setEnableBackground(final boolean enableBackground) {
         field.setEnableBackgroundDrawing(enableBackground);
         return this;
     }
-
-    // Functions
 
     public InputBox setOnUserKeyTyped(final BiFunction2Bool<InputBox, Character> onUserKeyTyped) {
         this.onUserKeyTyped = onUserKeyTyped;
@@ -274,12 +275,12 @@ public class InputBox extends DynamicWidget {
         return this;
     }
 
+    // Tooltip function
+
     public InputBox setOnContentChange(final BiConsumer<InputBox, String> onContentChange) {
         this.onContentChange = onContentChange;
         return this;
     }
-
-    // Tooltip function
 
     public InputBox setTooltipFunction(final Function<InputBox, List<String>> tooltipFunction) {
         this.tooltipFunction = tooltipFunction;
@@ -318,13 +319,6 @@ public class InputBox extends DynamicWidget {
             }
         }
         super.onMouseClickGlobal(mousePos, renderPos, mouseButton);
-    }
-
-    protected static int getActiveBase(String input) {
-        if (input.startsWith("0x") || input.startsWith("0X")) return 16;
-        if (input.startsWith("0b") || input.startsWith("0B")) return 2;
-        if (input.startsWith("0o") || input.startsWith("0O")) return 8;
-        return 10;
     }
 
     public enum InputType {

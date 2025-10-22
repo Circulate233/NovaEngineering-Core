@@ -15,13 +15,13 @@ public abstract class AbstractEPart<C extends EPartController<?>> extends TileEn
     protected C partController = null;
     protected boolean loaded = false;
 
-    public void setController(final EPartController<?> storageController) {
-        this.partController = (C) storageController;
-    }
-
     @Nullable
     public C getController() {
         return partController;
+    }
+
+    public void setController(final EPartController<?> storageController) {
+        this.partController = (C) storageController;
     }
 
     public void onAssembled() {

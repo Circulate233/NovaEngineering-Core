@@ -18,8 +18,7 @@ public class DatabaseType extends NetNodeType {
 
     public DatabaseType(final String typeName,
                         final long energyUsage,
-                        final int maxResearchDataStoreSize)
-    {
+                        final int maxResearchDataStoreSize) {
         super(typeName, energyUsage);
         this.maxResearchDataStoreSize = maxResearchDataStoreSize;
     }
@@ -27,8 +26,7 @@ public class DatabaseType extends NetNodeType {
     @ZenMethod
     public static DatabaseType create(final String typeName,
                                       final long energyUsage,
-                                      final int maxResearchDataStoreSize)
-    {
+                                      final int maxResearchDataStoreSize) {
         return new DatabaseType(typeName, energyUsage, maxResearchDataStoreSize);
     }
 

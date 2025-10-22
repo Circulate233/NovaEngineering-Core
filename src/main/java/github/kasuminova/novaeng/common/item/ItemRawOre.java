@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -20,8 +21,10 @@ import org.jetbrains.annotations.NotNull;
 
 import static github.kasuminova.novaeng.common.registry.RegistryItems.ITEMS_TO_REGISTER;
 
+@ExtensionMethod(StringUtils.class)
 public final class ItemRawOre extends Item {
 
+    private static final Object2ReferenceMap<String, ItemRawOre> allItemRawOre = new Object2ReferenceOpenHashMap<>();
     private static final CreativeTabs rawOreTab = new CreativeTabs("raw_ore") {
         private static ItemStack Icon;
 
@@ -36,8 +39,6 @@ public final class ItemRawOre extends Item {
             return Icon;
         }
     };
-
-    private static final Object2ReferenceMap<String, ItemRawOre> allItemRawOre = new Object2ReferenceOpenHashMap<>();
     private static final Object2ReferenceMap<String, BlockRawOre> allItemRawBlock = new Object2ReferenceOpenHashMap<>();
 
     @Getter
@@ -51,7 +52,7 @@ public final class ItemRawOre extends Item {
 
     public ItemRawOre(String name, Type type) {
         if (type == Type.BLOCK) throw new RuntimeException("Directly registering BlockRawOre is not allowed");
-        this.name = StringUtils.camelToSnake(name);
+        this.name = name.camelToSnake();
         this.type = type;
         this.setCreativeTab(rawOreTab);
         var key = type.getName() + "_" + this.name;
@@ -61,7 +62,7 @@ public final class ItemRawOre extends Item {
         partOD = type.name().toLowerCase() + name;
         allItemRawOre.put(this.name, this);
         allItemRawBlock.put(this.name, new BlockRawOre(name));
-        OreDictionary.registerOre(this.getRawOD(),this);
+        OreDictionary.registerOre(this.getRawOD(), this);
     }
 
     public static ItemRawOre getRawOre(String name) {
@@ -78,96 +79,6 @@ public final class ItemRawOre extends Item {
 
     public static ReferenceCollection<BlockRawOre> getRawBlocks() {
         return allItemRawBlock.values();
-    }
-
-    @Override
-    @NotNull
-    public String getItemStackDisplayName(@NotNull ItemStack stack) {
-        if (I18n.canTranslate(this.getTranslationKey(stack) + ".name")) return super.getItemStackDisplayName(stack);
-        return I18n.translateToLocalFormatted(type.localizationKey, I18n.translateToLocal("base.material." + name));
-    }
-
-    public enum Type {
-        INGOT("rawOre"),
-        GEM("rawOreGem"),
-        BLOCK("rawBlock"),
-        DUST("rawOre");
-
-        @Getter
-        @NotNull
-        private final String odName;
-        @Getter
-        @NotNull
-        private final String name;
-        @Getter
-        @NotNull
-        private final String localizationKey;
-        @Getter
-        @NotNull
-        private final String defR;
-
-        Type(@NotNull String name) {
-            this.odName = name;
-            this.name = StringUtils.camelToSnake(name);
-            this.localizationKey = "novaeng.part." + this.name;
-            this.defR = this.name().equals("BLOCK") ?
-                    "blocks/raw_block/raw_block" : "items/raw_ore/" + this.name;
-        }
-
-        public String getOdName(String name) {
-            return odName + name;
-        }
-    }
-
-    @Getter
-    public class BlockRawOre extends Block {
-
-        @Getter
-        private final String rawOD;
-        @Getter
-        private final Type type = Type.BLOCK;
-        @Getter
-        private final ItemBlock item;
-
-        private BlockRawOre(String name) {
-            super(Material.ROCK);
-            this.setResistance(10.0F);
-            this.setSoundType(SoundType.STONE);
-            this.setCreativeTab(rawOreTab);
-            this.setDefaultState(this.blockState.getBaseState());
-            this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "raw_block_" + ItemRawOre.this.name);
-            this.setRegistryName(NovaEngineeringCore.getRL("raw_block_" + ItemRawOre.this.name));
-            this.rawOD = type.getOdName(name);
-            this.item = new ItemBLockRawOre();
-        }
-
-        public String getPartOD() {
-            return ItemRawOre.this.partOD;
-        }
-
-        public class ItemBLockRawOre extends ItemBlock {
-
-            private ItemBLockRawOre() {
-                super(BlockRawOre.this);
-                this.setCreativeTab(rawOreTab);
-                this.setTranslationKey(BlockRawOre.this.getTranslationKey());
-                this.setRegistryName(BlockRawOre.this.getRegistryName());
-                OreDictionary.registerOre(BlockRawOre.this.getRawOD(),this);
-            }
-
-            public String getPartOD() {
-                return ItemRawOre.this.partOD;
-            }
-
-            @Override
-            @NotNull
-            public String getItemStackDisplayName(@NotNull ItemStack stack) {
-                if (I18n.canTranslate(this.getTranslationKey(stack) + ".name"))
-                    return super.getItemStackDisplayName(stack);
-                return I18n.translateToLocalFormatted(type.localizationKey, I18n.translateToLocal("base.material." + name));
-            }
-        }
-
     }
 
     public static void rawOreRegister(String name) {
@@ -264,5 +175,95 @@ public final class ItemRawOre extends Item {
         for (var rawBlock : getRawBlocks()) {
             RegistryBlocks.prepareItemBlockRegister(RegistryBlocks.registerBlock(rawBlock).getItem());
         }
+    }
+
+    @Override
+    @NotNull
+    public String getItemStackDisplayName(@NotNull ItemStack stack) {
+        if (I18n.canTranslate(this.getTranslationKey(stack) + ".name")) return super.getItemStackDisplayName(stack);
+        return I18n.translateToLocalFormatted(type.localizationKey, I18n.translateToLocal("base.material." + name));
+    }
+
+    public enum Type {
+        INGOT("rawOre"),
+        GEM("rawOreGem"),
+        BLOCK("rawBlock"),
+        DUST("rawOre");
+
+        @Getter
+        @NotNull
+        private final String odName;
+        @Getter
+        @NotNull
+        private final String name;
+        @Getter
+        @NotNull
+        private final String localizationKey;
+        @Getter
+        @NotNull
+        private final String defR;
+
+        Type(@NotNull String name) {
+            this.odName = name;
+            this.name = name.camelToSnake();
+            this.localizationKey = "novaeng.part." + this.name;
+            this.defR = this.name().equals("BLOCK") ?
+                    "blocks/raw_block/raw_block" : "items/raw_ore/" + this.name;
+        }
+
+        public String getOdName(String name) {
+            return odName + name;
+        }
+    }
+
+    @Getter
+    public class BlockRawOre extends Block {
+
+        @Getter
+        private final String rawOD;
+        @Getter
+        private final Type type = Type.BLOCK;
+        @Getter
+        private final ItemBlock item;
+
+        private BlockRawOre(String name) {
+            super(Material.ROCK);
+            this.setResistance(10.0F);
+            this.setSoundType(SoundType.STONE);
+            this.setCreativeTab(rawOreTab);
+            this.setDefaultState(this.blockState.getBaseState());
+            this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "raw_block_" + ItemRawOre.this.name);
+            this.setRegistryName(NovaEngineeringCore.getRL("raw_block_" + ItemRawOre.this.name));
+            this.rawOD = type.getOdName(name);
+            this.item = new ItemBLockRawOre();
+        }
+
+        public String getPartOD() {
+            return ItemRawOre.this.partOD;
+        }
+
+        public class ItemBLockRawOre extends ItemBlock {
+
+            private ItemBLockRawOre() {
+                super(BlockRawOre.this);
+                this.setCreativeTab(rawOreTab);
+                this.setTranslationKey(BlockRawOre.this.getTranslationKey());
+                this.setRegistryName(BlockRawOre.this.getRegistryName());
+                OreDictionary.registerOre(BlockRawOre.this.getRawOD(), this);
+            }
+
+            public String getPartOD() {
+                return ItemRawOre.this.partOD;
+            }
+
+            @Override
+            @NotNull
+            public String getItemStackDisplayName(@NotNull ItemStack stack) {
+                if (I18n.canTranslate(this.getTranslationKey(stack) + ".name"))
+                    return super.getItemStackDisplayName(stack);
+                return I18n.translateToLocalFormatted(type.localizationKey, I18n.translateToLocal("base.material." + name));
+            }
+        }
+
     }
 }

@@ -32,8 +32,7 @@ public class SpecialMachineInfoProvider implements IProbeInfoProvider {
                              final EntityPlayer player,
                              final World world,
                              final IBlockState blockState,
-                             final IProbeHitData data)
-    {
+                             final IProbeHitData data) {
         if (!blockState.getBlock().hasTileEntity(blockState)) {
             return;
         }

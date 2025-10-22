@@ -25,6 +25,22 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
         this.slotManager = slotManager;
     }
 
+    private static boolean renderDependiceColorOverlay(final RenderPos renderPos, final SlotConditionItemHandler dependency) {
+        if (dependency.isHovered()) {
+            GlStateManager.colorMask(true, true, true, false);
+
+            Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
+                    renderPos.posX() + 17, renderPos.posY() + 17,
+                    0x8096FF96
+            );
+            GlStateManager.color(1F, 1F, 1F, 1F);
+
+            GlStateManager.colorMask(true, true, true, true);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void update(final WidgetGui gui) {
         super.update(gui);
@@ -78,22 +94,6 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
                         0x80FF9696
                 );
             }
-            GlStateManager.color(1F, 1F, 1F, 1F);
-
-            GlStateManager.colorMask(true, true, true, true);
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean renderDependiceColorOverlay(final RenderPos renderPos, final SlotConditionItemHandler dependency) {
-        if (dependency.isHovered()) {
-            GlStateManager.colorMask(true, true, true, false);
-
-            Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
-                    renderPos.posX() + 17, renderPos.posY() + 17,
-                    0x8096FF96
-            );
             GlStateManager.color(1F, 1F, 1F, 1F);
 
             GlStateManager.colorMask(true, true, true, true);

@@ -42,8 +42,7 @@ public class BlockAngel extends Block {
     @Override
     public boolean canHarvestBlock(@Nonnull final IBlockAccess world,
                                    @Nonnull final BlockPos pos,
-                                   @Nonnull final EntityPlayer player)
-    {
+                                   @Nonnull final EntityPlayer player) {
         return true;
     }
 

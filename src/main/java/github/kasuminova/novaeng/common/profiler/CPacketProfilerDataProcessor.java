@@ -44,7 +44,38 @@ public class CPacketProfilerDataProcessor {
 
     private Future<Void> task = null;
 
-    private CPacketProfilerDataProcessor() {}
+    private CPacketProfilerDataProcessor() {
+    }
+
+    private static void generateDefaultMessage(final List<ITextComponent> messages, final long maxBandwidthPerSecond, final GameProfile maxPlayer, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
+        messages.add(new TextComponentString(TextFormatting.GREEN + "最大带宽使用: ~" + TextFormatting.AQUA + MiscUtils.formatNumber(maxBandwidthPerSecond) + "B/s" + TextFormatting.GREEN + "，来自: " + TextFormatting.YELLOW + maxPlayer.getName()));
+        messages.add(new TextComponentString(TextFormatting.GREEN + "合并后数据: "));
+        messages.add(new TextComponentString(TextFormatting.GREEN + "普通数据包: "));
+        generatePktMessage(messages, mergedPackets);
+        messages.add(new TextComponentString(TextFormatting.GREEN + "TileEntity 数据包: "));
+        generatePktMessage(messages, mergedTileEntityPackets);
+    }
+
+    private static void generatePktMessage(final List<ITextComponent> messages, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
+        for (Map.Entry<String, CPacketProfilerData.PacketData> entry : mergedTileEntityPackets.entrySet()) {
+            messages.add(new TextComponentString(
+                    "PktClass: " +
+                            TextFormatting.GOLD + entry.getKey() + TextFormatting.RESET + ": " +
+                            TextFormatting.RED + MiscUtils.formatNumber(entry.getValue().totalSize()) + 'B' +
+                            TextFormatting.WHITE + ", PktCnt: " + TextFormatting.AQUA + entry.getValue().count() +
+                            TextFormatting.WHITE + ", SizeAvg: " + TextFormatting.YELLOW + MiscUtils.formatNumber(entry.getValue().totalSize() / entry.getValue().count()) + 'B'
+            ));
+        }
+    }
+
+    private static void generateTargetMessage(final List<ITextComponent> messages, final GameProfile target, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
+        messages.add(new TextComponentString(TextFormatting.GREEN + "目标玩家: " + TextFormatting.YELLOW + target.getName()));
+        messages.add(new TextComponentString(TextFormatting.GREEN + "合并后数据: "));
+        messages.add(new TextComponentString(TextFormatting.GREEN + "普通数据包: "));
+        generatePktMessage(messages, mergedPackets);
+        messages.add(new TextComponentString(TextFormatting.GREEN + "TileEntity 数据包: "));
+        generatePktMessage(messages, mergedTileEntityPackets);
+    }
 
     public void create(final ICommandSender sender, final int limit, @Nullable GameProfile target) {
         if (this.currentEvent != null) {
@@ -80,7 +111,8 @@ public class CPacketProfilerDataProcessor {
             while (receivedPlayers < players && System.currentTimeMillis() - startTime < 5000) {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
             if (receivedPlayers < players) {
                 NovaEngineeringCore.log.warn("Profiler collect task timeout ({}ms), received players: {}, players: {}", System.currentTimeMillis() - startTime, receivedPlayers, players);
@@ -179,36 +211,6 @@ public class CPacketProfilerDataProcessor {
         return new ProcessedData(totalBandwidthPerSecond, maxPlayer, maxBandwidthPerSecond, mergedPackets, mergedTileEntityPackets);
     }
 
-    private static void generateDefaultMessage(final List<ITextComponent> messages, final long maxBandwidthPerSecond, final GameProfile maxPlayer, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
-        messages.add(new TextComponentString(TextFormatting.GREEN + "最大带宽使用: ~" + TextFormatting.AQUA + MiscUtils.formatNumber(maxBandwidthPerSecond) + "B/s" + TextFormatting.GREEN + "，来自: " + TextFormatting.YELLOW + maxPlayer.getName()));
-        messages.add(new TextComponentString(TextFormatting.GREEN + "合并后数据: "));
-        messages.add(new TextComponentString(TextFormatting.GREEN + "普通数据包: "));
-        generatePktMessage(messages, mergedPackets);
-        messages.add(new TextComponentString(TextFormatting.GREEN + "TileEntity 数据包: "));
-        generatePktMessage(messages, mergedTileEntityPackets);
-    }
-
-    private static void generatePktMessage(final List<ITextComponent> messages, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
-        for (Map.Entry<String, CPacketProfilerData.PacketData> entry : mergedTileEntityPackets.entrySet()) {
-            messages.add(new TextComponentString(
-                    "PktClass: " +
-                    TextFormatting.GOLD + entry.getKey() + TextFormatting.RESET + ": " +
-                    TextFormatting.RED + MiscUtils.formatNumber(entry.getValue().totalSize()) + 'B' +
-                    TextFormatting.WHITE + ", PktCnt: " + TextFormatting.AQUA + entry.getValue().count() +
-                    TextFormatting.WHITE + ", SizeAvg: " + TextFormatting.YELLOW + MiscUtils.formatNumber(entry.getValue().totalSize() / entry.getValue().count()) + 'B'
-            ));
-        }
-    }
-
-    private static void generateTargetMessage(final List<ITextComponent> messages, final GameProfile target, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
-        messages.add(new TextComponentString(TextFormatting.GREEN + "目标玩家: " + TextFormatting.YELLOW + target.getName()));
-        messages.add(new TextComponentString(TextFormatting.GREEN + "合并后数据: "));
-        messages.add(new TextComponentString(TextFormatting.GREEN + "普通数据包: "));
-        generatePktMessage(messages, mergedPackets);
-        messages.add(new TextComponentString(TextFormatting.GREEN + "TileEntity 数据包: "));
-        generatePktMessage(messages, mergedTileEntityPackets);
-    }
-
     public void receive(final UUID eventId, final GameProfile player, final CPacketProfilerData data) {
         if (currentEvent == null) {
             return;
@@ -225,7 +227,9 @@ public class CPacketProfilerDataProcessor {
     }
 
     @Desugar
-    private record ProcessedData(double totalBandwidthPerSecond, GameProfile maxPlayer, double maxBandwidthPerSecond, Map<String, CPacketProfilerData.PacketData> mergedPackets, Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
+    private record ProcessedData(double totalBandwidthPerSecond, GameProfile maxPlayer, double maxBandwidthPerSecond,
+                                 Map<String, CPacketProfilerData.PacketData> mergedPackets,
+                                 Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
     }
 
 }

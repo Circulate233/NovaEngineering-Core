@@ -8,7 +8,6 @@ public class ProxiedHashMap<K, V> extends HashMap<K, V> {
     public ProxiedHashMap(final Map<? extends K, ? extends V> m) {
         super(m);
     }
-    
-    
-    
+
+
 }

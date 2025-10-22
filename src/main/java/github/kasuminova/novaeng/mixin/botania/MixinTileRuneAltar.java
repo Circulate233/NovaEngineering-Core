@@ -21,15 +21,19 @@ import java.util.List;
 public abstract class MixinTileRuneAltar extends TileSimpleInventory {
 
     @Shadow
+    public int manaToGet;
+    @Shadow
     int mana;
     @Shadow
     RecipeRuneAltar currentRecipe;
+
     @Shadow
-    public int manaToGet;
+    public void saveLastRecipe() {
+    }
+
     @Shadow
-    public void saveLastRecipe() {}
-    @Shadow
-    public void recieveMana(int mana) {}
+    public void recieveMana(int mana) {
+    }
 
     /**
      * @author Circulation_
@@ -42,7 +46,7 @@ public abstract class MixinTileRuneAltar extends TileSimpleInventory {
             if (this.currentRecipe != null) {
                 recipe = this.currentRecipe;
             } else {
-                for(RecipeRuneAltar recipe_ : BotaniaAPI.runeAltarRecipes) {
+                for (RecipeRuneAltar recipe_ : BotaniaAPI.runeAltarRecipes) {
                     if (recipe_.matches(this.itemHandler)) {
                         recipe = recipe_;
                         break;
@@ -54,7 +58,7 @@ public abstract class MixinTileRuneAltar extends TileSimpleInventory {
                 List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.pos, this.pos.add(1, 1, 1)));
                 EntityItem livingrock = null;
 
-                for(EntityItem item : items) {
+                for (EntityItem item : items) {
                     if (!item.isDead && !item.getItem().isEmpty() && item.getItem().getItem() == Item.getItemFromBlock(ModBlocks.livingrock)) {
                         livingrock = item;
                         break;
@@ -65,18 +69,18 @@ public abstract class MixinTileRuneAltar extends TileSimpleInventory {
                     int mana = recipe.getManaUsage();
                     this.recieveMana(-mana);
                     ItemStack output = recipe.getOutput().copy();
-                    EntityItem outputItem = new EntityItem(this.world, (double)this.pos.getX() + (double)0.5F, (double)this.pos.getY() + (double)1.5F, (double)this.pos.getZ() + (double)0.5F, output);
+                    EntityItem outputItem = new EntityItem(this.world, (double) this.pos.getX() + (double) 0.5F, (double) this.pos.getY() + (double) 1.5F, (double) this.pos.getZ() + (double) 0.5F, output);
                     this.world.spawnEntity(outputItem);
                     this.currentRecipe = null;
                     this.world.addBlockEvent(this.getPos(), ModBlocks.runeAltar, 1, 60);
                     this.world.addBlockEvent(this.getPos(), ModBlocks.runeAltar, 2, 0);
                     this.saveLastRecipe();
 
-                    for(int i = 0; i < this.getSizeInventory(); ++i) {
+                    for (int i = 0; i < this.getSizeInventory(); ++i) {
                         ItemStack stack = this.itemHandler.getStackInSlot(i);
                         if (!stack.isEmpty()) {
                             if ((OreDictionary.getOreIDs(stack).length != 0 && OreDictionary.getOreName(OreDictionary.getOreIDs(stack)[0]).startsWith("rune")) && (player == null || !player.capabilities.isCreativeMode)) {
-                                EntityItem outputRune = new EntityItem(this.world, (double)this.getPos().getX() + (double)0.5F, (double)this.getPos().getY() + (double)1.5F, (double)this.getPos().getZ() + (double)0.5F, stack.copy());
+                                EntityItem outputRune = new EntityItem(this.world, (double) this.getPos().getX() + (double) 0.5F, (double) this.getPos().getY() + (double) 1.5F, (double) this.getPos().getZ() + (double) 0.5F, stack.copy());
                                 this.world.spawnEntity(outputRune);
                             }
 

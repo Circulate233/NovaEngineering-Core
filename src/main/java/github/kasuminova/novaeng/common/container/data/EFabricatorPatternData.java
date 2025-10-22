@@ -38,18 +38,6 @@ public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
         return new EFabricatorPatternData(Collections.singletonMap(data.pos(), Collections.singleton(data)));
     }
 
-    public void writeTo(final ByteBuf buf) {
-        buf.writeByte(patterns.size());
-        patterns.forEach((pos, patternSet) -> {
-            buf.writeLong(pos.toLong());
-            buf.writeByte(patternSet.size());
-            patternSet.forEach(pattern -> {
-                buf.writeByte(pattern.slot());
-                ByteBufUtils.writeItemStack(buf, pattern.pattern());
-            });
-        });
-    }
-
     public static EFabricatorPatternData readFrom(final ByteBuf buf) {
         final int len = buf.readByte();
         Map<BlockPos, Set<PatternData>> patterns = new BlockPos2ValueMap<>();
@@ -65,6 +53,18 @@ public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
         }
 
         return new EFabricatorPatternData(patterns);
+    }
+
+    public void writeTo(final ByteBuf buf) {
+        buf.writeByte(patterns.size());
+        patterns.forEach((pos, patternSet) -> {
+            buf.writeLong(pos.toLong());
+            buf.writeByte(patternSet.size());
+            patternSet.forEach(pattern -> {
+                buf.writeByte(pattern.slot());
+                ByteBufUtils.writeItemStack(buf, pattern.pattern());
+            });
+        });
     }
 
     @Desugar

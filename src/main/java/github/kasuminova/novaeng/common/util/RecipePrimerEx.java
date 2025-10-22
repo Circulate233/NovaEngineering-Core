@@ -20,8 +20,8 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class RecipePrimerEx {
 
     @ZenMethod
-    public static RecipePrimer setItemTags(final RecipePrimer primer, final String tagName ,boolean isInput) {
-        if (primer instanceof NovaRAB n){
+    public static RecipePrimer setItemTags(final RecipePrimer primer, final String tagName, boolean isInput) {
+        if (primer instanceof NovaRAB n) {
             if (isInput) {
                 n.n$setInTags(tagName);
             } else {
@@ -32,8 +32,12 @@ public class RecipePrimerEx {
         for (ComponentRequirement<?, ?> component : primer.getComponents()) {
             if (component instanceof RequirementItem) {
                 switch (component.getActionType()) {
-                    case OUTPUT -> {if (isInput) continue;}
-                    case INPUT -> {if (!isInput) continue;}
+                    case OUTPUT -> {
+                        if (isInput) continue;
+                    }
+                    case INPUT -> {
+                        if (!isInput) continue;
+                    }
                 }
                 var tag = new ComponentSelectorTag(tagName);
                 component.setTag(tag);
@@ -49,20 +53,20 @@ public class RecipePrimerEx {
     }
 
     @ZenMethod
-    public static RecipePrimer setLore(final RecipePrimer primer,String... key){
+    public static RecipePrimer setLore(final RecipePrimer primer, String... key) {
         primer.setPreViewNBT(getData(key));
         return primer;
     }
 
-    private static IData getData(String... key){
+    private static IData getData(String... key) {
         var nbt = new NBTTagCompound();
         var nbt1 = new NBTTagCompound();
         var list = new NBTTagList();
         for (String s : key) {
             list.appendTag(new NBTTagString(I18n.translateToLocalFormatted(s)));
         }
-        nbt1.setTag("Lore",list);
-        nbt.setTag("display",nbt1);
+        nbt1.setTag("Lore", list);
+        nbt.setTag("display", nbt1);
         return CraftTweakerMC.getIData(nbt);
     }
 

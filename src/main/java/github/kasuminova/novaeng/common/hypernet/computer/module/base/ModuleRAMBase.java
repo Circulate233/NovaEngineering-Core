@@ -21,16 +21,16 @@ public class ModuleRAMBase extends ServerModuleBase<ModuleRAM> {
         this.hardwareBandwidthProvision = hardwareBandwidthProvision;
     }
 
+    @ZenMethod
+    public static ModuleRAMBase create(final String registryName, final int hardwareBandwidthProvision) {
+        return new ModuleRAMBase(registryName, hardwareBandwidthProvision);
+    }
+
     @Override
     public List<String> getTooltip(final ModuleRAM moduleInstance) {
         List<String> tooltip = new ArrayList<>(super.getTooltip(moduleInstance));
         tooltip.add(I18n.format("novaeng.hypernet.hardware_bandwidth.provide", this.hardwareBandwidthProvision));
         return tooltip;
-    }
-
-    @ZenMethod
-    public static ModuleRAMBase create(final String registryName, final int hardwareBandwidthProvision) {
-        return new ModuleRAMBase(registryName, hardwareBandwidthProvision);
     }
 
     @Override

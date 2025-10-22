@@ -8,6 +8,7 @@ import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.ThreadCor
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorThreadCore;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
+import lombok.Getter;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -31,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+@Getter
 @SuppressWarnings("deprecation")
 public class BlockECalculatorThreadCore extends BlockECalculatorPart {
 
@@ -54,29 +56,17 @@ public class BlockECalculatorThreadCore extends BlockECalculatorPart {
         );
     }
 
-    public ItemECalculatorThreadCore getItem() {
-        return item;
-    }
-
-    public BlockECalculatorThreadCore setItem(final ItemECalculatorThreadCore item) {
-        this.item = item;
-        return this;
-    }
-
-    public int getThreads() {
-        return threads;
-    }
-
-    public int getHyperThreads() {
-        return hyperThreads;
-    }
-
     protected BlockECalculatorThreadCore(final String level, final int threads, final int hyperThreads) {
         this(
                 new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_" + level),
                 NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_" + level,
                 threads, hyperThreads
         );
+    }
+
+    public BlockECalculatorThreadCore setItem(final ItemECalculatorThreadCore item) {
+        this.item = item;
+        return this;
     }
 
     @Nullable
@@ -156,8 +146,7 @@ public class BlockECalculatorThreadCore extends BlockECalculatorPart {
                                 @Nonnull final BlockPos pos,
                                 @Nonnull final IBlockState state,
                                 @Nonnull final EntityLivingBase placer,
-                                @Nonnull final ItemStack stack)
-    {
+                                @Nonnull final ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 
         TileEntity te = worldIn.getTileEntity(pos);

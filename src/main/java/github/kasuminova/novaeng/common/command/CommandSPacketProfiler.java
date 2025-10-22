@@ -22,6 +22,11 @@ public class CommandSPacketProfiler extends CommandBase {
     private CommandSPacketProfiler() {
     }
 
+    private static GameProfile getPlayer(final String name) {
+        EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(name);
+        return player == null ? null : player.getGameProfile();
+    }
+
     @Nonnull
     @Override
     public String getName() {
@@ -57,8 +62,7 @@ public class CommandSPacketProfiler extends CommandBase {
     @Override
     public void execute(@Nonnull final MinecraftServer server,
                         @Nonnull final ICommandSender sender,
-                        @Nonnull final String[] args)
-    {
+                        @Nonnull final String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("full")) {
             SPacketProfiler.getFullProfilerMessages().stream().map(TextComponentString::new).forEach(sender::sendMessage);
             return;
@@ -85,11 +89,6 @@ public class CommandSPacketProfiler extends CommandBase {
             return;
         }
         SPacketProfiler.getProfilerMessages().stream().map(TextComponentString::new).forEach(sender::sendMessage);
-    }
-
-    private static GameProfile getPlayer(final String name) {
-        EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(name);
-        return player == null ? null : player.getGameProfile();
     }
 
 }

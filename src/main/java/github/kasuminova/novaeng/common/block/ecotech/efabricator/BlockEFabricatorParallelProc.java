@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Modifier;
+import lombok.Getter;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -22,10 +23,11 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
 @SuppressWarnings({"deprecation", "ArraysAsListWithZeroOrOneArgument"})
 public class BlockEFabricatorParallelProc extends BlockEFabricatorPart {
 
-    public static final BlockEFabricatorParallelProc L4 = new BlockEFabricatorParallelProc("l4", 
+    public static final BlockEFabricatorParallelProc L4 = new BlockEFabricatorParallelProc("l4",
             Arrays.asList(
                     new Modifier(EFabricatorParallelProc.Type.ADD, 24, false)
             ),
@@ -70,14 +72,6 @@ public class BlockEFabricatorParallelProc extends BlockEFabricatorPart {
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_parallel_proc_" + level);
         this.modifiers = modifiers;
         this.overclockModifiers = overclockModifiers;
-    }
-
-    public List<Modifier> getModifiers() {
-        return modifiers;
-    }
-
-    public List<Modifier> getOverclockModifiers() {
-        return overclockModifiers;
     }
 
     @Nullable

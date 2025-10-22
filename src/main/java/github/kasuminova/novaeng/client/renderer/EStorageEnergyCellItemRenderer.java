@@ -13,7 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.Nonnull;
 
 public class EStorageEnergyCellItemRenderer implements ItemMeshDefinition {
-    
+
     protected final ResourceLocation modelLocation;
 
     public EStorageEnergyCellItemRenderer(ItemBlockEStorageEnergyCell item, String level) {
@@ -23,14 +23,6 @@ public class EStorageEnergyCellItemRenderer implements ItemMeshDefinition {
                     modelLocation, "facing=north," + EnergyCellStatus.STATUS.getName() + "=" + status.getName())
             );
         }
-    }
-
-    @Nonnull
-    @Override
-    public ModelResourceLocation getModelLocation(@Nonnull final ItemStack stack) {
-        double fillFactor = getFillFactor(stack);
-        EnergyCellStatus status = EStorageEnergyCell.getStatusFromFillFactor(fillFactor);
-        return new ModelResourceLocation(modelLocation, "facing=north," + EnergyCellStatus.STATUS.getName() + "=" + status.getName());
     }
 
     private static double getFillFactor(ItemStack stack) {
@@ -48,6 +40,14 @@ public class EStorageEnergyCellItemRenderer implements ItemMeshDefinition {
             return 0;
         }
         return energyStored / maxEnergyStore;
+    }
+
+    @Nonnull
+    @Override
+    public ModelResourceLocation getModelLocation(@Nonnull final ItemStack stack) {
+        double fillFactor = getFillFactor(stack);
+        EnergyCellStatus status = EStorageEnergyCell.getStatusFromFillFactor(fillFactor);
+        return new ModelResourceLocation(modelLocation, "facing=north," + EnergyCellStatus.STATUS.getName() + "=" + status.getName());
     }
 
 }

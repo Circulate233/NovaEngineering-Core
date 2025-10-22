@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.hypernet.computer.module;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
+import lombok.Getter;
 import net.minecraft.nbt.NBTTagCompound;
 import stanhebben.zenscript.annotations.ZenClass;
 
@@ -12,22 +13,16 @@ import javax.annotation.Nonnull;
 @ZenClass("novaeng.hypernet.server.module.ServerModule")
 public abstract class ServerModule {
 
+    @Getter
     protected final ModularServer server;
+    @Getter
     protected final ServerModuleBase<?> moduleBase;
 
     protected boolean broken;
 
-    public ServerModule(final ModularServer server,final ServerModuleBase<?> moduleBase) {
+    public ServerModule(final ModularServer server, final ServerModuleBase<?> moduleBase) {
         this.server = server;
         this.moduleBase = moduleBase;
-    }
-
-    public ModularServer getServer() {
-        return server;
-    }
-
-    public ServerModuleBase<?> getModuleBase() {
-        return moduleBase;
     }
 
     public void readNBT(@Nonnull NBTTagCompound nbt) {

@@ -42,12 +42,6 @@ public final class CalculateTypes {
             super("intricate");
         }
 
-        @Override
-        @SideOnly(Side.CLIENT)
-        public String format(final double value) {
-            return I18n.format("novaeng.hypernet.calculate.type." + typeName, formatLogic(value));
-        }
-
         static String formatLogic(double value) {
             if (value < 1D) {
                 return NovaEngUtils.formatDouble(value * 1_000D, 1) + "G";
@@ -60,6 +54,12 @@ public final class CalculateTypes {
             }
 
             return NovaEngUtils.formatDouble(value / 1_000_000D, 3) + "E";
+        }
+
+        @Override
+        @SideOnly(Side.CLIENT)
+        public String format(final double value) {
+            return I18n.format("novaeng.hypernet.calculate.type." + typeName, formatLogic(value));
         }
     }
 

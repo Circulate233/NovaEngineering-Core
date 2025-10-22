@@ -6,14 +6,6 @@ import net.minecraft.util.text.TextFormatting;
 
 public interface Calculable {
 
-    double calculate(CalculateRequest request) throws ModularServerException;
-
-    double getCalculateTypeEfficiency(CalculateType type);
-
-    default double applyEfficiency(double value, CalculateType type) {
-        return value * getCalculateTypeEfficiency(type);
-    }
-
     static String formatEfficiency(double value) {
         String formattedValue = NovaEngUtils.formatDouble(value * 100D, 3);
 
@@ -28,5 +20,13 @@ public interface Calculable {
         } else {
             return TextFormatting.RED + formattedValue + TextFormatting.WHITE;
         }
+    }
+
+    double calculate(CalculateRequest request) throws ModularServerException;
+
+    double getCalculateTypeEfficiency(CalculateType type);
+
+    default double applyEfficiency(double value, CalculateType type) {
+        return value * getCalculateTypeEfficiency(type);
     }
 }

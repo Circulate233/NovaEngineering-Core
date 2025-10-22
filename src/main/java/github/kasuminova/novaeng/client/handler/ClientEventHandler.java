@@ -23,34 +23,13 @@ import java.util.List;
 public class ClientEventHandler {
     public static final ClientEventHandler INSTANCE = new ClientEventHandler();
 
-    public static int debugPacketProfilerMessageLimit   = 5;
+    public static int debugPacketProfilerMessageLimit = 5;
     public static int debugTEPacketProfilerMessageLimit = 5;
-
+    private final List<String> debugMessageCache = new ArrayList<>();
     private long clientTick = 0;
-
-    private final List<String> debugMessageCache          = new ArrayList<>();
-    private       boolean      debugMessageUpdateRequired = true;
+    private boolean debugMessageUpdateRequired = true;
 
     private ClientEventHandler() {
-    }
-
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) {
-            return;
-        }
-        clientTick++;
-
-        if (clientTick % 5 == 0) {
-            if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
-                TitleUtils.checkTitleState();
-            }
-            debugMessageUpdateRequired = true;
-        }
-
-        if (clientTick % 20 == 0) {
-            checkParticleEffects();
-        }
     }
 
     private static void checkParticleEffects() {
@@ -74,8 +53,27 @@ public class ClientEventHandler {
 
     private static long getTotalParticles(final AccessorParticleManager accessor) {
         return Arrays.stream(accessor.getFxLayers())
-                     .flatMapToLong(layers -> Arrays.stream(layers).mapToLong(ArrayDeque::size))
-                     .sum();
+                .flatMapToLong(layers -> Arrays.stream(layers).mapToLong(ArrayDeque::size))
+                .sum();
+    }
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) {
+            return;
+        }
+        clientTick++;
+
+        if (clientTick % 5 == 0) {
+            if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
+                TitleUtils.checkTitleState();
+            }
+            debugMessageUpdateRequired = true;
+        }
+
+        if (clientTick % 20 == 0) {
+            checkParticleEffects();
+        }
     }
 
     @SubscribeEvent

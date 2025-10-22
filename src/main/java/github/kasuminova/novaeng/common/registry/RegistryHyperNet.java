@@ -41,23 +41,18 @@ import java.util.Set;
 @ZenRegister
 @ZenClass("novaeng.hypernet.RegistryHyperNet")
 public class RegistryHyperNet {
-    @Getter
-    private static Item hyperNetConnectCard = Items.AIR;
-
     private static final Set<ResourceLocation> SUPPORTED_MACHINERY = new ObjectOpenHashSet<>();
     private static final Set<ResourceLocation> COMPUTATION_CENTERS = new ObjectOpenHashSet<>();
-
     private static final Map<ResourceLocation, Class<? extends NetNode>> REGISTERED_NODE_TYPE = new Object2ObjectOpenHashMap<>();
-
     private static final Map<String, ComputationCenterType> COMPUTATION_CENTER_TYPE = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, DataProcessorType>     DATA_PROCESSOR_TYPE     = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, ResearchStationType>   RESEARCH_STATION_TYPE   = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, DatabaseType>          DATABASE_TYPE           = new Object2ObjectOpenHashMap<>();
-
+    private static final Map<String, DataProcessorType> DATA_PROCESSOR_TYPE = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, ResearchStationType> RESEARCH_STATION_TYPE = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, DatabaseType> DATABASE_TYPE = new Object2ObjectOpenHashMap<>();
     private static final Map<String, ResearchCognitionData> RESEARCH_COGNITION = new Object2ObjectLinkedOpenHashMap<>();
-
     private static final Map<UpgradeType, ProcessorModuleCPUType> DATA_PROCESSOR_MODULE_CPU_TYPE = new Object2ObjectOpenHashMap<>();
     private static final Map<UpgradeType, ProcessorModuleRAMType> DATA_PROCESSOR_MODULE_RAM_TYPE = new Object2ObjectOpenHashMap<>();
+    @Getter
+    private static Item hyperNetConnectCard = Items.AIR;
 
     public static boolean isHyperNetSupported(@Nullable final DynamicMachine machine) {
         if (machine == null) {
@@ -161,10 +156,9 @@ public class RegistryHyperNet {
     public static Collection<DatabaseType> getAllDatabaseTypes() {
         return Collections.unmodifiableCollection(DATABASE_TYPE.values());
     }
-    
+
     public static <T extends NetNode> void registerHyperNetNode(@Nonnull final ResourceLocation registryName,
-                                                                @Nonnull final Class<T> nodeClass)
-    {
+                                                                @Nonnull final Class<T> nodeClass) {
         Preconditions.checkNotNull(registryName);
         Preconditions.checkNotNull(nodeClass);
 
@@ -233,10 +227,10 @@ public class RegistryHyperNet {
         COMPUTATION_CENTER_TYPE.clear();
 
         REGISTERED_NODE_TYPE.clear();
-        
+
         DATA_PROCESSOR_TYPE.clear();
         DATABASE_TYPE.clear();
-        
+
         RESEARCH_STATION_TYPE.clear();
         RESEARCH_COGNITION.clear();
 

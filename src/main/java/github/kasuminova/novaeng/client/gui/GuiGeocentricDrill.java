@@ -29,7 +29,7 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
             new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/guigeocentricdrill.png");
 
     private final OreControlList oreControlList = new OreControlList();
-    
+
     private final GeocentricDrillController owner;
 
     private final Button4State dive = new Button4State();

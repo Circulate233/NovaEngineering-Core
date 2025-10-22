@@ -28,16 +28,14 @@ public class RecipePrimerHyperNet {
      * 用法：{@code requireComputationPoint(1.0F);}
      */
     public static RecipePrimer requireComputationPoint(final RecipePrimer primer,
-                                                       final float required)
-    {
+                                                       final float required) {
         return requireComputationPoint(primer, required, false);
     }
 
     @ZenMethod
     public static RecipePrimer requireComputationPoint(final RecipePrimer primer,
                                                        final float required,
-                                                       @Optional final boolean triggerFailure)
-    {
+                                                       @Optional final boolean triggerFailure) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             primer.addRecipeTooltip(
                     I18n.format("novaeng.hypernet.computation_point_required.tip",
@@ -96,8 +94,7 @@ public class RecipePrimerHyperNet {
      */
     @ZenMethod
     public static RecipePrimer requireResearch(final RecipePrimer primer,
-                                               final String... researchNames)
-    {
+                                               final String... researchNames) {
         return requireResearch(primer, Arrays.stream(researchNames)
                 .map(RegistryHyperNet::getResearchCognitionData)
                 .filter(Objects::nonNull)
@@ -106,8 +103,7 @@ public class RecipePrimerHyperNet {
 
     @ZenMethod
     public static RecipePrimer requireResearch(final RecipePrimer primer,
-                                               final ResearchCognitionData... researchRequired)
-    {
+                                               final ResearchCognitionData... researchRequired) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             String researchTip = Arrays.stream(researchRequired)
                     .map(ResearchCognitionData::getTranslatedName)

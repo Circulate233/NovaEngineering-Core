@@ -14,7 +14,7 @@ public class EStorageCellGas extends EStorageCell<IAEGasStack> {
 
     public static final EStorageCellGas LEVEL_A = new EStorageCellGas(DriveStorageLevel.A, 16, 4);
     public static final EStorageCellGas LEVEL_B = new EStorageCellGas(DriveStorageLevel.B, 64, 16);
-    public static final EStorageCellGas LEVEL_C = new EStorageCellGas(DriveStorageLevel.C,256, 64);
+    public static final EStorageCellGas LEVEL_C = new EStorageCellGas(DriveStorageLevel.C, 256, 64);
 
     public EStorageCellGas(final DriveStorageLevel level, final int millionBytes, final int byteMultiplier) {
         super(level, millionBytes, byteMultiplier);

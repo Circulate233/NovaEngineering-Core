@@ -19,7 +19,7 @@ public class OrichalcosDrill extends Drill {
     }
 
     @Override
-    protected float getAdvancedRecipeTimeMultiple(){
+    protected float getAdvancedRecipeTimeMultiple() {
         return 1.5f;
     }
 

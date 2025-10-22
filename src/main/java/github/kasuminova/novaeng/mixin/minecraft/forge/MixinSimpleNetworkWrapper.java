@@ -20,10 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.EnumMap;
 
 @Mixin(SimpleNetworkWrapper.class)
-@SuppressWarnings("VulnerableCodeUsages")
+@SuppressWarnings({"VulnerableCodeUsages", "UnusedMixin"})
 public class MixinSimpleNetworkWrapper {
 
-    @Shadow(remap = false) private EnumMap<Side, FMLEmbeddedChannel> channels;
+    @Shadow(remap = false)
+    private EnumMap<Side, FMLEmbeddedChannel> channels;
 
     @Inject(method = "sendToAll", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectSendToAll(final IMessage message, final CallbackInfo ci) {

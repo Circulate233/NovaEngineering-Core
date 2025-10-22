@@ -43,12 +43,9 @@ public class DataProcessor extends NetNode {
 
     private final List<ProcessorModuleCPU> moduleCPUS = new CopyOnWriteArrayList<>();
     private final List<ProcessorModuleRAM> moduleRAMS = new CopyOnWriteArrayList<>();
-
-    private volatile int dynamicPatternSize = 0;
-
-    private volatile double maxGeneration = 0;
     private final AtomicReference<Double> generated = new AtomicReference<>(0D);
-
+    private volatile int dynamicPatternSize = 0;
+    private volatile double maxGeneration = 0;
     private int storedHU = 0;
     private boolean overheat = false;
     private double computationalLoadHistoryCache = 0;

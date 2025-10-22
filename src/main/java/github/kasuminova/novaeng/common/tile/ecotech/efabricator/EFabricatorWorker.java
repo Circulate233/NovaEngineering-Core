@@ -358,6 +358,10 @@ public class EFabricatorWorker extends EFabricatorPart {
             size = Math.max(1, nbt.getInteger(SIZE));
         }
 
+        private static boolean matchStacksStrict(final ItemStack stack1, final ItemStack stack2) {
+            return ItemUtils.matchStacks(stack1, stack2) && stack1.getCount() == stack2.getCount();
+        }
+
         public CraftWork split(int amount) {
             final var i = Math.min(amount, this.size);
             if (i > 0) {
@@ -432,10 +436,6 @@ public class EFabricatorWorker extends EFabricatorPart {
                 return matchStacksStrict(output, craftWork.output);
             }
             return false;
-        }
-
-        private static boolean matchStacksStrict(final ItemStack stack1, final ItemStack stack2) {
-            return ItemUtils.matchStacks(stack1, stack2) && stack1.getCount() == stack2.getCount();
         }
 
     }

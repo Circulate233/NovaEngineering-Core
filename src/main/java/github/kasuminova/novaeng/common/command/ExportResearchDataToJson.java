@@ -23,12 +23,11 @@ import java.util.stream.Collectors;
 
 public class ExportResearchDataToJson extends CommandBase {
     public static final ExportResearchDataToJson INSTANCE = new ExportResearchDataToJson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private ExportResearchDataToJson() {
 
     }
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Nonnull
     @Override
@@ -45,8 +44,7 @@ public class ExportResearchDataToJson extends CommandBase {
     @Override
     public void execute(@Nonnull final MinecraftServer server,
                         @Nonnull final ICommandSender sender,
-                        @Nonnull final String[] args)
-    {
+                        @Nonnull final String[] args) {
         List<SimpleResearchData> dataList = RegistryHyperNet.getAllResearchCognitionData().stream()
                 .map(SimpleResearchData::of)
                 .collect(Collectors.toList());

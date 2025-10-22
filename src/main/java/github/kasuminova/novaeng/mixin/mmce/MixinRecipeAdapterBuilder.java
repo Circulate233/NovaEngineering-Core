@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(value = RecipeAdapterBuilder.class,remap = false)
+@Mixin(value = RecipeAdapterBuilder.class, remap = false)
 public class MixinRecipeAdapterBuilder implements NovaRAB {
 
     @Unique

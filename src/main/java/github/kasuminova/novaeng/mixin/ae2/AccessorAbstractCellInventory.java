@@ -27,9 +27,9 @@ public interface AccessorAbstractCellInventory {
     void setStoredItemCount(long storedItemCount);
 
     @Accessor
-    void setIsPersisted(boolean isPersisted);
+    boolean getIsPersisted();
 
     @Accessor
-    boolean getIsPersisted();
+    void setIsPersisted(boolean isPersisted);
 
 }

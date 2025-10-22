@@ -30,10 +30,29 @@ public class StardustDisintegrator implements MachineSpecial {
     private StardustDisintegrator() {
     }
 
+    protected static void checkStructure(final MachineStructureUpdateEvent event) {
+        TileMultiblockMachineController ctrl = event.getController();
+        BlockPos ctrlPos = ctrl.getPos();
+        World world = ctrl.getWorld();
+        EnumFacing facing = ctrl.getControllerRotation();
+
+        if (CRYSTALS_POS_PRESET.stream()
+                .map(pos -> ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))
+                .anyMatch(crystalPos -> !world.canSeeSky(crystalPos))) {
+            ctrl.getCustomDataTag().removeTag("canSeeSky");
+        } else {
+            ctrl.getCustomDataTag().setBoolean("canSeeSky", true);
+        }
+    }
+
+    protected static BlockPos withXZ(final int x, final int z) {
+        return new BlockPos(x, 0, z);
+    }
+
     @Override
     public void init(final DynamicMachine machine) {
         machine.addMachineEventHandler(FactoryRecipeFinishEvent.class, event -> {
-            
+
         });
     }
 
@@ -52,29 +71,9 @@ public class StardustDisintegrator implements MachineSpecial {
         MachineSpecial.super.onTOPInfo(probeMode, probeInfo, player, data, controller);
     }
 
-    protected static void checkStructure(final MachineStructureUpdateEvent event) {
-        TileMultiblockMachineController ctrl = event.getController();
-        BlockPos ctrlPos = ctrl.getPos();
-        World world = ctrl.getWorld();
-        EnumFacing facing = ctrl.getControllerRotation();
-
-        if (CRYSTALS_POS_PRESET.stream()
-                .map(pos -> ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))
-                .anyMatch(crystalPos -> !world.canSeeSky(crystalPos)))
-        {
-            ctrl.getCustomDataTag().removeTag("canSeeSky");
-        } else {
-            ctrl.getCustomDataTag().setBoolean("canSeeSky", true);
-        }
-    }
-
     @Override
     public ResourceLocation getRegistryName() {
         return REGISTRY_NAME;
-    }
-
-    protected static BlockPos withXZ(final int x, final int z) {
-        return new BlockPos(x, 0, z);
     }
 
 }

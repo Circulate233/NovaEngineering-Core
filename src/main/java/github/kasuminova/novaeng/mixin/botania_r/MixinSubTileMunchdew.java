@@ -18,7 +18,7 @@ import vazkii.botania.common.core.handler.ConfigHandler;
 import java.util.Collections;
 import java.util.List;
 
-@Mixin(value = SubTileMunchdew.class,remap = false)
+@Mixin(value = SubTileMunchdew.class, remap = false)
 public class MixinSubTileMunchdew extends SubTileGenerating {
     @Shadow
     boolean ateOnce = false;
@@ -27,7 +27,7 @@ public class MixinSubTileMunchdew extends SubTileGenerating {
     @Shadow
     int cooldown;
 
-    @Inject(method = "onUpdate",at = @At("HEAD"),cancellable = true)
+    @Inject(method = "onUpdate", at = @At("HEAD"), cancellable = true)
     public void onUpdate(CallbackInfo ci) {
         super.onUpdate();
         if (!this.getWorld().isRemote) {
@@ -41,11 +41,11 @@ public class MixinSubTileMunchdew extends SubTileGenerating {
                     List<BlockPos> coords = new ObjectArrayList<>();
                     BlockPos pos = this.supertile.getPos();
 
-                    for(BlockPos pos_ : BlockPos.getAllInBox(pos.add(-8, 0, -8), pos.add(8, 16, 8))) {
+                    for (BlockPos pos_ : BlockPos.getAllInBox(pos.add(-8, 0, -8), pos.add(8, 16, 8))) {
                         if (this.supertile.getWorld().getBlockState(pos_).getMaterial() == Material.LEAVES) {
                             boolean exposed = false;
 
-                            for(EnumFacing dir : EnumFacing.VALUES) {
+                            for (EnumFacing dir : EnumFacing.VALUES) {
                                 IBlockState offState = this.supertile.getWorld().getBlockState(pos_.offset(dir));
                                 if (offState.getBlock().isAir(offState, this.supertile.getWorld(), pos_.offset(dir))) {
                                     exposed = true;
@@ -61,7 +61,7 @@ public class MixinSubTileMunchdew extends SubTileGenerating {
 
                     if (!coords.isEmpty()) {
                         Collections.shuffle(coords);
-                        BlockPos breakCoords = (BlockPos)coords.get(0);
+                        BlockPos breakCoords = (BlockPos) coords.get(0);
                         IBlockState state = this.supertile.getWorld().getBlockState(breakCoords);
                         this.supertile.getWorld().setBlockToAir(breakCoords);
                         this.ticksWithoutEating = 0;

@@ -9,7 +9,7 @@ import vazkii.botania.common.block.tile.string.TileRedStringContainer;
 
 import javax.annotation.Nonnull;
 
-@Mixin(value = TileRedStringContainer.class,remap = false)
+@Mixin(value = TileRedStringContainer.class, remap = false)
 public abstract class MixinTileRedStringContainer extends TileRedString {
 
     /**

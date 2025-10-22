@@ -27,6 +27,26 @@ public class PktCellDriveStatusUpdate implements IMessage, IMessageHandler<PktCe
         this.writing = writing;
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktCellDriveStatusUpdate message) {
+        BlockPos pos = message.pos;
+        boolean writing = message.writing;
+        if (pos == null) {
+            return;
+        }
+
+        WorldClient world = Minecraft.getMinecraft().world;
+        if (world == null) {
+            return;
+        }
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof EStorageCellDrive drive)) {
+            return;
+        }
+        drive.setWriting(writing);
+        drive.markForUpdate();
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         try {
@@ -49,26 +69,6 @@ public class PktCellDriveStatusUpdate implements IMessage, IMessageHandler<PktCe
             processPacket(message);
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktCellDriveStatusUpdate message) {
-        BlockPos pos = message.pos;
-        boolean writing = message.writing;
-        if (pos == null) {
-            return;
-        }
-
-        WorldClient world = Minecraft.getMinecraft().world;
-        if (world == null) {
-            return;
-        }
-        TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof EStorageCellDrive drive)) {
-            return;
-        }
-        drive.setWriting(writing);
-        drive.markForUpdate();
     }
 
 }

@@ -22,6 +22,10 @@ public class OreControlList extends IngredientList {
         setMaxStackPerRow(8);
     }
 
+    protected static SlotVirtual initSlot(final SlotVirtual slot) {
+        return slot.setSlotTex(TextureProperties.of(GuiGeocentricDrill.GUI_TEXTURE, 7, 130));
+    }
+
     @Override
     public void initWidget(final WidgetGui gui) {
         super.initWidget(gui);
@@ -52,7 +56,7 @@ public class OreControlList extends IngredientList {
 
         float chance = 1F / (merged.size() + (accelerateOres.size() * GeocentricDrill.ACCELERATE_MULTIPLIER));
         Row row = new Row();
-        row = addSlots(merged, row, merged.size(), 
+        row = addSlots(merged, row, merged.size(),
                 entry -> SlotOreControl.of(entry.getKey(), entry.getValue(), chance, accelerateOres.contains(entry.getKey()))
         );
 
@@ -62,8 +66,7 @@ public class OreControlList extends IngredientList {
 
     protected Row addSlots(final Map<String, ItemStack> stackList,
                            Row row, final int totalSize,
-                           final Function<Map.Entry<String, ItemStack>, SlotVirtual> slotSupplier)
-    {
+                           final Function<Map.Entry<String, ItemStack>, SlotVirtual> slotSupplier) {
         int stackPerRow = 0;
         int count = 0;
         for (final Map.Entry<String, ItemStack> entry : stackList.entrySet()) {
@@ -77,10 +80,6 @@ public class OreControlList extends IngredientList {
             count++;
         }
         return row;
-    }
-
-    protected static SlotVirtual initSlot(final SlotVirtual slot) {
-        return slot.setSlotTex(TextureProperties.of(GuiGeocentricDrill.GUI_TEXTURE, 7, 130));
     }
 
 }

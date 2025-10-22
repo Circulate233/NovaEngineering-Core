@@ -12,15 +12,27 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_ID)
 public class NovaEngCoreConfig {
 
+    @Config.Name("Client")
+    public static final Client CLIENT = new Client();
+    @Config.Name("Server")
+    public static final Server SERVER = new Server();
     @Config.RequiresMcRestart
     @Config.Name("javaCheck")
     public static boolean javaCheck = true;
 
-    @Config.Name("Client")
-    public static final Client CLIENT = new Client();
+    /*
+        必须在最后加载。
+    */
+    static {
+        ConfigAnytime.register(NovaEngCoreConfig.class);
+    }
 
-    @Config.Name("Server")
-    public static final Server SERVER = new Server();
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(NovaEngineeringCore.MOD_ID)) {
+            ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
+        }
+    }
 
     public static class Client {
 
@@ -34,7 +46,7 @@ public class NovaEngCoreConfig {
 
     }
 
-    public static class Server{
+    public static class Server {
 
         @Config.RequiresMcRestart
         @Config.Name("ForceChunkHandler")
@@ -49,20 +61,6 @@ public class NovaEngCoreConfig {
         @Config.Name("bot")
         public boolean bot = true;
 
-    }
-
-    /*
-        必须在最后加载。
-    */
-    static {
-        ConfigAnytime.register(NovaEngCoreConfig.class);
-    }
-
-    @SubscribeEvent
-    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equals(NovaEngineeringCore.MOD_ID)) {
-            ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
-        }
     }
 
 }

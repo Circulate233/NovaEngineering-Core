@@ -28,7 +28,7 @@ import static crafttweaker.CraftTweakerAPI.itemUtils;
 public class IEHandler {
     public static final IEHandler INSTANCE = new IEHandler();
 
-    private static final ResourceLocation tky = new ResourceLocation("contenttweaker","tky");
+    private static final ResourceLocation tky = new ResourceLocation("contenttweaker", "tky");
     private static final ResourceLocation scanner = new ResourceLocation("orevisualdetector,scanner");
 
     private static final byte[] NEXT_MODES = {1, 2, 3, 0};
@@ -38,37 +38,6 @@ public class IEHandler {
             "new.orevisualdetector.advanced.tooltips3",
             "new.orevisualdetector.advanced.tooltips0"
     };
-
-    @SubscribeEvent
-    @Optional.Method(modid = "immersivepetroleum")
-    public void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        val world = event.getWorld();
-        val item = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
-        EntityPlayer player;
-        if (event.getHand() != EnumHand.MAIN_HAND
-                ||(player = event.getEntityPlayer()) instanceof FakePlayer
-                ||event.isCanceled()
-                ||world.isRemote
-        ) return;
-        val eventpos = new BlockPos(event.getPos().getX(),250,event.getPos().getZ());
-        if (tky.equals(item.getItem().getRegistryName())){
-            giveCoresample(event, world, eventpos, player, item);
-        } else if (scanner.equals(item.getItem().getRegistryName())){
-            var nbt = item.getTagCompound();
-            var mode = nbt.getByte("mode");
-            if (player.isSneaking()) {
-                nbt.setByte("mode", NEXT_MODES[mode]);
-                player.sendMessage(
-                        new TextComponentTranslation(
-                                "new.orevisualdetector.scan",
-                                new TextComponentTranslation(MESSAGE_KEYS[mode])
-                        )
-                );
-                event.setCanceled(true);
-            } else if (mode == 3)
-                giveCoresample(event, world, eventpos, player, item);
-        }
-    }
 
     private static void giveCoresample(PlayerInteractEvent.RightClickItem event, World world, BlockPos eventpos, EntityPlayer player, ItemStack item) {
         world.setBlockState(eventpos, BlockMetalDevice1.getStateById(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
@@ -100,6 +69,41 @@ public class IEHandler {
         event.setCanceled(true);
     }
 
+    private static void dropItem(World world, BlockPos pos, IItemStack item) {
+        ItemUtils.dropItem(world, pos, CraftTweakerMC.getItemStack(item));
+    }
+
+    @SubscribeEvent
+    @Optional.Method(modid = "immersivepetroleum")
+    public void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        val world = event.getWorld();
+        val item = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
+        EntityPlayer player;
+        if (event.getHand() != EnumHand.MAIN_HAND
+                || (player = event.getEntityPlayer()) instanceof FakePlayer
+                || event.isCanceled()
+                || world.isRemote
+        ) return;
+        val eventpos = new BlockPos(event.getPos().getX(), 250, event.getPos().getZ());
+        if (tky.equals(item.getItem().getRegistryName())) {
+            giveCoresample(event, world, eventpos, player, item);
+        } else if (scanner.equals(item.getItem().getRegistryName())) {
+            var nbt = item.getTagCompound();
+            var mode = nbt.getByte("mode");
+            if (player.isSneaking()) {
+                nbt.setByte("mode", NEXT_MODES[mode]);
+                player.sendMessage(
+                        new TextComponentTranslation(
+                                "new.orevisualdetector.scan",
+                                new TextComponentTranslation(MESSAGE_KEYS[mode])
+                        )
+                );
+                event.setCanceled(true);
+            } else if (mode == 3)
+                giveCoresample(event, world, eventpos, player, item);
+        }
+    }
+
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
         var world = event.getWorld();
@@ -120,9 +124,5 @@ public class IEHandler {
         if (component && !event.getPlayer().isCreative()) {
             dropItem(world, pos, itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0));
         }
-    }
-
-    private static void dropItem(World world, BlockPos pos, IItemStack item) {
-        ItemUtils.dropItem(world, pos, CraftTweakerMC.getItemStack(item));
     }
 }

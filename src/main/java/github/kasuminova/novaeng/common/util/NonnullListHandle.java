@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 public class NonnullListHandle<E> extends NonNullList<E> {
-    
+
     private Runnable onChanged = null;
 
     public NonnullListHandle() {

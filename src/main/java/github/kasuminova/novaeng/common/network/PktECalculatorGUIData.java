@@ -24,6 +24,19 @@ public class PktECalculatorGUIData implements IMessage, IMessageHandler<PktECalc
         this.data = ECalculatorData.from(controller);
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktECalculatorGUIData message) {
+        ECalculatorData data = message.data;
+        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
+        if (!(cur instanceof GuiECalculatorController ecGUI)) {
+            return;
+        }
+        if (data == null) {
+            return;
+        }
+        ecGUI.onDataUpdate(data);
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         data = ECalculatorData.read(buf);
@@ -40,19 +53,6 @@ public class PktECalculatorGUIData implements IMessage, IMessageHandler<PktECalc
             Minecraft.getMinecraft().addScheduledTask(() -> processPacket(message));
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktECalculatorGUIData message) {
-        ECalculatorData data = message.data;
-        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
-        if (!(cur instanceof GuiECalculatorController ecGUI)) {
-            return;
-        }
-        if (data == null) {
-            return;
-        }
-        ecGUI.onDataUpdate(data);
     }
 
 }

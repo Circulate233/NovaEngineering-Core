@@ -22,6 +22,11 @@ public class PktMouseItemUpdate implements IMessage, IMessageHandler<PktMouseIte
         this.stack = stack;
     }
 
+    @SideOnly(Side.CLIENT)
+    private static void processPacket(final PktMouseItemUpdate message) {
+        Minecraft.getMinecraft().player.inventory.setItemStack(message.stack);
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         stack = ByteBufUtils.readItemStack(buf);
@@ -38,11 +43,6 @@ public class PktMouseItemUpdate implements IMessage, IMessageHandler<PktMouseIte
             Minecraft.getMinecraft().addScheduledTask(() -> processPacket(message));
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static void processPacket(final PktMouseItemUpdate message) {
-        Minecraft.getMinecraft().player.inventory.setItemStack(message.stack);
     }
 
 }

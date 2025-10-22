@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(value = Forfeit.class,remap = false)
+@Mixin(value = Forfeit.class, remap = false)
 public interface AccessorForfeit {
 
     @Accessor("name")

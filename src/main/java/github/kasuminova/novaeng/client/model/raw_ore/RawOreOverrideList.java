@@ -26,6 +26,7 @@ import java.util.Map;
  */
 public class RawOreOverrideList extends ItemOverrideList {
 
+    private static final TRSRTransformation flipX = new TRSRTransformation(null, null, new Vector3f(-1, 1, 1), null);
     private final Map<Item, IBakedModel> cache = new Reference2ObjectOpenHashMap<>();
 
     public RawOreOverrideList() {
@@ -44,8 +45,6 @@ public class RawOreOverrideList extends ItemOverrideList {
         builder.put(ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND, leftify(firstperson));
         return builder.build();
     }
-
-    private static final TRSRTransformation flipX = new TRSRTransformation(null, null, new Vector3f(-1, 1, 1), null);
 
     private static TRSRTransformation leftify(TRSRTransformation transform) {
         return TRSRTransformation.blockCenterToCorner(

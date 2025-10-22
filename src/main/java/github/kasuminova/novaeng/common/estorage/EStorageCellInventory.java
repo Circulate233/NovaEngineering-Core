@@ -41,7 +41,7 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
         this.channel = cellType.getChannel();
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"rawtypes"})
     public static <T extends IAEStack<T>> ICellInventory<T> createInventory(final ItemStack o, final ISaveProvider container) {
         try {
             if (o == null) {
@@ -64,16 +64,6 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
         }
     }
 
-    private boolean isStorageCell(final T input) {
-        if (input instanceof final IAEItemStack stack) {
-            final IStorageCell<?> type = getStorageCell(stack.getDefinition());
-
-            return type != null && !type.storableInStorageCell();
-        }
-
-        return false;
-    }
-
     private static IStorageCell<?> getStorageCell(final ItemStack input) {
         if (input != null) {
             final Item type = input.getItem();
@@ -86,12 +76,22 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
         return null;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     private static boolean isCellEmpty(ICellInventory inv) {
         if (inv != null) {
             return inv.getAvailableItems(inv.getChannel().createList()).isEmpty();
         }
         return true;
+    }
+
+    private boolean isStorageCell(final T input) {
+        if (input instanceof final IAEItemStack stack) {
+            final IStorageCell<?> type = getStorageCell(stack.getDefinition());
+
+            return type != null && !type.storableInStorageCell();
+        }
+
+        return false;
     }
 
     protected IItemList<T> getCellItems() {

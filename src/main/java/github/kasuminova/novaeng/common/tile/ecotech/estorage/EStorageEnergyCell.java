@@ -3,15 +3,20 @@ package github.kasuminova.novaeng.common.tile.ecotech.estorage;
 import appeng.api.config.Actionable;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageEnergyCell;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.EnergyCellStatus;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class EStorageEnergyCell extends EStoragePart implements Comparable<EStorageEnergyCell> {
 
+    @Setter
+    @Getter
     protected double energyStored = 0D;
+    @Getter
     protected double maxEnergyStore = 0D;
-    
+
     protected boolean recalculateCap = false;
 
     protected EnergyCellStatus currentStatus = EnergyCellStatus.EMPTY;
@@ -21,6 +26,22 @@ public class EStorageEnergyCell extends EStoragePart implements Comparable<EStor
 
     public EStorageEnergyCell(final double maxEnergyStore) {
         this.maxEnergyStore = maxEnergyStore;
+    }
+
+    public static EnergyCellStatus getStatusFromFillFactor(final double fillFactor) {
+        EnergyCellStatus status;
+        if (fillFactor >= 0.9D) {
+            status = EnergyCellStatus.FULL;
+        } else if (fillFactor >= 0.7D) {
+            status = EnergyCellStatus.HIGH;
+        } else if (fillFactor >= 0.5D) {
+            status = EnergyCellStatus.MID;
+        } else if (fillFactor >= 0.05D) {
+            status = EnergyCellStatus.LOW;
+        } else {
+            status = EnergyCellStatus.EMPTY;
+        }
+        return status;
     }
 
     public void recalculateCapacity() {
@@ -80,18 +101,6 @@ public class EStorageEnergyCell extends EStoragePart implements Comparable<EStor
         return toExtract;
     }
 
-    public double getEnergyStored() {
-        return energyStored;
-    }
-
-    public void setEnergyStored(final double energyStored) {
-        this.energyStored = energyStored;
-    }
-
-    public double getMaxEnergyStore() {
-        return maxEnergyStore;
-    }
-    
     public double getFillFactor() {
         return maxEnergyStore == 0 ? 0 : energyStored / maxEnergyStore;
     }
@@ -125,22 +134,6 @@ public class EStorageEnergyCell extends EStoragePart implements Comparable<EStor
     @Override
     public int compareTo(final EStorageEnergyCell o) {
         return Double.compare(o.energyStored, energyStored);
-    }
-
-    public static EnergyCellStatus getStatusFromFillFactor(final double fillFactor) {
-        EnergyCellStatus status;
-        if (fillFactor >= 0.9D) {
-            status = EnergyCellStatus.FULL;
-        } else if (fillFactor >= 0.7D) {
-            status = EnergyCellStatus.HIGH;
-        } else if (fillFactor >= 0.5D) {
-            status = EnergyCellStatus.MID;
-        } else if (fillFactor >= 0.05D) {
-            status = EnergyCellStatus.LOW;
-        } else {
-            status = EnergyCellStatus.EMPTY;
-        }
-        return status;
     }
 
 }

@@ -32,16 +32,20 @@ public class SlotOreControl extends SlotItemVirtualJEI {
         this.accelerated = accelerated;
     }
 
+    public static SlotOreControl of(final String oreName, final ItemStack stackInSlot, final float chance, final boolean accelerated) {
+        return new SlotOreControl(oreName, stackInSlot, chance, accelerated);
+    }
+
     @Override
     public List<String> getHoverTooltips(final WidgetGui widgetGui, final MousePos mousePos) {
         List<String> tooltips = super.getHoverTooltips(widgetGui, mousePos);
         if (!tooltips.isEmpty()) {
             float chance = (accelerated ? this.chance * GeocentricDrill.ACCELERATE_MULTIPLIER : this.chance) * 100;
-            tooltips.add(I18n.format("gui.geocentric_drill.ore_control.tooltip.chance", 
+            tooltips.add(I18n.format("gui.geocentric_drill.ore_control.tooltip.chance",
                     NovaEngUtils.formatFloat(chance, 1))
             );
-            tooltips.add(accelerated 
-                    ? I18n.format("gui.geocentric_drill.ore_control.tooltip.unmark") 
+            tooltips.add(accelerated
+                    ? I18n.format("gui.geocentric_drill.ore_control.tooltip.unmark")
                     : I18n.format("gui.geocentric_drill.ore_control.tooltip.mark")
             );
         }
@@ -94,10 +98,6 @@ public class SlotOreControl extends SlotItemVirtualJEI {
 
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
-    }
-
-    public static SlotOreControl of(final String oreName, final ItemStack stackInSlot, final float chance, final boolean accelerated) {
-        return new SlotOreControl(oreName, stackInSlot, chance, accelerated);
     }
 
     @Override

@@ -54,17 +54,6 @@ public record HashedItemStack(ItemStack stack, int stackHashCode, boolean hasTag
         return Base64.getEncoder().encodeToString(str.getBytes());
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (o instanceof HashedItemStack hashedItemStack) {
-            if (hasTag && !hashedItemStack.hasTag) {
-                return false;
-            }
-            return stackEqualsNonNBT(stack, hashedItemStack.stack) && (!hasTag || ItemStack.areItemStackTagsEqual(stack, hashedItemStack.stack));
-        }
-        return false;
-    }
-
     public static boolean stackEqualsNonNBT(@Nonnull ItemStack stack, @Nonnull ItemStack other) {
         if (stack.isEmpty() && other.isEmpty()) {
             return true;
@@ -76,12 +65,23 @@ public record HashedItemStack(ItemStack stack, int stackHashCode, boolean hasTag
         Item oItem = other.getItem();
         if (sItem.getHasSubtypes() || oItem.getHasSubtypes()) {
             return sItem.equals(other.getItem()) &&
-                   (stack.getItemDamage() == other.getItemDamage() ||
-                    stack.getItemDamage() == OreDictionary.WILDCARD_VALUE ||
-                    other.getItemDamage() == OreDictionary.WILDCARD_VALUE);
+                    (stack.getItemDamage() == other.getItemDamage() ||
+                            stack.getItemDamage() == OreDictionary.WILDCARD_VALUE ||
+                            other.getItemDamage() == OreDictionary.WILDCARD_VALUE);
         } else {
             return sItem.equals(other.getItem());
         }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o instanceof HashedItemStack hashedItemStack) {
+            if (hasTag && !hashedItemStack.hasTag) {
+                return false;
+            }
+            return stackEqualsNonNBT(stack, hashedItemStack.stack) && (!hasTag || ItemStack.areItemStackTagsEqual(stack, hashedItemStack.stack));
+        }
+        return false;
     }
 
     public HashedItemStack copy() {

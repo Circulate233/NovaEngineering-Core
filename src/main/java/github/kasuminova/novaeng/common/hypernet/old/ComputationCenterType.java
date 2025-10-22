@@ -101,7 +101,7 @@ public class ComputationCenterType extends NetNodeTypeRepairable {
     }
 
     @ZenMethod
-    public ComputationCenterType addFixIngredient( final int durability, final IIngredient... ingredients) {
+    public ComputationCenterType addFixIngredient(final int durability, final IIngredient... ingredients) {
         return (ComputationCenterType) super.addFixIngredient(durability, ingredients);
     }
 

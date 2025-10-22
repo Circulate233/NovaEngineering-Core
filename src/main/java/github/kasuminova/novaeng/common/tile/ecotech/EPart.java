@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 
 public interface EPart<C extends EPartController<?>> {
 
-    void setController(final EPartController<?> storageController);
-
     @Nullable
     C getController();
+
+    void setController(final EPartController<?> storageController);
 
     default boolean isAssembled() {
         return getController() != null;

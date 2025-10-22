@@ -26,17 +26,16 @@ import static github.kasuminova.novaeng.common.util.RecipePrimerEx.setLore;
 
 //TODO:处理硬编码
 public class BiogenicSimulationComputer implements MachineSpecial {
+    public static final BiogenicSimulationComputer INSTANCE = new BiogenicSimulationComputer();
     private static final String MachineID = "biogenic_simulation_computer";
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
-    public static final BiogenicSimulationComputer INSTANCE = new BiogenicSimulationComputer();
-    final IItemStack clay = CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_POLYMER_CLAY));
-
     private static final String[] inscriberModels = {
             "数位演算模块-α",
             "数位演算模块-β",
             "数位演算模块-δ",
             "数位演算模块-Ω"
     };
+    final IItemStack clay = CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_POLYMER_CLAY));
 
     @Override
     public void preInit(final DynamicMachine machine) {
@@ -125,7 +124,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
                             bl.addModifier("energy", RecipeModifierBuilder.create("modularmachinery:energy", "input", 20, 1, false).build());
                         }
                     })
-                    .addItemOutput(CraftTweakerAPI.oreDict.get("pristine")).addItemModifier((ctrl, Item) -> outputPristineMatter(ctrl,ysqname,ysqddcs))
+                    .addItemOutput(CraftTweakerAPI.oreDict.get("pristine")).addItemModifier((ctrl, Item) -> outputPristineMatter(ctrl, ysqname, ysqddcs))
                     .addItemOutput(CraftTweakerAPI.oreDict.get("livingMatter")).addItemModifier((ctrl, Item) -> outputLivingMatter(ctrl, ysqname))
                     .addFactoryFinishHandler(event -> {
                         var ctrl = event.getController();
@@ -157,7 +156,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
                     })
                     .addOutput(CraftTweakerAPI.oreDict.get("dataModel"));
             setLore(d, "§6提取出写入的模型")
-                    .addItemModifier((ctrl, Item) -> outputdata(ctrl, ysqname,ysqddcs))
+                    .addItemModifier((ctrl, Item) -> outputdata(ctrl, ysqname, ysqddcs))
                     .setParallelized(false)
                     .addRecipeTooltip("将数据模型从数位演算模块导出", "会先从哪个数据里导出？谁知道呢,试试不就知道了")
                     .setThreadName(inscriberModels[i]);
@@ -167,7 +166,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
             d.build();
         }
 
-        machine.addMachineEventHandler(ControllerGUIRenderEvent.class,event -> {
+        machine.addMachineEventHandler(ControllerGUIRenderEvent.class, event -> {
             var ctrl = event.getController();
             var data = ctrl.getCustomDataTag();
             List<String> info = new ArrayList<>();
@@ -175,11 +174,11 @@ public class BiogenicSimulationComputer implements MachineSpecial {
             for (int i = 0; i < inscriberModels.length; i++) {
                 var itemData = data.getTag("ysqname" + i);
                 String ysqname;
-                if (itemData == null){
+                if (itemData == null) {
                     ysqname = "暂无";
                 } else {
                     var item = new ItemStack((NBTTagCompound) itemData);
-                    ysqname = item.getItem().getItemStackDisplayName(item).replaceAll("[(].*","");
+                    ysqname = item.getItem().getItemStackDisplayName(item).replaceAll("[(].*", "");
                 }
                 var ysqddcs = data.getLong("ysqddcs" + i);
                 info.add("当前记录模型：" + ysqname);
@@ -203,7 +202,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
         return item.map(dataModel -> CraftTweakerMC.getIItemStack(dataModel.getLivingMatter())).orElse(null);
     }
 
-    private IItemStack outputPristineMatter(IMachineController ctrl, String ysqnamess,String ysqddcss) {
+    private IItemStack outputPristineMatter(IMachineController ctrl, String ysqnamess, String ysqddcss) {
         var data = ctrl.getController().getCustomDataTag();
         var name = data.getTag(ysqnamess);
         var ysqddcs = data.getLong(ysqddcss);
@@ -212,12 +211,12 @@ public class BiogenicSimulationComputer implements MachineSpecial {
         var item = DataModelHelper.getDataModelMetadata(new ItemStack((NBTTagCompound) name));
 
         boolean itemsl;
-        if (ysqddcs >= 32){
-            if (ysqddcs < 10032){
+        if (ysqddcs >= 32) {
+            if (ysqddcs < 10032) {
                 itemsl = 6 >= Random;
-            } else if (ysqddcs < 20032){
+            } else if (ysqddcs < 20032) {
                 itemsl = 12 >= Random;
-            } else if (ysqddcs < 30032){
+            } else if (ysqddcs < 30032) {
                 itemsl = 14 >= Random;
             } else {
                 itemsl = 20 >= Random;
@@ -226,7 +225,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
             itemsl = false;
         }
 
-        if (item.isPresent()){
+        if (item.isPresent()) {
             if (itemsl) {
                 return CraftTweakerMC.getIItemStack(item.get().getPristineMatter());
             } else {
@@ -248,21 +247,21 @@ public class BiogenicSimulationComputer implements MachineSpecial {
         if (ysqddcs < 32) {
             tiers = 0;
             dataCounts = (int) ysqddcs;
-        } else if (ysqddcs < 10032){
+        } else if (ysqddcs < 10032) {
             tiers = 1;
             dataCounts = (int) (ysqddcs - 32);
-        } else if (ysqddcs < 20032){
+        } else if (ysqddcs < 20032) {
             tiers = 2;
             dataCounts = (int) (ysqddcs - 10032);
-        } else if (ysqddcs < 30032){
+        } else if (ysqddcs < 30032) {
             tiers = 3;
             dataCounts = (int) (ysqddcs - 20032);
         } else {
             tiers = 4;
-            if (ysqddcs > 2000000000){
+            if (ysqddcs > 2000000000) {
                 dataCounts = 2000000000;
             } else {
-                dataCounts = (int)ysqddcs;
+                dataCounts = (int) ysqddcs;
             }
         }
 
@@ -270,13 +269,13 @@ public class BiogenicSimulationComputer implements MachineSpecial {
         data.removeTag(ysqddcss);
 
         var item = new ItemStack((NBTTagCompound) name);
-        if (!item.hasTagCompound()){
+        if (!item.hasTagCompound()) {
             item.setTagCompound(new NBTTagCompound());
         }
         NBTTagCompound nbt = item.getTagCompound();
-        nbt.setLong("totalSimulationCount",ysqddcs);
-        nbt.setInteger("tier",tiers);
-        nbt.setInteger("dataCount",dataCounts);
+        nbt.setLong("totalSimulationCount", ysqddcs);
+        nbt.setInteger("tier", tiers);
+        nbt.setInteger("dataCount", dataCounts);
 
         return CraftTweakerMC.getIItemStack(item);
     }

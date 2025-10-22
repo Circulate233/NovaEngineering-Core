@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = BuilderTileEntity.class,remap = false)
+@Mixin(value = BuilderTileEntity.class, remap = false)
 public abstract class MixinBuilderTileEntity extends GenericEnergyReceiverTileEntity {
 
     public MixinBuilderTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
     }
 
-    @Inject(method = "update",at = @At("HEAD"))
+    @Inject(method = "update", at = @At("HEAD"))
     private void commonQuarryBlockI(CallbackInfo ci) {
-        if (CommandBuilder.INSTANCE.isTickWork){
-            if (this.getWorld() instanceof WorldServer w){
-                if (w.getWorldTime() % 200 != 0)return;
-                if (w.getMinecraftServer() != null){
+        if (CommandBuilder.INSTANCE.isTickWork) {
+            if (this.getWorld() instanceof WorldServer w) {
+                if (w.getWorldTime() % 200 != 0) return;
+                if (w.getMinecraftServer() != null) {
                     var server = w.getMinecraftServer();
                     var playerList = server.getPlayerList();
                     var players = playerList.getPlayers();
@@ -39,11 +39,11 @@ public abstract class MixinBuilderTileEntity extends GenericEnergyReceiverTileEn
         }
     }
 
-    @Inject(method = "commonQuarryBlock",at = @At("HEAD"))
+    @Inject(method = "commonQuarryBlock", at = @At("HEAD"))
     private void commonQuarryBlockI(boolean silk, int rfNeeded, BlockPos srcPos, IBlockState srcState, CallbackInfoReturnable<Boolean> cir) {
-        if (CommandBuilder.INSTANCE.isQuarryWork){
-            if (this.getWorld() instanceof WorldServer w){
-                if (w.getMinecraftServer() != null){
+        if (CommandBuilder.INSTANCE.isQuarryWork) {
+            if (this.getWorld() instanceof WorldServer w) {
+                if (w.getMinecraftServer() != null) {
                     var server = w.getMinecraftServer();
                     var playerList = server.getPlayerList();
                     var players = playerList.getPlayers();
@@ -56,7 +56,7 @@ public abstract class MixinBuilderTileEntity extends GenericEnergyReceiverTileEn
     }
 
     @Unique
-    private String n$getPosName(BlockPos pos){
+    private String n$getPosName(BlockPos pos) {
         return "x:" + pos.getX() + ",y:" + pos.getY() + ",z:" + pos.getZ();
     }
 }

@@ -7,6 +7,7 @@ import github.kasuminova.mmce.client.gui.util.RenderSize;
 import github.kasuminova.mmce.client.gui.util.TextureProperties;
 import github.kasuminova.mmce.client.gui.widget.base.DynamicWidget;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
+import lombok.Getter;
 import net.minecraft.client.gui.GuiScreen;
 
 import java.util.ArrayList;
@@ -17,15 +18,21 @@ import java.util.function.Function;
 
 public class ProgressBar extends DynamicWidget {
 
+    @Getter
     protected boolean leftToRight = true;
+    @Getter
     protected boolean vertical = false;
 
+    @Getter
     protected TextureProperties backgroundTexture = null;
 
+    @Getter
     protected List<TextureProperties> progressTextures = new ArrayList<>();
 
     protected AnimationValue progress = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
+    @Getter
     protected double maxProgress = 1;
+    @Getter
     protected boolean shouldUseAnimation = true;
 
     protected Function<ProgressBar, List<String>> tooltipFunction = null;
@@ -148,10 +155,6 @@ public class ProgressBar extends DynamicWidget {
         return this;
     }
 
-    public double getMaxProgress() {
-        return maxProgress;
-    }
-
     public ProgressBar setMaxProgress(final float maxProgress) {
         this.maxProgress = maxProgress;
         if (progress.getTargetValue() > maxProgress) {
@@ -162,10 +165,6 @@ public class ProgressBar extends DynamicWidget {
             }
         }
         return this;
-    }
-
-    public boolean isShouldUseAnimation() {
-        return shouldUseAnimation;
     }
 
     public ProgressBar setShouldUseAnimation(final boolean shouldUseAnimation) {
@@ -183,23 +182,15 @@ public class ProgressBar extends DynamicWidget {
         return this;
     }
 
-    public boolean isVertical() {
-        return vertical;
-    }
-
-    public ProgressBar setHorizontal(final boolean horizontal) {
-        this.vertical = !horizontal;
-        return this;
-    }
-
-    // Left to right & Up to down settings.
-
     public boolean isHorizontal() {
         return !vertical;
     }
 
-    public boolean isLeftToRight() {
-        return leftToRight;
+    // Left to right & Up to down settings.
+
+    public ProgressBar setHorizontal(final boolean horizontal) {
+        this.vertical = !horizontal;
+        return this;
     }
 
     public ProgressBar setLeftToRight(final boolean leftToRight) {
@@ -214,18 +205,18 @@ public class ProgressBar extends DynamicWidget {
     public boolean isRightToLeft() {
         return !leftToRight;
     }
-    
+
     public boolean isUpToDown() {
         return !leftToRight;
-    }
-
-    public boolean isDownToUp() {
-        return leftToRight;
     }
 
     public ProgressBar setUpToDown(final boolean upToDown) {
         this.leftToRight = upToDown;
         return setVertical(true);
+    }
+
+    public boolean isDownToUp() {
+        return leftToRight;
     }
 
     public ProgressBar setDownToUp(final boolean downToUp) {
@@ -234,17 +225,9 @@ public class ProgressBar extends DynamicWidget {
 
     // Background & Foreground settings.
 
-    public TextureProperties getBackgroundTexture() {
-        return backgroundTexture;
-    }
-
     public ProgressBar setBackgroundTexture(final TextureProperties backgroundTexture) {
         this.backgroundTexture = backgroundTexture;
         return this;
-    }
-
-    public List<TextureProperties> getProgressTextures() {
-        return progressTextures;
     }
 
     public ProgressBar addForegroundTexture(final TextureProperties foregroundTex) {

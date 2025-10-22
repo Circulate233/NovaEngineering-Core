@@ -95,17 +95,6 @@ import static hellfirepvp.modularmachinery.common.registry.RegistryBlocks.pendin
 public class RegistryBlocks {
     public static final List<Block> BLOCK_MODEL_TO_REGISTER = new ObjectArrayList<>();
 
-    @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
-        GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
-
-        ItemRawOre.regAll();
-        registerBlocks();
-        registerTileEntities();
-
-        GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
-    }
-
     public static void registerBlocks() {
         prepareItemBlockRegister(registerBlock(BlockHyperNetTerminal.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockModularServerAssembler.INSTANCE));
@@ -252,5 +241,16 @@ public class RegistryBlocks {
         ResourceLocation registryName = Objects.requireNonNull(item.getRegistryName());
         ModelBakery.registerItemVariants(item, registryName);
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(registryName, "inventory"));
+    }
+
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
+
+        ItemRawOre.regAll();
+        registerBlocks();
+        registerTileEntities();
+
+        GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
     }
 }

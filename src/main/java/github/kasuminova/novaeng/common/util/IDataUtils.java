@@ -15,32 +15,32 @@ import java.util.Map;
 @ZenExpansion("crafttweaker.data.IData")
 public class IDataUtils {
 
-    private static Map<String,IData> get(IData data) {
-        if (data instanceof DataMap){
+    private static Map<String, IData> get(IData data) {
+        if (data instanceof DataMap) {
             return data.asMap();
         }
         return Object2ObjectMaps.emptyMap();
     }
 
     @ZenMethod
-    public static IData get(IData data,String path,@Optional IData defaultValue) {
-        if (check(data,path)){
+    public static IData get(IData data, String path, @Optional IData defaultValue) {
+        if (check(data, path)) {
             return get(data).get(path);
         }
         return defaultValue;
     }
 
     @ZenMethod
-    public static boolean getBool(IData data, String path,@Optional boolean defaultValue){
-        if (check(data,path)){
+    public static boolean getBool(IData data, String path, @Optional boolean defaultValue) {
+        if (check(data, path)) {
             return get(data).get(path).asBool();
         }
         return defaultValue;
     }
 
     @ZenMethod
-    public static byte getByte(IData data, String path,@Optional byte defaultValue) {
-        if (check(data,path)){
+    public static byte getByte(IData data, String path, @Optional byte defaultValue) {
+        if (check(data, path)) {
             return get(data).get(path).asByte();
         }
         return defaultValue;
@@ -127,10 +127,10 @@ public class IDataUtils {
     }
 
     @ZenMethod
-    public static boolean check(IData data, String... path){
+    public static boolean check(IData data, String... path) {
         final var nbt = get(data);
         for (String key : path) {
-            if (!nbt.containsKey(key)){
+            if (!nbt.containsKey(key)) {
                 return false;
             }
         }

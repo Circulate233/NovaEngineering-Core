@@ -12,6 +12,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface MachineSpecial {
 
+    static IProbeInfo newBox(final IProbeInfo info) {
+        return info.horizontal(info.defaultLayoutStyle().borderColor(0x801E90FF));
+    }
+
+    static IProbeInfo newVertical(final IProbeInfo probeInfo) {
+        return probeInfo.vertical(probeInfo.defaultLayoutStyle().spacing(0));
+    }
+
     default void preInit(final DynamicMachine machine) {
     }
 
@@ -29,16 +37,7 @@ public interface MachineSpecial {
                            final IProbeInfo probeInfo,
                            final EntityPlayer player,
                            final IProbeHitData data,
-                           final TileMultiblockMachineController controller)
-    {
-    }
-
-    static IProbeInfo newBox(final IProbeInfo info) {
-        return info.horizontal(info.defaultLayoutStyle().borderColor(0x801E90FF));
-    }
-
-    static IProbeInfo newVertical(final IProbeInfo probeInfo) {
-        return probeInfo.vertical(probeInfo.defaultLayoutStyle().spacing(0));
+                           final TileMultiblockMachineController controller) {
     }
 
     ResourceLocation getRegistryName();

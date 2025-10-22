@@ -61,21 +61,6 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
                 () -> Loader.isModLoaded("deepmoblearning") && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution"));
     }
 
-    @Override
-    public List<String> getMixinConfigs() {
-        return new ObjectArrayList<>(MIXIN_CONFIGS.keySet());
-    }
-
-    @Override
-    public boolean shouldMixinConfigQueue(final String mixinConfig) {
-        BooleanSupplier supplier = MIXIN_CONFIGS.get(mixinConfig);
-        if (supplier == null) {
-            LOG.warn(LOG_PREFIX + "Mixin config {} is not found in config map! It will never be loaded.", mixinConfig);
-            return false;
-        }
-        return supplier.getAsBoolean();
-    }
-
     private static boolean modLoaded(final String modID) {
         return Loader.isModLoaded(modID);
     }
@@ -94,5 +79,20 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
 
     private static void addMixinCFG(final String mixinConfig, final BooleanSupplier conditions) {
         MIXIN_CONFIGS.put(mixinConfig, conditions);
+    }
+
+    @Override
+    public List<String> getMixinConfigs() {
+        return new ObjectArrayList<>(MIXIN_CONFIGS.keySet());
+    }
+
+    @Override
+    public boolean shouldMixinConfigQueue(final String mixinConfig) {
+        BooleanSupplier supplier = MIXIN_CONFIGS.get(mixinConfig);
+        if (supplier == null) {
+            LOG.warn(LOG_PREFIX + "Mixin config {} is not found in config map! It will never be loaded.", mixinConfig);
+            return false;
+        }
+        return supplier.getAsBoolean();
     }
 }

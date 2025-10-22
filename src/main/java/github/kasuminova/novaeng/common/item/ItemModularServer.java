@@ -10,7 +10,7 @@ public class ItemModularServer extends Item {
     public ItemModularServer(final String registryName) {
         setMaxStackSize(1);
         setCreativeTab(CreativeTabNovaEng.INSTANCE);
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, registryName)).setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + registryName);;
+        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, registryName)).setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + registryName);
     }
 
 }

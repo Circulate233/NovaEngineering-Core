@@ -35,18 +35,14 @@ public class ResearchCognitionData {
     private final float techLevel;
     private final double requiredPoints;
     private final double minComputationPointPerTick;
-
-    private boolean hideByDefault = false;
-
     private final boolean cycleResearch;
     private final int maxCycle;
-
     private final ObjectList<String> descriptions;
     private final ObjectList<String> unlockedDescriptions;
     private final List<ResearchCognitionData> dependencies;
-
     @Getter
     private final Object2IntOpenHashMap<ResearchCognitionData> cycleDependencies = new Object2IntOpenHashMap<>();
+    private boolean hideByDefault = false;
 
     public ResearchCognitionData(final String researchName,
                                  final String translatedName,
@@ -56,8 +52,7 @@ public class ResearchCognitionData {
                                  final double minComputationPointPerTick,
                                  final ObjectList<String> descriptions,
                                  final ObjectList<String> unlockedDescriptions,
-                                 final List<ResearchCognitionData> dependencies)
-    {
+                                 final List<ResearchCognitionData> dependencies) {
         this.researchName = researchName;
         this.previewStack = previewStack.getCount() != 1 ? ItemUtils.copyStackWithSize(previewStack, 1) : previewStack;
         this.techLevel = techLevel;
@@ -86,8 +81,7 @@ public class ResearchCognitionData {
                                  final ObjectList<String> descriptions,
                                  final ObjectList<String> unlockedDescriptions,
                                  final List<ResearchCognitionData> dependencies,
-                                 final int maxCycle)
-    {
+                                 final int maxCycle) {
         this.researchName = researchName;
         this.previewStack = previewStack.getCount() != 1 ? ItemUtils.copyStackWithSize(previewStack, 1) : previewStack;
         this.techLevel = techLevel;
@@ -117,8 +111,7 @@ public class ResearchCognitionData {
                                                final double minComputationPointPerTick,
                                                final String[] descriptions,
                                                final String[] unlockedDescriptions,
-                                               final String[] dependenciesArr)
-    {
+                                               final String[] dependenciesArr) {
         List<ResearchCognitionData> dependencies = Arrays.stream(dependenciesArr)
                 .map(RegistryHyperNet::getResearchCognitionData)
                 .filter(Objects::nonNull)
@@ -146,8 +139,7 @@ public class ResearchCognitionData {
                                                     final String[] descriptions,
                                                     final String[] unlockedDescriptions,
                                                     final String[] dependenciesArr,
-                                                    final int maxCycle)
-    {
+                                                    final int maxCycle) {
         List<ResearchCognitionData> dependencies = Arrays.stream(dependenciesArr)
                 .map(RegistryHyperNet::getResearchCognitionData)
                 .filter(Objects::nonNull)

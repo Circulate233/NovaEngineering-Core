@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @SideOnly(Side.CLIENT)
-public class ExJEI{
+public class ExJEI {
 
     private static final List<String> blockList = Arrays.asList(
-        "mekanismgenerators","artisanworktables"
+            "mekanismgenerators", "artisanworktables"
     );
 
     public static void jeiCreate() {
@@ -36,18 +36,18 @@ public class ExJEI{
         MCJeiPanel JeiP = new MCJeiPanel("replicator_jei", I18n.format("gui." + NovaEngineeringCore.MOD_ID + ".replicator"));
         JeiP.setModid("ic2");
         JeiP.recipeCatalysts.addAll(
-            Arrays.asList(
-                pattern_storage,
-                replicator,
-                CraftTweakerMC.getIItemStack(ItemName.crystal_memory.getItemStack())
-            )
+                Arrays.asList(
+                        pattern_storage,
+                        replicator,
+                        CraftTweakerMC.getIItemStack(ItemName.crystal_memory.getItemStack())
+                )
         );
         JeiP.background = IJeiUtils.createBackground(80, 32);
         JeiP.slots.addAll(
-            Arrays.asList(
-                IJeiUtils.createItemSlot(30,0,true,false),
-                IJeiUtils.createItemSlot(30,0,false,false)
-            )
+                Arrays.asList(
+                        IJeiUtils.createItemSlot(30, 0, true, false),
+                        IJeiUtils.createItemSlot(30, 0, false, false)
+                )
         );
         JeiP.icon = replicator;
         JeiP.register();

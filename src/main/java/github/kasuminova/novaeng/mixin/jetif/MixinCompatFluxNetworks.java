@@ -19,5 +19,6 @@ public class MixinCompatFluxNetworks extends JETIFCompat {
      * @reason 直接注释掉通量网络的错误配方
      */
     @Overwrite
-    public void addRecipes(List<JETIFWrapper> list) {}
+    public void addRecipes(List<JETIFWrapper> list) {
+    }
 }

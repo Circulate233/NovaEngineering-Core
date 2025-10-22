@@ -73,8 +73,10 @@ public class CommandPacketProfiler extends CommandBase {
         if (args.length >= 2) {
             try {
                 switch (args[0]) {
-                    case "debug_limit" -> ClientEventHandler.debugPacketProfilerMessageLimit = Integer.parseInt(args[1]);
-                    case "te_debug_limit" -> ClientEventHandler.debugTEPacketProfilerMessageLimit = Integer.parseInt(args[1]);
+                    case "debug_limit" ->
+                            ClientEventHandler.debugPacketProfilerMessageLimit = Integer.parseInt(args[1]);
+                    case "te_debug_limit" ->
+                            ClientEventHandler.debugTEPacketProfilerMessageLimit = Integer.parseInt(args[1]);
                 }
             } catch (Exception e) {
                 sender.sendMessage(new TextComponentString("Invalid parameter " + args[1]));

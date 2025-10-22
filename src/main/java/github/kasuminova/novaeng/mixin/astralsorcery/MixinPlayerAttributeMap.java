@@ -53,5 +53,5 @@ public class MixinPlayerAttributeMap {
             AstralSorcery.log.warn("Trying to modify PerkConverters while modifiers are applied!");
         }
     }
-    
+
 }

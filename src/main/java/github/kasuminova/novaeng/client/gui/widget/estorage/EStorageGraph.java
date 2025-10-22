@@ -13,11 +13,13 @@ import github.kasuminova.novaeng.common.container.data.EStorageEnergyData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import hellfirepvp.modularmachinery.common.base.Mods;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Collections;
 
+@Getter
 public class EStorageGraph extends Row {
     protected final GuiEStorageController controllerGUI;
     protected final EStorageGraphBar graphBar;
@@ -46,18 +48,14 @@ public class EStorageGraph extends Row {
         super.initWidget(gui);
     }
 
-    public GuiEStorageController getControllerGUI() {
-        return controllerGUI;
-    }
-
-    public EStorageGraphBar getGraphBar() {
-        return graphBar;
+    public boolean getMekEngLoad() {
+        return Mods.MEKENG.isPresent();
     }
 
     public class FluidGraph extends Graph {
-        
+
         public FluidGraph(final EStorageGraph graphParent) {
-            super(graphParent, 
+            super(graphParent,
                     10, 32,
                     60, 16,
                     2,
@@ -226,7 +224,7 @@ public class EStorageGraph extends Row {
 
         protected final AnimationValue totalUsedFluidTypes = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
         protected final AnimationValue totalMaxFluidTypes = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
-        
+
         public FluidTypeGraph(final EStorageGraph graphParent) {
             super(graphParent,
                     85, 46,
@@ -455,9 +453,5 @@ public class EStorageGraph extends Row {
             }
             return super.onGuiEvent(event);
         }
-    }
-
-    public boolean getMekEngLoad() {
-        return Mods.MEKENG.isPresent();
     }
 }

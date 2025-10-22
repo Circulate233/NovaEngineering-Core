@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thelm.packagedauto.network.packet.PacketEjectTracker;
 
-@Mixin(value = PacketEjectTracker.class,remap = false)
+@Mixin(value = PacketEjectTracker.class, remap = false)
 public class MixinPacketEjectTracker {
 
-    @Inject(method = "onMessage",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onMessage", at = @At("HEAD"), cancellable = true)
     public void onMessage(MessageContext ctx, CallbackInfoReturnable<IMessage> cir) {
         cir.setReturnValue(null);
     }

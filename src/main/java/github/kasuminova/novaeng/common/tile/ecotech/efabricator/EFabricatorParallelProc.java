@@ -51,8 +51,33 @@ public class EFabricatorParallelProc extends EFabricatorPart {
         compound.setTag("overclockModifiers", overclockModifiersTag);
     }
 
+    @Getter
+    public enum Type {
+
+        ADD(0),
+        MULTIPLY(1);
+
+        final int priority;
+
+        Type(int priority) {
+            this.priority = priority;
+        }
+
+        public double apply(final double value, final double parallelism) {
+            return switch (this) {
+                case ADD -> value + parallelism;
+                case MULTIPLY -> value * parallelism;
+            };
+        }
+
+    }
+
     @Desugar
     public record Modifier(Type type, double value, boolean debuff) {
+
+        public static Modifier readFromNBT(NBTTagCompound tag) {
+            return new Modifier(Type.values()[tag.getByte("type")], tag.getDouble("value"), tag.getBoolean("debuff"));
+        }
 
         public double apply(final double parallelism) {
             return type.apply(value, parallelism);
@@ -68,10 +93,6 @@ public class EFabricatorParallelProc extends EFabricatorPart {
             tag.setDouble("value", value);
             tag.setBoolean("debuff", debuff);
             return tag;
-        }
-
-        public static Modifier readFromNBT(NBTTagCompound tag) {
-            return new Modifier(Type.values()[tag.getByte("type")], tag.getDouble("value"), tag.getBoolean("debuff"));
         }
 
         @SideOnly(Side.CLIENT)
@@ -92,27 +113,6 @@ public class EFabricatorParallelProc extends EFabricatorPart {
             }
             return "";
         }
-    }
-
-    @Getter
-    public enum Type {
-
-        ADD(0),
-        MULTIPLY(1);
-
-        final int priority;
-
-        Type(int priority) {
-            this.priority = priority;
-        }
-
-        public double apply(final double value, final double parallelism) {
-            return switch (this) {
-                case ADD -> value + parallelism;
-                case MULTIPLY -> value * parallelism;
-            };
-        }
-
     }
 
 }

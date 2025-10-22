@@ -5,9 +5,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class GuiButtonImageExt extends GuiButtonImage implements ITooltip {
-    
+
     private String message = "";
 
     public GuiButtonImageExt(final int buttonId, final int xIn, final int yIn, final int widthIn, final int heightIn, final int textureOffestX, final int textureOffestY, final int p_i47392_8_, final ResourceLocation resource) {
@@ -15,7 +16,7 @@ public class GuiButtonImageExt extends GuiButtonImage implements ITooltip {
     }
 
     @Override
-    public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, final float partialTicks) {
+    public void drawButton(final @NotNull Minecraft mc, final int mouseX, final int mouseY, final float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -23,14 +24,14 @@ public class GuiButtonImageExt extends GuiButtonImage implements ITooltip {
         super.drawButton(mc, mouseX, mouseY, partialTicks);
     }
 
-    public GuiButtonImageExt setMessage(final String message) {
-        this.message = message;
-        return this;
-    }
-
     @Override
     public String getMessage() {
         return message;
+    }
+
+    public GuiButtonImageExt setMessage(final String message) {
+        this.message = message;
+        return this;
     }
 
     @Override

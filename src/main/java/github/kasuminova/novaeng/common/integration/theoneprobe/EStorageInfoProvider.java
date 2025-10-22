@@ -28,28 +28,6 @@ public class EStorageInfoProvider implements IProbeInfoProvider {
     private EStorageInfoProvider() {
     }
 
-    @Override
-    public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "estorage_info_provider";
-    }
-
-    @Override
-    public void addProbeInfo(final ProbeMode probeMode,
-                             final IProbeInfo probeInfo,
-                             final EntityPlayer player,
-                             final World world,
-                             final IBlockState blockState,
-                             final IProbeHitData hitData) {
-        TileEntity te = world.getTileEntity(hitData.getPos());
-        if (te instanceof final EStorageEnergyCell cell) {
-            processEnergyCellInfo(probeInfo, cell);
-            return;
-        }
-        if (te instanceof final EStorageCellDrive drive) {
-            processCellDriveInfo(probeInfo, drive);
-        }
-    }
-
     private static void processCellDriveInfo(final IProbeInfo probeInfo, final EStorageCellDrive drive) {
         IProbeInfo box = newBox(probeInfo);
         IProbeInfo leftInfo = newVertical(box);
@@ -79,7 +57,7 @@ public class EStorageInfoProvider implements IProbeInfoProvider {
             case EMPTY -> "empty";
             case ITEM -> "item";
             case FLUID -> "fluid";
-            case GAS -> Mods.MEKENG.isPresent() ? "gas" :  "empty";
+            case GAS -> Mods.MEKENG.isPresent() ? "gas" : "empty";
         };
         String levelName = switch (level) {
             case EMPTY -> "empty";
@@ -130,5 +108,27 @@ public class EStorageInfoProvider implements IProbeInfoProvider {
 
     private static IProbeInfo newBox(final IProbeInfo info) {
         return info.horizontal(info.defaultLayoutStyle().borderColor(0x801E90FF));
+    }
+
+    @Override
+    public String getID() {
+        return NovaEngineeringCore.MOD_ID + ':' + "estorage_info_provider";
+    }
+
+    @Override
+    public void addProbeInfo(final ProbeMode probeMode,
+                             final IProbeInfo probeInfo,
+                             final EntityPlayer player,
+                             final World world,
+                             final IBlockState blockState,
+                             final IProbeHitData hitData) {
+        TileEntity te = world.getTileEntity(hitData.getPos());
+        if (te instanceof final EStorageEnergyCell cell) {
+            processEnergyCellInfo(probeInfo, cell);
+            return;
+        }
+        if (te instanceof final EStorageCellDrive drive) {
+            processCellDriveInfo(probeInfo, drive);
+        }
     }
 }

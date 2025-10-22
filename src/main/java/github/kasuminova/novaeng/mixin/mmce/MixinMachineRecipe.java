@@ -15,31 +15,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(value = MachineRecipe.class,remap = false)
+@Mixin(value = MachineRecipe.class, remap = false)
 public abstract class MixinMachineRecipe {
 
     @Shadow
     @Final
     protected List<ComponentRequirement<?, ?>> recipeRequirements;
 
-    @Inject(method = "mergeAdapter",at = @At("HEAD"))
+    @Inject(method = "mergeAdapter", at = @At("HEAD"))
     public void mergeAdapter(RecipeAdapterBuilder adapterBuilder, CallbackInfo ci) {
-        if (adapterBuilder instanceof NovaRAB n){
+        if (adapterBuilder instanceof NovaRAB n) {
             String inTagName = n.n$getInTags();
             String outTagName = n.n$getOutTags();
-            if (inTagName.isEmpty() && outTagName.isEmpty())return;
-            ComponentSelectorTag inTag = inTagName.isEmpty() ? null:new ComponentSelectorTag(n.n$getInTags());
-            ComponentSelectorTag outTag = outTagName.isEmpty() ? null:new ComponentSelectorTag(n.n$getOutTags());
+            if (inTagName.isEmpty() && outTagName.isEmpty()) return;
+            ComponentSelectorTag inTag = inTagName.isEmpty() ? null : new ComponentSelectorTag(n.n$getInTags());
+            ComponentSelectorTag outTag = outTagName.isEmpty() ? null : new ComponentSelectorTag(n.n$getOutTags());
             this.recipeRequirements.forEach(component -> {
                 if (component instanceof RequirementItem) {
-                    switch (component.getActionType()){
+                    switch (component.getActionType()) {
                         case INPUT -> {
-                            if (!inTagName.isEmpty()){
+                            if (!inTagName.isEmpty()) {
                                 component.setTag(inTag);
                             }
                         }
                         case OUTPUT -> {
-                            if (!outTagName.isEmpty()){
+                            if (!outTagName.isEmpty()) {
                                 component.setTag(outTag);
                             }
                         }

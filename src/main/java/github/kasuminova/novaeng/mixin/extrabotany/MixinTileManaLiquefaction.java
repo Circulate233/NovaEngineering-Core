@@ -12,20 +12,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vazkii.botania.common.block.tile.TileMod;
 import vazkii.botania.common.block.tile.mana.TilePool;
 
-@Mixin(value = TileManaLiquefaction.class,remap = false,priority = 0)
+@Mixin(value = TileManaLiquefaction.class, remap = false, priority = 0)
 public abstract class MixinTileManaLiquefaction extends TileMod {
-
-    @Shadow
-    int mana;
-
-    @Shadow
-    public int energy;
 
     @Final
     @Shadow
     private static int MAX_ENERGY;
+    @Shadow
+    public int energy;
+    @Shadow
+    int mana;
 
-    @Inject(method = "update", at = @At("HEAD"),remap = true)
+    @Inject(method = "update", at = @At("HEAD"), remap = true)
     public void updateMixin(CallbackInfo ci) {
         if (ConfigHandler.DISABLE_MANALIQUEFICATION) {
             var world = this.world;

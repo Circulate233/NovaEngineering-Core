@@ -15,8 +15,7 @@ public class ProcessorModuleCPUType extends ProcessorModuleType {
     protected final double computationPointGeneration;
 
     public ProcessorModuleCPUType(final long energyConsumption,
-                                  final double computationPointGeneration)
-    {
+                                  final double computationPointGeneration) {
         super(energyConsumption);
         this.computationPointGeneration = computationPointGeneration;
     }
@@ -29,15 +28,13 @@ public class ProcessorModuleCPUType extends ProcessorModuleType {
     public static ProcessorModuleCPUType create(final int minDurability,
                                                 final int maxDurability,
                                                 final long energyConsumption,
-                                                final double computationPointGeneration)
-    {
+                                                final double computationPointGeneration) {
         return new ProcessorModuleCPUType(energyConsumption, computationPointGeneration);
     }
 
     @ZenMethod
     public static ProcessorModuleCPUType create(final long energyConsumption,
-                                                final double computationPointGeneration)
-    {
+                                                final double computationPointGeneration) {
         return new ProcessorModuleCPUType(energyConsumption, computationPointGeneration);
     }
 

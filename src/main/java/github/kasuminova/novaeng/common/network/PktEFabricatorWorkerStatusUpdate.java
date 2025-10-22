@@ -28,6 +28,26 @@ public class PktEFabricatorWorkerStatusUpdate implements IMessage, IMessageHandl
         this.status = status;
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktEFabricatorWorkerStatusUpdate message) {
+        BlockPos pos = message.pos;
+        WorkerStatus status = message.status;
+        if (pos == null) {
+            return;
+        }
+
+        WorldClient world = Minecraft.getMinecraft().world;
+        if (world == null) {
+            return;
+        }
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof EFabricatorWorker worker)) {
+            return;
+        }
+        worker.setStatus(status);
+        worker.markForUpdate();
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         try {
@@ -50,26 +70,6 @@ public class PktEFabricatorWorkerStatusUpdate implements IMessage, IMessageHandl
             processPacket(message);
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktEFabricatorWorkerStatusUpdate message) {
-        BlockPos pos = message.pos;
-        WorkerStatus status = message.status;
-        if (pos == null) {
-            return;
-        }
-
-        WorldClient world = Minecraft.getMinecraft().world;
-        if (world == null) {
-            return;
-        }
-        TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof EFabricatorWorker worker)) {
-            return;
-        }
-        worker.setStatus(status);
-        worker.markForUpdate();
     }
 
 }

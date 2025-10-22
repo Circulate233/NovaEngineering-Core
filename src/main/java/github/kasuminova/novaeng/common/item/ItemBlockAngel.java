@@ -31,8 +31,7 @@ public class ItemBlockAngel extends ItemBlock {
     public void addInformation(@Nonnull final ItemStack stack,
                                @Nullable final World worldIn,
                                @Nonnull final List<String> tooltip,
-                               @Nonnull final ITooltipFlag flagIn)
-    {
+                               @Nonnull final ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         tooltip.add(I18n.format("tile.novaeng_core.angel_block.tip.0"));
         tooltip.add(I18n.format("tile.novaeng_core.angel_block.tip.1"));
@@ -43,8 +42,7 @@ public class ItemBlockAngel extends ItemBlock {
     @Override
     public ActionResult<ItemStack> onItemRightClick(@Nonnull final World world,
                                                     @Nonnull final EntityPlayer player,
-                                                    @Nonnull final EnumHand hand)
-    {
+                                                    @Nonnull final EnumHand hand) {
         EnumFacing playerFacing = player.getAdjustedHorizontalFacing();
         BlockPos pos = new BlockPos(player.posX, player.posY + player.eyeHeight, player.posZ);
         if (!player.isSneaking()) {
@@ -65,8 +63,7 @@ public class ItemBlockAngel extends ItemBlock {
                                                @Nonnull final EnumFacing facing,
                                                final float hitX,
                                                final float hitY,
-                                               final float hitZ)
-    {
+                                               final float hitZ) {
         EnumFacing playerFacing = player.getAdjustedHorizontalFacing();
         BlockPos pos = new BlockPos(player.posX, player.posY + player.eyeHeight, player.posZ);
         if (!player.isSneaking()) {

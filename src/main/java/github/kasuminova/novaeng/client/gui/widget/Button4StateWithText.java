@@ -5,11 +5,13 @@ import github.kasuminova.mmce.client.gui.util.RenderPos;
 import github.kasuminova.mmce.client.gui.util.RenderSize;
 import github.kasuminova.mmce.client.gui.widget.Button4State;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+@Getter
 public class Button4StateWithText extends Button4State {
-    
+
     private int textColor = 0xFFFFFF;
     private String content = "";
 
@@ -28,17 +30,9 @@ public class Button4StateWithText extends Button4State {
         );
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public Button4StateWithText setContent(final String content) {
         this.content = content;
         return this;
-    }
-
-    public int getTextColor() {
-        return textColor;
     }
 
     public Button4StateWithText setTextColor(final int textColor) {

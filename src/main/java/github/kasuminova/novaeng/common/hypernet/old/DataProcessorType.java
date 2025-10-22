@@ -35,8 +35,7 @@ public class DataProcessorType extends NetNodeType {
     public DataProcessorType(final String typeName,
                              final long energyUsage,
                              final int heatDistribution,
-                             final int overheatThreshold)
-    {
+                             final int overheatThreshold) {
         super(typeName, energyUsage);
         this.heatDistribution = heatDistribution;
         this.overheatThreshold = overheatThreshold;
@@ -46,8 +45,7 @@ public class DataProcessorType extends NetNodeType {
     public static DataProcessorType create(final String typeName,
                                            final long energyUsage,
                                            final int heatDistribution,
-                                           final int overheatThreshold)
-    {
+                                           final int overheatThreshold) {
         return new DataProcessorType(typeName,
                 energyUsage,
                 heatDistribution,
@@ -120,7 +118,8 @@ public class DataProcessorType extends NetNodeType {
                     })
                     .addFactoryFinishHandler(event -> {
                         DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
-                        if (processor != null) processor.setStoredHU(processor.getStoredHU() - (heatDistribution * event.getActiveRecipe().getParallelism()));
+                        if (processor != null)
+                            processor.setStoredHU(processor.getStoredHU() - (heatDistribution * event.getActiveRecipe().getParallelism()));
                     })
                     .addRecipeTooltip(FMLCommonHandler.instance().getSide().isClient()
                             ? new String[]{I18n.format("novaeng.hypernet.radiator.tooltip", heatDistribution * 20)}

@@ -4,6 +4,7 @@ import github.kasuminova.novaeng.common.block.BlockDreamEnergyPort;
 import github.kasuminova.novaeng.common.handler.DreamEnergyPortHandler;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
@@ -16,17 +17,20 @@ public class TileDreamEnergyPort extends TileFluxStorage {
 
     private final DreamEnergyPortHandler handler;
     private final ItemStack stack;
+    @Getter
     private BlockPos ctrlPos;
-
-    public BlockPos getCtrlPos() {
-        return this.ctrlPos;
-    }
 
     public TileDreamEnergyPort() {
         this.customName = "Dream Energy Port";
         this.limit = (long) FluxConfig.gargantuanTransfer;
         this.stack = new ItemStack(BlockDreamEnergyPort.INSTANCE);
         this.handler = new DreamEnergyPortHandler(this);
+    }
+
+    public void setCtrlPos(BlockPos pos) {
+        this.ctrlPos = pos;
+        this.handler.setCtrlPos(pos);
+        this.handler.setWorld(this.world);
     }
 
     @Override
@@ -46,8 +50,8 @@ public class TileDreamEnergyPort extends TileFluxStorage {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        if (ctrlPos != null){
-            compound.setLong("ctrlPos",this.ctrlPos.toLong());
+        if (ctrlPos != null) {
+            compound.setLong("ctrlPos", this.ctrlPos.toLong());
         }
         return compound;
     }
@@ -60,7 +64,7 @@ public class TileDreamEnergyPort extends TileFluxStorage {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        if (compound.hasKey("ctrlPos")){
+        if (compound.hasKey("ctrlPos")) {
             this.ctrlPos = BlockPos.fromLong(compound.getLong("ctrlPos"));
             this.handler.setCtrlPos(this.ctrlPos);
             this.handler.setWorld(this.world);
@@ -72,21 +76,15 @@ public class TileDreamEnergyPort extends TileFluxStorage {
         return this.handler;
     }
 
-    public boolean getCtrlStructureFormed(){
-        if (this.ctrlPos == null){
+    public boolean getCtrlStructureFormed() {
+        if (this.ctrlPos == null) {
             return false;
         }
         if (this.world.getTileEntity(ctrlPos) instanceof TileMultiblockMachineController ctrl) {
-            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)){
+            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)) {
                 return ctrl.isStructureFormed();
             }
         }
         return false;
-    }
-
-    public void setCtrlPos(BlockPos pos){
-        this.ctrlPos = pos;
-        this.handler.setCtrlPos(pos);
-        this.handler.setWorld(this.world);
     }
 }

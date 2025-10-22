@@ -42,16 +42,16 @@ public class HyperNetEventHandler {
     private static final Queue<Action> TICK_START_ACTIONS = Queues.createConcurrentQueue();
     private static final Queue<Action> TICK_END_ACTIONS = Queues.createConcurrentQueue();
 
+    private HyperNetEventHandler() {
+
+    }
+
     public static void addTickStartAction(final Action action) {
         TICK_START_ACTIONS.offer(action);
     }
 
     public static void addTickEndAction(final Action action) {
         TICK_END_ACTIONS.offer(action);
-    }
-
-    private HyperNetEventHandler() {
-
     }
 
     private static ComputationCenter getCenterFromNode(final TileMultiblockMachineController ctrl) {
@@ -98,6 +98,43 @@ public class HyperNetEventHandler {
                     cached.getNodeMaxPresences()
             ));
         }
+    }
+
+    private static void tryConnectToCenter(final TileMultiblockMachineController ctrl, final ItemStack stack, final World world, final EntityPlayer player, final DynamicMachine foundMachine) {
+        HyperNetConnectCardInfo info = HyperNetHelper.readConnectCardInfo(ctrl, stack);
+        if (info == null || !world.isBlockLoaded(info.pos())) {
+            player.sendMessage(new TextComponentTranslation(
+                    "novaeng.hypernet.connect.result.unknown_center"));
+            return;
+        }
+
+        BlockPos centerPos = info.pos();
+        TileEntity centerTE = world.getTileEntity(centerPos);
+        TileFactoryController centerCtrl = centerTE instanceof TileFactoryController
+                ? (TileFactoryController) centerTE
+                : null;
+        if (centerCtrl == null || !HyperNetHelper.isComputationCenter(centerCtrl)) {
+            player.sendMessage(new TextComponentTranslation(
+                    "novaeng.hypernet.connect.result.unknown_center"));
+            return;
+        }
+
+        NetNode cached = NetNodeCache.getCache(ctrl, RegistryHyperNet.getNodeType(foundMachine));
+        ComputationCenter center = ComputationCenter.from(centerCtrl);
+        if (cached == null || center == null) {
+            player.sendMessage(new TextComponentTranslation(
+                    "novaeng.hypernet.connect.result.unknown_center"));
+            return;
+        }
+
+        if (!info.networkOwner().equals(center.getNetworkOwner())) {
+            player.sendMessage(new TextComponentTranslation(
+                    "novaeng.hypernet.connect.result.no_permission"));
+            return;
+        }
+
+        ConnectResult result = cached.connectTo(centerPos);
+        sendResultMessage(result, player, center, cached);
     }
 
     @SubscribeEvent
@@ -189,43 +226,6 @@ public class HyperNetEventHandler {
         }
 
         tryConnectToCenter(ctrl, stack, world, player, foundMachine);
-    }
-
-    private static void tryConnectToCenter(final TileMultiblockMachineController ctrl, final ItemStack stack, final World world, final EntityPlayer player, final DynamicMachine foundMachine) {
-        HyperNetConnectCardInfo info = HyperNetHelper.readConnectCardInfo(ctrl, stack);
-        if (info == null || !world.isBlockLoaded(info.getPos())) {
-            player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
-            return;
-        }
-
-        BlockPos centerPos = info.getPos();
-        TileEntity centerTE = world.getTileEntity(centerPos);
-        TileFactoryController centerCtrl = centerTE instanceof TileFactoryController
-                ? (TileFactoryController) centerTE
-                : null;
-        if (centerCtrl == null || !HyperNetHelper.isComputationCenter(centerCtrl)) {
-            player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
-            return;
-        }
-
-        NetNode cached = NetNodeCache.getCache(ctrl, RegistryHyperNet.getNodeType(foundMachine));
-        ComputationCenter center = ComputationCenter.from(centerCtrl);
-        if (cached == null || center == null) {
-            player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
-            return;
-        }
-
-        if (!info.getNetworkOwner().equals(center.getNetworkOwner())) {
-            player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.no_permission"));
-            return;
-        }
-
-        ConnectResult result = cached.connectTo(centerPos);
-        sendResultMessage(result, player, center, cached);
     }
 
     @SubscribeEvent

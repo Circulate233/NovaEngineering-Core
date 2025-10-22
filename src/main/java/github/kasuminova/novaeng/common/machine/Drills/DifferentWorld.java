@@ -19,12 +19,12 @@ public class DifferentWorld extends Drill {
     }
 
     @Override
-    protected float getRecipeTimeMultiple(){
+    protected float getRecipeTimeMultiple() {
         return 1.5f;
     }
 
     @Override
-    protected float getAdvancedRecipeTimeMultiple(){
+    protected float getAdvancedRecipeTimeMultiple() {
         return 1.5f;
     }
 

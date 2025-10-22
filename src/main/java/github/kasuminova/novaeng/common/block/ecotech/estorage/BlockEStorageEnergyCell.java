@@ -20,6 +20,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -70,10 +71,9 @@ public class BlockEStorageEnergyCell extends BlockEStoragePart {
     }
 
     @Override
-    public void breakBlock(final World world,
+    public void breakBlock(final @NotNull World world,
                            @Nonnull final BlockPos pos,
-                           @Nonnull final IBlockState state)
-    {
+                           @Nonnull final IBlockState state) {
         ItemStack dropped = new ItemStack(Item.getItemFromBlock(this));
         if (dropped.isEmpty()) {
             super.dropBlockAsItemWithChance(world, pos, state, 1.0F, 0);
@@ -122,8 +122,7 @@ public class BlockEStorageEnergyCell extends BlockEStoragePart {
                                 @Nonnull final BlockPos pos,
                                 @Nonnull final IBlockState state,
                                 @Nonnull final EntityLivingBase placer,
-                                @Nonnull final ItemStack stack)
-    {
+                                @Nonnull final ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
         NBTTagCompound tag = stack.getTagCompound();
         if (tag != null && tag.hasKey("energyStored") && tag.hasKey("maxEnergyStore")) {

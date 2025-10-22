@@ -23,29 +23,11 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
 
     public static final EFabricatorInfoProvider INSTANCE = new EFabricatorInfoProvider();
 
-    public static final Color LOW_COLOR  = new Color(0xCC54FF9F);
-    public static final Color MID_COLOR  = new Color(0xCCFFFF00);
+    public static final Color LOW_COLOR = new Color(0xCC54FF9F);
+    public static final Color MID_COLOR = new Color(0xCCFFFF00);
     public static final Color FULL_COLOR = new Color(0xCCFF4500);
 
     private EFabricatorInfoProvider() {
-    }
-
-    @Override
-    public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "efabricator_info_provider";
-    }
-
-    @Override
-    public void addProbeInfo(final ProbeMode probeMode,
-                             final IProbeInfo probeInfo,
-                             final EntityPlayer player,
-                             final World world,
-                             final IBlockState blockState,
-                             final IProbeHitData hitData) {
-        TileEntity te = world.getTileEntity(hitData.getPos());
-        if (te instanceof EFabricatorWorker worker) {
-            processWorkerInfo(probeInfo, worker);
-        }
     }
 
     private static void processWorkerInfo(final IProbeInfo probeInfo, final EFabricatorWorker worker) {
@@ -70,7 +52,7 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
         int color = ColorUtils.getGradientColor(new Color[]{
                 LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
         }, 0xCC, percent).getRGB();
-        
+
         // Energy bar
         int energyCache = worker.getEnergyCache();
         int maxEnergyCache = worker.getMaxEnergyCache();
@@ -179,8 +161,6 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
         return len;
     }
 
-    // Utility methods to darken and lighten colors
-
     private static int darkenColor(int color, double factor) {
         int a = (color >> 24) & 0xFF;
         int r = (int) (((color >> 16) & 0xFF) * factor);
@@ -197,12 +177,32 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
+    // Utility methods to darken and lighten colors
+
     private static IProbeInfo newVertical(final IProbeInfo probeInfo) {
         return probeInfo.vertical(probeInfo.defaultLayoutStyle().spacing(0));
     }
 
     private static IProbeInfo newBox(final IProbeInfo info) {
         return info.horizontal(info.defaultLayoutStyle().borderColor(0x801E90FF));
+    }
+
+    @Override
+    public String getID() {
+        return NovaEngineeringCore.MOD_ID + ':' + "efabricator_info_provider";
+    }
+
+    @Override
+    public void addProbeInfo(final ProbeMode probeMode,
+                             final IProbeInfo probeInfo,
+                             final EntityPlayer player,
+                             final World world,
+                             final IBlockState blockState,
+                             final IProbeHitData hitData) {
+        TileEntity te = world.getTileEntity(hitData.getPos());
+        if (te instanceof EFabricatorWorker worker) {
+            processWorkerInfo(probeInfo, worker);
+        }
     }
 
 }

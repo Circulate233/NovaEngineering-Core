@@ -194,7 +194,7 @@ public class ServerInfoColumn extends ScrollingColumn {
             ));
             tip.add(I18n.format("gui.modular_server_assembler.calculate.value",
                     type.format(server.calculate(
-                            new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new Object2ObjectOpenHashMap<>()))
+                                    new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new Object2ObjectOpenHashMap<>()))
                             .generated()
                     ),
                     Calculable.formatEfficiency(server.getCalculateAvgEfficiency(type))

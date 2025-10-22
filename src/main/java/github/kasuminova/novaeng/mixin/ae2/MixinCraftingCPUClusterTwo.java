@@ -61,8 +61,31 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-@Mixin(value = CraftingCPUCluster.class, remap = false ,priority = 0)
+@Mixin(value = CraftingCPUCluster.class, remap = false, priority = 0)
 public abstract class MixinCraftingCPUClusterTwo {
+
+    @Shadow
+    private int remainingOperations;
+    @Shadow
+    private MachineSource machineSrc;
+    @Shadow
+    private MECraftingInventory inventory;
+    @Shadow
+    @Final
+    private Map<ICraftingPatternDetails, AccessorTaskProgress> tasks;
+    @Shadow
+    @Final
+    private Map<ICraftingPatternDetails, Queue<ICraftingMedium>> visitedMediums;
+    @Shadow
+    private boolean somethingChanged;
+    @Shadow
+    private IItemList<IAEItemStack> waitingFor;
+    @Unique
+    private boolean r$IgnoreParallel = false;
+    @Unique
+    private long r$craftingFrequency = 0;
+    @Unique
+    private boolean r$nae2$ghostInjecting;
 
     @Shadow
     protected abstract void postChange(IAEItemStack diff, IActionSource src);
@@ -71,33 +94,10 @@ public abstract class MixinCraftingCPUClusterTwo {
     protected abstract void postCraftingStatusChange(IAEItemStack diff);
 
     @Shadow
-    private int remainingOperations;
-
-    @Shadow
-    private MachineSource machineSrc;
-
-    @Shadow
-    private MECraftingInventory inventory;
-
-    @Shadow
-    @Final
-    private Map<ICraftingPatternDetails, AccessorTaskProgress> tasks;
-
-    @Shadow
     protected abstract boolean canCraft(ICraftingPatternDetails details, IAEItemStack[] condensedInputs);
 
     @Shadow
-    @Final
-    private Map<ICraftingPatternDetails, Queue<ICraftingMedium>> visitedMediums;
-
-    @Shadow
     protected abstract World getWorld();
-
-    @Shadow
-    private boolean somethingChanged;
-
-    @Shadow
-    private IItemList<IAEItemStack> waitingFor;
 
     @Shadow
     protected abstract void markDirty();
@@ -110,12 +110,6 @@ public abstract class MixinCraftingCPUClusterTwo {
 
     @Shadow
     public abstract IAEItemStack injectItems(IAEItemStack input, Actionable type, IActionSource src);
-
-    @Unique
-    private boolean r$IgnoreParallel = false;
-
-    @Unique
-    private long r$craftingFrequency = 0;
 
     /**
      * @author circulation
@@ -430,9 +424,6 @@ public abstract class MixinCraftingCPUClusterTwo {
             receiver.setStackSize(receiver.getStackSize() * this.r$craftingFrequency);
         return instance.extractItems(receiver, mode, src);
     }
-
-    @Unique
-    private boolean r$nae2$ghostInjecting;
 
     @Unique
     protected void r$nae2$ghostInject(IAEItemStack output) {

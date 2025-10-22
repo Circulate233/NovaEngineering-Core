@@ -31,56 +31,55 @@ import static crafttweaker.CraftTweakerAPI.itemUtils;
 public class OreHandler {
 
     public static final OreHandler INSTANCE = new OreHandler();
-
+    public static final Map<String, String> VeinMap = new Object2ObjectOpenHashMap<>();
+    public static final Map<String, IItemStack> VeinItemMap = new Object2ObjectOpenHashMap<>();
     private static final String rawOreOD = "rawOre";
     private static final String rawOreGemOD = "rawOreGem";
     private static final String oreOD = "ore";
     private static Map<OreKey, ItemStack> rawOreMap;
     private static Map<OreKey, ItemStack> oreMap;
 
-    private OreHandler(){}
+    private OreHandler() {
+    }
 
-    public static IItemStack getRawOre(@NotNull ItemStack ore){
+    public static IItemStack getRawOre(@NotNull ItemStack ore) {
         return getRawOre(CraftTweakerMC.getIItemStack(ore));
     }
 
     @ZenMethod
-    public static IItemStack getRawOre(@NotNull IItemStack ore){
-        if (rawOreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
+    public static IItemStack getRawOre(@NotNull IItemStack ore) {
+        if (rawOreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))) {
             return CraftTweakerMC.getIItemStack(rawOreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
         } else {
             return null;
         }
     }
 
-    public static IItemStack getOre(@NotNull ItemStack ore){
+    public static IItemStack getOre(@NotNull ItemStack ore) {
         return getOre(CraftTweakerMC.getIItemStack(ore));
     }
 
     @ZenMethod
-    public static IItemStack getOre(@NotNull IItemStack ore){
-        if (oreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))){
+    public static IItemStack getOre(@NotNull IItemStack ore) {
+        if (oreMap.containsKey(OreKey.getKey(CraftTweakerMC.getItemStack(ore)))) {
             return CraftTweakerMC.getIItemStack(oreMap.get(OreKey.getKey(CraftTweakerMC.getItemStack(ore))));
         } else {
             return ore;
         }
     }
 
-    public static final Map<String,String> VeinMap = new Object2ObjectOpenHashMap<>();
-    public static final Map<String,IItemStack> VeinItemMap = new Object2ObjectOpenHashMap<>();
-
     @ZenMethod
-    public static void regOreVein(String name,String oreVeinItemName) {
+    public static void regOreVein(String name, String oreVeinItemName) {
         VeinMap.put(name, oreVeinItemName);
     }
 
     @ZenMethod
-    public static IItemStack getOreVeinItem(String name){
+    public static IItemStack getOreVeinItem(String name) {
         var out = VeinItemMap.get(name);
-        if (out == null){
-            out = itemUtils.getItem("contenttweaker:" + VeinMap.get(name),0);
+        if (out == null) {
+            out = itemUtils.getItem("contenttweaker:" + VeinMap.get(name), 0);
             VeinMap.remove(name);
-            VeinItemMap.put(name,out);
+            VeinItemMap.put(name, out);
         }
         return out;
     }
@@ -122,8 +121,8 @@ public class OreHandler {
             IBlockState blockState = event.getState();
             Block block = blockState.getBlock();
             int meta = block.getMetaFromState(blockState);
-            final OreKey key = OreKey.getKey(block,meta);
-            if (rawOreMap.containsKey(key)){
+            final OreKey key = OreKey.getKey(block, meta);
+            if (rawOreMap.containsKey(key)) {
                 List<ItemStack> drops = event.getDrops();
                 drops.clear();
                 if (event.isSilkTouching()) {
@@ -139,7 +138,7 @@ public class OreHandler {
                 int random = event.getWorld().rand.nextInt((fortune + 2));
                 ItemStack rawOre = rawOreMap.get(key).copy();
                 rawOre.setCount(Math.max(random, 1));
-                if (drops.isEmpty()){
+                if (drops.isEmpty()) {
                     drops.add(rawOre);
                 }
             }
@@ -147,53 +146,52 @@ public class OreHandler {
     }
 
     private final static class OreKey {
+        private static final OreKey redStone = new OreKey(new ItemStack(Blocks.REDSTONE_ORE));
         private final ItemStack item;
         private String toString;
         private int hash = -1;
 
-        private OreKey(ItemStack item){
+        private OreKey(ItemStack item) {
             this.item = item;
-        }
-
-        public int getMetadata(){
-            return item.getMetadata();
-        }
-
-        public ResourceLocation getRl(){
-            return item.getItem().getRegistryName();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof OreKey oreKey)) return false;
-            return this.getMetadata() == oreKey.getMetadata() && Objects.equals(this.getRl(),oreKey.getRl());
-        }
-
-        @Override
-        public int hashCode() {
-            if (hash == -1){
-                hash = Objects.hash(this.getRl(), this.getMetadata());
-            }
-            return hash;
-        }
-
-        @Override
-        public String toString(){
-            if (toString == null){
-                toString = this.getRl().toString() + ":" + this.getMetadata();
-            }
-            return toString;
         }
 
         public static OreKey getKey(ItemStack itemStack) {
             return new OreKey(itemStack);
         }
 
-        private static final OreKey redStone = new OreKey(new ItemStack(Blocks.REDSTONE_ORE));
+        public static OreKey getKey(Block block, int meta) {
+            if (block == Blocks.LIT_REDSTONE_ORE) return redStone;
+            return new OreKey(new ItemStack(block, 1, meta));
+        }
 
-        public static OreKey getKey(Block block,int meta) {
-            if (block == Blocks.LIT_REDSTONE_ORE)return redStone;
-            return new OreKey(new ItemStack(block,1,meta));
+        public int getMetadata() {
+            return item.getMetadata();
+        }
+
+        public ResourceLocation getRl() {
+            return item.getItem().getRegistryName();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof OreKey oreKey)) return false;
+            return this.getMetadata() == oreKey.getMetadata() && Objects.equals(this.getRl(), oreKey.getRl());
+        }
+
+        @Override
+        public int hashCode() {
+            if (hash == -1) {
+                hash = Objects.hash(this.getRl(), this.getMetadata());
+            }
+            return hash;
+        }
+
+        @Override
+        public String toString() {
+            if (toString == null) {
+                toString = this.getRl().toString() + ":" + this.getMetadata();
+            }
+            return toString;
         }
 
     }
@@ -210,7 +208,7 @@ public class OreHandler {
         public static ItemStack getPriorityItemFromOreDict(String oreName) {
             List<ItemStack> oreEntries = OreDictionary.getOres(oreName);
 
-            return switch (oreEntries.size()){
+            return switch (oreEntries.size()) {
                 case 0 -> ItemStack.EMPTY;
                 case 1 -> oreEntries.get(0).copy();
                 default -> {
@@ -230,11 +228,11 @@ public class OreHandler {
                                 break;
                             }
                         }
-                        if (!candidates.isEmpty())break;
+                        if (!candidates.isEmpty()) break;
                     }
 
                     var out = candidates.isEmpty() ? oreEntries.get(0).copy() : candidates;
-                    if (out.getItemDamage() == 32767)out.setItemDamage(0);
+                    if (out.getItemDamage() == 32767) out.setItemDamage(0);
                     yield out;
                 }
             };

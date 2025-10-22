@@ -72,32 +72,6 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         return ecpuData;
     }
 
-    public void write(final ByteBuf buf) {
-        buf.writeLong(totalStorage);
-        buf.writeLong(usedExtraStorage);
-        buf.writeInt(accelerators);
-        buf.writeByte(threadCores.size());
-        threadCores.forEach(threadCore -> {
-            buf.writeByte(threadCore.type.ordinal());
-            buf.writeByte(threadCore.threads);
-            buf.writeByte(threadCore.hyperThreads);
-            buf.writeByte(threadCore.maxThreads);
-            buf.writeByte(threadCore.maxHyperThreads);
-        });
-        buf.writeByte(ecpuList.size());
-        ecpuList.forEach(ecpu -> {
-            try {
-                ecpu.crafting.writeToPacket(buf);
-            } catch (IOException ignored) {
-            }
-            buf.writeLong(ecpu.usedMemory);
-            buf.writeLong(ecpu.usedExtraMemory);
-            buf.writeInt(ecpu.parallelismPreSecond);
-            buf.writeInt(ecpu.cpuUsagePerSecond);
-        });
-        buf.writeInt(cpuUsagePerSecond);
-    }
-
     public static ECalculatorData read(final ByteBuf buf) {
         long totalStorage = buf.readLong();
         long usedExtraStorage = buf.readLong();
@@ -125,8 +99,35 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         return new ECalculatorData(totalStorage, usedExtraStorage, accelerators, threadCores, ecpuList, cpuUsagePerSecond);
     }
 
+    public void write(final ByteBuf buf) {
+        buf.writeLong(totalStorage);
+        buf.writeLong(usedExtraStorage);
+        buf.writeInt(accelerators);
+        buf.writeByte(threadCores.size());
+        threadCores.forEach(threadCore -> {
+            buf.writeByte(threadCore.type.ordinal());
+            buf.writeByte(threadCore.threads);
+            buf.writeByte(threadCore.hyperThreads);
+            buf.writeByte(threadCore.maxThreads);
+            buf.writeByte(threadCore.maxHyperThreads);
+        });
+        buf.writeByte(ecpuList.size());
+        ecpuList.forEach(ecpu -> {
+            try {
+                ecpu.crafting.writeToPacket(buf);
+            } catch (IOException ignored) {
+            }
+            buf.writeLong(ecpu.usedMemory);
+            buf.writeLong(ecpu.usedExtraMemory);
+            buf.writeInt(ecpu.parallelismPreSecond);
+            buf.writeInt(ecpu.cpuUsagePerSecond);
+        });
+        buf.writeInt(cpuUsagePerSecond);
+    }
+
     @Desugar
-    public record ECPUData(IAEItemStack crafting, long usedMemory, long usedExtraMemory, int parallelismPreSecond, int cpuUsagePerSecond) {
+    public record ECPUData(IAEItemStack crafting, long usedMemory, long usedExtraMemory, int parallelismPreSecond,
+                           int cpuUsagePerSecond) {
     }
 
     @Desugar

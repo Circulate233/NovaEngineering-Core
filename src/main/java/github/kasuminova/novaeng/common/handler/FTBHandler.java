@@ -9,12 +9,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class FTBHandler {
 
-    public static FTBHandler INSTANCE = new FTBHandler();
-
-    private FTBHandler() {
-
-    }
-
     private static final Int2ObjectMap<TextComponentTranslation> ids = new Int2ObjectOpenHashMap<>() {{
         put(-697329152,
                 new TextComponentTranslation("new.ftb.as.tooltip",
@@ -29,6 +23,11 @@ public class FTBHandler {
                 new TextComponentTranslation("new.ftb.as.tooltip",
                         new TextComponentTranslation("new.ftb.as.tooltip.3")));
     }};
+    public static FTBHandler INSTANCE = new FTBHandler();
+
+    private FTBHandler() {
+
+    }
 
     @SubscribeEvent
     public void onCustomReward(CustomRewardEvent event) {

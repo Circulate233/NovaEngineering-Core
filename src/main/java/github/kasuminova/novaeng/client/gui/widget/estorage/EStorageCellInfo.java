@@ -64,11 +64,9 @@ public class EStorageCellInfo extends SizedColumn {
             1, 82,
             CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
     );
-
+    protected final EStorageCellData data;
     protected TextureProperties cellBackground = TextureProperties.EMPTY;
     protected TextureProperties cellTypeBackground = TextureProperties.EMPTY;
-
-    protected final EStorageCellData data;
 
     public EStorageCellInfo(final EStorageCellData data) {
         this.data = data;
@@ -96,7 +94,8 @@ public class EStorageCellInfo extends SizedColumn {
             case EMPTY -> cellTypeBackground = CELL_TYPE_BACKGROUND_EMPTY;
             case ITEM -> cellTypeBackground = CELL_TYPE_BACKGROUND_ITEM;
             case FLUID -> cellTypeBackground = CELL_TYPE_BACKGROUND_FLUID;
-            case GAS -> cellTypeBackground = Mods.MEKENG.isPresent() ? CELL_TYPE_BACKGROUND_GAS : CELL_TYPE_BACKGROUND_EMPTY;
+            case GAS ->
+                    cellTypeBackground = Mods.MEKENG.isPresent() ? CELL_TYPE_BACKGROUND_GAS : CELL_TYPE_BACKGROUND_EMPTY;
         }
     }
 

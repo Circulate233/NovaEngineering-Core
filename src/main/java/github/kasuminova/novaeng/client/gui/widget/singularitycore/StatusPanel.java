@@ -20,7 +20,7 @@ public class StatusPanel extends SizedRow {
     public static final int HEIGHT = 129;
     public static final int TEX_X = 163;
     public static final int TEX_Y = 0;
-    
+
     public static final int BAR_WIDTH = 14;
     public static final int BAR_HEIGHT = 108;
 
@@ -116,12 +116,12 @@ public class StatusPanel extends SizedRow {
 
     @Override
     public int getWidth() {
-        return this.width;
+        return super.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return this.height;
+        return super.getHeight();
     }
 
 }

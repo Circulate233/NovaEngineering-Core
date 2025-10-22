@@ -8,6 +8,7 @@ import hellfirepvp.modularmachinery.common.crafting.MachineRecipe;
 import hellfirepvp.modularmachinery.common.crafting.helper.RecipeCraftingContext;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import lombok.Getter;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,11 +29,14 @@ import static github.kasuminova.novaeng.common.machine.GeocentricDrill.PARALLELI
 
 public class GeocentricDrillController extends TileMachineController {
 
+    @Getter
     protected final Set<String> accelerateOres = new ObjectLinkedOpenHashSet<>();
 
     protected boolean accelerateOresChanged = false;
 
+    @Getter
     protected float depth = 0;
+    @Getter
     protected int targetDepth = MIN_DEPTH;
 
     public GeocentricDrillController() {
@@ -58,23 +62,11 @@ public class GeocentricDrillController extends TileMachineController {
         markNoUpdateSync();
     }
 
-    public float getDepth() {
-        return depth;
-    }
-
-    public int getTargetDepth() {
-        return targetDepth;
-    }
-
     @Nullable
     @Override
     public RecipeCraftingContext.CraftingCheckResult checkPreStartResult(final RecipeCraftingContext context) {
         context.getActiveRecipe().setMaxParallelism(MathHelper.clamp((int) (depth / PARALLELISM_PER_DEPTH), 1, MAX_PARALLELISM));
         return super.checkPreStartResult(context);
-    }
-
-    public Set<String> getAccelerateOres() {
-        return accelerateOres;
     }
 
     public synchronized void addAccelerateOre(final String accelerateOre) {

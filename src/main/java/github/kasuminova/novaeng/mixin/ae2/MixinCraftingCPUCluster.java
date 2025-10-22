@@ -36,20 +36,15 @@ import javax.annotation.Nullable;
 public abstract class MixinCraftingCPUCluster implements ECPUCluster {
 
     @Unique
-    private ECalculatorThreadCore novaeng_ec$core = null;
-
-    @Unique
-    private ECalculatorController novaeng_ec$virtualCPUOwner = null;
-
-    @Unique
-    private long novaeng_ec$usedExtraStorage = 0;
-
-    @Unique
     private final TimeRecorder novaeng_ec$timeRecorder = new TimeRecorder();
-
     @Unique
     private final TimeRecorder novaeng_ec$parallelismRecorder = new TimeRecorder();
-
+    @Unique
+    private ECalculatorThreadCore novaeng_ec$core = null;
+    @Unique
+    private ECalculatorController novaeng_ec$virtualCPUOwner = null;
+    @Unique
+    private long novaeng_ec$usedExtraStorage = 0;
     @Shadow
     private long availableStorage;
 
@@ -70,16 +65,15 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
 
     @Shadow
     private MachineSource machineSrc;
+    @Final
+    @Shadow
+    private int[] usedOps;
 
     @Shadow
     public abstract void destroy();
 
     @Shadow
     public abstract void cancel();
-
-    @Final
-    @Shadow
-    private int[] usedOps;
 
     @Inject(method = "submitJob", at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingJob;getOutput()Lappeng/api/storage/data/IAEItemStack;"))
     private void injectSubmitJob(final IGrid g, final ICraftingJob job, final IActionSource src, final ICraftingRequester requestingMachine, final CallbackInfoReturnable<ICraftingLink> cir) {

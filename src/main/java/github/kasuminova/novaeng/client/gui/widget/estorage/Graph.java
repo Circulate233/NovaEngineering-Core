@@ -28,7 +28,7 @@ public abstract class Graph extends SizedColumn {
     protected final int bgTexY;
     protected final int bgTexWidth;
     protected final int bgTexHeight;
-    
+
     protected final boolean reverseColor;
 
     protected boolean focused = false;
@@ -114,11 +114,11 @@ public abstract class Graph extends SizedColumn {
 
     @Override
     public int getWidth() {
-        return this.width;
+        return super.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return this.height;
+        return super.getHeight();
     }
 }

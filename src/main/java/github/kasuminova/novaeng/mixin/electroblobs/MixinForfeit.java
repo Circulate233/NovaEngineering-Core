@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Arrays;
 import java.util.List;
 
-@Mixin(value = Forfeit.class,remap = false)
+@Mixin(value = Forfeit.class, remap = false)
 public class MixinForfeit {
 
     @Unique
     private static final List<String> novaEngineering_Core$banList = Arrays.asList(
-        "bury_self"
+            "bury_self"
     );
 
-    @Inject(method = "add",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "add", at = @At("HEAD"), cancellable = true)
     private static void addMixin(Tier tier, Element element, Forfeit forfeit, CallbackInfo ci) {
-        if (novaEngineering_Core$banList.contains(((AccessorForfeit)forfeit).getName().getPath())){
+        if (novaEngineering_Core$banList.contains(((AccessorForfeit) forfeit).getName().getPath())) {
             ci.cancel();
         }
     }

@@ -29,8 +29,7 @@ public class ItemBlockME extends ItemBlock {
                                 final float hitX,
                                 final float hitY,
                                 final float hitZ,
-                                @Nonnull final IBlockState newState)
-    {
+                                @Nonnull final IBlockState newState) {
         if (super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState)) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof IGridProxyable) {

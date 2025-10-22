@@ -9,7 +9,7 @@ import vazkii.psi.common.Psi;
 /*
   来自Psi的调用方法,解决一些内存泄露问题
  */
-@Mixin(value = ClientProxy.class,remap = false)
+@Mixin(value = ClientProxy.class, remap = false)
 public abstract class MixinClientProxy {
 
     /**
@@ -18,7 +18,7 @@ public abstract class MixinClientProxy {
      */
     @Overwrite
     public void wispFX(double x, double y, double z, float r, float g, float b, float size, float motionx, float motiony, float motionz, float maxAgeMul) {
-        Psi.proxy.wispFX(Minecraft.getMinecraft().world,x, y, z, r, g, b, size,motionx,motiony,motionz,maxAgeMul);
+        Psi.proxy.wispFX(Minecraft.getMinecraft().world, x, y, z, r, g, b, size, motionx, motiony, motionz, maxAgeMul);
     }
 
     /**

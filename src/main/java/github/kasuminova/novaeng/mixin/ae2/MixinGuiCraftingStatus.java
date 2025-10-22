@@ -30,56 +30,42 @@ import java.util.List;
 @Mixin(value = GuiCraftingStatus.class, remap = false)
 public abstract class MixinGuiCraftingStatus extends AEBaseGui {
 
+    @Unique
+    private static final ResourceLocation novaeng_ec$TEXTURE = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_2.png");
+    @Unique
+    private static final TextureProperties novaeng_ec$L4 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 1, 67, 22);
+    @Unique
+    private static final TextureProperties novaeng_ec$L4_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 0, 124, 16, 16);
+    @Unique
+    private static final TextureProperties novaeng_ec$L6 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 26, 67, 22);
+    @Unique
+    private static final TextureProperties novaeng_ec$L6_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 34, 124, 16, 16);
+    @Unique
+    private static final TextureProperties novaeng_ec$L9 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 51, 67, 22);
+    @Unique
+    private static final TextureProperties novaeng_ec$L9_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 17, 124, 16, 16);
+    @Unique
+    private static final TextureProperties novaeng_ec$L11 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 76, 67, 22);
     @Shadow
     @Final
     private static int CPU_TABLE_WIDTH;
-
     @Shadow
     @Final
     private static int CPU_TABLE_SLOT_HEIGHT;
-
-    @Shadow
-    @Final
-    private ContainerCraftingStatus status;
-
     @Shadow
     @Final
     private static int CPU_TABLE_SLOT_XOFF;
-
     @Shadow
     @Final
     private static int CPU_TABLE_SLOT_YOFF;
-
     @Shadow
     @Final
     private static int CPU_TABLE_SLOT_WIDTH;
-
+    @Shadow
+    @Final
+    private ContainerCraftingStatus status;
     @Shadow
     private GuiScrollbar cpuScrollbar;
-
-    @Unique
-    private static final ResourceLocation novaeng_ec$TEXTURE = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_2.png");
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L4 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 1, 67, 22);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L4_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 0, 124, 16, 16);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L6 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 26, 67, 22);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L6_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 34, 124, 16, 16);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L9 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 51, 67, 22);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L9_CELL = TextureProperties.of(novaeng_ec$TEXTURE, 17, 124, 16, 16);
-
-    @Unique
-    private static final TextureProperties novaeng_ec$L11 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 76, 67, 22);
 
     public MixinGuiCraftingStatus() {
         super(null);

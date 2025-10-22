@@ -25,6 +25,19 @@ public class PktEFabricatorPatternSearchGUIUpdate implements IMessage, IMessageH
         this.data = data;
     }
 
+    @SideOnly(Side.CLIENT)
+    protected static void processPacket(final PktEFabricatorPatternSearchGUIUpdate message) {
+        EFabricatorPatternData data = message.data;
+        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
+        if (!(cur instanceof GuiEFabricatorPatternSearch efGUI)) {
+            return;
+        }
+        if (data == null) {
+            return;
+        }
+        efGUI.onDataUpdate(data, message.type == UpdateType.FULL);
+    }
+
     @Override
     public void fromBytes(final ByteBuf buf) {
         type = UpdateType.values()[buf.readByte()];
@@ -43,19 +56,6 @@ public class PktEFabricatorPatternSearchGUIUpdate implements IMessage, IMessageH
             Minecraft.getMinecraft().addScheduledTask(() -> processPacket(message));
         }
         return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected static void processPacket(final PktEFabricatorPatternSearchGUIUpdate message) {
-        EFabricatorPatternData data = message.data;
-        GuiScreen cur = Minecraft.getMinecraft().currentScreen;
-        if (!(cur instanceof GuiEFabricatorPatternSearch efGUI)) {
-            return;
-        }
-        if (data == null) {
-            return;
-        }
-        efGUI.onDataUpdate(data, message.type == UpdateType.FULL);
     }
 
     public enum UpdateType {
