@@ -8,6 +8,8 @@
     "MixinIngredientItemStackRenderer"
   ],
   "mixins": [
+    "MixinBlockArrayPreviewRenderHelper",
+    "MixinBlockArrayRenderHelper",
     "MixinCommonProxy",
     "MixinMachineRecipe",
     "MixinMachineRegistry",

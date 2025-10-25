@@ -1,23 +1,20 @@
-package github.kasuminova.novaeng.common.trait;
+package github.kasuminova.novaeng.common.trait
 
-import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
-import github.kasuminova.novaeng.common.item.ItemBasic;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import slimeknights.tconstruct.library.modifiers.Modifier;
-import slimeknights.tconstruct.tools.AbstractToolPulse;
+import github.kasuminova.novaeng.common.enchantment.MagicBreaking
+import github.kasuminova.novaeng.common.item.ItemBasic
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import slimeknights.tconstruct.library.modifiers.Modifier
+import slimeknights.tconstruct.tools.AbstractToolPulse
 
-import java.util.List;
+object Register : AbstractToolPulse() {
 
-public class Register extends AbstractToolPulse {
+    var modifierTraitsF: MutableList<Modifier> = ObjectArrayList()
+    var modifierTraitsT: MutableList<Modifier> = ObjectArrayList()
 
-    public static Register TRAITREGISTER = new Register();
-    public List<Modifier> modifierTraitsF = new ObjectArrayList<>();
-    public List<Modifier> modifierTraitsT = new ObjectArrayList<>();
+    fun registerModifiers() {
+        val traitMagicBreaking = registerModifier(TraitMagicBreaking())
+        traitMagicBreaking.addItem(ItemBasic.getItem(MagicBreaking.MAGICBREAKING.id + "_stone"), 1, 1)
 
-    public void registerModifiers() {
-        TraitMagicBreaking traitMagicBreaking = registerModifier(new TraitMagicBreaking());
-        traitMagicBreaking.addItem(ItemBasic.getItem(MagicBreaking.MAGICBREAKING.getId() + "_stone"), 1, 1);
-
-        modifierTraitsF.add(traitMagicBreaking);
+        modifierTraitsF.add(traitMagicBreaking)
     }
 }

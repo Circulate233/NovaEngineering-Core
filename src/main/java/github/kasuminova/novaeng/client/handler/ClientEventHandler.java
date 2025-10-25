@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.client.handler;
 
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.util.TitleUtils;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;

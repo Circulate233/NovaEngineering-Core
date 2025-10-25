@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.registry;
 
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.BlockAngel;
 import github.kasuminova.novaeng.common.block.BlockDreamEnergyPort;
@@ -30,7 +31,6 @@ import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageCont
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageEnergyCell;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageMEChannel;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageVent;
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.item.ItemBlockAngel;
 import github.kasuminova.novaeng.common.item.ItemBlockME;
 import github.kasuminova.novaeng.common.item.ItemRawOre;
@@ -102,7 +102,7 @@ public class RegistryBlocks {
         prepareItemBlockRegister(registerBlock(BlockSingularityCoreController.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockGeocentricDrillController.INSTANCE));
         prepareItemBlockRegister(registerBlock(BlockRedstoneLogicalPort.INSTANCE));
-        if (NovaEngCoreConfig.SERVER.SpecialMachine) {
+        if (NovaEngCoreConfig.SERVER.specialMachine) {
             prepareItemBlockRegister(registerBlock(BlockDreamEnergyPort.INSTANCE));
         }
 
@@ -162,7 +162,7 @@ public class RegistryBlocks {
         registerTileEntity(TileModularServerAssembler.class, "modular_server_assembler");
         registerTileEntity(SingularityCore.class, "singularity_core");
         registerTileEntity(GeocentricDrillController.class, "geocentric_drill_controller");
-        if (NovaEngCoreConfig.SERVER.SpecialMachine) {
+        if (NovaEngCoreConfig.SERVER.specialMachine) {
             registerTileEntity(TileDreamEnergyPort.class, "dream_energy_port");
         }
 

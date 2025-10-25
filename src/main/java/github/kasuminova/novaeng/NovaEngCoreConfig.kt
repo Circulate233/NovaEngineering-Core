@@ -15,12 +15,15 @@ class NovaEngCoreConfig {
         @JvmField
         @Config.Name("Client")
         val CLIENT = Client()
+
         @JvmField
         @Config.Name("Server")
         val SERVER = Server()
+
         @JvmField
         @Config.Name("MachineAssemblyTool")
         val MACHINE_ASSEMBLY_TOOL = MachineAssemblyTool()
+
         @JvmField
         @Config.RequiresMcRestart
         @Config.Name("javaCheck")

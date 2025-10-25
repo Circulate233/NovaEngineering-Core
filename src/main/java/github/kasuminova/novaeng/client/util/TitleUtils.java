@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.client.util;
 
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader;
 import org.lwjgl.opengl.Display;
 

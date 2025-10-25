@@ -1,5 +1,10 @@
 package github.kasuminova.mmce.common.util;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class DataReference<T> {
 
     private T value;
@@ -8,11 +13,4 @@ public class DataReference<T> {
         this.value = value;
     }
 
-    public T getValue() {
-        return value;
-    }
-
-    public void setValue(final T value) {
-        this.value = value;
-    }
 }

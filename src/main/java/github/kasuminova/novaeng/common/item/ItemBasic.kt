@@ -1,58 +1,59 @@
-package github.kasuminova.novaeng.common.item;
+package github.kasuminova.novaeng.common.item
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
-import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.common.core.CreativeTabNovaEng
+import github.kasuminova.novaeng.common.enchantment.MagicBreaking
+import github.kasuminova.novaeng.common.util.Functions
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import net.minecraft.client.resources.I18n
+import net.minecraft.client.util.ITooltipFlag
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
+import net.minecraft.world.World
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+open class ItemBasic(name: String) : Item() {
 
-public class ItemBasic extends Item {
+    companion object {
+        var NAMES: List<String> = Functions.asList(
+            MagicBreaking.MAGICBREAKING.id + "_stone"
+        )
 
-    public static List<String> NAMES = Arrays.asList(
-            MagicBreaking.MAGICBREAKING.getId() + "_stone"
-    );
-    protected static Map<String, ItemBasic> map = new Object2ObjectOpenHashMap<>();
+        protected var map: MutableMap<String?, ItemBasic?> = Object2ObjectOpenHashMap<String?, ItemBasic?>()
 
-    public ItemBasic(final String name) {
-        this.setMaxStackSize(1);
-        this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, name));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + name);
-    }
+        val allItem: List<Item>
+            get() {
+                val itemBasics: MutableList<Item> = ObjectArrayList()
+                for (name in NAMES) {
+                    val item = ItemBasic(name)
+                    itemBasics.add(item)
+                    map[name] = item
+                }
+                return itemBasics
+            }
 
-    public static List<Item> getAllItem() {
-        List<Item> ItemBasics = new ObjectArrayList<>();
-        for (String name : NAMES) {
-            final ItemBasic item = new ItemBasic(name);
-            ItemBasics.add(item);
-            map.put(name, item);
+        fun getItem(name: String?): ItemBasic? {
+            return map[name]
         }
-        return ItemBasics;
     }
 
-    public static ItemBasic getItem(String name) {
-        return map.get(name);
+    init {
+        this.setMaxStackSize(1)
+        this.setCreativeTab(CreativeTabNovaEng.INSTANCE)
+        this.registryName = ResourceLocation(NovaEngineeringCore.MOD_ID, name)
+        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + name)
     }
 
     @SideOnly(Side.CLIENT)
-    @SuppressWarnings("DataFlowIssue")
-    protected void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips) {
-        int i = 0;
-        while (I18n.hasKey(this.getTranslationKey() + ".tooltip." + i)) {
-            lines.add(I18n.format(this.getTranslationKey() + ".tooltip." + i));
-            i++;
+    override fun addInformation(stack: ItemStack, world: World?, lines: MutableList<String?>, flagIn: ITooltipFlag) {
+        var i = 0
+        while (I18n.hasKey(this.translationKey + ".tooltip." + i)) {
+            lines.add(I18n.format(this.translationKey + ".tooltip." + i))
+            i++
         }
     }
+
 }

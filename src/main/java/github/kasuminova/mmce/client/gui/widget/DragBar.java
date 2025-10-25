@@ -8,10 +8,16 @@ import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.common.util.DataReference;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+@Accessors(chain = true)
+@Setter
+@Getter
 @SuppressWarnings("unused")
 public class DragBar extends DynamicWidget {
 
@@ -203,192 +209,8 @@ public class DragBar extends DynamicWidget {
         return super.getWidth() + paddingHorizontal * 2;
     }
 
-    // Getter / Setters
-
-    public DragBarButton getDragBarButton() {
-        return dragBarButton;
-    }
-
-    public int getPaddingHorizontal() {
-        return paddingHorizontal;
-    }
-
-    public DragBar setPaddingHorizontal(final int paddingHorizontal) {
-        this.paddingHorizontal = paddingHorizontal;
-        return this;
-    }
-
-    public ResourceLocation getTexLocation() {
-        return texLocation;
-    }
-
-    public DragBar setTexLocation(final ResourceLocation texLocation) {
-        this.texLocation = texLocation;
-        return this;
-    }
-
-    public int getBarHeight() {
-        return barHeight;
-    }
-
-    public DragBar setBarHeight(final int barHeight) {
-        this.barHeight = barHeight;
-        return this;
-    }
-
-    public int getBarLeftTexOffsetX() {
-        return barLeftTexOffsetX;
-    }
-
-    public DragBar setBarLeftTexOffsetX(final int barLeftTexOffsetX) {
-        this.barLeftTexOffsetX = barLeftTexOffsetX;
-        return this;
-    }
-
-    public int getBarLeftTexOffsetY() {
-        return barLeftTexOffsetY;
-    }
-
-    public DragBar setBarLeftTexOffsetY(final int barLeftTexOffsetY) {
-        this.barLeftTexOffsetY = barLeftTexOffsetY;
-        return this;
-    }
-
-    public int getBarLeftTexOffsetXFilled() {
-        return barLeftTexOffsetXFilled;
-    }
-
-    public DragBar setBarLeftTexOffsetXFilled(final int barLeftTexOffsetXFilled) {
-        this.barLeftTexOffsetXFilled = barLeftTexOffsetXFilled;
-        return this;
-    }
-
-    public int getBarLeftTexOffsetYFilled() {
-        return barLeftTexOffsetYFilled;
-    }
-
-    public DragBar setBarLeftTexOffsetYFilled(final int barLeftTexOffsetYFilled) {
-        this.barLeftTexOffsetYFilled = barLeftTexOffsetYFilled;
-        return this;
-    }
-
-    public int getBarLeftTexWidth() {
-        return barLeftTexWidth;
-    }
-
-    public DragBar setBarLeftTexWidth(final int barLeftTexWidth) {
-        this.barLeftTexWidth = barLeftTexWidth;
-        return this;
-    }
-
-    public int getBarMidTexOffsetX() {
-        return barMidTexOffsetX;
-    }
-
-    public DragBar setBarMidTexOffsetX(final int barMidTexOffsetX) {
-        this.barMidTexOffsetX = barMidTexOffsetX;
-        return this;
-    }
-
-    public int getBarMidTexOffsetY() {
-        return barMidTexOffsetY;
-    }
-
-    public DragBar setBarMidTexOffsetY(final int barMidTexOffsetY) {
-        this.barMidTexOffsetY = barMidTexOffsetY;
-        return this;
-    }
-
-    public int getBarMidTexOffsetXFilled() {
-        return barMidTexOffsetXFilled;
-    }
-
-    public DragBar setBarMidTexOffsetXFilled(final int barMidTexOffsetXFilled) {
-        this.barMidTexOffsetXFilled = barMidTexOffsetXFilled;
-        return this;
-    }
-
-    public int getBarMidTexOffsetYFilled() {
-        return barMidTexOffsetYFilled;
-    }
-
-    public DragBar setBarMidTexOffsetYFilled(final int barMidTexOffsetYFilled) {
-        this.barMidTexOffsetYFilled = barMidTexOffsetYFilled;
-        return this;
-    }
-
-    public int getBarRightTexOffsetX() {
-        return barRightTexOffsetX;
-    }
-
-    public DragBar setBarRightTexOffsetX(final int barRightTexOffsetX) {
-        this.barRightTexOffsetX = barRightTexOffsetX;
-        return this;
-    }
-
-    public int getBarRightTexOffsetY() {
-        return barRightTexOffsetY;
-    }
-
-    public DragBar setBarRightTexOffsetY(final int barRightTexOffsetY) {
-        this.barRightTexOffsetY = barRightTexOffsetY;
-        return this;
-    }
-
-    public int getBarRightTexOffsetXFilled() {
-        return barRightTexOffsetXFilled;
-    }
-
-    public DragBar setBarRightTexOffsetXFilled(final int barRightTexOffsetXFilled) {
-        this.barRightTexOffsetXFilled = barRightTexOffsetXFilled;
-        return this;
-    }
-
-    public int getBarRightTexOffsetYFilled() {
-        return barRightTexOffsetYFilled;
-    }
-
-    public DragBar setBarRightTexOffsetYFilled(final int barRightTexOffsetYFilled) {
-        this.barRightTexOffsetYFilled = barRightTexOffsetYFilled;
-        return this;
-    }
-
-    public int getBarRightTexWidth() {
-        return barRightTexWidth;
-    }
-
-    public DragBar setBarRightTexWidth(final int barRightTexWidth) {
-        this.barRightTexWidth = barRightTexWidth;
-        return this;
-    }
-
-    public DataReference<Double> getValue() {
-        return value;
-    }
-
-    public DragBar setValue(final DataReference<Double> value) {
-        this.value = value;
-        return this;
-    }
-
-    public DataReference<Double> getMin() {
-        return min;
-    }
-
-    public DragBar setMin(final DataReference<Double> min) {
-        this.min = min;
-        return this;
-    }
-
-    public DataReference<Double> getMax() {
-        return max;
-    }
-
-    public DragBar setMax(final DataReference<Double> max) {
-        this.max = max;
-        return this;
-    }
-
+    @Accessors(chain = true)
+    @Setter
     public class DragBarButton extends DynamicWidget {
         public static final int DEFAULT_BUTTON_HEIGHT = 9;
 
@@ -408,36 +230,54 @@ public class DragBar extends DynamicWidget {
         public static final float MOUSE_OVER_DARK_VALUE = 0.15F;
         public static final float MOUSE_DOWN_DARK_VALUE = 0.3F;
 
+        @Getter
         protected ResourceLocation texLocation = DEFAULT_TEX_RES;
 
         protected float width = 0;
         protected float height;
 
+        @Getter
         protected int buttonLeftTexOffsetX = DEFAULT_BUTTON_LEFT_TEX_OFFSET_X;
+        @Getter
         protected int buttonLeftTexOffsetY = DEFAULT_BUTTON_LEFT_TEX_OFFSET_Y;
+        @Getter
         protected int buttonLeftTexWidth = DEFAULT_BUTTON_LEFT_TEX_WIDTH;
 
+        @Getter
         protected int buttonMidTexOffsetX = DEFAULT_BUTTON_MID_TEX_OFFSET_X;
+        @Getter
         protected int buttonMidTexOffsetY = DEFAULT_BUTTON_MID_TEX_OFFSET_Y;
 
+        @Getter
         protected int buttonRightTexOffsetX = DEFAULT_BUTTON_RIGHT_TEX_OFFSET_X;
+        @Getter
         protected int buttonRightTexOffsetY = DEFAULT_BUTTON_RIGHT_TEX_OFFSET_Y;
+        @Getter
         protected int buttonRightTexWidth = DEFAULT_BUTTON_RIGHT_TEX_WIDTH;
 
+        @Getter
         protected int animationDuration = DEFAULT_ANIMATION_DURATION;
 
         protected double cachedValue;
 
+        @Getter
         protected long expandAnimationStartTime = 0;
+        @Getter
         protected boolean expandAnimationStarted = false;
 
+        @Getter
         protected float expandedWidth = 0;
+        @Getter
         protected float lastExpandedWidth = 0;
 
+        @Getter
         protected long lastColorUpdateTime = 0;
+        @Getter
         protected float darkValue = 0;
 
+        @Getter
         protected boolean mouseOver = false;
+        @Getter
         protected boolean mouseDown = false;
 
         public DragBarButton() {
@@ -603,17 +443,9 @@ public class DragBar extends DynamicWidget {
             return widgetGui.getGui().mc.fontRenderer.getStringWidth(formattedValue);
         }
 
-        public ResourceLocation getTexLocation() {
-            return texLocation;
-        }
-
         public DragBarButton setTexLocation(final ResourceLocation texLocation) {
             this.texLocation = texLocation;
             return this;
-        }
-
-        public int getButtonLeftTexOffsetX() {
-            return buttonLeftTexOffsetX;
         }
 
         public DragBarButton setButtonLeftTexOffsetX(final int buttonLeftTexOffsetX) {
@@ -621,17 +453,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public int getButtonLeftTexOffsetY() {
-            return buttonLeftTexOffsetY;
-        }
-
         public DragBarButton setButtonLeftTexOffsetY(final int buttonLeftTexOffsetY) {
             this.buttonLeftTexOffsetY = buttonLeftTexOffsetY;
             return this;
-        }
-
-        public int getButtonLeftTexWidth() {
-            return buttonLeftTexWidth;
         }
 
         public DragBarButton setButtonLeftTexWidth(final int buttonLeftTexWidth) {
@@ -639,17 +463,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public int getButtonMidTexOffsetX() {
-            return buttonMidTexOffsetX;
-        }
-
         public DragBarButton setButtonMidTexOffsetX(final int buttonMidTexOffsetX) {
             this.buttonMidTexOffsetX = buttonMidTexOffsetX;
             return this;
-        }
-
-        public int getButtonMidTexOffsetY() {
-            return buttonMidTexOffsetY;
         }
 
         public DragBarButton setButtonMidTexOffsetY(final int buttonMidTexOffsetY) {
@@ -657,17 +473,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public int getButtonRightTexOffsetX() {
-            return buttonRightTexOffsetX;
-        }
-
         public DragBarButton setButtonRightTexOffsetX(final int buttonRightTexOffsetX) {
             this.buttonRightTexOffsetX = buttonRightTexOffsetX;
             return this;
-        }
-
-        public int getButtonRightTexOffsetY() {
-            return buttonRightTexOffsetY;
         }
 
         public DragBarButton setButtonRightTexOffsetY(final int buttonRightTexOffsetY) {
@@ -675,17 +483,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public int getButtonRightTexWidth() {
-            return buttonRightTexWidth;
-        }
-
         public DragBarButton setButtonRightTexWidth(final int buttonRightTexWidth) {
             this.buttonRightTexWidth = buttonRightTexWidth;
             return this;
-        }
-
-        public int getAnimationDuration() {
-            return animationDuration;
         }
 
         public DragBarButton setAnimationDuration(final int animationDuration) {
@@ -693,17 +493,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public long getExpandAnimationStartTime() {
-            return expandAnimationStartTime;
-        }
-
         public DragBarButton setExpandAnimationStartTime(final long expandAnimationStartTime) {
             this.expandAnimationStartTime = expandAnimationStartTime;
             return this;
-        }
-
-        public boolean isExpandAnimationStarted() {
-            return expandAnimationStarted;
         }
 
         public DragBarButton setExpandAnimationStarted(final boolean expandAnimationStarted) {
@@ -711,17 +503,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public float getExpandedWidth() {
-            return expandedWidth;
-        }
-
         public DragBarButton setExpandedWidth(final float expandedWidth) {
             this.expandedWidth = expandedWidth;
             return this;
-        }
-
-        public float getLastExpandedWidth() {
-            return lastExpandedWidth;
         }
 
         public DragBarButton setLastExpandedWidth(final float lastExpandedWidth) {
@@ -729,17 +513,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public long getLastColorUpdateTime() {
-            return lastColorUpdateTime;
-        }
-
         public DragBarButton setLastColorUpdateTime(final long lastColorUpdateTime) {
             this.lastColorUpdateTime = lastColorUpdateTime;
             return this;
-        }
-
-        public float getDarkValue() {
-            return darkValue;
         }
 
         public DragBarButton setDarkValue(final float darkValue) {
@@ -747,17 +523,9 @@ public class DragBar extends DynamicWidget {
             return this;
         }
 
-        public boolean isMouseOver() {
-            return mouseOver;
-        }
-
         public DragBarButton setMouseOver(final boolean mouseOver) {
             this.mouseOver = mouseOver;
             return this;
-        }
-
-        public boolean isMouseDown() {
-            return mouseDown;
         }
 
         public DragBarButton setMouseDown(final boolean mouseDown) {

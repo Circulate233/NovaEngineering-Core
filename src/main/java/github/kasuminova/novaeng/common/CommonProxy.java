@@ -3,9 +3,9 @@ package github.kasuminova.novaeng.common;
 import appeng.api.AEApi;
 import appeng.api.storage.ICellHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternBus;
@@ -168,7 +168,7 @@ public class CommonProxy implements IGuiHandler {
             List<ICellHandler> handlers = ((AccessorCellRegistry) (AEApi.instance().registries().cell())).getHandlers();
             handlers.add(0, EStorageCellHandler.INSTANCE);
         }
-        Register.TRAITREGISTER.registerModifiers();
+        Register.INSTANCE.registerModifiers();
     }
 
     public void postInit() {

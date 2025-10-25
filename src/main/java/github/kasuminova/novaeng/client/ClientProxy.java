@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.client;
 
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
@@ -21,7 +22,7 @@ import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
+import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler;
 import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
@@ -85,11 +86,11 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isClea
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
 
-    @Getter
-    private static List<String> itemDisplayTooltip;
     private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
     public static List<Item> items = new ObjectArrayList<>();
     public static List<Block> blocks = new ObjectArrayList<>();
+    @Getter
+    private static List<String> itemDisplayTooltip;
 
     static {
         colorCache.defaultReturnValue(-1);
@@ -172,6 +173,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(HyperNetClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler.Client.INSTANCE);
 
         itemDisplayTooltip = ObjectLists.singleton(I18n.format("key.novaeng.item_display.tooltip", "Ctrl + L"));
 
