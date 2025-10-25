@@ -97,9 +97,9 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
                         array = array.offset(pos)
                         if (array.min.y < 1 || array.max.y > 255) {
                             val e = if (array.min.y < 1) {
-                                array.min.y
+                                "y = ${array.min.y}"
                             } else {
-                                array.max.y
+                                "y = ${array.max.y}"
                             }
                             player.sendMessage(
                                 TextComponentTranslation(
