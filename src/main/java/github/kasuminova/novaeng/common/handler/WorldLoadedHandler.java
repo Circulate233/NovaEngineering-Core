@@ -18,7 +18,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import java.util.Map;
 import java.util.Random;
 
-import static github.kasuminova.novaeng.common.config.NovaEngCoreConfig.SERVER;
+import static github.kasuminova.novaeng.NovaEngCoreConfig.SERVER;
 
 @ZenRegister
 @ZenClass("novaeng.WorldLoadedHandler")

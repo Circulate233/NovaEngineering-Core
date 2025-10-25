@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.mixin.psi;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import net.minecraft.util.text.TextComponentString;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

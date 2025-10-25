@@ -21,7 +21,7 @@ import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;

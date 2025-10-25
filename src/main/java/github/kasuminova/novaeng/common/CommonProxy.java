@@ -5,7 +5,7 @@ import appeng.api.storage.ICellHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternBus;

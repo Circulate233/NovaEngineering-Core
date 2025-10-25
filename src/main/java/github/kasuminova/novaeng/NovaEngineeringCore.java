@@ -4,7 +4,6 @@ import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.network.ItemDisplayPkt;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;

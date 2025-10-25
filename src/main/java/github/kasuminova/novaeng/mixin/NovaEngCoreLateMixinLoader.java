@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin;
 
-import github.kasuminova.novaeng.common.config.NovaEngCoreConfig;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.common.config.Config;
