@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import github.kasuminova.novaeng.common.util.BlockArrayPreviewRenderUtils;
-import github.kasuminova.novaeng.common.util.BlockArrayRenderUtils;
-import github.kasuminova.novaeng.common.util.NEWBlockArrayPreviewRenderHelper;
+import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
+import github.kasuminova.novaeng.mixin.util.BlockArrayPreviewRenderUtils;
+import github.kasuminova.novaeng.mixin.util.BlockArrayRenderUtils;
 import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper;
 import hellfirepvp.modularmachinery.client.util.BlockArrayRenderHelper;
 import hellfirepvp.modularmachinery.common.util.BlockArray;

@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.common.util;
+package github.kasuminova.novaeng.mixin.util;
 
 import hellfirepvp.modularmachinery.common.util.BlockArray;
 

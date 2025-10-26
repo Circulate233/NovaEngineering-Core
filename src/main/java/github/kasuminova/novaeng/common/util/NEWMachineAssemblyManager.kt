@@ -19,7 +19,11 @@ import hellfirepvp.modularmachinery.common.util.MiscUtils
 import ink.ikx.mmce.common.assembly.MachineAssembly
 import ink.ikx.mmce.common.utils.FluidUtils
 import ink.ikx.mmce.common.utils.StackUtils
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectIterator
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.block.BlockLiquid
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
@@ -36,7 +40,11 @@ import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.world.World
 import net.minecraftforge.common.util.BlockSnapshot
 import net.minecraftforge.event.ForgeEventFactory
-import net.minecraftforge.fluids.*
+import net.minecraftforge.fluids.BlockFluidBase
+import net.minecraftforge.fluids.FluidRegistry
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.FluidUtil
+import net.minecraftforge.fluids.UniversalBucket
 import net.minecraftforge.fluids.capability.IFluidHandlerItem
 import java.util.*
 import java.util.function.Function
@@ -133,7 +141,7 @@ class NEWMachineAssemblyManager {
         }
 
         fun start(usingAE: Boolean = true, ignoreFluids: Boolean = true) {
-            queue = ArrayDeque<BlockPos>()
+            queue = ArrayDeque()
             val l = Function { b: BlockInformation -> ObjectArrayList<Tuple<Ingredient, IBlockState>>() }
             for (entry in this.pattern.entries) {
                 queue!!.add(entry.key)
@@ -327,7 +335,7 @@ class NEWMachineAssemblyManager {
         }
 
         override fun hashCode(): Int {
-            return Objects.hash(aeStack)
+            return aeStack.hashCode()
         }
 
         val itemStack: ItemStack?

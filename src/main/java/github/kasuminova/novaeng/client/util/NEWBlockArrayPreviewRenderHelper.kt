@@ -1,5 +1,7 @@
-package github.kasuminova.novaeng.common.util
+package github.kasuminova.novaeng.client.util
 
+import github.kasuminova.novaeng.mixin.util.BlockArrayPreviewRenderUtils
+import github.kasuminova.novaeng.mixin.util.BlockArrayRenderUtils
 import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext
 import hellfirepvp.modularmachinery.common.block.BlockController

@@ -16,13 +16,13 @@ import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
 import github.kasuminova.novaeng.client.handler.ClientEventHandler;
 import github.kasuminova.novaeng.client.handler.HyperNetClientEventHandler;
+import github.kasuminova.novaeng.client.handler.MachineAssemblyHandlerClient;
 import github.kasuminova.novaeng.client.model.raw_ore.RawOreModelLoader;
 import github.kasuminova.novaeng.client.util.ExJEI;
 import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandPacketProfiler;
 import github.kasuminova.novaeng.common.command.ExportResearchDataToJson;
-import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler;
 import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryItems;
@@ -173,7 +173,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(HyperNetClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockAngelRendererHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler.Client.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(MachineAssemblyHandlerClient.INSTANCE);
 
         itemDisplayTooltip = ObjectLists.singleton(I18n.format("key.novaeng.item_display.tooltip", "Ctrl + L"));
 

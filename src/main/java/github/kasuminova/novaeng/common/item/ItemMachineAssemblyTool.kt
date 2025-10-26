@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.item
 
 import appeng.util.Platform
-import github.kasuminova.novaeng.common.util.NEWBlockArrayPreviewRenderHelper
+import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
 import hellfirepvp.modularmachinery.client.ClientScheduler
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext
@@ -10,7 +10,6 @@ import hellfirepvp.modularmachinery.common.block.BlockFactoryController
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
 import hellfirepvp.modularmachinery.common.util.BlockArrayCache
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ActionResult
@@ -26,6 +25,7 @@ import kotlin.math.min
 object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
 
     override fun onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult<ItemStack> {
+        //TODO:手持打开配置GUI
         if (world.isRemote || hand != EnumHand.MAIN_HAND) return ActionResult(
             EnumActionResult.PASS,
             player.getHeldItem(hand)
@@ -116,7 +116,7 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
                         return EnumActionResult.SUCCESS
                     }
                 } else {
-                    Minecraft.getMinecraft().player.sendMessage(
+                    player.sendMessage(
                         TextComponentTranslation(
                             "message.assembly.tip.already_assembly"
                         )

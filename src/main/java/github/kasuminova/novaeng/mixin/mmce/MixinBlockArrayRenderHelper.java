@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import github.kasuminova.novaeng.common.util.BlockArrayRenderUtils;
+import github.kasuminova.novaeng.mixin.util.BlockArrayRenderUtils;
 import hellfirepvp.modularmachinery.client.util.BlockArrayRenderHelper;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
 import org.spongepowered.asm.mixin.Final;
