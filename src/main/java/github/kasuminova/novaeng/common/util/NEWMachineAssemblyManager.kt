@@ -13,17 +13,29 @@ import appeng.fluids.util.AEFluidStack
 import appeng.helpers.WirelessTerminalGuiObject
 import appeng.me.helpers.PlayerSource
 import appeng.util.item.AEItemStack
-import com.circulation.random_complement.common.handler.MEHandler
+import com.circulation.random_complement.common.util.MEHandler
+import com.glodblock.github.common.item.fake.FakeFluids
+import hellfirepvp.modularmachinery.ModularMachinery
+import hellfirepvp.modularmachinery.common.network.PktAssemblyReport
 import hellfirepvp.modularmachinery.common.util.BlockArray
+import hellfirepvp.modularmachinery.common.util.ItemUtils
 import hellfirepvp.modularmachinery.common.util.MiscUtils
 import ink.ikx.mmce.common.assembly.MachineAssembly
 import ink.ikx.mmce.common.utils.FluidUtils
 import ink.ikx.mmce.common.utils.StackUtils
+import ink.ikx.mmce.common.utils.StructureIngredient
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectIterator
+import it.unimi.dsi.fastutil.objects.ObjectLists
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList
+import java.util.ArrayDeque
+import java.util.EnumMap
+import java.util.Queue
+import java.util.function.Function
+import java.util.stream.Collectors
 import net.minecraft.block.BlockLiquid
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
@@ -46,8 +58,6 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.UniversalBucket
 import net.minecraftforge.fluids.capability.IFluidHandlerItem
-import java.util.*
-import java.util.function.Function
 
 class NEWMachineAssemblyManager {
 
@@ -56,38 +66,222 @@ class NEWMachineAssemblyManager {
             Reference2ObjectOpenHashMap<Class<out TileEntity>, EnumMap<EnumFacing, AssemblyBlockArray>>()
         private val MACHINE_ASSEMBLY_CACHE =
             Object2ObjectOpenHashMap<EntityPlayer, AssemblyBlockArray>()
+        private val CheckAllItemComplete = ObjectLists.singleton(
+            ObjectLists.singleton(ItemStack.EMPTY)
+        )
+        private val emptyMiss2ListPair = Miss2ListPair(0, ObjectLists.emptyList())
 
         fun getConstructorsIterator(): ObjectIterator<Map.Entry<Class<out TileEntity>, EnumMap<EnumFacing, AssemblyBlockArray>>> {
             return ADDITIONAL_CONSTRUCTORS.entries.iterator()
         }
 
-        fun addAssemblyMachine(player: EntityPlayer?, array: BlockArray): AssemblyBlockArray {
+        fun addAssemblyMachine(player: EntityPlayer, array: BlockArray): AssemblyBlockArray {
             val newArray = AssemblyBlockArray(array)
             MACHINE_ASSEMBLY_CACHE[player] = newArray
             return newArray
         }
 
-        fun getMachineAssembly(player: EntityPlayer?): AssemblyBlockArray? {
+        fun getMachineAssembly(player: EntityPlayer): AssemblyBlockArray? {
             return MACHINE_ASSEMBLY_CACHE[player]
         }
 
-        fun checkMachineAssembly(player: EntityPlayer?): Boolean {
+        fun checkMachineAssembly(player: EntityPlayer): Boolean {
             return MACHINE_ASSEMBLY_CACHE.containsKey(player)
         }
 
-        fun removeMachineAssembly(player: EntityPlayer?) {
-            val r: AssemblyBlockArray? = MACHINE_ASSEMBLY_CACHE.remove(player)
-            r?.end()
+        fun removeMachineAssembly(player: EntityPlayer) {
+            MACHINE_ASSEMBLY_CACHE.remove(player)?.end()
+        }
+
+        fun checkAllItems(
+            player: EntityPlayer,
+            ingredient: StructureIngredient,
+            usingAE: Boolean,
+            autoAECrafting: Boolean
+        ): Miss2ListPair {
+            if (player.isCreative) return emptyMiss2ListPair
+            val inventory = player.inventory.mainInventory.stream().map { obj: ItemStack -> obj.copy() }
+                .collect(Collectors.toCollection { ObjectArrayList() })
+            val itemIngredientList = ingredient.itemIngredient()
+            val fluidIngredientList = ingredient.fluidIngredient()
+            MachineAssembly.searchAndRemoveContainItem(inventory, itemIngredientList)
+            MachineAssembly.searchAndRemoveContainFluid(inventory, fluidIngredientList)
+            if (itemIngredientList.isEmpty() && fluidIngredientList.isEmpty()) {
+                return emptyMiss2ListPair
+            } else {
+                val itemStackIngList = getItemStackIngList(itemIngredientList)
+                val fluidStackIngList = getFluidStackIngList(fluidIngredientList)
+
+                if (usingAE) {
+                    val obj = MEHandler.getTerminalGuiObject(player)
+                    obj?.actionableNode?.grid?.let {
+                        val storage = it.getCache<IStorageGrid>(IStorageGrid::class.java)
+                        val items: IMEMonitor<IAEItemStack?> = storage.getInventory(
+                            AEApi.instance().storage().getStorageChannel(IItemStorageChannel::class.java)
+                        )
+                        val fluids = storage.getInventory(
+                            AEApi.instance().storage().getStorageChannel(IFluidStorageChannel::class.java)
+                        )
+                        val playerSource = PlayerSource(player, obj)
+                        for (stacks in ReferenceArrayList(itemStackIngList)) {
+                            for (item in ReferenceArrayList(stacks)) {
+                                val aeItem = items.extractItems(
+                                    AEItemStack.fromItemStack(item),
+                                    Actionable.SIMULATE,
+                                    playerSource
+                                )
+                                if (aeItem == null) continue
+                                val aeItemSize = aeItem.stackSize.toInt()
+                                if (item.count <= aeItemSize) {
+                                    itemStackIngList.remove(stacks)
+                                    break
+                                } else {
+                                    for (stack in stacks) {
+                                        stack.shrink(aeItemSize)
+                                    }
+                                }
+                            }
+                        }
+                        for (stacks in ReferenceArrayList(fluidStackIngList)) {
+                            for (fluid in ReferenceArrayList(stacks)) {
+                                val aeFluid = fluids.extractItems(
+                                    AEFluidStack.fromFluidStack(fluid),
+                                    Actionable.SIMULATE,
+                                    playerSource
+                                )
+                                if (aeFluid == null) continue
+                                val aeFluidSize = aeFluid.stackSize.toInt()
+                                if (fluid.amount <= aeFluidSize) {
+                                    fluidStackIngList.remove(stacks)
+                                    break
+                                } else {
+                                    for (stack in stacks) {
+                                        stack.amount -= aeFluidSize
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (itemIngredientList.isEmpty() && fluidIngredientList.isEmpty()) {
+                        return emptyMiss2ListPair
+                    }
+                }
+
+                var miss = 0
+                for (stacks in itemStackIngList) {
+                    for (stack in stacks) {
+                        miss += stack.count
+                        break
+                    }
+                }
+                for (stacks in fluidStackIngList) {
+                    for (stack in stacks) {
+                        miss += (stack.amount + 999) / 1000
+                        break
+                    }
+                }
+
+                val pkt = PktAssemblyReport(itemStackIngList, fluidStackIngList)
+                if (player is EntityPlayerMP) {
+                    ModularMachinery.NET_CHANNEL.sendTo(pkt, player)
+                }
+
+                return if (autoAECrafting) {
+                    val list = ObjectArrayList<List<ItemStack>>(itemStackIngList)
+                    for (stacks in fluidStackIngList) {
+                        val fs = ObjectArrayList<ItemStack>()
+                        for (stack in stacks) {
+                            val i = FakeFluids.packFluid2Drops(stack)
+                            i.count = stack.amount
+                            fs.add(i)
+                        }
+                        list.add(fs)
+                    }
+
+                    Miss2ListPair(miss, list)
+                } else Miss2ListPair(miss, CheckAllItemComplete)
+            }
+        }
+
+        class Miss2ListPair(val miss: Int, val list: List<List<ItemStack>>)
+
+        private fun getFluidStackIngList(fluidIngredientList: List<StructureIngredient.FluidIngredient>): MutableList<MutableList<FluidStack>> {
+            val fluidStackIngList: MutableList<MutableList<FluidStack>> = ObjectArrayList()
+
+            label36@ for (ingredient in fluidIngredientList) {
+                if (!ingredient.ingredientList().isEmpty()) {
+                    val stackIngList = ingredient.ingredientList().stream()
+                        .map { obj: Tuple<FluidStack, IBlockState> -> obj.getFirst() }
+                        .collect(Collectors.toCollection { ObjectArrayList() })
+                    if (stackIngList.size == 1) {
+                        val ing = stackIngList[0]
+
+                        for (fluidStackList in fluidStackIngList) {
+                            if (fluidStackList.size == 1) {
+                                val another = fluidStackList[0]
+                                if (ing.isFluidEqual(another)) {
+                                    another.amount += 1000
+                                    continue@label36
+                                }
+                            }
+                        }
+                    }
+
+                    fluidStackIngList.add(stackIngList)
+                }
+            }
+
+            return fluidStackIngList
+        }
+
+        private fun getItemStackIngList(itemIngredientList: List<StructureIngredient.ItemIngredient>): MutableList<MutableList<ItemStack>> {
+            val stackList: MutableList<MutableList<ItemStack>> = ObjectArrayList()
+
+            label56@ for (itemIng in itemIngredientList) {
+                if (!itemIng.ingredientList().isEmpty()) {
+                    val stackIngList: MutableList<ItemStack> = itemIng.ingredientList().stream()
+                        .map { obj: Tuple<ItemStack, IBlockState> -> obj.getFirst() }
+                        .collect(Collectors.toCollection { ObjectArrayList() })
+                    if (stackIngList.size == 1) {
+                        val ing = stackIngList[0]
+
+                        for (itemStackList in stackList) {
+                            if (itemStackList.size == 1) {
+                                val anotherInput = itemStackList[0]
+                                if (ItemUtils.matchStacks(ing, anotherInput)) {
+                                    anotherInput.grow(1)
+                                    continue@label56
+                                }
+                            }
+                        }
+                    }
+
+                    val filteredStackIngList: MutableList<ItemStack> = ObjectArrayList()
+
+                    label44@ for (stack in stackIngList) {
+                        for (filtered in filteredStackIngList) {
+                            if (ItemUtils.matchStacks(stack, filtered)) {
+                                continue@label44
+                            }
+                        }
+
+                        filteredStackIngList.add(stack)
+                    }
+
+                    stackList.add(filteredStackIngList)
+                }
+            }
+
+            return stackList
         }
 
         /**
          * MachineAssembly#getFluidHandlerItems(List)
          */
-        private fun getFluidHandlerItems(inventory: MutableList<ItemStack>): List<IFluidHandlerItem?> {
-            val fluidHandlers: MutableList<IFluidHandlerItem?> = ObjectArrayList<IFluidHandlerItem?>()
+        private fun getFluidHandlerItems(inventory: List<ItemStack>): List<IFluidHandlerItem> {
+            val fluidHandlers = ObjectArrayList<IFluidHandlerItem>()
             for (invStack in inventory) {
                 val item = invStack.item
-                // TODO Bucket are not supported at this time.
                 if (item is UniversalBucket || item === Items.LAVA_BUCKET || item === Items.WATER_BUCKET) {
                     continue
                 }
@@ -117,8 +311,9 @@ class NEWMachineAssemblyManager {
                 Object2ReferenceOpenHashMap<BlockInformation, ObjectArrayList<Tuple<Ingredient, IBlockState>>>()
         }
 
-        var usingAE = true
-        var ignoreFluids = true
+        var usingAE = false
+        var ignoreFluids = false
+        var missing = 0
         private var queue: Queue<BlockPos>? = null
 
         constructor(uid: Long) : super(uid)
@@ -174,18 +369,16 @@ class NEWMachineAssemblyManager {
         }
 
         fun assemblyBlock(world: World, player: EntityPlayerMP): OperatingStatus {
-            val info: BlockInformation?
             val pos = queue!!.poll() ?: return OperatingStatus.COMPLETE
-            synchronized(pattern) {
-                info = this.pattern.remove(pos)
+            val info: BlockInformation = synchronized(pattern) {
+                this.pattern.remove(pos) ?: return OperatingStatus.ALREADY_EXISTS
             }
-            if (info == null) {
-                return OperatingStatus.ALREADY_EXISTS
-            }
+
             if (player.isCreative) {
-                player.getServer()!!.addScheduledTask { world.setBlockState(pos, info.sampleState, 1 or 2 or 16) }
+                placeBlock(player, world, pos, info.sampleState)
                 return OperatingStatus.SUCCESS
             }
+
             val oldState = world.getBlockState(pos)
             if (oldState != null &&
                 (oldState.getBlock() !== Blocks.AIR
@@ -194,11 +387,10 @@ class NEWMachineAssemblyManager {
                 return if (matchesState(info, oldState)) {
                     OperatingStatus.ALREADY_EXISTS
                 } else {
-                    val posToString = MiscUtils.posToString(pos)
                     player.sendMessage(
                         TextComponentTranslation(
                             "message.assembly.tip.cannot_replace",
-                            posToString
+                            MiscUtils.posToString(pos)
                         )
                     )
                     OperatingStatus.FAILURE
@@ -211,19 +403,21 @@ class NEWMachineAssemblyManager {
             var wobj: WirelessTerminalGuiObject? = null
             var items: IMEMonitor<IAEItemStack>? = null
             var fluids: IMEMonitor<IAEFluidStack>? = null
+
             if (usingAE) {
                 wobj = MEHandler.getTerminalGuiObject(player)
-                val node = wobj.getActionableNode()
-                val grid = node.grid.getCache<IStorageGrid>(IStorageGrid::class.java)
-                items = grid.getInventory(
-                    AEApi.instance().storage()
-                        .getStorageChannel(IItemStorageChannel::class.java)
-                )
-                fluids = grid.getInventory(
-                    AEApi.instance().storage()
-                        .getStorageChannel(IFluidStorageChannel::class.java)
-                )
-                hasAE = true
+                wobj?.actionableNode?.grid?.let {
+                    val grid = it.getCache<IStorageGrid>(IStorageGrid::class.java)
+                    items = grid.getInventory(
+                        AEApi.instance().storage()
+                            .getStorageChannel(IItemStorageChannel::class.java)
+                    )
+                    fluids = grid.getInventory(
+                        AEApi.instance().storage()
+                            .getStorageChannel(IFluidStorageChannel::class.java)
+                    )
+                    hasAE = true
+                }
             }
             val itemInventory = player.inventory.mainInventory
             val fluidInventory = getFluidHandlerItems(itemInventory)
@@ -237,15 +431,6 @@ class NEWMachineAssemblyManager {
                     ) {
                         placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
                         return OperatingStatus.SUCCESS
-                    } else if (hasAE) {
-                        val item = items!!.extractItems(
-                            ingredient.aEItemStack,
-                            Actionable.MODULATE,
-                            PlayerSource(player, wobj)
-                        )
-                        if (item == null || item.stackSize == 0L) continue
-                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
-                        return OperatingStatus.SUCCESS
                     }
                 } else {
                     if (MachineAssembly.consumeInventoryFluid(
@@ -255,7 +440,22 @@ class NEWMachineAssemblyManager {
                     ) {
                         placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
                         return OperatingStatus.SUCCESS
-                    } else if (hasAE) {
+                    }
+                }
+            }
+            if (hasAE) {
+                for (ingredientAndIBlockState in list) {
+                    val ingredient = ingredientAndIBlockState.first
+                    if (ingredient.isItem) {
+                        val item = items!!.extractItems(
+                            ingredient.aEItemStack,
+                            Actionable.MODULATE,
+                            PlayerSource(player, wobj)
+                        )
+                        if (item == null || item.stackSize == 0L) continue
+                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
+                        return OperatingStatus.SUCCESS
+                    } else {
                         val fluid = fluids!!.extractItems(
                             ingredient.aEFluidStack,
                             Actionable.SIMULATE,
@@ -272,11 +472,17 @@ class NEWMachineAssemblyManager {
                     }
                 }
             }
-            val posToString = MiscUtils.posToString(pos)
+            if (oldState.block == Blocks.AIR && matchesState(info, oldState)) {
+                return OperatingStatus.ALREADY_EXISTS
+            }
+            if (missing > 0) {
+                --missing
+                return OperatingStatus.SUCCESS
+            }
             player.sendMessage(
                 TextComponentTranslation(
                     "message.assembly.tip.missing",
-                    posToString
+                    MiscUtils.posToString(pos)
                 )
             )
             return OperatingStatus.FAILURE
@@ -284,12 +490,37 @@ class NEWMachineAssemblyManager {
 
         private fun placeBlock(player: EntityPlayerMP, world: World, pos: BlockPos, state: IBlockState) {
             player.getServer()!!.addScheduledTask {
-                if (ForgeEventFactory.onBlockPlace(player, BlockSnapshot(world, pos, state), EnumFacing.UP)
-                        .isCanceled
+                if (!player.isCreative && ForgeEventFactory.onBlockPlace(
+                        player,
+                        BlockSnapshot(world, pos, state),
+                        EnumFacing.UP
+                    ).isCanceled
                 ) {
-                    player.inventory.placeItemBackInInventory(world, StackUtils.getStackFromBlockState(state))
+                    player.sendMessage(
+                        TextComponentTranslation(
+                            "message.assembly.tip.missing",
+                            MiscUtils.posToString(pos)
+                        )
+                    )
+                    player.inventory.placeItemBackInInventory(
+                        world,
+                        StackUtils.getStackFromBlockState(state)
+                    )
                 } else {
-                    world.setBlockState(pos, state, 1 or 2 or 16)
+                    val flags = 0b10011
+                    val chunk = world.getChunk(pos)
+                    var blockSnapshot: BlockSnapshot? = null
+                    if (world.captureBlockSnapshots)
+                        blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos, flags)
+                    val iblockstate = chunk.setBlockState(pos, state)
+
+                    if (iblockstate != null) {
+                        if (blockSnapshot == null) {
+                            world.markAndNotifyBlock(pos, chunk, iblockstate, state, flags)
+                        } else {
+                            world.capturedBlockSnapshots.add(blockSnapshot)
+                        }
+                    }
                 }
             }
         }
@@ -338,16 +569,16 @@ class NEWMachineAssemblyManager {
             return aeStack.hashCode()
         }
 
-        val itemStack: ItemStack?
-            get() = ingredient as ItemStack?
+        val itemStack: ItemStack
+            get() = ingredient as ItemStack
 
-        val aEItemStack: IAEItemStack?
-            get() = aeStack as IAEItemStack?
+        val aEItemStack: IAEItemStack
+            get() = aeStack as IAEItemStack
 
-        val fluidStack: FluidStack?
-            get() = ingredient as FluidStack?
+        val fluidStack: FluidStack
+            get() = ingredient as FluidStack
 
-        val aEFluidStack: IAEFluidStack?
-            get() = aeStack as IAEFluidStack?
+        val aEFluidStack: IAEFluidStack
+            get() = aeStack as IAEFluidStack
     }
 }

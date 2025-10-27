@@ -1,15 +1,17 @@
 package github.kasuminova.novaeng.common.item
 
-import appeng.util.Platform
-import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper
+import appeng.api.networking.crafting.ICraftingGrid
+import appeng.util.Platform.openNbtData
+import appeng.util.item.AEItemStack
+import com.circulation.random_complement.common.interfaces.RCCraftingGridCache
+import com.circulation.random_complement.common.util.MEHandler
+import github.kasuminova.novaeng.common.util.AutoCraftingQueue
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
-import hellfirepvp.modularmachinery.client.ClientScheduler
-import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext
 import hellfirepvp.modularmachinery.common.block.BlockController
-import hellfirepvp.modularmachinery.common.block.BlockFactoryController
-import hellfirepvp.modularmachinery.common.machine.DynamicMachine
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
 import hellfirepvp.modularmachinery.common.util.BlockArrayCache
+import ink.ikx.mmce.common.utils.StructureIngredient
+import java.util.ArrayDeque
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ActionResult
@@ -37,146 +39,158 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
         player: EntityPlayer, world: World, pos: BlockPos, hand: EnumHand,
         facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float
     ): EnumActionResult {
-        if (hand != EnumHand.MAIN_HAND) return EnumActionResult.PASS
-        val state = world.getBlockState(pos)
-        val block = state.block
+        if (hand != EnumHand.MAIN_HAND || world.isRemote) return EnumActionResult.PASS
         val tile = world.getTileEntity(pos)
-        val stack = player.getHeldItem(hand)
         if (tile == null) {
             return EnumActionResult.PASS
         } else if (player.isSneaking) {
-            val mode = getMode(stack)
-            if (!world.isRemote && mode == 0.toByte()) {
-                if (!NEWMachineAssemblyManager.checkMachineAssembly(player)) {
-                    var array: NEWMachineAssemblyManager.AssemblyBlockArray? = null
-                    if (tile is TileMultiblockMachineController) {
-                        var machine = tile.blueprintMachine
-                        if (machine == null) {
-                            if (block is BlockController) {
-                                machine = block.getParentMachine()
-                            }
-                            if (block is BlockFactoryController) {
-                                machine = block.getParentMachine()
-                            }
-                        }
-                        if (machine == null) return EnumActionResult.FAIL
+            if (!NEWMachineAssemblyManager.checkMachineAssembly(player)) {
+                val stack = player.getHeldItem(hand)
+                var array: NEWMachineAssemblyManager.AssemblyBlockArray? = null
+                if (tile is TileMultiblockMachineController) {
+                    val state = world.getBlockState(pos)
+                    val block = state.block
 
-                        val controllerFacing = player.world.getBlockState(pos).getValue(BlockController.FACING)
-                        array = NEWMachineAssemblyManager.AssemblyBlockArray(
-                            BlockArrayCache.getBlockArrayCache(
-                                machine.pattern,
-                                controllerFacing
-                            )
-                        )
+                    val machine = tile.blueprintMachine ?: if (block is BlockController)
+                        block.getParentMachine()
+                    else return EnumActionResult.FAIL
 
-                        var dynamicPatternSize = getDynamicPatternSize(stack)
-                        val dynamicPatterns = machine.dynamicPatterns
-
-                        for (pattern in dynamicPatterns.values) {
-                            dynamicPatternSize = max(dynamicPatternSize, pattern.minSize)
-                        }
-
-                        for (pattern in dynamicPatterns.values) {
-                            pattern.addPatternToBlockArray(
-                                array,
-                                min(max(pattern.minSize, dynamicPatternSize), pattern.maxSize),
-                                pattern.faces.iterator().next(),
-                                controllerFacing
-                            )
-                        }
-                    } else {
-                        for (entry in NEWMachineAssemblyManager.getConstructorsIterator()) {
-                            if (entry.key.isInstance(tile)) {
-                                array = entry.value[facing]
-                                break
-                            }
-                        }
-                    }
-
-                    array?.let {
-                        array = array.offset(pos)
-                        if (array.min.y < 1 || array.max.y > 255) {
-                            val e = if (array.min.y < 1) {
-                                "y = ${array.min.y}"
-                            } else {
-                                "y = ${array.max.y}"
-                            }
-                            player.sendMessage(
-                                TextComponentTranslation(
-                                    "message.assembly.tip.too_high", e
-                                )
-                            )
-                            return EnumActionResult.FAIL
-                        }
-                        array = NEWMachineAssemblyManager.addAssemblyMachine(player, array)
-                        array.usingAE = isUsingAE(stack)
-                        array.ignoreFluids = isIgnoreFluids(stack)
-                        array.start()
-                        //TODO:开始工作的通知
-                        return EnumActionResult.SUCCESS
-                    }
-                } else {
-                    player.sendMessage(
-                        TextComponentTranslation(
-                            "message.assembly.tip.already_assembly"
+                    val controllerFacing = player.world.getBlockState(pos).getValue(BlockController.FACING)
+                    array = NEWMachineAssemblyManager.AssemblyBlockArray(
+                        BlockArrayCache.getBlockArrayCache(
+                            machine.pattern,
+                            controllerFacing
                         )
                     )
-                    return EnumActionResult.FAIL
-                }
-            } else if (world.isRemote && mode == 1.toByte()) {
-                var machine: DynamicMachine? = null
-                if (tile is TileMultiblockMachineController) {
-                    machine = tile.blueprintMachine
-                    if (machine == null) {
-                        if (block is BlockController) {
-                            machine = block.getParentMachine()
-                        }
-                        if (block is BlockFactoryController) {
-                            machine = block.getParentMachine()
+
+                    var dynamicPatternSize = getDynamicPatternSize(stack)
+                    val dynamicPatterns = machine.dynamicPatterns
+
+                    for (pattern in dynamicPatterns.values) {
+                        dynamicPatternSize = max(dynamicPatternSize, pattern.minSize)
+                    }
+
+                    for (pattern in dynamicPatterns.values) {
+                        pattern.addPatternToBlockArray(
+                            array,
+                            min(max(pattern.minSize, dynamicPatternSize), pattern.maxSize),
+                            pattern.faces.iterator().next(),
+                            controllerFacing
+                        )
+                    }
+                } else {
+                    for (entry in NEWMachineAssemblyManager.getConstructorsIterator()) {
+                        if (entry.key.isInstance(tile)) {
+                            array = entry.value[facing]
+                            break
                         }
                     }
                 }
-                if (machine != null) {
-                    val renderContext = DynamicMachineRenderContext
-                        .createContext(machine, getDynamicPatternSize(stack))
-                    renderContext.shiftSnap = ClientScheduler.getClientTick()
-                    NEWBlockArrayPreviewRenderHelper.startPreview(renderContext, pos)
+
+                array?.let {
+                    val st = StructureIngredient.of(player.world, pos, array.copy())
+                    array = array.offset(pos)
+                    if (array.min.y < 0 || array.max.y > 255) {
+                        player.sendMessage(
+                            TextComponentTranslation(
+                                "message.assembly.tip.too_high",
+                                if (array.min.y < 1) {
+                                    "y = ${array.min.y}"
+                                } else {
+                                    "y = ${array.max.y}"
+                                }
+                            )
+                        )
+                        return EnumActionResult.FAIL
+                    }
+
+                    val usingAE = isUsingAE(stack)
+                    val autoAECrafting = usingAE && isAutoAECrafting(stack)
+                    val missing = NEWMachineAssemblyManager.checkAllItems(player, st, usingAE, autoAECrafting)
+                    val q = missing.list
+                    if (autoAECrafting && !q.isEmpty()) {
+                        MEHandler.getTerminalGuiObject(player)?.actionableNode?.grid?.let {
+                            val autoList = ArrayDeque<ItemStack>()
+                            val cgc: RCCraftingGridCache = it.getCache(ICraftingGrid::class.java)
+                            val list = cgc.`rc$getCraftableItems`()
+                            for (stacks in q) {
+                                for (item in stacks) {
+                                    if (item.isEmpty) continue
+                                    if (list.containsKey(AEItemStack.fromItemStack(item))) {
+                                        autoList.add(item)
+                                        break
+                                    }
+                                }
+                            }
+                            AutoCraftingQueue.setQueueAndStrat(autoList, player)
+                        }
+                    }
+                    if (q.isEmpty()
+                        || !isNeedAllIngredient(stack)
+                    ) {
+                        array = NEWMachineAssemblyManager.addAssemblyMachine(player, array)
+                        array.usingAE = usingAE
+                        array.ignoreFluids = isIgnoreFluids(stack)
+                        array.missing = missing.miss
+                        array.start()
+                        player.sendMessage(
+                            TextComponentTranslation(
+                                "message.assembly.tip.already_assembly.start"
+                            )
+                        )
+                        return EnumActionResult.SUCCESS
+                    }
                 }
+            } else {
+                player.sendMessage(
+                    TextComponentTranslation(
+                        "message.assembly.tip.already_assembly"
+                    )
+                )
+                return EnumActionResult.FAIL
             }
         }
         return EnumActionResult.PASS
     }
 
     fun isUsingAE(stack: ItemStack): Boolean {
-        return Platform.openNbtData(stack).getBoolean("UsingAE")
+        return openNbtData(stack).getBoolean("UsingAE")
     }
 
     fun isIgnoreFluids(stack: ItemStack): Boolean {
-        return Platform.openNbtData(stack).getBoolean("IgnoreFluids")
+        return openNbtData(stack).getBoolean("IgnoreFluids")
     }
 
     fun getDynamicPatternSize(stack: ItemStack): Int {
-        return Platform.openNbtData(stack).getInteger("DynamicPatternSize")
+        return openNbtData(stack).getInteger("DynamicPatternSize")
     }
 
-    fun getMode(stack: ItemStack): Byte {
-        return Platform.openNbtData(stack).getByte("Mode")
+    fun isAutoAECrafting(stack: ItemStack): Boolean {
+        return openNbtData(stack).getBoolean("AutoAECrafting")
+    }
+
+    fun isNeedAllIngredient(stack: ItemStack): Boolean {
+        return openNbtData(stack).getBoolean("NeedAllIngredient")
     }
 
     fun setUsingAE(stack: ItemStack, b: Boolean) {
-        return Platform.openNbtData(stack).setBoolean("UsingAE", b)
+        openNbtData(stack).setBoolean("UsingAE", b)
     }
 
     fun setIgnoreFluids(stack: ItemStack, b: Boolean) {
-        return Platform.openNbtData(stack).setBoolean("IgnoreFluids", b)
+        openNbtData(stack).setBoolean("IgnoreFluids", b)
     }
 
     fun setDynamicPatternSize(stack: ItemStack, size: Int) {
-        return Platform.openNbtData(stack).setByte("DynamicPatternSize", size.toByte())
+        openNbtData(stack).setByte("DynamicPatternSize", size.toByte())
     }
 
-    fun setMode(stack: ItemStack, mode: Byte) {
-        return Platform.openNbtData(stack).setByte("Mode", mode)
+    fun setAutoAECrafting(stack: ItemStack, auto: Boolean) {
+        openNbtData(stack).setBoolean("AutoAECrafting", auto)
+    }
+
+    fun setNeedAllIngredient(stack: ItemStack, auto: Boolean) {
+        openNbtData(stack).setBoolean("NeedAllIngredient", auto)
     }
 
 }

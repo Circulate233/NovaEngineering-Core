@@ -1,171 +1,174 @@
-package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
+package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.implementations.ICraftingPatternItem;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.events.MENetworkCraftingPatternChange;
-import appeng.me.GridAccessException;
-import appeng.tile.inventory.AppEngInternalInventory;
-import appeng.util.inv.IAEAppEngInventory;
-import appeng.util.inv.InvOperation;
-import com.glodblock.github.util.FluidCraftingPatternDetails;
-import github.kasuminova.mmce.common.util.PatternItemFilter;
-import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
-import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
-import github.kasuminova.novaeng.common.network.PktEFabricatorPatternSearchGUIUpdate;
-import hellfirepvp.modularmachinery.ModularMachinery;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import lombok.Getter;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import appeng.api.implementations.ICraftingPatternItem
+import appeng.api.networking.crafting.ICraftingPatternDetails
+import appeng.api.networking.events.MENetworkCraftingPatternChange
+import appeng.me.GridAccessException
+import appeng.tile.inventory.AppEngInternalInventory
+import appeng.util.inv.IAEAppEngInventory
+import appeng.util.inv.InvOperation
+import com.glodblock.github.util.FluidCraftingPatternDetails
+import github.kasuminova.mmce.common.util.PatternItemFilter
+import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch
+import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData
+import github.kasuminova.novaeng.common.network.PktEFabricatorPatternSearchGUIUpdate
+import hellfirepvp.modularmachinery.ModularMachinery
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import java.util.Objects
+import java.util.function.Consumer
+import java.util.function.IntFunction
+import java.util.stream.Collectors
+import java.util.stream.IntStream
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.items.CapabilityItemHandler
+import net.minecraftforge.items.IItemHandler
+import javax.annotation.Nonnull
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
-public class EFabricatorPatternBus extends EFabricatorPart implements IAEAppEngInventory {
+    companion object {
+        val PATTERN_SLOTS = 12 * 6
+    }
 
-    public static final int PATTERN_SLOTS = 12 * 6;
+    val patterns = AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE)
+    protected val details = ObjectArrayList<ICraftingPatternDetails?>(PATTERN_SLOTS)
 
-    @Getter
-    protected final AppEngInternalInventory patterns = new AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE);
-    protected final List<ICraftingPatternDetails> details = new ObjectArrayList<>(PATTERN_SLOTS);
-
-    public EFabricatorPatternBus() {
+    init {
         // Initialize details...
-        IntStream.range(0, PATTERN_SLOTS).<ICraftingPatternDetails>mapToObj(i -> null).forEach(details::add);
+        IntStream.range(0, PATTERN_SLOTS).mapToObj<ICraftingPatternDetails?>(IntFunction { i: Int -> null })
+            .forEach { e: ICraftingPatternDetails? -> details.add(e) }
     }
 
-    protected void refreshPatterns() {
-        for (int i = 0; i < PATTERN_SLOTS; i++) {
-            refreshPattern(i);
+    protected fun refreshPatterns() {
+        for (i in 0..<PATTERN_SLOTS) {
+            refreshPattern(i)
         }
-        notifyPatternChanged();
+        notifyPatternChanged()
     }
 
-    protected void refreshPattern(final int slot) {
-        details.set(slot, null);
+    protected fun refreshPattern(slot: Int) {
+        details[slot] = null
 
-        ItemStack pattern = patterns.getStackInSlot(slot);
-        Item item = pattern.getItem();
-        if (pattern.isEmpty() || !(item instanceof ICraftingPatternItem patternItem)) {
-            return;
+        val pattern = patterns.getStackInSlot(slot)
+        val item = pattern.item
+        if (pattern.isEmpty || item !is ICraftingPatternItem) {
+            return
         }
 
-        ICraftingPatternDetails detail = patternItem.getPatternForItem(pattern, getWorld());
-        if (detail != null && (detail.isCraftable() || detail instanceof FluidCraftingPatternDetails)) {
-            details.set(slot, detail);
+        val detail = item.getPatternForItem(pattern, getWorld())
+        if (detail != null && (detail.isCraftable || detail is FluidCraftingPatternDetails)) {
+            details[slot] = detail
         }
     }
 
-    public List<ICraftingPatternDetails> getDetails() {
+    fun getDetails(): MutableList<ICraftingPatternDetails?> {
         return details.stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .filter { obj: ICraftingPatternDetails? -> Objects.nonNull(obj) }
+            .collect(Collectors.toList())
     }
 
-    public int getValidPatterns() {
-        return (int) details.stream().filter(Objects::nonNull).count();
+    val validPatterns: Int
+        get() = details.stream().filter { obj: ICraftingPatternDetails? -> Objects.nonNull(obj) }.count()
+            .toInt()
+
+    override fun saveChanges() {
+        markNoUpdateSync()
     }
 
-    @Override
-    public void saveChanges() {
-        markNoUpdateSync();
+    override fun onChangeInventory(
+        inv: IItemHandler?,
+        slot: Int,
+        mc: InvOperation?,
+        removedStack: ItemStack?,
+        newStack: ItemStack?
+    ) {
+        refreshPattern(slot)
+        notifyPatternChanged()
+        sendPatternSearchGUIUpdateToClient(slot)
     }
 
-    @Override
-    public void onChangeInventory(final IItemHandler inv, final int slot, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack) {
-        refreshPattern(slot);
-        notifyPatternChanged();
-        sendPatternSearchGUIUpdateToClient(slot);
-    }
-
-    private void notifyPatternChanged() {
+    private fun notifyPatternChanged() {
         if (this.partController == null) {
-            return;
+            return
         }
         try {
-            EFabricatorMEChannel channel = this.partController.getChannel();
-            if (channel != null && channel.getProxy().isActive()) {
-                channel.getProxy().getGrid().postEvent(new MENetworkCraftingPatternChange(channel, channel.getProxy().getNode()));
+            val channel: EFabricatorMEChannel? = this.partController.channel
+            if (channel != null && channel.proxy.isActive) {
+                channel.proxy.grid
+                    .postEvent(MENetworkCraftingPatternChange(channel, channel.proxy.node))
             }
-        } catch (GridAccessException ignored) {
+        } catch (ignored: GridAccessException) {
         }
-        this.partController.recalculateEnergyUsage();
+        this.partController.recalculateEnergyUsage()
     }
 
-    private void sendPatternSearchGUIUpdateToClient(final int slot) {
+    private fun sendPatternSearchGUIUpdateToClient(slot: Int) {
         if (this.partController == null) {
-            return;
+            return
         }
 
-        List<EntityPlayerMP> players = new ArrayList<>();
+        val players = ObjectArrayList<EntityPlayerMP>()
         world.playerEntities.stream()
-                .filter(EntityPlayerMP.class::isInstance)
-                .map(EntityPlayerMP.class::cast)
-                .forEach(playerMP -> {
-                    if (playerMP.openContainer instanceof ContainerEFabricatorPatternSearch efPatternSearch) {
-                        if (efPatternSearch.getOwner() == this.partController) {
-                            players.add(playerMP);
-                        }
+            .filter { obj: EntityPlayer -> EntityPlayerMP::class.java.isInstance(obj) }
+            .map { obj: EntityPlayer -> EntityPlayerMP::class.java.cast(obj) }
+            .forEach { playerMP: EntityPlayerMP ->
+                val openContainer = playerMP.openContainer
+                if (openContainer is ContainerEFabricatorPatternSearch) {
+                    if (openContainer.getOwner() === this.partController) {
+                        players.add(playerMP)
                     }
-                });
+                }
+            }
 
-        if (!players.isEmpty()) {
-            PktEFabricatorPatternSearchGUIUpdate pktUpdate = new PktEFabricatorPatternSearchGUIUpdate(
-                    PktEFabricatorPatternSearchGUIUpdate.UpdateType.SINGLE,
-                    EFabricatorPatternData.of(
-                            new EFabricatorPatternData.PatternData(getPos(), slot, patterns.getStackInSlot(slot))
-                    )
-            );
-            players.forEach(player -> NovaEngineeringCore.NET_CHANNEL.sendTo(pktUpdate, player));
+        if (!players.isEmpty) {
+            val pktUpdate = PktEFabricatorPatternSearchGUIUpdate(
+                PktEFabricatorPatternSearchGUIUpdate.UpdateType.SINGLE,
+                EFabricatorPatternData.of(
+                    EFabricatorPatternData.PatternData(getPos(), slot, patterns.getStackInSlot(slot))
+                )
+            )
+            players.forEach(Consumer { player: EntityPlayerMP? ->
+                NovaEngineeringCore.NET_CHANNEL.sendTo(
+                    pktUpdate,
+                    player
+                )
+            })
         }
     }
 
-    @Override
-    public void validate() {
-        super.validate();
-        if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-            ModularMachinery.EXECUTE_MANAGER.addSyncTask(this::refreshPatterns);
+    override fun validate() {
+        super.validate()
+        if (FMLCommonHandler.instance().getEffectiveSide().isServer) {
+            ModularMachinery.EXECUTE_MANAGER.addSyncTask { this.refreshPatterns() }
         }
     }
 
-    @Override
-    public boolean hasCapability(@Nonnull final Capability<?> capability, @Nullable final EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+    override fun hasCapability(@Nonnull capability: Capability<*>, facing: EnumFacing?): Boolean {
+        return capability === CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing)
     }
 
-    @Nullable
-    @Override
-    public <T> T getCapability(@Nonnull final Capability<T> capability, @Nullable final EnumFacing facing) {
-        Capability<IItemHandler> cap = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
-        if (capability == cap) {
-            return cap.cast(patterns);
+    override fun <T> getCapability(@Nonnull capability: Capability<T?>, facing: EnumFacing?): T? {
+        val cap = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+        if (capability === cap) {
+            return cap.cast<T?>(patterns)
         }
-        return super.getCapability(capability, facing);
+        return super.getCapability<T?>(capability, facing)
     }
 
-    @Override
-    public void readCustomNBT(final NBTTagCompound compound) {
-        super.readCustomNBT(compound);
-        patterns.readFromNBT(compound.getCompoundTag("patterns"));
+    override fun readCustomNBT(compound: NBTTagCompound) {
+        super.readCustomNBT(compound)
+        patterns.readFromNBT(compound.getCompoundTag("patterns"))
     }
 
-    @Override
-    public void writeCustomNBT(final NBTTagCompound compound) {
-        super.writeCustomNBT(compound);
-        patterns.writeToNBT(compound, "patterns");
+    override fun writeCustomNBT(compound: NBTTagCompound?) {
+        super.writeCustomNBT(compound)
+        patterns.writeToNBT(compound, "patterns")
     }
-
 }

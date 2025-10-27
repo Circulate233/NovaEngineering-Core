@@ -292,7 +292,6 @@ dependencies {
     implementation(rfg.deobf("curse.maven:libnine-322344:3509087"))
     implementation(rfg.deobf("curse.maven:lazy-ae2-322347:3254160"))
     compileOnly(rfg.deobf("curse.maven:better-chat-363860:3048407"))
-    compileOnly(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5237484"))
     compileOnly(rfg.deobf("curse.maven:lunatriuscore-225605:2489549"))
     compileOnly(rfg.deobf("curse.maven:immersive-engineering-231951:2974106"))
     compileOnly(rfg.deobf("curse.maven:immersive-petroleum-268250:3382321"))
@@ -319,7 +318,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
-    implementation(rfg.deobf("curse.maven:random-complement-1198138:7133485"))
+    implementation(rfg.deobf("curse.maven:random-complement-1198138:7155516"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
 }

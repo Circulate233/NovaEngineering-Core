@@ -24,8 +24,8 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
     public PktEFabricatorGUIData(final EFabricatorController controller) {
         data = new EFabricatorData(
                 controller.getLength(),
-                controller.isOverclocked(),
-                controller.isActiveCooling(),
+                controller.getOverclocked(),
+                controller.getActiveCooling(),
                 controller.getParallelism(),
                 controller.getCoolantInputFluids(),
                 controller.getCoolantInputCap(),

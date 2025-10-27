@@ -6,10 +6,11 @@ import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext
 import hellfirepvp.modularmachinery.common.block.BlockController
 import hellfirepvp.modularmachinery.common.util.MiscUtils
+import java.util.stream.IntStream
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
-import java.util.stream.IntStream
+import net.minecraft.util.text.TextComponentTranslation
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
@@ -28,30 +29,30 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
             val newpos = pos.subtract(moveDir)
             utils.matchArray = MiscUtils.rotateYCCWNorthUntil(utils.matchArray, rotate)
             utils.attachedPosition = newpos
-            setLayers(0)
             renderHelperUtils = utils.renderHelper as BlockArrayRenderUtils
+            initLayers()
             work = true
             return true
         }
         return false
     }
 
+    private fun initLayers() {
+        val matchingArray = renderHelperUtils!!.`n$getBlocks`()
+        val lowestSlice = matchingArray.min.y
+        val maxSlice = matchingArray.max.y
+        val status = IntStream.range(lowestSlice, maxSlice + 2).toArray()
+        utils.renderedLayer = status[status.size - 1]
+        this.status = status
+    }
+
     fun setLayers(newValue: Int) {
         if (renderHelperUtils != null) {
-            if (status == null) {
-                val matchingArray = renderHelperUtils!!.`n$getBlocks`()
-                val lowestSlice = matchingArray.min.y
-                val maxSlice = matchingArray.max.y
-                status = IntStream.range(lowestSlice, maxSlice + 2).toArray()
-            }
+            val size = status!!.size
+            val mod = newValue % size
 
-            var value = newValue
+            val value = if (mod < 0) mod + size else mod
 
-            while (value < 0) {
-                value += status!!.size
-            }
-
-            value %= status!!.size
             utils.renderedLayer = status!![value]
         }
     }
@@ -76,5 +77,18 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
         status = null
         work = false
         utils.renderedLayer = -1
+
+        if (Minecraft.getMinecraft().player != null) {
+            Minecraft.getMinecraft().player.sendMessage(
+                TextComponentTranslation(
+                    "gui.blueprint.popout.placed.dynamic_pattern.unload"
+                )
+            )
+        }
+    }
+
+    override fun unloadWorld() {
+        super.unloadWorld()
+        clear()
     }
 }

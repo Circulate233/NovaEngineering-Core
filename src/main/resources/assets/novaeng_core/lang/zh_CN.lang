@@ -20,6 +20,11 @@ item.hypernet_connect_card.tooltip.pos.tip.1=§2右击任意等级的计算网�
 
 item.novaeng_core.machine_assembly_tool.name=§9高级结构构造器
 
+message.assembly.tip.already_assembly.start=模块化组装：机器开始组装
+message.assembly.tip.fail=模块化组装: 在 %s 放置方块失败，已返还材料
+
+gui.blueprint.popout.placed.dynamic_pattern.unload=当前结构预览已结束
+
 item.novaeng_core.estorage_cell_item_16m.name=§9ECO - §bSE4 §9存储矩阵§a（物品）
 item.novaeng_core.estorage_cell_item_64m.name=§9ECO - §6SE6 §9存储矩阵§a（物品）
 item.novaeng_core.estorage_cell_item_256m.name=§9ECO - §5SE9 §9存储矩阵§a（物品）

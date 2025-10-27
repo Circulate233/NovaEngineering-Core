@@ -1,75 +1,67 @@
-package github.kasuminova.novaeng.common.container;
+package github.kasuminova.novaeng.common.container
 
-import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
-import github.kasuminova.novaeng.common.container.slot.SlotModularServer;
-import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
-import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
-import hellfirepvp.modularmachinery.common.container.ContainerBase;
-import lombok.Getter;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager
+import github.kasuminova.novaeng.common.container.slot.SlotModularServer
+import github.kasuminova.novaeng.common.tile.TileModularServerAssembler
+import hellfirepvp.modularmachinery.common.container.ContainerBase
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
+import javax.annotation.Nonnull
 
-import javax.annotation.Nonnull;
+open class ContainerModularServerAssembler(owner: TileModularServerAssembler, protected val opening: EntityPlayer) :
+    ContainerBase<TileModularServerAssembler>(
+        owner,
+        opening
+    ) {
+    protected val slotModularServer: SlotModularServer
 
-public class ContainerModularServerAssembler extends ContainerBase<TileModularServerAssembler> {
-    protected final EntityPlayer opening;
-    @Getter
-    protected final SlotModularServer slotModularServer;
+    var slotManager: AssemblySlotManager?
 
-    @Getter
-    protected AssemblySlotManager slotManager;
-
-    public ContainerModularServerAssembler(final TileModularServerAssembler owner, final EntityPlayer opening) {
-        super(owner, opening);
-        this.opening = opening;
-
-        ModularServer server = owner.getServer();
-        this.slotManager = server == null ? null : server.getSlotManager();
+    init {
+        val server = owner.getServer()
+        this.slotManager = server?.getSlotManager()
         if (this.slotManager != null) {
-            this.slotManager.addAllSlotToContainer(this);
+            this.slotManager!!.addAllSlotToContainer(this)
         }
 
-        slotModularServer = new SlotModularServer(owner.getServerInventory().asGUIAccess(), 0, 302, 126);
-        this.addSlotToContainer(slotModularServer);
-        this.owner.addContainer(this);
+        slotModularServer = SlotModularServer(owner.getServerInventory().asGUIAccess(), 0, 302, 126)
+        this.addSlotToContainer(slotModularServer)
+        this.owner!!.addContainer(this)
     }
 
-    @Override
-    public void onContainerClosed(@Nonnull final EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
-        this.owner.removeContainer(this);
+    override fun onContainerClosed(@Nonnull playerIn: EntityPlayer) {
+        super.onContainerClosed(playerIn)
+        this.owner!!.removeContainer(this)
     }
 
-    public void reInitSlots() {
-        this.inventorySlots.clear();
-        this.inventoryItemStacks.clear();
-        this.addPlayerSlots(opening);
+    fun reInitSlots() {
+        this.inventorySlots.clear()
+        this.inventoryItemStacks.clear()
+        this.addPlayerSlots(opening)
 
-        ModularServer server = owner.getServer();
-        this.slotManager = server == null ? null : server.getSlotManager();
+        val server = owner!!.getServer()
+        this.slotManager = server?.getSlotManager()
         if (this.slotManager != null) {
-            this.slotManager.addAllSlotToContainer(this);
+            this.slotManager!!.addAllSlotToContainer(this)
         }
 
-        this.addSlotToContainer(slotModularServer);
+        this.addSlotToContainer(slotModularServer)
     }
 
     @Nonnull
-    @Override
-    public Slot addSlotToContainer(@Nonnull final Slot slotIn) {
-        return super.addSlotToContainer(slotIn);
+    public override fun addSlotToContainer(@Nonnull slotIn: Slot): Slot {
+        return super.addSlotToContainer(slotIn)
     }
 
     @Nonnull
-    @Override
-    public ItemStack transferStackInSlot(@Nonnull final EntityPlayer playerIn, final int index) {
-        ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+    override fun transferStackInSlot(@Nonnull playerIn: EntityPlayer, index: Int): ItemStack {
+        var itemstack = ItemStack.EMPTY
+        val slot = this.inventorySlots[index]
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack stackInSlot = slot.getStack();
-            itemstack = stackInSlot.copy();
+        if (slot != null && slot.hasStack) {
+            val stackInSlot = slot.stack
+            itemstack = stackInSlot.copy()
 
             if (index < 36) {
 //                if (!itemstack1.isEmpty() && itemstack1.getItem() instanceof ItemBlueprint) {
@@ -84,41 +76,40 @@ public class ContainerModularServerAssembler extends ContainerBase<TileModularSe
 
             if (index < 27) {
                 if (!this.mergeItemStack(stackInSlot, 27, 36, false)) {
-                    return ItemStack.EMPTY;
+                    return ItemStack.EMPTY
                 }
             } else if (index < 36) {
                 if (!this.mergeItemStack(stackInSlot, 0, 27, false)) {
-                    return ItemStack.EMPTY;
+                    return ItemStack.EMPTY
                 }
             } else if (!this.mergeItemStack(stackInSlot, 0, 36, false)) {
-                return ItemStack.EMPTY;
+                return ItemStack.EMPTY
             }
 
-            if (stackInSlot.getCount() == 0) {
-                slot.putStack(ItemStack.EMPTY);
+            if (stackInSlot.count == 0) {
+                slot.putStack(ItemStack.EMPTY)
             } else {
-                slot.onSlotChanged();
+                slot.onSlotChanged()
             }
 
-            if (stackInSlot.getCount() == itemstack.getCount()) {
-                return ItemStack.EMPTY;
+            if (stackInSlot.count == itemstack.count) {
+                return ItemStack.EMPTY
             }
 
-            slot.onTake(playerIn, stackInSlot);
+            slot.onTake(playerIn, stackInSlot)
         }
 
-        return itemstack;
+        return itemstack
     }
 
-    @Override
-    protected void addPlayerSlots(EntityPlayer opening) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 9; j++) {
-                addSlotToContainer(new Slot(opening.inventory, j + i * 9 + 9, 133 + j * 18, 124 + i * 18));
+    override fun addPlayerSlots(opening: EntityPlayer) {
+        for (i in 0..2) {
+            for (j in 0..8) {
+                addSlotToContainer(Slot(opening.inventory, j + i * 9 + 9, 133 + j * 18, 124 + i * 18))
             }
         }
-        for (int i = 0; i < 9; i++) {
-            addSlotToContainer(new Slot(opening.inventory, i, 133 + i * 18, 182));
+        for (i in 0..8) {
+            addSlotToContainer(Slot(opening.inventory, i, 133 + i * 18, 182))
         }
     }
 }

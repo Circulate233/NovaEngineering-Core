@@ -5,6 +5,7 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "AccessorGuiCraftConfirm",
     "MixinAppEngClientPacketHandler",
     "MixinGuiCraftingStatus",
     "MixinGuiPatternTerm"
@@ -15,7 +16,9 @@
   "mixins": [
     "AccessorAbstractCellInventory",
     "AccessorCellRegistry",
+    "AccessorContainerCraftConfirm",
     "AccessorContainerPatternEncoder",
+    "AccessorCraftingCPURecord",
     "MixinAppEngServerPacketHandler",
     "MixinCraftingCPUCluster",
     "MixinCraftingCPUClusterTwo",

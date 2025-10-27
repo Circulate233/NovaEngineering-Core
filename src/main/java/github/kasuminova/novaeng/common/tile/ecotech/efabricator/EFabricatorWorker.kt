@@ -1,442 +1,442 @@
-package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
+package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.config.Actionable;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.me.GridAccessException;
-import appeng.util.item.AEItemStack;
-import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus;
-import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate;
-import hellfirepvp.modularmachinery.common.util.ItemUtils;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import lombok.Getter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
+import appeng.api.config.Actionable
+import appeng.api.networking.energy.IEnergyGrid
+import appeng.api.storage.data.IAEItemStack
+import appeng.api.storage.data.IItemList
+import appeng.me.GridAccessException
+import appeng.util.item.AEItemStack
+import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus
+import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate
+import hellfirepvp.modularmachinery.common.util.ItemUtils
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import java.util.ArrayDeque
+import java.util.Arrays
+import java.util.Deque
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.network.NetworkRegistry
+import kotlin.math.max
+import kotlin.math.min
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
+open class EFabricatorWorker : EFabricatorPart() {
 
-public class EFabricatorWorker extends EFabricatorPart {
+    companion object {
+        const val MAX_ENERGY_CACHE: Int = 500000
+        const val MAX_QUEUE_DEPTH: Int = 32
 
-    public static final int MAX_ENERGY_CACHE = 500_000;
-    public static final int MAX_QUEUE_DEPTH = 32;
-
-    public static final int ENERGY_USAGE = 100;
-    public static final int COOLANT_USAGE = 5;
-
-    @Getter
-    protected final CraftingQueue queue = new CraftingQueue();
-
-    @Getter
-    protected WorkerStatus status = WorkerStatus.OFF;
-    protected int queueDepth = MAX_QUEUE_DEPTH;
-    @Getter
-    protected int energyCache = 0;
-
-    protected long lastUpdateTick = 0L;
-
-    public EFabricatorWorker() {
+        const val ENERGY_USAGE: Int = 100
+        const val COOLANT_USAGE: Int = 5
     }
 
-    public int getRemainingSpace() {
-        return this.getQueueDepth() - this.queue.size();
-    }
+    val queue = CraftingQueue()
 
-    public synchronized int doWork() {
-        EFabricatorController controller = partController;
-        int coolantCache = controller.getCoolantCache();
-        int energyUsage;
-        if (controller.isOverclocked() && !controller.isActiveCooling()) {
-            energyUsage = controller.getLevel().applyOverclockEnergyUsage(ENERGY_USAGE);
-        } else {
-            energyUsage = ENERGY_USAGE;
-        }
-        double energy = this.energyCache;
-        var c = controller.getChannel();
-        IEnergyGrid grid = null;
-        if (c != null) {
-            try {
-                grid = c.proxy.getGrid().getCache(IEnergyGrid.class);
-                energy += grid.getStoredPower();
-            } catch (GridAccessException ignored) {
-
+    var status = WorkerStatus.OFF
+        set(value) {
+            field = value
+            if (FMLCommonHandler.instance().getEffectiveSide().isServer) {
+                markNoUpdateSync()
             }
         }
-        int parallelism = (int) Math.min(Math.max(controller.getAvailableParallelism(), 1), energy / energyUsage);
-        if (controller.isActiveCooling()) {
-            parallelism = Math.min(parallelism, coolantCache / COOLANT_USAGE);
+    var queueDepth = MAX_QUEUE_DEPTH
+        get() {
+            val controller = getController()
+            if (controller != null && controller.overclocked) {
+                return controller.level.applyOverclockQueueDepth(field)
+            }
+            return field
         }
 
-        int completed = 0;
-        IItemList<IAEItemStack> outputBuffer = controller.getOutputBuffer();
-        CraftWork craftWork;
-        synchronized (outputBuffer) {
-            while ((parallelism > completed) && (craftWork = queue.poll()) != null) {
-                var workSize = parallelism - completed;
-                final var size = craftWork.size;
-                final CraftWork out;
+    var energyCache = 0
+
+    var updateTick = 0L
+
+    val remainingSpace: Int
+        get() = this.queueDepth - this.queue.size()
+
+    fun getMaxEnergyCache(): Int {
+        return MAX_ENERGY_CACHE
+    }
+
+    @Synchronized
+    fun doWork(): Int {
+        val controller = partController
+        val coolantCache = controller.coolantCache
+        val energyUsage: Int = if (controller.overclocked && !controller.activeCooling) {
+            controller.level.applyOverclockEnergyUsage(ENERGY_USAGE)
+        } else {
+            ENERGY_USAGE
+        }
+        var energy = this.energyCache.toDouble()
+        val c = controller.channel
+        var grid: IEnergyGrid? = null
+        if (c != null) {
+            try {
+                grid = c.proxy.grid.getCache(IEnergyGrid::class.java)
+                energy += grid.storedPower
+            } catch (ignored: GridAccessException) {
+            }
+        }
+        var parallelism = min(max(controller.availableParallelism, 1).toDouble(), energy / energyUsage).toInt()
+        if (controller.activeCooling) {
+            parallelism = min(parallelism, coolantCache / COOLANT_USAGE)
+        }
+
+        var completed = 0
+        val outputBuffer: IItemList<IAEItemStack> = controller.outputBuffer
+        var craftWork: CraftWork
+        synchronized(outputBuffer) {
+            while ((parallelism > completed) && !queue.isEmpty) {
+                craftWork = queue.poll()
+                val workSize = parallelism - completed
+                val size = craftWork.size
+                val out: CraftWork
                 if (size > workSize) {
-                    out = craftWork.split(workSize);
-                    queue.add(craftWork);
+                    out = craftWork.split(workSize)
+                    queue.add(craftWork)
                 } else {
-                    out = craftWork;
+                    out = craftWork
                 }
-                for (ItemStack remain : out.getRemaining()) {
-                    if (!remain.isEmpty()) {
-                        outputBuffer.add(AEItemStack.fromItemStack(remain));
+                for (remain in out.remaining) {
+                    if (!remain.isEmpty) {
+                        outputBuffer.add(AEItemStack.fromItemStack(remain))
                     }
                 }
-                outputBuffer.add(AEItemStack.fromItemStack(out.getOutput()));
+                outputBuffer.add(AEItemStack.fromItemStack(out.output))
 
-                completed += out.size;
+                completed += out.size
             }
         }
 
         if (completed > 0) {
-            int in = energyUsage * completed;
-            if (in > energyCache) {
-                energyCache = 0;
-                in -= energyCache;
+            var `in` = energyUsage * completed
+            if (`in` > energyCache) {
+                `in` -= energyCache
+                energyCache = 0
                 if (grid != null) {
-                    synchronized (grid) {
-                        grid.injectPower(in, Actionable.MODULATE);
+                    synchronized(grid) {
+                        grid.injectPower(`in`.toDouble(), Actionable.MODULATE)
                     }
                 }
             } else {
-                energyCache -= in;
+                energyCache -= `in`
             }
-            if (controller.isActiveCooling()) {
-                controller.consumeCoolant(COOLANT_USAGE * completed);
+            if (controller.activeCooling) {
+                controller.consumeCoolant(COOLANT_USAGE * completed)
             }
         }
-        return completed;
+        return completed
     }
 
-    public void supplyEnergy(int energy) {
-        energyCache += energy;
+    fun supplyEnergy(energy: Int) {
+        energyCache += energy
     }
 
-    public int getMaxEnergyCache() {
-        return MAX_ENERGY_CACHE;
+    fun offerWork(craftWork: CraftWork) {
+        queue.add(craftWork)
     }
 
-    public int getQueueDepth() {
-        EFabricatorController controller = getController();
-        if (controller != null && controller.isOverclocked()) {
-            return controller.getLevel().applyOverclockQueueDepth(queueDepth);
-        }
-        return queueDepth;
+    fun hasWork(): Boolean {
+        return !queue.isEmpty
     }
 
-    public void offerWork(final CraftWork craftWork) {
-        queue.add(craftWork);
+    val isFull: Boolean
+        get() = queue.size() >= queueDepth
+
+    override fun onAssembled() {
+        updateStatus(true)
+        super.onAssembled()
     }
 
-    public boolean hasWork() {
-        return !queue.isEmpty();
+    override fun onDisassembled() {
+        updateStatus(true)
+        super.onDisassembled()
     }
 
-    public boolean isFull() {
-        return queue.size() >= getQueueDepth();
-    }
-
-    @Override
-    public void onAssembled() {
-        updateStatus(true);
-        super.onAssembled();
-    }
-
-    @Override
-    public void onDisassembled() {
-        updateStatus(true);
-        super.onDisassembled();
-    }
-
-    public void updateStatus(final boolean force) {
-        long prevUpdateTick = lastUpdateTick;
-        long updateTick = getWorld().getTotalWorldTime();
+    fun updateStatus(force: Boolean) {
+        val prevUpdateTick = updateTick
+        val updateTick = getWorld().totalWorldTime
 
         if (!force && status == WorkerStatus.RUN && prevUpdateTick + 20 >= updateTick) {
             if (hasWork()) {
-                lastUpdateTick = updateTick;
+                this@EFabricatorWorker.updateTick = updateTick
             }
-            return;
+            return
         }
 
-        if (getController() == null) {
+        if (controller == null) {
             if (status != WorkerStatus.OFF) {
-                setStatus(WorkerStatus.OFF);
+                status = WorkerStatus.OFF
             }
         } else if (hasWork()) {
             if (status != WorkerStatus.RUN) {
-                setStatus(WorkerStatus.RUN);
+                status = WorkerStatus.RUN
             }
         } else {
             if (status != WorkerStatus.ON) {
-                setStatus(WorkerStatus.ON);
+                status = WorkerStatus.ON
             }
         }
-        lastUpdateTick = updateTick;
+        this@EFabricatorWorker.updateTick = updateTick
     }
 
-    public void setStatus(final WorkerStatus status) {
-        this.status = status;
-        if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-            markNoUpdateSync();
-        }
-    }
-
-    @Override
-    public void markNoUpdate() {
-        if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
+    override fun markNoUpdate() {
+        if (FMLCommonHandler.instance().getEffectiveSide().isServer) {
             NovaEngineeringCore.NET_CHANNEL.sendToAllTracking(
-                    new PktEFabricatorWorkerStatusUpdate(getPos(), status),
-                    new NetworkRegistry.TargetPoint(
-                            world.provider.getDimension(),
-                            pos.getX(), pos.getY(), pos.getZ(),
-                            -1)
-            );
+                PktEFabricatorWorkerStatusUpdate(getPos(), status),
+                NetworkRegistry.TargetPoint(
+                    world.provider.dimension,
+                    pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
+                    -1.0
+                )
+            )
         }
-        super.markNoUpdate();
+        super.markNoUpdate()
     }
 
-    @Override
-    public void readCustomNBT(final NBTTagCompound compound) {
-        queue.readFromNBT(compound);
-        energyCache = compound.getInteger("energyCache");
-        status = WorkerStatus.values()[compound.getByte("status")];
-        super.readCustomNBT(compound);
+    override fun readCustomNBT(compound: NBTTagCompound) {
+        queue.readFromNBT(compound)
+        energyCache = compound.getInteger("energyCache")
+        status = WorkerStatus.entries[compound.getByte("status").toInt()]
+        super.readCustomNBT(compound)
     }
 
-    @Override
-    public void writeCustomNBT(final NBTTagCompound compound) {
-        queue.writeToNBT(compound);
-        compound.setInteger("energyCache", energyCache);
-        compound.setByte("status", (byte) status.ordinal());
-        super.writeCustomNBT(compound);
+    override fun writeCustomNBT(compound: NBTTagCompound) {
+        queue.writeToNBT(compound)
+        compound.setInteger("energyCache", energyCache)
+        compound.setByte("status", status.ordinal.toByte())
+        super.writeCustomNBT(compound)
     }
 
-    public static class CraftingQueue {
+    class CraftingQueue {
+        val queue: Deque<CraftWork> = ArrayDeque<CraftWork>()
+        private var size = 0
 
-        private static final String QUEUE_TAG = "Q";
-        private static final String STACK_SET_TAG = "SS";
-        private static final String STACK_SET_TAG_ID_PREFIX = "S#";
-        private static final String STACK_SET_SIZE_TAG = "SSS";
-        private static final String REPEAT_TAG = "R";
-
-        @Getter
-        private final Deque<CraftWork> queue = new ArrayDeque<>();
-        private int size = 0;
-
-        public int size() {
-            return size;
+        fun size(): Int {
+            return size
         }
 
-        public boolean isEmpty() {
-            return queue.isEmpty();
+        val isEmpty: Boolean
+            get() = queue.isEmpty()
+
+        fun add(craftWork: CraftWork) {
+            queue.add(craftWork)
+            size += craftWork.size
         }
 
-        public void add(final CraftWork craftWork) {
-            queue.add(craftWork);
-            size += craftWork.size;
-        }
-
-        public CraftWork poll() {
-            var i = queue.poll();
+        fun poll(): CraftWork {
+            val i = queue.poll()
             if (i != null) {
-                size -= i.size;
+                size -= i.size
             } else {
-                size = 0;
+                size = 0
             }
-            return i;
+            return i
         }
 
-        public CraftWork peek() {
-            return queue.peek();
+        fun peek(): CraftWork? {
+            return queue.peek()
         }
 
-        public NBTTagCompound writeToNBT(final NBTTagCompound nbt) {
+        fun writeToNBT(nbt: NBTTagCompound): NBTTagCompound {
             if (queue.isEmpty()) {
-                return nbt;
+                return nbt
             }
 
-            List<ItemStack> stackSet = new ObjectArrayList<>();
+            val stackSet = ObjectArrayList<ItemStack>()
 
             // Queue
-            NBTTagList queueTag = new NBTTagList();
-            CraftWork prev = null;
-            int repeat = 0;
-            for (CraftWork craftWork : queue) {
-                if (prev != null && prev.equals(craftWork)) {
-                    repeat++;
-                    continue;
+            val queueTag = NBTTagList()
+            var prev: CraftWork? = null
+            var repeat = 0
+            for (craftWork in queue) {
+                if (prev != null && prev == craftWork) {
+                    repeat++
+                    continue
                 }
                 if (repeat > 0) {
-                    queueTag.getCompoundTagAt(queueTag.tagCount() - 1).setShort(REPEAT_TAG, (short) repeat);
-                    repeat = 0;
+                    queueTag.getCompoundTagAt(queueTag.tagCount() - 1).setShort(REPEAT_TAG, repeat.toShort())
+                    repeat = 0
                 }
-                queueTag.appendTag(craftWork.writeToNBT(stackSet));
-                prev = craftWork;
+                queueTag.appendTag(craftWork.writeToNBT(stackSet))
+                prev = craftWork
             }
             if (repeat > 0) {
-                queueTag.getCompoundTagAt(queueTag.tagCount() - 1).setShort(REPEAT_TAG, (short) repeat);
+                queueTag.getCompoundTagAt(queueTag.tagCount() - 1).setShort(REPEAT_TAG, repeat.toShort())
             }
-            nbt.setTag(QUEUE_TAG, queueTag);
+            nbt.setTag(QUEUE_TAG, queueTag)
 
             // StackSet
-            NBTTagCompound stackSetTag = new NBTTagCompound();
-            for (int i = 0; i < stackSet.size(); i++) {
-                final ItemStack stack = stackSet.get(i);
-                if (!stack.isEmpty()) {
-                    stackSetTag.setTag(STACK_SET_TAG_ID_PREFIX + i, stack.serializeNBT());
+            val stackSetTag = NBTTagCompound()
+            for (i in stackSet.indices) {
+                val stack = stackSet[i]
+                if (!stack.isEmpty) {
+                    stackSetTag.setTag(STACK_SET_TAG_ID_PREFIX + i, stack.serializeNBT())
                 }
             }
-            nbt.setTag(STACK_SET_TAG, stackSetTag);
-            nbt.setInteger(STACK_SET_SIZE_TAG, stackSet.size());
+            nbt.setTag(STACK_SET_TAG, stackSetTag)
+            nbt.setInteger(STACK_SET_SIZE_TAG, stackSet.size)
 
-            return nbt;
+            return nbt
         }
 
-        public void readFromNBT(final NBTTagCompound nbt) {
-            queue.clear();
-            List<ItemStack> stackSet = new ObjectArrayList<>();
+        fun readFromNBT(nbt: NBTTagCompound) {
+            queue.clear()
+            val stackSet = ObjectArrayList<ItemStack>()
 
             // StackSet
-            NBTTagCompound stackSetTag = nbt.getCompoundTag(STACK_SET_TAG);
-            for (int i = 0; i < nbt.getInteger(STACK_SET_SIZE_TAG); i++) {
-                stackSet.add(new ItemStack(stackSetTag.getCompoundTag(STACK_SET_TAG_ID_PREFIX + i)));
+            val stackSetTag = nbt.getCompoundTag(STACK_SET_TAG)
+            for (i in 0..<nbt.getInteger(STACK_SET_SIZE_TAG)) {
+                stackSet.add(ItemStack(stackSetTag.getCompoundTag(STACK_SET_TAG_ID_PREFIX + i)))
             }
 
             // Queue
-            NBTTagList queueTag = nbt.getTagList(QUEUE_TAG, Constants.NBT.TAG_COMPOUND);
-            for (int i = 0; i < queueTag.tagCount(); i++) {
-                NBTTagCompound tagAt = queueTag.getCompoundTagAt(i);
-                CraftWork work = new CraftWork(tagAt, stackSet);
-                queue.add(work);
-                short repeat = tagAt.getShort(REPEAT_TAG);
-                for (short r = 0; r < repeat; r++) {
-                    queue.add(work.copy());
+            val queueTag = nbt.getTagList(QUEUE_TAG, Constants.NBT.TAG_COMPOUND)
+            for (i in 0..<queueTag.tagCount()) {
+                val tagAt = queueTag.getCompoundTagAt(i)
+                val work = CraftWork(tagAt, stackSet)
+                queue.add(work)
+                val repeat = tagAt.getShort(REPEAT_TAG)
+                for (r in 0..<repeat) {
+                    queue.add(work.copy())
                 }
             }
         }
 
+        companion object {
+            private const val QUEUE_TAG = "Q"
+            private const val STACK_SET_TAG = "SS"
+            private const val STACK_SET_TAG_ID_PREFIX = "S#"
+            private const val STACK_SET_SIZE_TAG = "SSS"
+            private const val REPEAT_TAG = "R"
+        }
     }
 
-    @Getter
-    public static class CraftWork {
+    class CraftWork {
+        internal val remaining: Array<ItemStack>
+        val output: ItemStack
+        internal var size: Int
 
-        private static final String REMAIN_TAG_PREFIX = "R#";
-        private static final String REMAIN_SIZE_TAG = REMAIN_TAG_PREFIX + "S";
-        private static final String OUTPUT_TAG = "O";
-        private static final String SIZE = "Z";
-
-        private final ItemStack[] remaining;
-        private final ItemStack output;
-        private int size;
-
-        public CraftWork(final ItemStack[] remaining, final ItemStack output, final int size) {
-            this.remaining = remaining;
-            this.output = output;
-            this.size = Math.max(1, size);
+        constructor(remaining: Array<ItemStack>, output: ItemStack, size: Int) {
+            this.remaining = remaining
+            this.output = output
+            this.size = max(1, size)
         }
 
-        public CraftWork(final NBTTagCompound nbt, final List<ItemStack> stackSet) {
-            remaining = new ItemStack[nbt.getByte(REMAIN_SIZE_TAG)];
-            for (int remainIdx = 0; remainIdx < remaining.length; remainIdx++) {
-                int setIdx = nbt.hasKey(REMAIN_TAG_PREFIX + remainIdx) ? nbt.getInteger(REMAIN_TAG_PREFIX + remainIdx) : -1;
-                remaining[remainIdx] = setIdx == -1 ? ItemStack.EMPTY : stackSet.get(setIdx);
+        constructor(nbt: NBTTagCompound, stackSet: MutableList<ItemStack>) {
+            remaining = Array<ItemStack>(
+                nbt.getByte(REMAIN_SIZE_TAG).toInt()
+            ) { i -> ItemStack.EMPTY }
+            for (remainIdx in remaining.indices) {
+                val setIdx =
+                    if (nbt.hasKey(REMAIN_TAG_PREFIX + remainIdx)) nbt.getInteger(REMAIN_TAG_PREFIX + remainIdx) else -1
+                remaining[remainIdx] = if (setIdx == -1) ItemStack.EMPTY else stackSet[setIdx]
             }
-            output = stackSet.get(nbt.getInteger(OUTPUT_TAG));
-            size = Math.max(1, nbt.getInteger(SIZE));
+            output = stackSet[nbt.getInteger(OUTPUT_TAG)]
+            size = max(1, nbt.getInteger(SIZE))
         }
 
-        private static boolean matchStacksStrict(final ItemStack stack1, final ItemStack stack2) {
-            return ItemUtils.matchStacks(stack1, stack2) && stack1.getCount() == stack2.getCount();
-        }
-
-        public CraftWork split(int amount) {
-            final var i = Math.min(amount, this.size);
+        fun split(amount: Int): CraftWork {
+            val i = min(amount, this.size)
             if (i > 0) {
-                final var inputs = new ItemStack[this.remaining.length];
-                for (int ii = 0; ii < remaining.length; ii++) {
-                    inputs[ii] = remaining[ii].splitStack(i);
+                val inputs: Array<ItemStack> = Array<ItemStack>(
+                    this.remaining.size
+                ) { i -> ItemStack.EMPTY }
+                for (ii in remaining.indices) {
+                    inputs[ii] = remaining[ii].splitStack(i)
                 }
-                final var output = this.output.copy();
-                final var eachOutput = this.output.getCount() / size;
-                final var outCount = i * eachOutput;
-                output.setCount(outCount);
-                this.output.shrink(outCount);
-                size -= i;
-                return new CraftWork(inputs, output, i);
+                val output = this.output.copy()
+                val eachOutput = this.output.count / size
+                val outCount = i * eachOutput
+                output.setCount(outCount)
+                this.output.shrink(outCount)
+                size -= i
+                return CraftWork(inputs, output, i)
             } else {
-                final var inputs = new ItemStack[this.remaining.length];
-                Arrays.fill(inputs, ItemStack.EMPTY);
-                return new CraftWork(inputs, ItemStack.EMPTY, 0);
+                val inputs = Array<ItemStack>(this.remaining.size) { i -> ItemStack.EMPTY }
+                return CraftWork(inputs, ItemStack.EMPTY, 0)
             }
         }
 
-        public NBTTagCompound writeToNBT(final List<ItemStack> stackSet) {
-            NBTTagCompound nbt = new NBTTagCompound();
+        fun writeToNBT(stackSet: MutableList<ItemStack>): NBTTagCompound {
+            val nbt = NBTTagCompound()
 
             // Input.
-            nbt.setByte(REMAIN_SIZE_TAG, (byte) remaining.length);
-            remain:
-            for (int remainIdx = 0; remainIdx < remaining.length; remainIdx++) {
-                final ItemStack remain = remaining[remainIdx];
-                if (remain.isEmpty()) {
-                    continue;
+            nbt.setByte(REMAIN_SIZE_TAG, remaining.size.toByte())
+            remain@ for (remainIdx in remaining.indices) {
+                val remain = remaining[remainIdx]
+                if (remain.isEmpty) {
+                    continue
                 }
 
-                for (int setIdx = 0; setIdx < stackSet.size(); setIdx++) {
-                    if (matchStacksStrict(remain, stackSet.get(setIdx))) {
-                        nbt.setShort(REMAIN_TAG_PREFIX + remainIdx, (short) setIdx);
-                        continue remain;
+                for (setIdx in stackSet.indices) {
+                    if (matchStacksStrict(remain, stackSet[setIdx])) {
+                        nbt.setShort(REMAIN_TAG_PREFIX + remainIdx, setIdx.toShort())
+                        continue@remain
                     }
                 }
 
-                stackSet.add(remain);
-                nbt.setShort(REMAIN_TAG_PREFIX + remainIdx, (short) (stackSet.size() - 1));
+                stackSet.add(remain)
+                nbt.setShort(REMAIN_TAG_PREFIX + remainIdx, (stackSet.size - 1).toShort())
             }
 
             // Output
-            for (int setIdx = 0; setIdx < stackSet.size(); setIdx++) {
-                if (matchStacksStrict(output, stackSet.get(setIdx))) {
-                    nbt.setShort(OUTPUT_TAG, (short) setIdx);
-                    return nbt;
+            for (setIdx in stackSet.indices) {
+                if (matchStacksStrict(output, stackSet[setIdx])) {
+                    nbt.setShort(OUTPUT_TAG, setIdx.toShort())
+                    return nbt
                 }
             }
 
-            stackSet.add(output);
-            nbt.setShort(OUTPUT_TAG, (short) (stackSet.size() - 1));
-            nbt.setInteger(SIZE, size);
-            return nbt;
+            stackSet.add(output)
+            nbt.setShort(OUTPUT_TAG, (stackSet.size - 1).toShort())
+            nbt.setInteger(SIZE, size)
+            return nbt
         }
 
-        public CraftWork copy() {
-            ItemStack[] remaining = Arrays.stream(this.remaining).map(ItemStack::copy).toArray(ItemStack[]::new);
-            return new CraftWork(remaining, output.copy(), this.size);
+        fun copy(): CraftWork {
+            val remaining = Arrays.stream<ItemStack>(this.remaining)
+                .map { obj: ItemStack -> obj.copy() }
+                .toArray {
+                    Array<ItemStack>(
+                        0
+                    ) { ItemStack.EMPTY }
+                }
+            return CraftWork(remaining, output.copy(), this.size)
         }
 
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj instanceof final CraftWork craftWork) {
-                for (int i = 0; i < remaining.length; i++) {
-                    if (!matchStacksStrict(remaining[i], craftWork.remaining[i])) {
-                        return false;
+        override fun equals(other: Any?): Boolean {
+            if (other is CraftWork) {
+                for (i in remaining.indices) {
+                    if (!matchStacksStrict(remaining[i], other.remaining[i])) {
+                        return false
                     }
                 }
-                return matchStacksStrict(output, craftWork.output);
+                return matchStacksStrict(output, other.output)
             }
-            return false;
+            return false
         }
 
+        companion object {
+            private const val REMAIN_TAG_PREFIX = "R#"
+            private val REMAIN_SIZE_TAG = REMAIN_TAG_PREFIX + "S"
+            private const val OUTPUT_TAG = "O"
+            private const val SIZE = "Z"
+
+            private fun matchStacksStrict(stack1: ItemStack, stack2: ItemStack): Boolean {
+                return ItemUtils.matchStacks(stack1, stack2) && stack1.count == stack2.count
+            }
+        }
+
+        override fun hashCode(): Int {
+            var result = size
+            result = 31 * result + remaining.contentHashCode()
+            result = 31 * result + output.hashCode()
+            return result
+        }
     }
 }

@@ -1,226 +1,233 @@
-package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
+package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.config.PowerMultiplier;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.me.GridAccessException;
-import appeng.me.helpers.AENetworkProxy;
-import appeng.tile.inventory.AppEngInternalInventory;
-import appeng.util.Platform;
-import appeng.util.item.ItemList;
-import github.kasuminova.mmce.client.util.ItemStackUtils;
-import github.kasuminova.mmce.common.helper.IDynamicPatternInfo;
-import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.client.util.BlockModelHider;
-import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController;
-import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.Levels;
-import github.kasuminova.novaeng.common.network.PktEFabricatorGUIData;
-import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
-import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Modifier;
-import github.kasuminova.novaeng.common.util.MachineCoolants;
-import hellfirepvp.modularmachinery.ModularMachinery;
-import hellfirepvp.modularmachinery.client.ClientProxy;
-import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
-import hellfirepvp.modularmachinery.common.util.ItemUtils;
-import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
-import lombok.Getter;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import appeng.api.AEApi
+import appeng.api.config.Actionable
+import appeng.api.config.PowerMultiplier
+import appeng.api.networking.energy.IEnergyGrid
+import appeng.api.storage.channels.IItemStorageChannel
+import appeng.api.storage.data.IAEItemStack
+import appeng.api.storage.data.IItemList
+import appeng.me.GridAccessException
+import appeng.util.Platform
+import appeng.util.item.ItemList
+import github.kasuminova.mmce.client.util.ItemStackUtils
+import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.client.util.BlockModelHider
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController
+import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.Levels
+import github.kasuminova.novaeng.common.network.PktEFabricatorGUIData
+import github.kasuminova.novaeng.common.tile.ecotech.EPartController
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker.CraftWork
+import github.kasuminova.novaeng.common.util.Functions
+import github.kasuminova.novaeng.common.util.MachineCoolants
+import hellfirepvp.modularmachinery.ModularMachinery
+import hellfirepvp.modularmachinery.client.ClientProxy
+import hellfirepvp.modularmachinery.common.crafting.helper.ProcessingComponent
+import hellfirepvp.modularmachinery.common.machine.IOType
+import hellfirepvp.modularmachinery.common.machine.MachineRegistry
+import hellfirepvp.modularmachinery.common.util.ItemUtils
+import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import java.util.function.Consumer
+import java.util.function.IntFunction
+import java.util.stream.Collectors
+import java.util.stream.IntStream
+import java.util.stream.Stream
+import net.minecraft.block.Block
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.BlockPos
+import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.IFluidHandler
+import net.minecraftforge.fml.common.FMLCommonHandler
+import kotlin.concurrent.Volatile
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+@Suppress("unused")
+open class EFabricatorController() : EPartController<EFabricatorPart>() {
 
-import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L4;
-import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L6;
-import static github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController.L9;
+    companion object {
+        const val MAX_COOLANT_CACHE: Int = 100000
+        const val WORK_DELAY: Int = 20
 
-@SuppressWarnings({"FieldAccessedSynchronizedAndUnsynchronized", "unused"})
-public class EFabricatorController extends EPartController<EFabricatorPart> {
+        val HIDE_POS_LIST: MutableList<BlockPos> = Functions.asList( // Center
+            BlockPos(0, 1, 0),
+            BlockPos(0, -1, 0),
 
-    public static final int MAX_COOLANT_CACHE = 100_000;
-    public static final int WORK_DELAY = 20;
+            BlockPos(0, 1, 1),
+            BlockPos(0, 0, 1),
+            BlockPos(0, -1, 1),  // Left
 
-    public static final List<BlockPos> HIDE_POS_LIST = Arrays.asList(
-            // Center
-            new BlockPos(0, 1, 0),
-            new BlockPos(0, -1, 0),
+            BlockPos(1, 1, 0),
+            BlockPos(1, 0, 0),
+            BlockPos(1, -1, 0),
 
-            new BlockPos(0, 1, 1),
-            new BlockPos(0, 0, 1),
-            new BlockPos(0, -1, 1),
+            BlockPos(1, 1, 1),
+            BlockPos(1, 0, 1),
+            BlockPos(1, -1, 1),  // Right
 
-            // Left
-            new BlockPos(1, 1, 0),
-            new BlockPos(1, 0, 0),
-            new BlockPos(1, -1, 0),
+            BlockPos(-1, 1, 0),
+            BlockPos(-1, 0, 0),
+            BlockPos(-1, -1, 0),
 
-            new BlockPos(1, 1, 1),
-            new BlockPos(1, 0, 1),
-            new BlockPos(1, -1, 1),
-
-            // Right
-            new BlockPos(-1, 1, 0),
-            new BlockPos(-1, 0, 0),
-            new BlockPos(-1, -1, 0),
-
-            new BlockPos(-1, 1, 1),
-            new BlockPos(-1, 0, 1),
-            new BlockPos(-1, -1, 1)
-    );
-
-    protected final List<IFluidHandler> coolantInputHandlers = new ArrayList<>();
-    protected final List<IFluidHandler> coolantOutputHandlers = new ArrayList<>();
-
-    protected final IItemStorageChannel itemChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
-    @Getter
-    protected IItemList<IAEItemStack> outputBuffer = new ItemList();
-
-    @Getter
-    protected BlockEFabricatorController parentController = null;
-    protected double idleDrain = 64;
-
-    @Getter
-    protected EFabricatorMEChannel channel = null;
-
-    @Getter
-    protected int length = 0;
-
-    protected int workDelay = WORK_DELAY;
-    protected int maxWorkDelay = WORK_DELAY;
-
-    @Getter
-    protected int parallelism = 0;
-    protected int consumedParallelism = 0;
-
-    @Getter
-    protected int coolantCache = 0;
-
-    @Getter
-    protected long totalCrafted = 0;
-
-    protected boolean speedupApplied = false;
-    @Getter
-    protected boolean overclocked = false;
-    @Getter
-    protected boolean activeCooling = false;
-
-    protected PktEFabricatorGUIData guiDataPacket = null;
-    protected volatile boolean guiDataDirty = false;
-
-    public EFabricatorController(final ResourceLocation machineRegistryName) {
-        this();
-        this.parentMachine = MachineRegistry.getRegistry().getMachine(machineRegistryName);
-        this.parentController = BlockEFabricatorController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, machineRegistryName.getPath()));
+            BlockPos(-1, 1, 1),
+            BlockPos(-1, 0, 1),
+            BlockPos(-1, -1, 1)
+        )
     }
 
-    public EFabricatorController() {
-        this.workMode = WorkMode.SEMI_SYNC;
-    }
+    val coolantInputHandlers = ObjectArrayList<IFluidHandler>()
+    val coolantOutputHandlers = ObjectArrayList<IFluidHandler>()
 
-    protected boolean onSyncTick() {
-        if (channel == null || !channel.getProxy().isActive()) {
-            this.tickExecutor = null;
-            return false;
+    val itemChannel = AEApi.instance().storage()
+        .getStorageChannel(IItemStorageChannel::class.java)
+
+    var outputBuffer: IItemList<IAEItemStack> = ItemList()
+
+    var parentController: BlockEFabricatorController? = null
+    var energyConsumePerTick: Double = 64.0
+
+    var channel: EFabricatorMEChannel? = null
+
+    var length = 0
+
+    var workDelay = WORK_DELAY
+    var maxWorkDelay = WORK_DELAY
+
+    var parallelism = 0
+    var consumedParallelism = 0
+
+    var coolantCache = 0
+
+    var totalCrafted: Long = 0
+
+    var speedupApplied = false
+
+    var overclocked = false
+        set(value) {
+            field = value
+            updateParallelism()
+            updateGUIDataPacket()
         }
 
-        workDelay--;
+    var activeCooling = false
+        set(value) {
+            field = value
+            updateParallelism()
+            updateWorkDelay()
+            updateGUIDataPacket()
+        }
+
+    var guiDataPacket: PktEFabricatorGUIData? = null
+        get() {
+            if (guiDataDirty || field == null) {
+                field = PktEFabricatorGUIData(this)
+                this.guiDataDirty = false
+            }
+            return field
+        }
+
+    @Volatile
+    var guiDataDirty = false
+
+    constructor(machineRegistryName: ResourceLocation) : this() {
+        this.parentMachine = MachineRegistry.getRegistry().getMachine(machineRegistryName)
+        this.parentController = BlockEFabricatorController.REGISTRY[ResourceLocation(
+            NovaEngineeringCore.MOD_ID,
+            machineRegistryName.getPath()
+        )]
+    }
+
+    init {
+        this.workMode = WorkMode.SEMI_SYNC
+    }
+
+    override fun onSyncTick(): Boolean {
+        if (channel == null || !channel!!.proxy.isActive) {
+            this.tickExecutor = null
+            return false
+        }
+
+        workDelay--
         if (workDelay > 0) {
-            this.tickExecutor = null;
-            return false;
+            this.tickExecutor = null
+            return false
         }
-        workDelay = maxWorkDelay;
-        speedupApplied = false;
-        clearOutputBuffer();
-        supplyWorkerPower();
-        supplyCoolantCache();
-        return true;
+        workDelay = maxWorkDelay
+        speedupApplied = false
+        clearOutputBuffer()
+        supplyWorkerPower()
+        supplyCoolantCache()
+        return true
     }
 
-    protected void onAsyncTick() {
-        updateGUIDataPacket();
+    override fun onAsyncTick() {
+        updateGUIDataPacket()
 
-        long prevTotalCrafted = totalCrafted;
-        List<EFabricatorWorker> workers = getWorkers();
-        workers.forEach(worker -> worker.updateStatus(false));
-        for (EFabricatorWorker worker : workers) {
+        val prevTotalCrafted = totalCrafted
+        val workers = this.workers
+        workers.forEach(Consumer { worker: EFabricatorWorker? -> worker!!.updateStatus(false) })
+        for (worker in workers) {
             if (worker.hasWork()) {
-                int worked = worker.doWork();
-                totalCrafted += worked;
-                consumedParallelism += worked <= 1 ? 0 : worked;
+                val worked = worker.doWork()
+                totalCrafted += worked.toLong()
+                consumedParallelism += if (worked <= 1) 0 else worked
             }
         }
         if (activeCooling && hasWork()) {
-            convertOverflowParallelismToWorkDelay(parallelism - consumedParallelism);
+            convertOverflowParallelismToWorkDelay(parallelism - consumedParallelism)
         }
-        consumedParallelism = 0;
+        consumedParallelism = 0
 
         if (prevTotalCrafted != totalCrafted) {
-            markNoUpdateSync();
+            markNoUpdateSync()
         }
     }
 
-    protected void supplyCoolantCache() {
+    fun supplyCoolantCache() {
         if (coolantCache >= MAX_COOLANT_CACHE) {
-            return;
+            return
         }
 
         // 写了一坨大的！
-        for (final IFluidHandler inputHandler : coolantInputHandlers) {
-            for (final IFluidTankProperties property : inputHandler.getTankProperties()) {
-                FluidStack contents = property.getContents();
+        for (inputHandler in coolantInputHandlers) {
+            for (property in inputHandler.getTankProperties()) {
+                val contents = property.getContents()
                 if (contents == null || contents.amount == 0) {
-                    continue;
+                    continue
                 }
 
-                MachineCoolants.Coolant coolant = MachineCoolants.INSTANCE.getCoolant(contents.getFluid());
-                if (coolant == null) {
-                    continue;
-                }
+                val coolant = MachineCoolants.INSTANCE.getCoolant(contents.fluid) ?: continue
 
-                for (final IFluidHandler outputHandler : coolantOutputHandlers) {
-                    int maxCanConsume = coolant.maxCanConsume(inputHandler, outputHandler);
+                for (outputHandler in coolantOutputHandlers) {
+                    val maxCanConsume = coolant.maxCanConsume(inputHandler, outputHandler)
                     if (maxCanConsume <= 0) {
-                        continue;
+                        continue
                     }
 
-                    int required = MAX_COOLANT_CACHE - coolantCache;
-                    int mul = required / coolant.coolantUnit();
-                    if (mul * coolant.coolantUnit() < required) {
-                        mul++;
+                    val required: Int = MAX_COOLANT_CACHE - coolantCache
+                    var mul = required / coolant.coolantUnit
+                    if (mul * coolant.coolantUnit < required) {
+                        mul++
                     }
-                    mul = Math.min(mul, maxCanConsume);
+                    mul = min(mul, maxCanConsume)
 
                     if (mul > 0) {
-                        FluidStack input = coolant.input();
-                        inputHandler.drain(new FluidStack(input, mul * input.amount), true);
-                        FluidStack output = coolant.output();
+                        val input = coolant.input
+                        inputHandler.drain(FluidStack(input, mul * input.amount), true)
+                        val output = coolant.output
                         if (output != null) {
-                            outputHandler.fill(new FluidStack(output, mul * output.amount), true);
+                            outputHandler.fill(FluidStack(output, mul * output.amount), true)
                         }
-                        coolantCache += mul * coolant.coolantUnit();
+                        coolantCache += mul * coolant.coolantUnit
                         if (coolantCache >= MAX_COOLANT_CACHE) {
-                            return;
+                            return
                         }
                     }
                 }
@@ -228,403 +235,408 @@ public class EFabricatorController extends EPartController<EFabricatorPart> {
         }
     }
 
-    protected void supplyWorkerPower() {
-        IEnergyGrid energy;
+    fun supplyWorkerPower() {
+        val energy: IEnergyGrid
         try {
-            energy = channel.getProxy().getEnergy();
-        } catch (GridAccessException ignored) {
-            return;
+            energy = channel!!.proxy.energy
+        } catch (ignored: GridAccessException) {
+            return
         }
 
-        for (EFabricatorWorker worker : getWorkers()) {
-            if (worker.getEnergyCache() < worker.getMaxEnergyCache()) {
+        for (worker in this.workers) {
+            if (worker.energyCache < worker.getMaxEnergyCache()) {
                 worker.supplyEnergy(
-                        (int) energy.extractAEPower(worker.getMaxEnergyCache() - worker.getEnergyCache(), Actionable.MODULATE, PowerMultiplier.CONFIG));
+                    energy.extractAEPower(
+                        (worker.getMaxEnergyCache() - worker.energyCache).toDouble(),
+                        Actionable.MODULATE,
+                        PowerMultiplier.CONFIG
+                    ).toInt()
+                )
             }
         }
     }
 
-    protected void clearOutputBuffer() {
+    fun clearOutputBuffer() {
         try {
-            AENetworkProxy proxy = this.channel.getProxy();
-            IMEMonitor<IAEItemStack> inv = proxy.getStorage().getInventory(itemChannel);
-            for (final IAEItemStack stack : outputBuffer) {
-                IAEItemStack notInserted = Platform.poweredInsert(proxy.getEnergy(), inv, stack.copy(), this.channel.getSource());
+            val proxy = this.channel!!.proxy
+            val inv = proxy.storage.getInventory(itemChannel)
+            for (stack in outputBuffer) {
+                val notInserted = Platform.poweredInsert<IAEItemStack?>(
+                    proxy.energy,
+                    inv,
+                    stack.copy(),
+                    this.channel!!.source
+                )
                 if (notInserted != null) {
-                    stack.setStackSize(notInserted.getStackSize());
+                    stack.stackSize = notInserted.stackSize
                 } else {
-                    stack.setStackSize(0);
+                    stack.stackSize = 0
                 }
             }
-        } catch (GridAccessException ignored) {
+        } catch (ignored: GridAccessException) {
         }
     }
 
-    @Override
-    protected void updateComponents() {
-        super.updateComponents();
-        IDynamicPatternInfo workers = getDynamicPattern("workers");
-        this.length = workers != null ? workers.getSize() : 0;
-        this.foundComponents.values().forEach(component -> {
-            if (component.providedComponent() instanceof IFluidHandler handler) {
-                switch (component.getComponent().ioType) {
-                    case INPUT -> coolantInputHandlers.add(handler);
-                    case OUTPUT -> coolantOutputHandlers.add(handler);
+    override fun updateComponents() {
+        super.updateComponents()
+        val workers = getDynamicPattern("workers")
+        this.length = workers?.size ?: 0
+        this.foundComponents.values.forEach(Consumer { component: ProcessingComponent<*>? ->
+            val handler = component!!.providedComponent()
+            if (handler is IFluidHandler) {
+                when (component.getComponent().ioType) {
+                    IOType.INPUT -> coolantInputHandlers.add(handler)
+                    IOType.OUTPUT -> coolantOutputHandlers.add(handler)
                 }
             }
-        });
-        updateParallelism();
-        updateWorkDelay();
+        })
+        updateParallelism()
+        updateWorkDelay()
     }
 
-    @Override
-    protected void onAddPart(final EFabricatorPart part) {
-        if (part instanceof EFabricatorMEChannel channelc) {
-            this.channel = channelc;
+    override fun onAddPart(part: EFabricatorPart?) {
+        if (part is EFabricatorMEChannel) {
+            this.channel = part
         }
     }
 
-    protected void clearParts() {
-        super.clearParts();
-        this.coolantInputHandlers.clear();
-        this.coolantOutputHandlers.clear();
-        this.channel = null;
-        this.length = 0;
+    override fun clearParts() {
+        super.clearParts()
+        this.coolantInputHandlers.clear()
+        this.coolantOutputHandlers.clear()
+        this.channel = null
+        this.length = 0
     }
 
-    protected void updateParallelism() {
-        final double[] parallelism = {0};
-        Map<EFabricatorParallelProc.Type, List<Modifier>> modifierMap = getParallelProcs().stream()
-                .flatMap(proc -> overclocked ? Stream.concat(proc.modifiers.stream(), proc.overclockModifiers.stream()) : proc.modifiers.stream()) // 超频额外添加超频修正器
-                .filter(modifier -> modifier.isBuff() || !activeCooling) // 主动冷却移除超频的负面效果。
-                .collect(Collectors.groupingBy(
-                        Modifier::type,
-                        () -> new Object2ObjectAVLTreeMap<>(Comparator.comparingInt(EFabricatorParallelProc.Type::getPriority)),
-                        Collectors.toList())
-                );
+    fun updateParallelism() {
+        val parallelism = doubleArrayOf(0.0)
+        val modifierMap: MutableMap<EFabricatorParallelProc.Type?, MutableList<EFabricatorParallelProc.Modifier>> =
+            this.parallelProcs.stream()
+                .flatMap { proc: EFabricatorParallelProc? ->
+                    if (overclocked) Stream.concat<EFabricatorParallelProc.Modifier>(
+                        proc!!.modifiers.stream(),
+                        proc.overclockModifiers.stream()
+                    ) else proc!!.modifiers.stream()
+                }  // 超频额外添加超频修正器
+                .filter { modifier: EFabricatorParallelProc.Modifier -> modifier.isBuff || !activeCooling }  // 主动冷却移除超频的负面效果。
+                .collect(
+                    Collectors.groupingBy(
+                        EFabricatorParallelProc.Modifier::type,
+                        {
+                            Object2ObjectAVLTreeMap<EFabricatorParallelProc.Type, MutableList<EFabricatorParallelProc.Modifier>>(
+                                Comparator.comparingInt<EFabricatorParallelProc.Type>(EFabricatorParallelProc.Type::priority)
+                            )
+                        },
+                        Collectors.toCollection { ObjectArrayList() }
+                    )
+                )
 
-        modifierMap.values().stream()
-                .flatMap(Collection::stream)
-                .filter(Modifier::isBuff)
-                .forEach(modifier -> parallelism[0] = modifier.apply(parallelism[0]));
-        modifierMap.values().stream()
-                .flatMap(Collection::stream)
-                .filter(Modifier::debuff)
-                .forEach(modifier -> parallelism[0] = modifier.apply(parallelism[0]));
+        modifierMap.values.stream()
+            .flatMap { obj: MutableList<EFabricatorParallelProc.Modifier> -> obj.stream() }
+            .filter { obj: EFabricatorParallelProc.Modifier -> obj.isBuff }
+            .forEach { modifier: EFabricatorParallelProc.Modifier ->
+                parallelism[0] = modifier.apply(parallelism[0])
+            }
+        modifierMap.values.stream()
+            .flatMap { obj: MutableList<EFabricatorParallelProc.Modifier> -> obj.stream() }
+            .filter(EFabricatorParallelProc.Modifier::debuff)
+            .forEach { modifier: EFabricatorParallelProc.Modifier ->
+                parallelism[0] = modifier.apply(parallelism[0])
+            }
 
-        this.parallelism = (int) Math.round(parallelism[0]);
+        this.parallelism = parallelism[0].roundToLong().toInt()
     }
 
-    public synchronized void convertOverflowParallelismToWorkDelay(final int overflow) {
+    @Synchronized
+    fun convertOverflowParallelismToWorkDelay(overflow: Int) {
         if (overflow <= 0 || speedupApplied) {
-            return;
+            return
         }
-        float ratio = (float) parallelism / overflow;
-        int speedUp = Math.min(Math.round(ratio / 0.05f), maxWorkDelay - 1);
+        val ratio = parallelism.toFloat() / overflow
+        var speedUp = min((ratio / 0.05f).roundToInt(), maxWorkDelay - 1)
 
-        double coolantUsage = parallelism * 0.04;
-        int maxCanConsume = (int) (coolantCache / coolantUsage);
-        speedUp = Math.min(speedUp, maxCanConsume);
-        coolantCache -= (int) Math.round(speedUp * coolantUsage);
+        val coolantUsage = parallelism * 0.04
+        val maxCanConsume = (coolantCache / coolantUsage).toInt()
+        speedUp = min(speedUp, maxCanConsume)
+        coolantCache -= (speedUp * coolantUsage).roundToLong().toInt()
 
-        this.workDelay = maxWorkDelay - speedUp;
-        this.speedupApplied = true;
+        this.workDelay = maxWorkDelay - speedUp
+        this.speedupApplied = true
     }
 
-    public void updateWorkDelay() {
+    fun updateWorkDelay() {
         if (activeCooling) {
-            this.maxWorkDelay = WORK_DELAY - this.getWorkers().size();
+            this.maxWorkDelay = WORK_DELAY - this.workers.size
         } else {
-            this.maxWorkDelay = WORK_DELAY;
+            this.maxWorkDelay = WORK_DELAY
         }
     }
 
-    public void recalculateEnergyUsage() {
-        double newIdleDrain = 64;
-        final int allPatterns = this.getPatternBuses().stream().mapToInt(EFabricatorPatternBus::getValidPatterns).sum();
-        newIdleDrain += allPatterns;
-        if (this.idleDrain != newIdleDrain) {
-            this.idleDrain = newIdleDrain;
+    fun recalculateEnergyUsage() {
+        var newIdleDrain = 64.0
+        val allPatterns =
+            this.patternBuses.stream().mapToInt { obj: EFabricatorPatternBus? -> obj!!.validPatterns }.sum()
+        newIdleDrain += allPatterns.toDouble()
+        if (this.energyConsumePerTick != newIdleDrain) {
+            this.energyConsumePerTick = newIdleDrain
             if (this.channel != null) {
-                this.channel.getProxy().setIdlePowerUsage(idleDrain);
+                this.channel!!.proxy.idlePowerUsage = this.energyConsumePerTick
             }
         }
     }
 
-    public boolean insertPattern(final ItemStack patternStack) {
-        for (final EFabricatorPatternBus patternBus : getPatternBuses()) {
-            AppEngInternalInventory patternInv = patternBus.getPatterns();
-            for (int i = 0; i < patternInv.getSlots(); i++) {
-                if (patternInv.getStackInSlot(i).isEmpty()) {
-                    patternInv.setStackInSlot(i, ItemUtils.copyStackWithSize(patternStack, 1));
-                    return true;
+    fun insertPattern(patternStack: ItemStack): Boolean {
+        for (patternBus in this.patternBuses) {
+            val patternInv = patternBus.patterns
+            for (i in 0..<patternInv.slots) {
+                if (patternInv.getStackInSlot(i).isEmpty) {
+                    patternInv.setStackInSlot(i, ItemUtils.copyStackWithSize(patternStack, 1))
+                    return true
                 }
             }
         }
 
-        return false;
+        return false
     }
 
-    public boolean offerWork(EFabricatorWorker.CraftWork work) {
-        boolean success = false;
-        for (EFabricatorWorker worker : getWorkers()) {
-            if (!worker.isFull()) {
-                var i = worker.getRemainingSpace();
-                worker.offerWork(work.split(i));
-                success = true;
-                if (work.getSize() < 1) {
-                    break;
+    fun offerWork(work: CraftWork): Boolean {
+        var success = false
+        for (worker in this.workers) {
+            if (!worker.isFull) {
+                val i = worker.remainingSpace
+                worker.offerWork(work.split(i))
+                success = true
+                if (work.size < 1) {
+                    break
                 }
             }
         }
         if (success && activeCooling && !speedupApplied) {
-            convertOverflowParallelismToWorkDelay(parallelism);
+            convertOverflowParallelismToWorkDelay(parallelism)
         }
-        return success;
+        return success
     }
 
-    public boolean isQueueFull() {
-        for (final EFabricatorWorker worker : getWorkers()) {
-            if (!worker.isFull()) {
-                return false;
+    val isQueueFull: Boolean
+        get() {
+            for (worker in this.workers) {
+                if (!worker.isFull) {
+                    return false
+                }
             }
+            return true
         }
-        return true;
-    }
 
-    public boolean hasWork() {
-        for (EFabricatorWorker eFabricatorWorker : getWorkers()) {
+    fun hasWork(): Boolean {
+        for (eFabricatorWorker in this.workers) {
             if (eFabricatorWorker.hasWork()) {
-                return true;
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public synchronized void updateGUIDataPacket() {
-        guiDataDirty = true;
+    @Synchronized
+    fun updateGUIDataPacket() {
+        guiDataDirty = true
     }
 
-    public PktEFabricatorGUIData getGuiDataPacket() {
-        if (guiDataDirty || guiDataPacket == null) {
-            this.guiDataPacket = new PktEFabricatorGUIData(this);
-            this.guiDataDirty = false;
-        }
-        return guiDataPacket;
-    }
-
-    public double getEnergyConsumePerTick() {
-        return idleDrain;
-    }
-
-    public Levels getLevel() {
-        if (parentController == L4) {
-            return Levels.L4;
-        }
-        if (parentController == L6) {
-            return Levels.L6;
-        }
-        if (parentController == L9) {
-            return Levels.L9;
-        }
-        NovaEngineeringCore.log.warn("Invalid EFabricator controller level: {}", parentController);
-        return Levels.L4;
-    }
-
-    public List<EFabricatorWorker> getWorkers() {
-        return parts.getParts(EFabricatorWorker.class);
-    }
-
-    public List<EFabricatorPatternBus> getPatternBuses() {
-        return parts.getParts(EFabricatorPatternBus.class);
-    }
-
-    public List<EFabricatorParallelProc> getParallelProcs() {
-        return parts.getParts(EFabricatorParallelProc.class);
-    }
-
-    public int getAvailableParallelism() {
-        return Math.max(0, parallelism - consumedParallelism);
-    }
-
-    public EFabricatorController setOverclocked(final boolean overclocked) {
-        this.overclocked = overclocked;
-        updateParallelism();
-        updateGUIDataPacket();
-        return this;
-    }
-
-    public EFabricatorController setActiveCooling(final boolean activeCooling) {
-        this.activeCooling = activeCooling;
-        updateParallelism();
-        updateWorkDelay();
-        updateGUIDataPacket();
-        return this;
-    }
-
-    public int getEnergyStored() {
-        return getWorkers().stream().mapToInt(EFabricatorWorker::getEnergyCache).sum();
-    }
-
-    public void consumeCoolant(final int amount) {
-        coolantCache -= amount;
-    }
-
-    public int getCoolantInputCap() {
-        int total = 0;
-        for (final IFluidHandler handler : coolantInputHandlers) {
-            for (final IFluidTankProperties property : handler.getTankProperties()) {
-                total += Math.min(property.getCapacity(), Integer.MAX_VALUE - total);
-                if (total == Integer.MAX_VALUE) {
-                    return Integer.MAX_VALUE;
-                }
+    val level: Levels
+        get() {
+            if (parentController === BlockEFabricatorController.L4) {
+                return Levels.L4
             }
+            if (parentController === BlockEFabricatorController.L6) {
+                return Levels.L6
+            }
+            if (parentController === BlockEFabricatorController.L9) {
+                return Levels.L9
+            }
+            NovaEngineeringCore.log.warn("Invalid EFabricator controller level: {}", parentController)
+            return Levels.L4
         }
-        return total;
+
+    val workers: List<EFabricatorWorker>
+        get() = parts.getParts(EFabricatorWorker::class.java)
+
+    val patternBuses: List<EFabricatorPatternBus>
+        get() = parts.getParts(EFabricatorPatternBus::class.java)
+
+    val parallelProcs: List<EFabricatorParallelProc>
+        get() = parts.getParts(EFabricatorParallelProc::class.java)
+
+    val availableParallelism: Int
+        get() = max(0, parallelism - consumedParallelism)
+
+    val energyStored: Int
+        get() = this.workers.stream().mapToInt { obj: EFabricatorWorker -> obj.energyCache }.sum()
+
+    fun consumeCoolant(amount: Int) {
+        coolantCache -= amount
     }
 
-    public int getCoolantInputFluids() {
-        int total = 0;
-        for (final IFluidHandler handler : coolantInputHandlers) {
-            for (final IFluidTankProperties property : handler.getTankProperties()) {
-                FluidStack contents = property.getContents();
-                if (contents == null || contents.amount == 0) {
-                    continue;
-                }
-                if (MachineCoolants.INSTANCE.getCoolant(contents.getFluid()) != null) {
-                    total += Math.min(contents.amount, Integer.MAX_VALUE - total);
-                    if (total == Integer.MAX_VALUE) {
-                        return Integer.MAX_VALUE;
+    val coolantInputCap: Int
+        get() {
+            var total = 0
+            for (handler in coolantInputHandlers) {
+                for (property in handler.getTankProperties()) {
+                    total += min(property.getCapacity(), Int.MAX_VALUE - total)
+                    if (total == Int.MAX_VALUE) {
+                        return Int.MAX_VALUE
                     }
                 }
             }
+            return total
         }
-        return total;
-    }
 
-    public int getCoolantOutputCap() {
-        int total = 0;
-        for (final IFluidHandler handler : coolantOutputHandlers) {
-            for (final IFluidTankProperties property : handler.getTankProperties()) {
-                total += Math.min(property.getCapacity(), Integer.MAX_VALUE - total);
-                if (total == Integer.MAX_VALUE) {
-                    return Integer.MAX_VALUE;
+    val coolantInputFluids: Int
+        get() {
+            var total = 0
+            for (handler in coolantInputHandlers) {
+                for (property in handler.getTankProperties()) {
+                    val contents = property.getContents()
+                    if (contents == null || contents.amount == 0) {
+                        continue
+                    }
+                    if (MachineCoolants.INSTANCE.getCoolant(contents.fluid) != null) {
+                        total += min(contents.amount, Int.MAX_VALUE - total)
+                        if (total == Int.MAX_VALUE) {
+                            return Int.MAX_VALUE
+                        }
+                    }
                 }
             }
+            return total
         }
-        return total;
-    }
 
-    public int getCoolantOutputFluids() {
-        int total = 0;
-        for (final IFluidHandler handler : coolantOutputHandlers) {
-            for (final IFluidTankProperties property : handler.getTankProperties()) {
-                FluidStack contents = property.getContents();
-                if (contents == null || contents.amount == 0) {
-                    continue;
-                }
-                total += Math.min(contents.amount, Integer.MAX_VALUE - total);
-                if (total == Integer.MAX_VALUE) {
-                    return Integer.MAX_VALUE;
+    val coolantOutputCap: Int
+        get() {
+            var total = 0
+            for (handler in coolantOutputHandlers) {
+                for (property in handler.getTankProperties()) {
+                    total += min(property.getCapacity(), Int.MAX_VALUE - total)
+                    if (total == Int.MAX_VALUE) {
+                        return Int.MAX_VALUE
+                    }
                 }
             }
-        }
-        return total;
-    }
-
-    @Override
-    protected Class<? extends Block> getControllerBlock() {
-        return BlockEFabricatorController.class;
-    }
-
-    @Override
-    public void validate() {
-        if (!FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            return;
+            return total
         }
 
-        ClientProxy.clientScheduler.addRunnable(() -> {
-            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this);
-            notifyStructureFormedState(isStructureFormed());
-        }, 0);
+    val coolantOutputFluids: Int
+        get() {
+            var total = 0
+            for (handler in coolantOutputHandlers) {
+                for (property in handler.getTankProperties()) {
+                    val contents = property.getContents()
+                    if (contents == null || contents.amount == 0) {
+                        continue
+                    }
+                    total += min(contents.amount, Int.MAX_VALUE - total)
+                    if (total == Int.MAX_VALUE) {
+                        return Int.MAX_VALUE
+                    }
+                }
+            }
+            return total
+        }
+
+    override fun getControllerBlock(): Class<out Block?> {
+        return BlockEFabricatorController::class.java
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this);
+    override fun validate() {
+        if (!FMLCommonHandler.instance().getEffectiveSide().isClient) {
+            return
+        }
+
+        ClientProxy.clientScheduler.addRunnable({
+            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
+            notifyStructureFormedState(isStructureFormed)
+        }, 0)
+    }
+
+    override fun invalidate() {
+        super.invalidate()
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient) {
+            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
         }
     }
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (!FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            return;
+    override fun onLoad() {
+        super.onLoad()
+        if (!FMLCommonHandler.instance().getEffectiveSide().isClient) {
+            return
         }
-        ClientProxy.clientScheduler.addRunnable(() -> {
-            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this);
-            notifyStructureFormedState(isStructureFormed());
-        }, 0);
+        ClientProxy.clientScheduler.addRunnable({
+            BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
+            notifyStructureFormedState(isStructureFormed)
+        }, 0)
     }
 
-    @Override
-    public void readCustomNBT(final NBTTagCompound compound) {
-        boolean prevLoaded = loaded;
-        loaded = false;
+    override fun readCustomNBT(compound: NBTTagCompound) {
+        val prevLoaded = loaded
+        loaded = false
 
-        super.readCustomNBT(compound);
-        totalCrafted = compound.getLong("totalCrafted");
-        overclocked = compound.getBoolean("overclock");
-        activeCooling = compound.getBoolean("activeCooling");
-        coolantCache = compound.getInteger("coolantCache");
+        super.readCustomNBT(compound)
+        totalCrafted = compound.getLong("totalCrafted")
+        overclocked = compound.getBoolean("overclock")
+        activeCooling = compound.getBoolean("activeCooling")
+        coolantCache = compound.getInteger("coolantCache")
 
-        outputBuffer = new ItemList();
-        NBTTagList list = compound.getTagList("outputBuffer", Constants.NBT.TAG_COMPOUND);
+        outputBuffer = ItemList()
+        val list = compound.getTagList("outputBuffer", Constants.NBT.TAG_COMPOUND)
         IntStream.range(0, list.tagCount())
-                .mapToObj(i -> itemChannel.createStack(ItemStackUtils.readNBTOversize(list.getCompoundTagAt(i))))
-                .forEach(outputBuffer::add);
+            .mapToObj<IAEItemStack?>(IntFunction { i: Int ->
+                itemChannel.createStack(
+                    ItemStackUtils.readNBTOversize(
+                        list.getCompoundTagAt(
+                            i
+                        )
+                    )
+                )
+            })
+            .forEach { t: IAEItemStack? -> outputBuffer.add(t) }
 
-        loaded = prevLoaded;
+        loaded = prevLoaded
 
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            ClientProxy.clientScheduler.addRunnable(() -> {
-                BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this);
-                notifyStructureFormedState(isStructureFormed());
-            }, 0);
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient) {
+            ClientProxy.clientScheduler.addRunnable({
+                BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
+                notifyStructureFormedState(isStructureFormed)
+            }, 0)
         }
     }
 
-    @Override
-    public void writeCustomNBT(final NBTTagCompound compound) {
-        super.writeCustomNBT(compound);
-        compound.setLong("totalCrafted", totalCrafted);
-        compound.setBoolean("overclock", overclocked);
-        compound.setBoolean("activeCooling", activeCooling);
-        compound.setInteger("coolantCache", coolantCache);
+    override fun writeCustomNBT(compound: NBTTagCompound) {
+        super.writeCustomNBT(compound)
+        compound.setLong("totalCrafted", totalCrafted)
+        compound.setBoolean("overclock", overclocked)
+        compound.setBoolean("activeCooling", activeCooling)
+        compound.setInteger("coolantCache", coolantCache)
 
-        NBTTagList list = new NBTTagList();
-        synchronized (outputBuffer) {
-            for (final IAEItemStack stack : outputBuffer) {
-                list.appendTag(ItemStackUtils.writeNBTOversize(stack.getCachedItemStack(stack.getStackSize())));
+        val list = NBTTagList()
+        synchronized(outputBuffer) {
+            for (stack in outputBuffer) {
+                list.appendTag(ItemStackUtils.writeNBTOversize(stack.getCachedItemStack(stack.stackSize)))
             }
         }
-        compound.setTag("outputBuffer", list);
+        compound.setTag("outputBuffer", list)
     }
 
-    @Override
-    protected void readMachineNBT(final NBTTagCompound compound) {
-        super.readMachineNBT(compound);
+    override fun readMachineNBT(compound: NBTTagCompound) {
+        super.readMachineNBT(compound)
         if (compound.hasKey("parentMachine")) {
-            ResourceLocation rl = new ResourceLocation(compound.getString("parentMachine"));
-            parentMachine = MachineRegistry.getRegistry().getMachine(rl);
+            val rl = ResourceLocation(compound.getString("parentMachine"))
+            parentMachine = MachineRegistry.getRegistry().getMachine(rl)
             if (parentMachine != null) {
-                this.parentController = BlockEFabricatorController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, parentMachine.getRegistryName().getPath()));
+                this.parentController = BlockEFabricatorController.REGISTRY[ResourceLocation(
+                    NovaEngineeringCore.MOD_ID,
+                    parentMachine.getRegistryName().getPath()
+                )]
             } else {
-                ModularMachinery.log.info("Couldn't find machine named " + rl + " for controller at " + getPos());
+                ModularMachinery.log.info("Couldn't find machine named " + rl + " for controller at " + getPos())
             }
         }
     }
-
 }

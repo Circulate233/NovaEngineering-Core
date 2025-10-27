@@ -1,118 +1,121 @@
-package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
+package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import com.github.bsideup.jabel.Desugar;
-import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
-import lombok.Getter;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Type.ADD
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Type.MULTIPLY
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import java.util.function.Consumer
+import net.minecraft.client.resources.I18n
+import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
+import kotlin.math.abs
 
-import java.util.ArrayList;
-import java.util.List;
+open class EFabricatorParallelProc : EFabricatorPart {
+    val modifiers: MutableList<Modifier> = ObjectArrayList<Modifier>()
+    val overclockModifiers: MutableList<Modifier> = ObjectArrayList<Modifier>()
 
-@Getter
-public class EFabricatorParallelProc extends EFabricatorPart {
+    constructor()
 
-    protected final List<Modifier> modifiers = new ArrayList<>();
-    protected final List<Modifier> overclockModifiers = new ArrayList<>();
-
-    public EFabricatorParallelProc() {
+    constructor(modifiers: MutableList<Modifier>, overclockModifiers: MutableList<Modifier>) {
+        this.modifiers.addAll(modifiers)
+        this.overclockModifiers.addAll(overclockModifiers)
     }
 
-    public EFabricatorParallelProc(List<Modifier> modifiers, List<Modifier> overclockModifiers) {
-        this.modifiers.addAll(modifiers);
-        this.overclockModifiers.addAll(overclockModifiers);
-    }
-
-    @Override
-    public void readCustomNBT(final NBTTagCompound compound) {
-        super.readCustomNBT(compound);
-        modifiers.clear();
+    override fun readCustomNBT(compound: NBTTagCompound) {
+        super.readCustomNBT(compound)
+        modifiers.clear()
         compound.getTagList("modifiers", Constants.NBT.TAG_COMPOUND)
-                .forEach(tag -> modifiers.add(Modifier.readFromNBT((NBTTagCompound) tag)));
+            .forEach(Consumer { tag: NBTBase? -> modifiers.add(Modifier.readFromNBT((tag as NBTTagCompound?)!!)) })
 
-        overclockModifiers.clear();
+        overclockModifiers.clear()
         compound.getTagList("overclockModifiers", Constants.NBT.TAG_COMPOUND)
-                .forEach(tag -> overclockModifiers.add(Modifier.readFromNBT((NBTTagCompound) tag)));
+            .forEach(Consumer { tag: NBTBase? -> overclockModifiers.add(Modifier.readFromNBT((tag as NBTTagCompound?)!!)) })
     }
 
-    @Override
-    public void writeCustomNBT(final NBTTagCompound compound) {
-        super.writeCustomNBT(compound);
-        NBTTagList modifiersTag = new NBTTagList();
-        modifiers.forEach(modifier -> modifiersTag.appendTag(modifier.writeToNBT()));
-        compound.setTag("modifiers", modifiersTag);
+    override fun writeCustomNBT(compound: NBTTagCompound) {
+        super.writeCustomNBT(compound)
+        val modifiersTag = NBTTagList()
+        modifiers.forEach(Consumer { modifier: Modifier? -> modifiersTag.appendTag(modifier!!.writeToNBT()) })
+        compound.setTag("modifiers", modifiersTag)
 
-        NBTTagList overclockModifiersTag = new NBTTagList();
-        overclockModifiers.forEach(modifier -> overclockModifiersTag.appendTag(modifier.writeToNBT()));
-        compound.setTag("overclockModifiers", overclockModifiersTag);
+        val overclockModifiersTag = NBTTagList()
+        overclockModifiers.forEach(Consumer { modifier: Modifier? -> overclockModifiersTag.appendTag(modifier!!.writeToNBT()) })
+        compound.setTag("overclockModifiers", overclockModifiersTag)
     }
 
-    @Getter
-    public enum Type {
-
+    enum class Type(val priority: Int) {
         ADD(0),
         MULTIPLY(1);
 
-        final int priority;
-
-        Type(int priority) {
-            this.priority = priority;
+        fun apply(value: Double, parallelism: Double): Double {
+            return when (this) {
+                ADD -> value + parallelism
+                MULTIPLY -> value * parallelism
+            }
         }
-
-        public double apply(final double value, final double parallelism) {
-            return switch (this) {
-                case ADD -> value + parallelism;
-                case MULTIPLY -> value * parallelism;
-            };
-        }
-
     }
 
-    @Desugar
-    public record Modifier(Type type, double value, boolean debuff) {
+    data class Modifier(val type: Type, val value: Double, val debuff: Boolean) {
 
-        public static Modifier readFromNBT(NBTTagCompound tag) {
-            return new Modifier(Type.values()[tag.getByte("type")], tag.getDouble("value"), tag.getBoolean("debuff"));
+        companion object {
+            fun readFromNBT(tag: NBTTagCompound): Modifier {
+                return Modifier(
+                    Type.entries[tag.getByte("type").toInt()],
+                    tag.getDouble("value"),
+                    tag.getBoolean("debuff")
+                )
+            }
         }
 
-        public double apply(final double parallelism) {
-            return type.apply(value, parallelism);
+        fun apply(parallelism: Double): Double {
+            return type.apply(value, parallelism)
         }
 
-        public boolean isBuff() {
-            return !debuff;
+        val isBuff: Boolean
+            get() = !debuff
+
+        fun writeToNBT(): NBTTagCompound {
+            val tag = NBTTagCompound()
+            tag.setByte("type", type.ordinal.toByte())
+            tag.setDouble("value", value)
+            tag.setBoolean("debuff", debuff)
+            return tag
         }
 
-        public NBTTagCompound writeToNBT() {
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setByte("type", (byte) type.ordinal());
-            tag.setDouble("value", value);
-            tag.setBoolean("debuff", debuff);
-            return tag;
-        }
+        @get:SideOnly(Side.CLIENT)
+        val desc: String
+            get() {
+                when (type) {
+                    ADD -> {
+                        return if (this.isBuff)
+                            I18n.format(
+                                "novaeng.efabricator_parallel_proc.modifier.add",
+                                value
+                            )
+                        else
+                            I18n.format(
+                                "novaeng.efabricator_parallel_proc.modifier.sub",
+                                abs(value)
+                            )
+                    }
 
-        @SideOnly(Side.CLIENT)
-        public String getDesc() {
-            switch (type) {
-                case ADD -> {
-                    return isBuff()
-                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.add", value)
-                            : I18n.format("novaeng.efabricator_parallel_proc.modifier.sub", Math.abs(value));
-                }
-                case MULTIPLY -> {
-                    return isBuff()
-                            ? I18n.format("novaeng.efabricator_parallel_proc.modifier.mul",
-                            NovaEngUtils.formatDouble((1D - value) * 100, 1))
-                            : I18n.format("novaeng.efabricator_parallel_proc.modifier.mul.debuff",
-                            NovaEngUtils.formatDouble(Math.abs(1D - value) * 100, 1));
+                    MULTIPLY -> {
+                        return if (this.isBuff)
+                            I18n.format(
+                                "novaeng.efabricator_parallel_proc.modifier.mul",
+                                NovaEngUtils.formatDouble((1.0 - value) * 100, 1)
+                            )
+                        else
+                            I18n.format(
+                                "novaeng.efabricator_parallel_proc.modifier.mul.debuff",
+                                NovaEngUtils.formatDouble(abs(1.0 - value) * 100, 1)
+                            )
+                    }
                 }
             }
-            return "";
-        }
     }
-
 }

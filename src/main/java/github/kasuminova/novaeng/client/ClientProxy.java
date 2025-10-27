@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.client;
 
+import appeng.api.features.IWirelessTermHandler;
+import appeng.helpers.WirelessTerminalGuiObject;
+import baubles.api.BaublesApi;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
@@ -12,6 +15,7 @@ import github.kasuminova.novaeng.client.gui.GuiEStorageController;
 import github.kasuminova.novaeng.client.gui.GuiGeocentricDrill;
 import github.kasuminova.novaeng.client.gui.GuiHyperNetTerminal;
 import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
+import github.kasuminova.novaeng.client.gui.GuiNEWCraftConfirm;
 import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
 import github.kasuminova.novaeng.client.handler.ClientEventHandler;
@@ -250,8 +254,8 @@ public class ClientProxy extends CommonProxy {
 
     @Nullable
     @Override
-    public Object getClientGuiElement(final int ID, final EntityPlayer player, final World world, final int x, final int y, final int z) {
-        GuiType type = GuiType.values()[MathHelper.clamp(ID, 0, GuiType.values().length - 1)];
+    public Object getClientGuiElement(final int id, final EntityPlayer player, final World world, final int x, final int y, final int z) {
+        GuiType type = GuiType.values()[MathHelper.clamp(id, 0, GuiType.values().length - 1)];
         Class<? extends TileEntity> required = type.requiredTileEntity;
         TileEntity present = null;
         if (required != null) {
@@ -274,6 +278,14 @@ public class ClientProxy extends CommonProxy {
             case EFABRICATOR_PATTERN_BUS -> new GuiEFabricatorPatternBus((EFabricatorPatternBus) present, player);
             case GEOCENTRIC_DRILL_CONTROLLER -> new GuiGeocentricDrill((GeocentricDrillController) present, player);
             case ECALCULATOR_CONTROLLER -> new GuiECalculatorController((ECalculatorController) present, player);
+            case AUTO_CRAFTGUI -> {
+                var stack = y == 1 ? BaublesApi.getBaublesHandler(player).getStackInSlot(x)
+                        : player.inventory.getStackInSlot(x);
+                if (stack.getItem() instanceof IWirelessTermHandler wt) {
+                    yield new GuiNEWCraftConfirm(player.inventory,
+                            new WirelessTerminalGuiObject(wt, stack, player, player.world, x, y, Integer.MIN_VALUE));
+                } else yield null;
+            }
         };
     }
 
