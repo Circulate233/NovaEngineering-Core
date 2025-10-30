@@ -180,7 +180,7 @@ repositories {
     }
     maven {
         name = "GTNH Maven"
-        url = uri("http://jenkins.usrv.eu:8081/nexus/content/groups/public/")
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
         isAllowInsecureProtocol = true
     }
     mavenCentral()
@@ -321,6 +321,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:random-complement-1198138:7155516"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
+    implementation(rfg.deobf("curse.maven:brandons-core-231382:3408276"))
+    implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
 }
 
 // Publishing to a Maven repository
