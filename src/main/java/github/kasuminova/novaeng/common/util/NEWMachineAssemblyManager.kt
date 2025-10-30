@@ -66,7 +66,7 @@ class NEWMachineAssemblyManager {
             return ADDITIONAL_CONSTRUCTORS.entries.iterator()
         }
 
-        fun setConstructors(block: BlockPair, machine: DynamicMachine) {
+        fun setConstructors(block: BlockPair, machine: NEWDynamicMachine) {
             ADDITIONAL_CONSTRUCTORS[block] = machine
             ModIntegrationJEI.PREVIEW_WRAPPERS.add(StructurePreviewWrapper(machine))
         }

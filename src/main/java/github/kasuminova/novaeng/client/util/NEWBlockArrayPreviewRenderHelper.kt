@@ -17,8 +17,9 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
 
     val utils = this as BlockArrayPreviewRenderUtils
     var renderHelperUtils: BlockArrayRenderUtils? = null
-    var status: IntArray? = null
+    private var status: IntArray? = null
     var work = false
+    var key = 0L
 
     fun startPreview(currentContext: DynamicMachineRenderContext, pos: BlockPos, facing: EnumFacing?): Boolean {
         if (this.startPreview(currentContext)) {
@@ -28,6 +29,7 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
             val newpos = pos.subtract(moveDir)
             utils.matchArray = MiscUtils.rotateYCCWNorthUntil(utils.matchArray, rotate)
             utils.attachedPosition = newpos
+            key = pos.toLong()
             renderHelperUtils = utils.renderHelper as BlockArrayRenderUtils
             utils.facing = facing
             initLayers()
@@ -69,6 +71,7 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
         renderHelperUtils = null
         status = null
         work = false
+        key = 0
 
         if (Minecraft.getMinecraft().player != null) {
             Minecraft.getMinecraft().player.sendMessage(

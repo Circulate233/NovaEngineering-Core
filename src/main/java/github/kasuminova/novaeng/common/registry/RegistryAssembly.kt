@@ -2,29 +2,44 @@
 
 package github.kasuminova.novaeng.common.registry
 
+import github.kasuminova.mmce.common.util.DynamicPattern
 import github.kasuminova.novaeng.common.util.Functions
+import github.kasuminova.novaeng.common.util.NEWDynamicMachine
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
 import github.kasuminova.novaeng.mixin.mmce.AccessorAbstractMachine
 import hellfirepvp.astralsorcery.common.lib.BlocksAS
 import hellfirepvp.astralsorcery.common.lib.MultiBlockArrays
 import hellfirepvp.astralsorcery.common.structure.array.PatternBlockArray
-import hellfirepvp.modularmachinery.common.machine.DynamicMachine
+import hellfirepvp.modularmachinery.common.machine.TaggedPositionBlockArray
 import hellfirepvp.modularmachinery.common.util.BlockArray
 import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectLists
+import mekanism.common.MekanismBlocks
 import mekanism.generators.common.GeneratorsBlocks
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.translation.I18n
 import vazkii.botania.common.block.ModBlocks
+import java.util.Arrays
+import java.util.stream.Collectors
 
-@Suppress("DEPRECATION", "KotlinConstantConditions")
+@Suppress("DEPRECATION", "USELESS_IS_CHECK")
 object RegistryAssembly {
 
     fun packBlock(block: IBlockState): BlockArray.BlockInformation {
         return BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(block)))
+    }
+
+    fun packBlock(vararg blocks: IBlockState): BlockArray.BlockInformation {
+        return BlockArray.BlockInformation(
+            Arrays.stream(blocks)
+                .map { IBlockStateDescriptor(it) }
+                .collect(Collectors.toCollection { ObjectArrayList() })
+        )
     }
 
     fun regAll() {
@@ -108,7 +123,7 @@ object RegistryAssembly {
 
     @Suppress("UNCHECKED_CAST")
     private fun regMEK() {
-        val reactorMachine = DynamicMachine("")
+        val reactorMachine = NEWDynamicMachine("")
         if (reactorMachine is AccessorAbstractMachine) {
             reactorMachine.setRL(ResourceLocation("mek", "reactor"))
         }
@@ -157,7 +172,7 @@ object RegistryAssembly {
          */
         val poss = p as Array<Array<XY>>
 
-        mekReactor.addBlock(0, 0, 0, packBlock(reactor.blockState))
+        mekReactor.addBlock(BlockPos.ORIGIN, packBlock(reactor.blockState))
 
         mekReactor.addBlock(poss[0][2][0], framework)
         mekReactor.addBlock(poss[1][1][0], framework)
@@ -229,10 +244,89 @@ object RegistryAssembly {
             reactor,
             reactorMachine.setName("tile.Reactor.name")
         )
+
+        val thermalEvaporationMachine = NEWDynamicMachine("")
+        if (thermalEvaporationMachine is AccessorAbstractMachine) {
+            thermalEvaporationMachine.setRL(ResourceLocation("mek", "thermalEvaporation".camelToSnake()))
+        }
+        val thermalEvaporationArray = thermalEvaporationMachine.pattern
+        val thermalEvaporation = NEWMachineAssemblyManager.BlockPair(MekanismBlocks.BasicBlock, 14)
+        val thermal = packBlock(MekanismBlocks.BasicBlock2.defaultState)
+        val thermalP =
+            packBlock(MekanismBlocks.BasicBlock2.defaultState, MekanismBlocks.BasicBlock.getStateFromMeta(15))
+
+        thermalEvaporationArray.addBlock(-1, -1, 3, thermal)
+        thermalEvaporationArray.addBlock(0, -1, 3, thermal)
+        thermalEvaporationArray.addBlock(1, -1, 3, thermal)
+        thermalEvaporationArray.addBlock(-2, -1, 3, thermal)
+        thermalEvaporationArray.addBlock(-1, -1, 2, thermal)
+        thermalEvaporationArray.addBlock(0, -1, 2, thermal)
+        thermalEvaporationArray.addBlock(1, -1, 2, thermal)
+        thermalEvaporationArray.addBlock(-2, -1, 2, thermal)
+        thermalEvaporationArray.addBlock(-1, -1, 1, thermal)
+        thermalEvaporationArray.addBlock(0, -1, 1, thermal)
+        thermalEvaporationArray.addBlock(1, -1, 1, thermal)
+        thermalEvaporationArray.addBlock(-2, -1, 1, thermal)
+        thermalEvaporationArray.addBlock(-1, -1, 0, thermal)
+        thermalEvaporationArray.addBlock(0, -1, 0, thermal)
+        thermalEvaporationArray.addBlock(1, -1, 0, thermal)
+        thermalEvaporationArray.addBlock(-2, -1, 0, thermal)
+
+        thermalEvaporationArray.addBlock(-1, 0, 0, thermalP)
+        thermalEvaporationArray.addBlock(BlockPos.ORIGIN, packBlock(thermalEvaporation.blockState))
+        thermalEvaporationArray.addBlock(1, 0, 0, thermalP)
+        thermalEvaporationArray.addBlock(-2, 0, 0, thermalP)
+        thermalEvaporationArray.addBlock(-1, 0, 3, thermalP)
+        thermalEvaporationArray.addBlock(0, 0, 3, thermalP)
+        thermalEvaporationArray.addBlock(1, 0, 3, thermalP)
+        thermalEvaporationArray.addBlock(-2, 0, 3, thermalP)
+        thermalEvaporationArray.addBlock(1, 0, 2, thermalP)
+        thermalEvaporationArray.addBlock(1, 0, 1, thermalP)
+        thermalEvaporationArray.addBlock(-2, 0, 2, thermalP)
+        thermalEvaporationArray.addBlock(-2, 0, 1, thermalP)
+
+        val dy = DynamicPattern("thermal", TaggedPositionBlockArray(), TaggedPositionBlockArray(), 1, 16)
+        dy.faces.add(EnumFacing.UP)
+        dy.structureSizeOffset = dy.structureSizeOffset.add(0, 1, 0)
+
+        val patter = dy.pattern
+        patter.addBlock(-1, 1, 0, thermalP)
+        patter.addBlock(0, 1, 0, thermalP)
+        patter.addBlock(1, 1, 0, thermalP)
+        patter.addBlock(-2, 1, 0, thermalP)
+        patter.addBlock(-1, 1, 3, thermalP)
+        patter.addBlock(0, 1, 3, thermalP)
+        patter.addBlock(1, 1, 3, thermalP)
+        patter.addBlock(-2, 1, 3, thermalP)
+        patter.addBlock(1, 1, 2, thermalP)
+        patter.addBlock(1, 1, 1, thermalP)
+        patter.addBlock(-2, 1, 2, thermalP)
+        patter.addBlock(-2, 1, 1, thermalP)
+
+        val patterEnd = dy.patternEnd
+        patterEnd.addBlock(-1, 0, 0, thermalP)
+        patterEnd.addBlock(BlockPos.ORIGIN, thermalP)
+        patterEnd.addBlock(1, 0, 0, thermalP)
+        patterEnd.addBlock(-2, 0, 0, thermalP)
+        patterEnd.addBlock(-1, 0, 3, thermalP)
+        patterEnd.addBlock(0, 0, 3, thermalP)
+        patterEnd.addBlock(1, 0, 3, thermalP)
+        patterEnd.addBlock(-2, 0, 3, thermalP)
+        patterEnd.addBlock(1, 0, 2, thermalP)
+        patterEnd.addBlock(1, 0, 1, thermalP)
+        patterEnd.addBlock(-2, 0, 2, thermalP)
+        patterEnd.addBlock(-2, 0, 1, thermalP)
+
+        thermalEvaporationMachine.addDynamicPattern("thermal", dy)
+
+        NEWMachineAssemblyManager.setConstructors(
+            thermalEvaporation,
+            thermalEvaporationMachine.setName("tile.ThermalEvaporation.name")
+        )
     }
 
     private fun regBot() {
-        val terraPlateMachine = DynamicMachine("")
+        val terraPlateMachine = NEWDynamicMachine("")
         if (terraPlateMachine is AccessorAbstractMachine) {
             terraPlateMachine.setRL(ResourceLocation("botania", "terra_plate"))
         }
@@ -241,7 +335,7 @@ object RegistryAssembly {
         val lapis = packBlock(Blocks.LAPIS_BLOCK.defaultState)
         val terraPlate = NEWMachineAssemblyManager.BlockPair(ModBlocks.terraPlate, 0)
 
-        terraplateArray.addBlock(0, 0, 0, packBlock(terraPlate.blockState))
+        terraplateArray.addBlock(BlockPos.ORIGIN, packBlock(terraPlate.blockState))
         terraplateArray.addBlock(0, -1, 0, stone)
         terraplateArray.addBlock(-1, -1, -1, stone)
         terraplateArray.addBlock(-1, -1, 1, stone)
@@ -256,6 +350,33 @@ object RegistryAssembly {
             terraPlate,
             terraPlateMachine.setName("tile.botania:terraPlate.name")
         )
+
+        val alfheimportalMachine = NEWDynamicMachine("")
+        if (alfheimportalMachine is AccessorAbstractMachine) {
+            alfheimportalMachine.setRL(ResourceLocation("botania", "alfheimportal"))
+        }
+        val alfheimportalArray = alfheimportalMachine.pattern
+        val wood = packBlock(ModBlocks.livingwood.defaultState)
+        val lightwood = packBlock(ModBlocks.livingwood.getStateFromMeta(5))
+        val alfheimportal = NEWMachineAssemblyManager.BlockPair(ModBlocks.alfPortal, 0)
+
+        alfheimportalArray.addBlock(BlockPos.ORIGIN, packBlock(alfheimportal.blockState))
+        alfheimportalArray.addBlock(1, 0, 0, wood)
+        alfheimportalArray.addBlock(-1, 0, 0, wood)
+        alfheimportalArray.addBlock(2, 1, 0, wood)
+        alfheimportalArray.addBlock(-2, 1, 0, wood)
+        alfheimportalArray.addBlock(2, 2, 0, lightwood)
+        alfheimportalArray.addBlock(-2, 2, 0, lightwood)
+        alfheimportalArray.addBlock(2, 3, 0, wood)
+        alfheimportalArray.addBlock(-2, 3, 0, wood)
+        alfheimportalArray.addBlock(0, 4, 0, lightwood)
+        alfheimportalArray.addBlock(1, 4, 0, wood)
+        alfheimportalArray.addBlock(-1, 4, 0, wood)
+
+        NEWMachineAssemblyManager.setConstructors(
+            alfheimportal,
+            alfheimportalMachine.setName("tile.botania:alfheimPortal.name")
+        )
     }
 
     private class XY(val x: Int, val z: Int) {
@@ -264,8 +385,8 @@ object RegistryAssembly {
         }
     }
 
-    private fun transformationBlockArrays(array: PatternBlockArray, name: String): DynamicMachine {
-        val machine = DynamicMachine("")
+    private fun transformationBlockArrays(array: PatternBlockArray, name: String): NEWDynamicMachine {
+        val machine = NEWDynamicMachine("")
         if (machine is AccessorAbstractMachine) {
             machine.setRL(ResourceLocation("astralsorcery", name))
         }
@@ -277,7 +398,7 @@ object RegistryAssembly {
         return machine
     }
 
-    private fun DynamicMachine.setName(name: String): DynamicMachine {
+    private fun NEWDynamicMachine.setName(name: String): NEWDynamicMachine {
         this.localizedName = I18n.translateToLocal(name)
         return this
     }

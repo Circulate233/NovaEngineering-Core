@@ -64,13 +64,16 @@ object MachineAssemblyHandler {
 
             if (world.isRemote) {
                 if (NEWBlockArrayPreviewRenderHelper.work) {
+                    val oldpos = NEWBlockArrayPreviewRenderHelper.key
                     NEWBlockArrayPreviewRenderHelper.unloadWorld()
-                } else {
-                    val renderContext = DynamicMachineRenderContext
-                        .createContext(machine, getDynamicPatternSize(stack))
-                    renderContext.shiftSnap = ClientScheduler.getClientTick()
-                    NEWBlockArrayPreviewRenderHelper.startPreview(renderContext, pos, facing)
+                    if (oldpos == pos.toLong()) {
+                        return
+                    }
                 }
+                val renderContext = DynamicMachineRenderContext
+                    .createContext(machine, getDynamicPatternSize(stack))
+                renderContext.shiftSnap = ClientScheduler.getClientTick()
+                NEWBlockArrayPreviewRenderHelper.startPreview(renderContext, pos, facing)
             }
         }
     }

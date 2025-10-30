@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
+import github.kasuminova.novaeng.common.util.NEWDynamicMachine;
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
@@ -14,7 +15,7 @@ public class MixinDynamicMachineRenderContext {
 
     @Inject(method = "addControllerToBlockArray", at = @At("HEAD"), cancellable = true)
     private static void addControllerToBlockArray(DynamicMachine machine, BlockArray copy, Vec3i moveOffset, CallbackInfo ci) {
-        if (!"modularmachinery".equals(machine.getRegistryName().getNamespace())) {
+        if (machine instanceof NEWDynamicMachine n) {
             ci.cancel();
         }
     }

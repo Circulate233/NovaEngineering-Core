@@ -57,7 +57,7 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
     @Shadow
     protected abstract void updateLayers();
 
-    @Redirect(method = {"hashBlocks", "doesPlacedLayerMatch", "hasLowerLayer", "updateLayers"}, at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;"))
+    @Redirect(method = {"hashBlocks", "hasLowerLayer", "updateLayers"}, at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;"))
     public BlockPos isRenderingComplete(BlockArrayPreviewRenderHelper instance) {
         if (this.renderHelper == null) return this.attachedPosition;
         if ((Object) this instanceof NEWBlockArrayPreviewRenderHelper) {

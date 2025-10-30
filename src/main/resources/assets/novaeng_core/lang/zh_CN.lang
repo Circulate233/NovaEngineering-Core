@@ -26,6 +26,7 @@ message.assembly.tip.fail=模块化组装: 在 %s 放置方块失败，已返还
 gui.blueprint.popout.placed.dynamic_pattern.unload=当前结构预览已结束
 
 tile.Reactor.name=聚变反应堆
+tile.ThermalEvaporation.name=热力蒸馏塔
 
 item.novaeng_core.estorage_cell_item_16m.name=§9ECO - §bSE4 §9存储矩阵§a（物品）
 item.novaeng_core.estorage_cell_item_64m.name=§9ECO - §6SE6 §9存储矩阵§a（物品）
