@@ -6,11 +6,11 @@ import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext
 import hellfirepvp.modularmachinery.common.block.BlockController
 import hellfirepvp.modularmachinery.common.util.MiscUtils
-import java.util.stream.IntStream
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentTranslation
+import java.util.stream.IntStream
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
@@ -20,16 +20,16 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
     var status: IntArray? = null
     var work = false
 
-    fun startPreview(currentContext: DynamicMachineRenderContext, pos: BlockPos): Boolean {
+    fun startPreview(currentContext: DynamicMachineRenderContext, pos: BlockPos, facing: EnumFacing?): Boolean {
         if (this.startPreview(currentContext)) {
-            clear()
             val lookState = Minecraft.getMinecraft().world.getBlockState(pos)
-            val rotate = lookState.getValue(BlockController.FACING) as EnumFacing
+            val rotate = facing ?: lookState.getValue(BlockController.FACING)
             val moveDir = MiscUtils.rotateYCCWNorthUntil(BlockPos(utils.renderHelperOffset), rotate)
             val newpos = pos.subtract(moveDir)
             utils.matchArray = MiscUtils.rotateYCCWNorthUntil(utils.matchArray, rotate)
             utils.attachedPosition = newpos
             renderHelperUtils = utils.renderHelper as BlockArrayRenderUtils
+            utils.facing = facing
             initLayers()
             work = true
             return true
@@ -65,18 +65,10 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
         utils.`n$renderTranslucentBlocks`()
     }
 
-    override fun tick() {
-        super.tick()
-        if (work && this.context == null) {
-            clear()
-        }
-    }
-
     fun clear() {
         renderHelperUtils = null
         status = null
         work = false
-        utils.renderedLayer = -1
 
         if (Minecraft.getMinecraft().player != null) {
             Minecraft.getMinecraft().player.sendMessage(
@@ -85,10 +77,5 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
                 )
             )
         }
-    }
-
-    override fun unloadWorld() {
-        super.unloadWorld()
-        clear()
     }
 }

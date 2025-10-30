@@ -12,6 +12,7 @@ import hellfirepvp.modularmachinery.common.machine.DynamicMachine
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.EnumActionResult
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
 import net.minecraft.util.text.TextComponentTranslation
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -25,20 +26,38 @@ object MachineAssemblyHandler {
     @SubscribeEvent
     fun onPlayerRightBlock(event: PlayerInteractEvent.RightClickBlock) {
         val hand = event.hand
-        val world = event.world
         if (hand != EnumHand.MAIN_HAND) return
+        val world = event.world
         val player = event.entityPlayer
         val stack = player.getHeldItem(hand)
         if (!player.isSneaking && stack.item is ItemMachineAssemblyTool) {
             val pos = event.pos
             val tile = world.getTileEntity(pos)
+            val state = world.getBlockState(pos)
+            val block = state.block
+            var facing: EnumFacing? = null
             val machine: DynamicMachine = if (tile is TileMultiblockMachineController) {
-                val state = world.getBlockState(pos)
-                val block = state.block
                 tile.blueprintMachine ?: if (block is BlockController)
                     block.getParentMachine()
                 else return
-            } else return
+            } else {
+                val meta = block.getMetaFromState(state)
+                var m: DynamicMachine? = null
+                val eventFacing = if (event.face == EnumFacing.UP || event.face == EnumFacing.DOWN) {
+                    EnumFacing.NORTH
+                } else event.face
+                for (entry in NEWMachineAssemblyManager.getConstructorsIterator()) {
+                    if (entry.key.block == block && entry.key.meta == meta) {
+                        m = entry.value
+                        val pf = block.blockState.getProperty("facting")
+                        facing = if (pf != null) {
+                            state.getValue(pf) as? EnumFacing ?: eventFacing
+                        } else eventFacing
+                        break
+                    }
+                }
+                m ?: return
+            }
 
             event.isCanceled = true
             event.cancellationResult = EnumActionResult.SUCCESS
@@ -50,7 +69,7 @@ object MachineAssemblyHandler {
                     val renderContext = DynamicMachineRenderContext
                         .createContext(machine, getDynamicPatternSize(stack))
                     renderContext.shiftSnap = ClientScheduler.getClientTick()
-                    NEWBlockArrayPreviewRenderHelper.startPreview(renderContext, pos)
+                    NEWBlockArrayPreviewRenderHelper.startPreview(renderContext, pos, facing)
                 }
             }
         }

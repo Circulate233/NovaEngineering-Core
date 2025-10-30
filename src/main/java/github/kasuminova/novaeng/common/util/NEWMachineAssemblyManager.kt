@@ -10,60 +10,47 @@ import appeng.api.storage.data.IAEFluidStack
 import appeng.api.storage.data.IAEItemStack
 import appeng.api.storage.data.IAEStack
 import appeng.fluids.util.AEFluidStack
-import appeng.helpers.WirelessTerminalGuiObject
 import appeng.me.helpers.PlayerSource
 import appeng.util.item.AEItemStack
 import com.circulation.random_complement.common.util.MEHandler
 import com.glodblock.github.common.item.fake.FakeFluids
 import hellfirepvp.modularmachinery.ModularMachinery
+import hellfirepvp.modularmachinery.common.integration.ModIntegrationJEI
+import hellfirepvp.modularmachinery.common.integration.preview.StructurePreviewWrapper
+import hellfirepvp.modularmachinery.common.machine.DynamicMachine
 import hellfirepvp.modularmachinery.common.network.PktAssemblyReport
 import hellfirepvp.modularmachinery.common.util.BlockArray
 import hellfirepvp.modularmachinery.common.util.ItemUtils
-import hellfirepvp.modularmachinery.common.util.MiscUtils
 import ink.ikx.mmce.common.assembly.MachineAssembly
-import ink.ikx.mmce.common.utils.FluidUtils
-import ink.ikx.mmce.common.utils.StackUtils
 import ink.ikx.mmce.common.utils.StructureIngredient
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.ObjectLists
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList
-import java.util.ArrayDeque
-import java.util.EnumMap
-import java.util.Queue
-import java.util.function.Function
-import java.util.stream.Collectors
-import net.minecraft.block.BlockLiquid
-import net.minecraft.block.material.Material
+import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.EnumFacing
 import net.minecraft.util.Tuple
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextComponentTranslation
-import net.minecraft.world.World
-import net.minecraftforge.common.util.BlockSnapshot
-import net.minecraftforge.event.ForgeEventFactory
-import net.minecraftforge.fluids.BlockFluidBase
-import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.UniversalBucket
-import net.minecraftforge.fluids.capability.IFluidHandlerItem
+import java.util.stream.Collectors
 
 class NEWMachineAssemblyManager {
 
+    data class BlockPair(val block: Block, val meta: Int) {
+        val blockState: IBlockState
+            get() : IBlockState {
+                @Suppress("DEPRECATION")
+                return block.getStateFromMeta(meta)
+            }
+    }
+
     companion object {
         private val ADDITIONAL_CONSTRUCTORS =
-            Reference2ObjectOpenHashMap<Class<out TileEntity>, EnumMap<EnumFacing, AssemblyBlockArray>>()
+            Reference2ObjectOpenHashMap<BlockPair, DynamicMachine>()
         private val MACHINE_ASSEMBLY_CACHE =
             Object2ObjectOpenHashMap<EntityPlayer, AssemblyBlockArray>()
         private val CheckAllItemComplete = ObjectLists.singleton(
@@ -71,8 +58,17 @@ class NEWMachineAssemblyManager {
         )
         private val emptyMiss2ListPair = Miss2ListPair(0, ObjectLists.emptyList())
 
-        fun getConstructorsIterator(): ObjectIterator<Map.Entry<Class<out TileEntity>, EnumMap<EnumFacing, AssemblyBlockArray>>> {
+        fun getAllConstructors(): Collection<DynamicMachine> {
+            return ADDITIONAL_CONSTRUCTORS.values
+        }
+
+        fun getConstructorsIterator(): ObjectIterator<Map.Entry<BlockPair, DynamicMachine>> {
             return ADDITIONAL_CONSTRUCTORS.entries.iterator()
+        }
+
+        fun setConstructors(block: BlockPair, machine: DynamicMachine) {
+            ADDITIONAL_CONSTRUCTORS[block] = machine
+            ModIntegrationJEI.PREVIEW_WRAPPERS.add(StructurePreviewWrapper(machine))
         }
 
         fun addAssemblyMachine(player: EntityPlayer, array: BlockArray): AssemblyBlockArray {
@@ -162,7 +158,7 @@ class NEWMachineAssemblyManager {
                             }
                         }
                     }
-                    if (itemIngredientList.isEmpty() && fluidIngredientList.isEmpty()) {
+                    if (itemStackIngList.isEmpty() && fluidStackIngList.isEmpty()) {
                         return emptyMiss2ListPair
                     }
                 }
@@ -187,7 +183,7 @@ class NEWMachineAssemblyManager {
                 }
 
                 return if (autoAECrafting) {
-                    val list = ObjectArrayList<List<ItemStack>>(itemStackIngList)
+                    val list = ObjectArrayList(itemStackIngList)
                     for (stacks in fluidStackIngList) {
                         val fs = ObjectArrayList<ItemStack>()
                         for (stack in stacks) {
@@ -274,27 +270,6 @@ class NEWMachineAssemblyManager {
 
             return stackList
         }
-
-        /**
-         * MachineAssembly#getFluidHandlerItems(List)
-         */
-        private fun getFluidHandlerItems(inventory: List<ItemStack>): List<IFluidHandlerItem> {
-            val fluidHandlers = ObjectArrayList<IFluidHandlerItem>()
-            for (invStack in inventory) {
-                val item = invStack.item
-                if (item is UniversalBucket || item === Items.LAVA_BUCKET || item === Items.WATER_BUCKET) {
-                    continue
-                }
-                if (!FluidUtils.isFluidHandler(invStack)) {
-                    continue
-                }
-                val fluidHandler = FluidUtil.getFluidHandler(invStack)
-                if (fluidHandler != null) {
-                    fluidHandlers.add(fluidHandler)
-                }
-            }
-            return fluidHandlers
-        }
     }
 
     enum class OperatingStatus {
@@ -302,244 +277,6 @@ class NEWMachineAssemblyManager {
         ALREADY_EXISTS,
         FAILURE,
         COMPLETE
-    }
-
-    class AssemblyBlockArray : BlockArray {
-
-        companion object {
-            private val material =
-                Object2ReferenceOpenHashMap<BlockInformation, ObjectArrayList<Tuple<Ingredient, IBlockState>>>()
-        }
-
-        var usingAE = false
-        var ignoreFluids = false
-        var missing = 0
-        private var queue: Queue<BlockPos>? = null
-
-        constructor(uid: Long) : super(uid)
-
-        constructor(other: BlockArray) : super(other)
-
-        constructor(other: BlockArray, offset: BlockPos) : super(other, offset)
-
-        fun copy(): AssemblyBlockArray {
-            return AssemblyBlockArray(this)
-        }
-
-        fun offset(offset: BlockPos): AssemblyBlockArray {
-            return AssemblyBlockArray(this, offset)
-        }
-
-        fun end() {
-            this.pattern.clear()
-            queue = null
-        }
-
-        fun start(usingAE: Boolean = true, ignoreFluids: Boolean = true) {
-            queue = ArrayDeque()
-            val l = Function { b: BlockInformation -> ObjectArrayList<Tuple<Ingredient, IBlockState>>() }
-            for (entry in this.pattern.entries) {
-                queue!!.add(entry.key)
-                val info = entry.value
-                if (material.containsKey(info)) continue
-                for (stateDescriptor in info.matchingStates) {
-                    for (state in stateDescriptor.applicable) {
-                        val block = state.getBlock()
-                        val ingredient = if (block is BlockFluidBase) {
-                            Ingredient(
-                                FluidStack(block.fluid, 1000)
-                            )
-                        } else if (block is BlockLiquid) {
-                            val material1 = state.getMaterial()
-                            if (material1 === Material.LAVA) {
-                                Ingredient(FluidStack(FluidRegistry.LAVA, 1000))
-                            } else Ingredient(FluidStack(FluidRegistry.WATER, 1000))
-                        } else {
-                            Ingredient(StackUtils.getStackFromBlockState(state))
-                        }
-                        material.computeIfAbsent(info, l).add(Tuple<Ingredient, IBlockState>(ingredient, state))
-                    }
-                }
-            }
-        }
-
-        fun isFluid(state: IBlockState): Boolean {
-            val block = state.getBlock()
-            return block is BlockLiquid || block is BlockFluidBase
-        }
-
-        fun assemblyBlock(world: World, player: EntityPlayerMP): OperatingStatus {
-            val pos = queue!!.poll() ?: return OperatingStatus.COMPLETE
-            val info: BlockInformation = synchronized(pattern) {
-                this.pattern.remove(pos) ?: return OperatingStatus.ALREADY_EXISTS
-            }
-
-            if (player.isCreative) {
-                placeBlock(player, world, pos, info.sampleState)
-                return OperatingStatus.SUCCESS
-            }
-
-            val oldState = world.getBlockState(pos)
-            if (oldState != null &&
-                (oldState.getBlock() !== Blocks.AIR
-                        && !(ignoreFluids && isFluid(oldState)))
-            ) {
-                return if (matchesState(info, oldState)) {
-                    OperatingStatus.ALREADY_EXISTS
-                } else {
-                    player.sendMessage(
-                        TextComponentTranslation(
-                            "message.assembly.tip.cannot_replace",
-                            MiscUtils.posToString(pos)
-                        )
-                    )
-                    OperatingStatus.FAILURE
-                }
-            }
-
-            val list = material[info] ?: throw RuntimeException("Unknown BlockInformation")
-
-            var hasAE = false
-            var wobj: WirelessTerminalGuiObject? = null
-            var items: IMEMonitor<IAEItemStack>? = null
-            var fluids: IMEMonitor<IAEFluidStack>? = null
-
-            if (usingAE) {
-                wobj = MEHandler.getTerminalGuiObject(player)
-                wobj?.actionableNode?.grid?.let {
-                    val grid = it.getCache<IStorageGrid>(IStorageGrid::class.java)
-                    items = grid.getInventory(
-                        AEApi.instance().storage()
-                            .getStorageChannel(IItemStorageChannel::class.java)
-                    )
-                    fluids = grid.getInventory(
-                        AEApi.instance().storage()
-                            .getStorageChannel(IFluidStorageChannel::class.java)
-                    )
-                    hasAE = true
-                }
-            }
-            val itemInventory = player.inventory.mainInventory
-            val fluidInventory = getFluidHandlerItems(itemInventory)
-            for (ingredientAndIBlockState in list) {
-                val ingredient = ingredientAndIBlockState.first
-                if (ingredient.isItem) {
-                    if (MachineAssembly.consumeInventoryItem(
-                            ingredient.itemStack,
-                            itemInventory
-                        )
-                    ) {
-                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
-                        return OperatingStatus.SUCCESS
-                    }
-                } else {
-                    if (MachineAssembly.consumeInventoryFluid(
-                            ingredient.fluidStack,
-                            fluidInventory
-                        )
-                    ) {
-                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
-                        return OperatingStatus.SUCCESS
-                    }
-                }
-            }
-            if (hasAE) {
-                for (ingredientAndIBlockState in list) {
-                    val ingredient = ingredientAndIBlockState.first
-                    if (ingredient.isItem) {
-                        val item = items!!.extractItems(
-                            ingredient.aEItemStack,
-                            Actionable.MODULATE,
-                            PlayerSource(player, wobj)
-                        )
-                        if (item == null || item.stackSize == 0L) continue
-                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
-                        return OperatingStatus.SUCCESS
-                    } else {
-                        val fluid = fluids!!.extractItems(
-                            ingredient.aEFluidStack,
-                            Actionable.SIMULATE,
-                            PlayerSource(player, wobj)
-                        )
-                        if (fluid == null || fluid.stackSize < 1000) continue
-                        fluids.extractItems(
-                            ingredient.aEFluidStack,
-                            Actionable.MODULATE,
-                            PlayerSource(player, wobj)
-                        )
-                        placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
-                        return OperatingStatus.SUCCESS
-                    }
-                }
-            }
-            if (oldState.block == Blocks.AIR && matchesState(info, oldState)) {
-                return OperatingStatus.ALREADY_EXISTS
-            }
-            if (missing > 0) {
-                --missing
-                return OperatingStatus.SUCCESS
-            }
-            player.sendMessage(
-                TextComponentTranslation(
-                    "message.assembly.tip.missing",
-                    MiscUtils.posToString(pos)
-                )
-            )
-            return OperatingStatus.FAILURE
-        }
-
-        private fun placeBlock(player: EntityPlayerMP, world: World, pos: BlockPos, state: IBlockState) {
-            player.getServer()!!.addScheduledTask {
-                if (!player.isCreative && ForgeEventFactory.onBlockPlace(
-                        player,
-                        BlockSnapshot(world, pos, state),
-                        EnumFacing.UP
-                    ).isCanceled
-                ) {
-                    player.sendMessage(
-                        TextComponentTranslation(
-                            "message.assembly.tip.missing",
-                            MiscUtils.posToString(pos)
-                        )
-                    )
-                    player.inventory.placeItemBackInInventory(
-                        world,
-                        StackUtils.getStackFromBlockState(state)
-                    )
-                } else {
-                    val flags = 0b10011
-                    val chunk = world.getChunk(pos)
-                    var blockSnapshot: BlockSnapshot? = null
-                    if (world.captureBlockSnapshots)
-                        blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos, flags)
-                    val iblockstate = chunk.setBlockState(pos, state)
-
-                    if (iblockstate != null) {
-                        if (blockSnapshot == null) {
-                            world.markAndNotifyBlock(pos, chunk, iblockstate, state, flags)
-                        } else {
-                            world.capturedBlockSnapshots.add(blockSnapshot)
-                        }
-                    }
-                }
-            }
-        }
-
-        fun matchesState(info: BlockInformation, state: IBlockState): Boolean {
-            val atBlock = state.getBlock()
-            val atMeta = atBlock.getMetaFromState(state)
-
-            for (descriptor in info.matchingStates) {
-                for (applicable in descriptor.applicable) {
-                    val type = applicable.getBlock()
-                    val meta = type.getMetaFromState(applicable)
-                    if (type == atBlock && meta == atMeta) {
-                        return true
-                    }
-                }
-            }
-            return false
-        }
     }
 
     class Ingredient {
@@ -572,13 +309,13 @@ class NEWMachineAssemblyManager {
         val itemStack: ItemStack
             get() = ingredient as ItemStack
 
-        val aEItemStack: IAEItemStack
-            get() = aeStack as IAEItemStack
+        val aEItemStack: IAEItemStack?
+            get() = aeStack as? IAEItemStack
 
         val fluidStack: FluidStack
             get() = ingredient as FluidStack
 
-        val aEFluidStack: IAEFluidStack
-            get() = aeStack as IAEFluidStack
+        val aEFluidStack: IAEFluidStack?
+            get() = aeStack as? IAEFluidStack
     }
 }

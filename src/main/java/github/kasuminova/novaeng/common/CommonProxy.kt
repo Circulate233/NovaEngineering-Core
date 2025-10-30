@@ -50,6 +50,7 @@ import github.kasuminova.novaeng.common.machine.MMAltar
 import github.kasuminova.novaeng.common.machine.MaterialSequenceProcessing
 import github.kasuminova.novaeng.common.machine.SingularityCore
 import github.kasuminova.novaeng.common.machine.SpaceGenerator
+import github.kasuminova.novaeng.common.registry.RegistryAssembly
 import github.kasuminova.novaeng.common.registry.RegistryBlocks
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet
 import github.kasuminova.novaeng.common.registry.RegistryItems
@@ -165,12 +166,14 @@ open class CommonProxy : IGuiHandler {
     }
 
     open fun postInit() {
+        RegistryAssembly.regAll()
         MachineCoolants.INSTANCE.init()
         HyperNetMachineEventHandler.registerHandler()
         OreHandler.registry()
     }
 
     open fun loadComplete() {
+
     }
 
     override fun getServerGuiElement(id: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): Any? {

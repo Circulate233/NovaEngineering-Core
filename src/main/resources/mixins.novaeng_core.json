@@ -8,14 +8,18 @@
     "MixinIngredientItemStackRenderer"
   ],
   "mixins": [
+    "AccessorAbstractMachine",
+    "MixinBlockArrayCache",
     "MixinBlockArrayPreviewRenderHelper",
     "MixinBlockArrayRenderHelper",
     "MixinCommonProxy",
+    "MixinDynamicMachineRenderContext",
     "MixinMachineRecipe",
     "MixinMachineRegistry",
     "MixinMEPatternProvider",
     "MixinRecipeAdapterBuilder",
     "MixinTaskExecutor",
-    "MixinTileMultiblockMachineController"
+    "MixinTileMultiblockMachineController",
+    "MixinWorldSceneRendererWidget"
   ]
 }

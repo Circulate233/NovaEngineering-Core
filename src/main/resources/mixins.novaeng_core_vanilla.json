@@ -12,6 +12,7 @@
   "client": [
     "AccessorParticleManager",
     "MixinFontRenderer",
+    "MixinGuiScreen",
     "MixinNetHandlerPlayClient",
     "MixinNettyCompressionDecoder",
     "forge.MixinForgeHooksClient"
