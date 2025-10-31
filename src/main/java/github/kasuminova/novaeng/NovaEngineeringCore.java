@@ -7,6 +7,7 @@ import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.network.ItemDisplayPkt;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
+import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
@@ -136,6 +137,7 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(ItemDisplayPkt.class, ItemDisplayPkt.class, start++, Side.SERVER);
+        NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
         proxy.preInit();
     }

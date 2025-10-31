@@ -1,5 +1,6 @@
 import org.jetbrains.gradle.ext.Gradle
 import org.jetbrains.gradle.ext.RunConfigurationContainer
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.*
 
 plugins {
@@ -92,6 +93,18 @@ tasks.compileTestJava.configure {
     }
 }
 
+tasks.compileKotlin.configure {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_1_8)
+    }
+}
+
+tasks.compileTestKotlin.configure {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_1_8)
+    }
+}
+
 tasks.javadoc.configure {
     // No need for JavaDoc.
     actions = Collections.emptyList()
@@ -167,7 +180,7 @@ repositories {
     }
     maven {
         name = "GTNH Maven"
-        url = uri("http://jenkins.usrv.eu:8081/nexus/content/groups/public/")
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
         isAllowInsecureProtocol = true
     }
     mavenCentral()
@@ -273,13 +286,10 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671384"))
     compileOnly(rfg.deobf("curse.maven:ender-io-64578:4674244"))
     compileOnly(rfg.deobf("curse.maven:more-electric-tools-366298:3491973"))
-    compileOnly(rfg.deobf("curse.maven:brandonscore-231382:3051539"))
-    compileOnly(rfg.deobf("curse.maven:draconicevolution-223565:3051542"))
     implementation(rfg.deobf("curse.maven:extrabotany-299086:3112313"))
     implementation(rfg.deobf("curse.maven:libnine-322344:3509087"))
     implementation(rfg.deobf("curse.maven:lazy-ae2-322347:3254160"))
     compileOnly(rfg.deobf("curse.maven:better-chat-363860:3048407"))
-    compileOnly(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5237484"))
     compileOnly(rfg.deobf("curse.maven:lunatriuscore-225605:2489549"))
     compileOnly(rfg.deobf("curse.maven:immersive-engineering-231951:2974106"))
     compileOnly(rfg.deobf("curse.maven:immersive-petroleum-268250:3382321"))
@@ -306,9 +316,11 @@ dependencies {
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
-    implementation(rfg.deobf("curse.maven:random-complement-1198138:7133485"))
+    implementation(rfg.deobf("curse.maven:random-complement-1198138:7155516"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
+    implementation(rfg.deobf("curse.maven:brandons-core-231382:3408276"))
+    implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
 }
 
 // Publishing to a Maven repository

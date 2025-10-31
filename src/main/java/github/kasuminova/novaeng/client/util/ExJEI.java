@@ -15,15 +15,12 @@ import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@SideOnly(Side.CLIENT)
 public class ExJEI {
 
     private static final List<String> blockList = Arrays.asList(

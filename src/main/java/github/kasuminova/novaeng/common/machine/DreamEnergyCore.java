@@ -8,6 +8,7 @@ import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
 import github.kasuminova.mmce.common.event.machine.MachineTickEvent;
 import github.kasuminova.mmce.common.helper.IMachineController;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
+import github.kasuminova.novaeng.common.util.BlockPos2ValueMap;
 import github.kasuminova.novaeng.common.util.FixedSizeDeque;
 import github.kasuminova.novaeng.common.util.IBlockPosEx;
 import hellfirepvp.modularmachinery.ModularMachinery;
@@ -26,6 +27,7 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -170,7 +172,8 @@ public class DreamEnergyCore implements MachineSpecial {
     }
 
     private static FixedSizeDeque<String> getEnergyInfo(World world, BlockPos pos) {
-        return map.computeIfAbsent(world, k -> new ConcurrentHashMap<>())
+        return map.computeIfAbsent(world, k ->
+                        Collections.synchronizedMap(new BlockPos2ValueMap<>()))
                 .computeIfAbsent(pos, m -> new FixedSizeDeque<>(MinuteScale));
     }
 

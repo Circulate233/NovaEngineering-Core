@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
 public class EPartMap<P extends EPart<?>> {
 
     protected final Map<Class<?>, List<P>> parts = new Reference2ObjectOpenHashMap<>();

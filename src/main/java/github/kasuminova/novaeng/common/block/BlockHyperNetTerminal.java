@@ -117,7 +117,7 @@ public class BlockHyperNetTerminal extends BlockController {
             spawnAsEntity(worldIn, pos, stackCtrl);
         }
 
-        // TODO MM warn.
+        //MM warn.
         super.breakBlock(worldIn, pos, state);
     }
 

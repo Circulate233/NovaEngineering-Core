@@ -18,6 +18,36 @@ item.hypernet_connect_card.tooltip.no_pos.tip.1=§2右击任意等级的计算�
 item.hypernet_connect_card.tooltip.pos.tip.0=§b存储卡中保存的坐标:§a（X: %s, Y: %s, Z: %s）
 item.hypernet_connect_card.tooltip.pos.tip.1=§2右击任意等级的计算网络中心控制器来覆写数据。
 
+item.novaeng_core.machine_assembly_tool.name=§9高级结构构造器
+
+message.assembly.tip.already_assembly.start=模块化组装：机器开始组装
+message.assembly.tip.fail=模块化组装: 在 %s 放置方块失败，已返还材料
+
+gui.blueprint.popout.placed.dynamic_pattern.unload=当前结构预览已结束
+
+tile.Reactor.name=Fusion Reactor
+tile.ThermalEvaporation.name=Thermal Evaporation Tower
+
+config.field.UsingAE.entry=使用AE
+text.machine_assembly_tool.config.UsingAE=允许使用背包内可用的第一个无线终端链接的网络内物品工作（支持饰品栏）
+config.field.IgnoreFluids.entry=忽略流体
+text.machine_assembly_tool.config.IgnoreFluids=是否在目标搭建位置为流体时继续搭建
+config.field.DynamicPatternSize.entry=动态结构层数
+text.machine_assembly_tool.config.DynamicPatternSize=搭建动态结构时所搭建的层数
+config.field.AutoAECrafting.entry=自动AE合成
+text.machine_assembly_tool.config.AutoAECrafting=在允许使用AE时，将会尝试请求可合成的缺失的材料的合成
+config.field.NeedAllIngredient.entry=完整材料需求
+text.machine_assembly_tool.config.NeedAllIngredient=是否需要有结构所需的所有材料时才开始搭建
+
+item.novaeng_core.machine_assembly_tool.tooltip.0=右键机械控制器以进行投影
+item.novaeng_core.machine_assembly_tool.tooltip.1=在潜行状态下使用滚轮切换投影层数
+item.novaeng_core.machine_assembly_tool.tooltip.2=潜行右键机械控制器以触发自动搭建
+item.novaeng_core.machine_assembly_tool.tooltip.3=右键空气打开配置GUI
+item.novaeng_core.machine_assembly_tool.config=当前状态：
+
+tooltip.machine_assembly_tool.0=§r作为 §6%s§r 的主方块
+tooltip.machine_assembly_tool.1=§r可使用 §6%s§r 投影或自动搭建
+
 item.novaeng_core.estorage_cell_item_16m.name=§9ECO - §bSE4 §9存储矩阵§a（物品）
 item.novaeng_core.estorage_cell_item_64m.name=§9ECO - §6SE6 §9存储矩阵§a（物品）
 item.novaeng_core.estorage_cell_item_256m.name=§9ECO - §5SE9 §9存储矩阵§a（物品）
@@ -943,6 +973,7 @@ new.ctrl.tooltip.help=§9//////// 控制器提示 /////////
 new.ctrl.tooltip.base=§9§o每个机械的独立控制器,JEI 中左键以查看结构
 new.ctrl.tooltip.factory=§9§o控制器的工厂变种,包含特殊功能
 new.ctrl.tooltip.structure=§9§oJEI 中左键以查看结构
+new.ctrl.tooltip.assembly=§9使用 %s 或 %s 自动搭建结构
 
 new.energy.storge=§a能量缓存: %s
 new.energy.max_input=§a最大输入: %s
