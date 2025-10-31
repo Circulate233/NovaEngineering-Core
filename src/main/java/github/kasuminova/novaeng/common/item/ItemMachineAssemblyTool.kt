@@ -47,9 +47,10 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
             return EnumActionResult.PASS
         } else if (player.isSneaking) {
             if (!NEWMachineAssemblyManager.checkMachineAssembly(player)) {
-                val state = world.getBlockState(pos)
+                var state = world.getBlockState(pos)
                 val block = state.block
-
+                @Suppress("DEPRECATION")
+                state = block.getActualState(state, world, pos)
                 val machine: DynamicMachine
                 val controllerFacing: EnumFacing
                 if (tile is TileMultiblockMachineController) {
@@ -61,19 +62,19 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool") {
                     val meta = block.getMetaFromState(state)
                     var m: DynamicMachine? = null
                     var e: EnumFacing? = null
-                    val eventFacing = if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
-                        EnumFacing.NORTH
-                    } else facing
                     for (entry in NEWMachineAssemblyManager.getConstructorsIterator()) {
-                        if (entry.key.block == block && entry.key.meta == meta) {
-                            m = entry.value
-                            val pf = block.blockState.getProperty("facting")
+                        if (entry.key == block && entry.value.containsKey(meta)) {
+                            m = entry.value[meta]
+                            val pf = block.blockState.getProperty("facing")
                             e = if (pf != null) {
-                                state.getValue(pf) as? EnumFacing ?: eventFacing
-                            } else eventFacing
+                                state.getValue(pf) as? EnumFacing ?: facing
+                            } else facing
                             break
                         }
                     }
+                    e = if (e == EnumFacing.UP || e == EnumFacing.DOWN) {
+                        EnumFacing.NORTH
+                    } else e
                     machine = m ?: return EnumActionResult.FAIL
                     controllerFacing = e ?: return EnumActionResult.FAIL
                 }

@@ -33,8 +33,10 @@ object MachineAssemblyHandler {
         if (!player.isSneaking && stack.item is ItemMachineAssemblyTool) {
             val pos = event.pos
             val tile = world.getTileEntity(pos)
-            val state = world.getBlockState(pos)
+            var state = world.getBlockState(pos)
             val block = state.block
+            @Suppress("DEPRECATION")
+            state = block.getActualState(state, world, pos)
             var facing: EnumFacing? = null
             val machine: DynamicMachine = if (tile is TileMultiblockMachineController) {
                 tile.blueprintMachine ?: if (block is BlockController)
@@ -43,19 +45,19 @@ object MachineAssemblyHandler {
             } else {
                 val meta = block.getMetaFromState(state)
                 var m: DynamicMachine? = null
-                val eventFacing = if (event.face == EnumFacing.UP || event.face == EnumFacing.DOWN) {
-                    EnumFacing.NORTH
-                } else event.face
                 for (entry in NEWMachineAssemblyManager.getConstructorsIterator()) {
-                    if (entry.key.block == block && entry.key.meta == meta) {
-                        m = entry.value
-                        val pf = block.blockState.getProperty("facting")
+                    if (entry.key == block && entry.value.containsKey(meta)) {
+                        m = entry.value[meta]
+                        val pf = block.blockState.getProperty("facing")
                         facing = if (pf != null) {
-                            state.getValue(pf) as? EnumFacing ?: eventFacing
-                        } else eventFacing
+                            state.getValue(pf) as? EnumFacing ?: event.face
+                        } else event.face
                         break
                     }
                 }
+                facing = if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
+                    EnumFacing.NORTH
+                } else facing
                 m ?: return
             }
 

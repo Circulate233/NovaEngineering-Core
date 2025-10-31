@@ -10,14 +10,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentTranslation
-import java.util.stream.IntStream
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
 
     val utils = this as BlockArrayPreviewRenderUtils
     var renderHelperUtils: BlockArrayRenderUtils? = null
-    private var status: IntArray? = null
+    private var status: Int = 0
     var work = false
     var key = 0L
 
@@ -41,21 +40,19 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
 
     private fun initLayers() {
         val matchingArray = renderHelperUtils!!.`n$getBlocks`()
-        val lowestSlice = matchingArray.min.y
         val maxSlice = matchingArray.max.y
-        val status = IntStream.range(lowestSlice, maxSlice + 2).toArray()
-        utils.renderedLayer = status[status.size - 1]
-        this.status = status
+        utils.renderedLayer = maxSlice + 1
+        this.status = maxSlice + 2
     }
 
     fun setLayers(newValue: Int) {
         if (renderHelperUtils != null) {
-            val size = status!!.size
+            val size = status
             val mod = newValue % size
 
             val value = if (mod < 0) mod + size else mod
 
-            utils.renderedLayer = status!![value]
+            utils.renderedLayer = value
         }
     }
 
@@ -69,7 +66,7 @@ object NEWBlockArrayPreviewRenderHelper : BlockArrayPreviewRenderHelper() {
 
     fun clear() {
         renderHelperUtils = null
-        status = null
+        status = 0
         work = false
         key = 0
 

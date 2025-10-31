@@ -23,6 +23,7 @@ import hellfirepvp.modularmachinery.common.util.BlockArray
 import hellfirepvp.modularmachinery.common.util.ItemUtils
 import ink.ikx.mmce.common.assembly.MachineAssembly
 import ink.ikx.mmce.common.utils.StructureIngredient
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectIterator
@@ -50,7 +51,7 @@ class NEWMachineAssemblyManager {
 
     companion object {
         private val ADDITIONAL_CONSTRUCTORS =
-            Reference2ObjectOpenHashMap<BlockPair, DynamicMachine>()
+            Reference2ObjectOpenHashMap<Block, Int2ObjectOpenHashMap<DynamicMachine>>()
         private val MACHINE_ASSEMBLY_CACHE =
             Object2ObjectOpenHashMap<EntityPlayer, AssemblyBlockArray>()
         private val CheckAllItemComplete = ObjectLists.singleton(
@@ -59,15 +60,25 @@ class NEWMachineAssemblyManager {
         private val emptyMiss2ListPair = Miss2ListPair(0, ObjectLists.emptyList())
 
         fun getAllConstructors(): Collection<DynamicMachine> {
-            return ADDITIONAL_CONSTRUCTORS.values
+            val i = ObjectArrayList<DynamicMachine>()
+            for (map in ADDITIONAL_CONSTRUCTORS.values) {
+                i.addAll(map.values)
+            }
+            return i
         }
 
-        fun getConstructorsIterator(): ObjectIterator<Map.Entry<BlockPair, DynamicMachine>> {
+        fun getDynamicMachine(state: IBlockState): DynamicMachine? {
+            return ADDITIONAL_CONSTRUCTORS[state.block]?.let {
+                it[state.block.getMetaFromState(state)]
+            }
+        }
+
+        fun getConstructorsIterator(): ObjectIterator<Map.Entry<Block, Int2ObjectOpenHashMap<DynamicMachine>>> {
             return ADDITIONAL_CONSTRUCTORS.entries.iterator()
         }
 
         fun setConstructors(block: BlockPair, machine: NEWDynamicMachine) {
-            ADDITIONAL_CONSTRUCTORS[block] = machine
+            ADDITIONAL_CONSTRUCTORS.computeIfAbsent(block.block) { Int2ObjectOpenHashMap() }[block.meta] = machine
             ModIntegrationJEI.PREVIEW_WRAPPERS.add(StructurePreviewWrapper(machine))
         }
 
