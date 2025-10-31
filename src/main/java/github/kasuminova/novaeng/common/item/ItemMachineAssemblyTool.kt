@@ -44,7 +44,7 @@ import kotlin.math.min
 object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool"), IConfigurableItem {
 
     override fun onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult<ItemStack> {
-        if (hand != EnumHand.MAIN_HAND) return super.onItemRightClick(world, player, hand)
+        if (hand != EnumHand.MAIN_HAND || player.isSneaking) return super.onItemRightClick(world, player, hand)
         if (world.isRemote) {
             player.openGui(
                 NovaEngineeringCore.instance,
