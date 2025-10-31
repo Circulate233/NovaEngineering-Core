@@ -44,15 +44,14 @@ open class ItemBasic(name: String) : Item() {
         this.setMaxStackSize(1)
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE)
         this.registryName = ResourceLocation(NovaEngineeringCore.MOD_ID, name)
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + name)
+        this.translationKey = NovaEngineeringCore.MOD_ID + '.' + name
     }
 
     @SideOnly(Side.CLIENT)
     override fun addInformation(stack: ItemStack, world: World?, lines: MutableList<String?>, flagIn: ITooltipFlag) {
-        var i = 0
-        while (I18n.hasKey(this.translationKey + ".tooltip." + i)) {
+        var i = -1
+        while (I18n.hasKey(this.translationKey + ".tooltip." + ++i)) {
             lines.add(I18n.format(this.translationKey + ".tooltip." + i))
-            i++
         }
     }
 

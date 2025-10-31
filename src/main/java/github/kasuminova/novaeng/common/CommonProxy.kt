@@ -257,6 +257,7 @@ open class CommonProxy : IGuiHandler {
                 }
                 return null
             }
+            GuiType.MACHINE_ASSEMBLY_TOOL -> null
         }
     }
 
@@ -274,6 +275,7 @@ open class CommonProxy : IGuiHandler {
         EFABRICATOR_PATTERN_BUS(EFabricatorPatternBus::class.java),
         GEOCENTRIC_DRILL_CONTROLLER(GeocentricDrillController::class.java),
         ECALCULATOR_CONTROLLER(ECalculatorController::class.java),
-        AUTO_CRAFTGUI(null)
+        AUTO_CRAFTGUI(null),
+        MACHINE_ASSEMBLY_TOOL(null)
     }
 }

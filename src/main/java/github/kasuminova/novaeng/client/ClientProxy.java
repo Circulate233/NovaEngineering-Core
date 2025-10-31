@@ -14,6 +14,7 @@ import github.kasuminova.novaeng.client.gui.GuiEFabricatorPatternSearch;
 import github.kasuminova.novaeng.client.gui.GuiEStorageController;
 import github.kasuminova.novaeng.client.gui.GuiGeocentricDrill;
 import github.kasuminova.novaeng.client.gui.GuiHyperNetTerminal;
+import github.kasuminova.novaeng.client.gui.GuiMachineAssemblyTool;
 import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
 import github.kasuminova.novaeng.client.gui.GuiNEWCraftConfirm;
 import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
@@ -286,6 +287,7 @@ public class ClientProxy extends CommonProxy {
                             new WirelessTerminalGuiObject(wt, stack, player, player.world, x, y, Integer.MIN_VALUE));
                 } else yield null;
             }
+            case MACHINE_ASSEMBLY_TOOL -> new GuiMachineAssemblyTool(player);
         };
     }
 

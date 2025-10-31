@@ -33,7 +33,7 @@ public abstract class MixinBlockArrayCache {
 
     @Inject(method = "buildCache", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;forEach(Ljava/util/function/Consumer;)V", shift = At.Shift.AFTER))
     private static void buildCache(Collection<DynamicMachine> machines, CallbackInfo ci) {
-        NEWMachineAssemblyManager.Companion.getAllConstructors().parallelStream().forEach(machine -> {
+        NEWMachineAssemblyManager.Companion.getAllDynamicMachines().parallelStream().forEach(machine -> {
             TaggedPositionBlockArray blockArray = machine.getPattern();
             buildBlockArrayCache(blockArray);
             buildMultiBlockModifierCache(machine.getMultiBlockModifiers());

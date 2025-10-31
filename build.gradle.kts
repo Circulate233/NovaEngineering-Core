@@ -286,8 +286,6 @@ dependencies {
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671384"))
     compileOnly(rfg.deobf("curse.maven:ender-io-64578:4674244"))
     compileOnly(rfg.deobf("curse.maven:more-electric-tools-366298:3491973"))
-    compileOnly(rfg.deobf("curse.maven:brandonscore-231382:3051539"))
-    compileOnly(rfg.deobf("curse.maven:draconicevolution-223565:3051542"))
     implementation(rfg.deobf("curse.maven:extrabotany-299086:3112313"))
     implementation(rfg.deobf("curse.maven:libnine-322344:3509087"))
     implementation(rfg.deobf("curse.maven:lazy-ae2-322347:3254160"))

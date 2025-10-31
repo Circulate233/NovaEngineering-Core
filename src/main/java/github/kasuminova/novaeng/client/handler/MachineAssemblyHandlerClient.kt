@@ -2,10 +2,14 @@ package github.kasuminova.novaeng.client.handler
 
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper
 import github.kasuminova.novaeng.common.item.ItemMachineAssemblyTool
+import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
 import net.minecraft.client.Minecraft
+import net.minecraft.client.resources.I18n
+import net.minecraft.item.ItemBlock
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -17,7 +21,31 @@ import org.lwjgl.input.Mouse
 @SideOnly(Side.CLIENT)
 object MachineAssemblyHandlerClient {
 
-    val mc: Minecraft = Minecraft.getMinecraft()
+    val mc: Minecraft by lazy {
+        Minecraft.getMinecraft()
+    }
+
+    @SubscribeEvent
+    fun addMachineCtrlTooltip(event: ItemTooltipEvent) {
+        val stack = event.itemStack
+        val item = stack.item
+        if (item is ItemBlock) {
+            val machine = NEWMachineAssemblyManager
+                .getDynamicMachine(item.block, stack.metadata) ?: return
+            event.toolTip.add(
+                I18n.format(
+                    "tooltip.machine_assembly_tool.0",
+                    machine.localizedName
+                )
+            )
+            event.toolTip.add(
+                I18n.format(
+                    "tooltip.machine_assembly_tool.1",
+                    ItemMachineAssemblyTool.getItemStackDisplayName(ItemStack.EMPTY)
+                )
+            )
+        }
+    }
 
     @SubscribeEvent
     fun onMouseEvent(event: MouseEvent) {

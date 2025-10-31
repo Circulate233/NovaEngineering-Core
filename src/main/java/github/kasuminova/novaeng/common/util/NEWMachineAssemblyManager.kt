@@ -50,16 +50,22 @@ class NEWMachineAssemblyManager {
     }
 
     companion object {
-        private val ADDITIONAL_CONSTRUCTORS =
+        private val ADDITIONAL_CONSTRUCTORS by lazy {
             Reference2ObjectOpenHashMap<Block, Int2ObjectOpenHashMap<DynamicMachine>>()
-        private val MACHINE_ASSEMBLY_CACHE =
+        }
+        private val MACHINE_ASSEMBLY_CACHE by lazy {
             Object2ObjectOpenHashMap<EntityPlayer, AssemblyBlockArray>()
-        private val CheckAllItemComplete = ObjectLists.singleton(
-            ObjectLists.singleton(ItemStack.EMPTY)
-        )
-        private val emptyMiss2ListPair = Miss2ListPair(0, ObjectLists.emptyList())
+        }
+        private val CheckAllItemComplete by lazy {
+            ObjectLists.singleton(
+                ObjectLists.singleton(ItemStack.EMPTY)
+            )
+        }
+        private val emptyMiss2ListPair by lazy {
+            Miss2ListPair(0, ObjectLists.emptyList())
+        }
 
-        fun getAllConstructors(): Collection<DynamicMachine> {
+        fun getAllDynamicMachines(): Collection<DynamicMachine> {
             val i = ObjectArrayList<DynamicMachine>()
             for (map in ADDITIONAL_CONSTRUCTORS.values) {
                 i.addAll(map.values)
@@ -68,9 +74,11 @@ class NEWMachineAssemblyManager {
         }
 
         fun getDynamicMachine(state: IBlockState): DynamicMachine? {
-            return ADDITIONAL_CONSTRUCTORS[state.block]?.let {
-                it[state.block.getMetaFromState(state)]
-            }
+            return getDynamicMachine(state.block, state.block.getMetaFromState(state))
+        }
+
+        fun getDynamicMachine(block: Block, meta: Int): DynamicMachine? {
+            return ADDITIONAL_CONSTRUCTORS[block]?.let { it[meta] }
         }
 
         fun getConstructorsIterator(): ObjectIterator<Map.Entry<Block, Int2ObjectOpenHashMap<DynamicMachine>>> {
