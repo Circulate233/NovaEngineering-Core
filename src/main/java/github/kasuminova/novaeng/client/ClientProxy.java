@@ -44,15 +44,13 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -67,11 +65,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.resource.VanillaResourceType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -92,8 +88,6 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isClea
 public class ClientProxy extends CommonProxy {
 
     private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
-    public static List<Item> items = new ObjectArrayList<>();
-    public static List<Block> blocks = new ObjectArrayList<>();
     @Getter
     private static List<String> itemDisplayTooltip;
 
@@ -189,29 +183,27 @@ public class ClientProxy extends CommonProxy {
         TitleUtils.setRandomTitle("*PreInit*");
     }
 
+    public static List<Item> colorsItems = new ReferenceArrayList<>();
+    public static List<Block> colorsBlocks = new ReferenceArrayList<>();
+
     @Override
     public void init() {
         super.init();
 
-        TitleUtils.setRandomTitle("*Init*");
-
         if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiCreate();
         }
+
+        TitleUtils.setRandomTitle("*Init*");
     }
 
     @Override
     public void postInit() {
         super.postInit();
 
-        ClientCommandHandler.instance.registerCommand(ExportResearchDataToJson.INSTANCE);
-        ClientCommandHandler.instance.registerCommand(CommandPacketProfiler.INSTANCE);
-
-        TitleUtils.setRandomTitle("*PostInit*");
-
         Minecraft mc = Minecraft.getMinecraft();
-        BlockColors blockColors = mc.getBlockColors();
-        ItemColors itemColors = mc.getItemColors();
+        var blockColors = mc.getBlockColors();
+        var itemColors = mc.getItemColors();
 
         itemColors.registerItemColorHandler((stack, i) -> {
             var item = stack.getItem();
@@ -222,21 +214,27 @@ public class ClientProxy extends CommonProxy {
                 return getColorForODFirst(r.getPartOD());
             }
             return Color.WHITE.getRGB();
-        }, items.toArray(new Item[0]));
+        }, colorsItems.toArray(new Item[0]));
+        colorsItems = null;
 
         blockColors.registerBlockColorHandler((state, worldIn, pos, i) -> {
             if (state.getBlock() instanceof ItemRawOre.BlockRawOre blockRawOre) {
                 return getColorForODFirst(blockRawOre.getPartOD());
             }
             return Color.WHITE.getRGB();
-        }, blocks.toArray(new Block[0]));
+        }, colorsBlocks.toArray(new Block[0]));
+        colorsBlocks = null;
+
+        ClientCommandHandler.instance.registerCommand(ExportResearchDataToJson.INSTANCE);
+        ClientCommandHandler.instance.registerCommand(CommandPacketProfiler.INSTANCE);
 
         if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiRecipeRegister();
         }
 
         TinkerBook.INSTANCE.addTransformer(BookTransformerAppendModifiers.INSTANCE_FALSE);
-        FMLClientHandler.instance().refreshResources(VanillaResourceType.TEXTURES, VanillaResourceType.MODELS);
+
+        TitleUtils.setRandomTitle("*PostInit*");
     }
 
     @Override

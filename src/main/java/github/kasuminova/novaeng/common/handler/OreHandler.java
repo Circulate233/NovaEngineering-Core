@@ -4,9 +4,12 @@ import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
+import github.kasuminova.novaeng.common.item.ItemRawOre;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceMaps;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -33,9 +36,6 @@ public class OreHandler {
     public static final OreHandler INSTANCE = new OreHandler();
     public static final Map<String, String> VeinMap = new Object2ObjectOpenHashMap<>();
     public static final Map<String, IItemStack> VeinItemMap = new Object2ObjectOpenHashMap<>();
-    private static final String rawOreOD = "rawOre";
-    private static final String rawOreGemOD = "rawOreGem";
-    private static final String oreOD = "ore";
     private static Map<OreKey, ItemStack> rawOreMap;
     private static Map<OreKey, ItemStack> oreMap;
 
@@ -85,34 +85,28 @@ public class OreHandler {
     }
 
     public static void registry() {
-        Object2ObjectMap<OreKey, ItemStack> map = new Object2ObjectOpenHashMap<>();
-        Object2ObjectMap<OreKey, ItemStack> mapO = new Object2ObjectOpenHashMap<>();
+        Object2ReferenceMap<OreKey, ItemStack> map = new Object2ReferenceOpenHashMap<>();
+        Object2ReferenceMap<OreKey, ItemStack> mapO = new Object2ReferenceOpenHashMap<>();
 
-        for (String odName : OreDictionary.getOreNames()) {
-            if (odName.startsWith(rawOreOD)) {
-                if (!OreDictionary.getOres(odName).isEmpty()) {
-                    ItemStack rawOre = OreDictionary.getOres(odName).get(0);
-                    String rawOreName = odName.startsWith(rawOreGemOD) ?
-                            odName.substring(rawOreGemOD.length()) :
-                            odName.substring(rawOreOD.length());
-
-                    final String oreName = oreOD + rawOreName;
-                    if (!OreDictionary.getOres(oreName).isEmpty()) {
-                        var ores = OreDictionary.getOres(oreName);
-                        final ItemStack ODore = OreDictHelper.getPriorityItemFromOreDict(oreName);
-                        for (ItemStack ore : ores) {
-                            var ok = OreKey.getKey(ore);
-                            map.put(ok, rawOre);
-                            mapO.put(ok, ODore);
-                            NovaEngineeringCore.log.info("registered : {}[{}]", ok.toString(), rawOreName);
-                        }
-                    }
+        for (var entry : ItemRawOre.getRawOreAndName()) {
+            val rawOreName = entry.getKey();
+            val rawOreItem = entry.getValue();
+            ItemStack rawOre = new ItemStack(rawOreItem);
+            final String oreName = rawOreItem.getOreOD();
+            if (!OreDictionary.getOres(oreName).isEmpty()) {
+                var ores = OreDictionary.getOres(oreName);
+                final ItemStack ODore = OreDictHelper.getPriorityItemFromOreDict(oreName, ores);
+                for (ItemStack ore : ores) {
+                    var ok = OreKey.getKey(ore);
+                    map.put(ok, rawOre);
+                    mapO.put(ok, ODore);
+                    NovaEngineeringCore.log.info("registered : {}[{}]", ok.toString(), rawOreName);
                 }
             }
         }
 
-        rawOreMap = Object2ObjectMaps.unmodifiable(map);
-        oreMap = Object2ObjectMaps.unmodifiable(mapO);
+        rawOreMap = Object2ReferenceMaps.unmodifiable(map);
+        oreMap = Object2ReferenceMaps.unmodifiable(mapO);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -206,8 +200,10 @@ public class OreHandler {
         };
 
         public static ItemStack getPriorityItemFromOreDict(String oreName) {
-            List<ItemStack> oreEntries = OreDictionary.getOres(oreName);
+            return getPriorityItemFromOreDict(oreName, OreDictionary.getOres(oreName));
+        }
 
+        public static ItemStack getPriorityItemFromOreDict(String oreName, List<ItemStack> oreEntries) {
             return switch (oreEntries.size()) {
                 case 0 -> ItemStack.EMPTY;
                 case 1 -> oreEntries.get(0).copy();

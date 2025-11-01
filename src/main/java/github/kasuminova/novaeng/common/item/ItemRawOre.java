@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import lombok.Getter;
 import net.minecraft.block.Block;
@@ -17,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 import static github.kasuminova.novaeng.common.registry.RegistryItems.ITEMS_TO_REGISTER;
 
@@ -38,9 +41,12 @@ public final class ItemRawOre extends Item {
         }
     };
     private static final Object2ReferenceMap<String, BlockRawOre> allItemRawBlock = new Object2ReferenceOpenHashMap<>();
+    private static final Object2ReferenceMap<String, BlockRawOre.ItemBLockRawOre> allItemRawBlockItem = new Object2ReferenceOpenHashMap<>();
 
     @Getter
     private final String rawOD;
+    @Getter
+    private final String oreOD;
     @Getter
     private final String partOD;
     @Getter
@@ -57,6 +63,7 @@ public final class ItemRawOre extends Item {
         this.setRegistryName(NovaEngineeringCore.getRL(key));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + key);
         rawOD = type.getOdName(name);
+        oreOD = "ore" + name;
         partOD = type.name().toLowerCase() + name;
         allItemRawOre.put(this.name, this);
         allItemRawBlock.put(this.name, new BlockRawOre(name));
@@ -71,8 +78,16 @@ public final class ItemRawOre extends Item {
         return allItemRawBlock.get(name);
     }
 
+    public static BlockRawOre.ItemBLockRawOre getRawItemBlock(String name) {
+        return allItemRawBlockItem.get(name);
+    }
+
     public static ReferenceCollection<ItemRawOre> getRawOres() {
         return allItemRawOre.values();
+    }
+
+    public static ObjectSet<Map.Entry<String, ItemRawOre>> getRawOreAndName() {
+        return allItemRawOre.entrySet();
     }
 
     public static ReferenceCollection<BlockRawOre> getRawBlocks() {
@@ -222,7 +237,7 @@ public final class ItemRawOre extends Item {
         @Getter
         private final Type type = Type.BLOCK;
         @Getter
-        private final ItemBlock item;
+        private final ItemBLockRawOre item;
 
         private BlockRawOre(String name) {
             super(Material.ROCK);
@@ -234,6 +249,7 @@ public final class ItemRawOre extends Item {
             this.setRegistryName(NovaEngineeringCore.getRL("raw_block_" + ItemRawOre.this.name));
             this.rawOD = type.getOdName(name);
             this.item = new ItemBLockRawOre();
+            allItemRawBlockItem.put(ItemRawOre.this.name, this.item);
         }
 
         public String getPartOD() {
