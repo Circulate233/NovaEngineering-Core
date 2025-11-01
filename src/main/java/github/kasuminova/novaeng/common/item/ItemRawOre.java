@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static github.kasuminova.novaeng.common.registry.RegistryItems.ITEMS_TO_REGISTER;
 
-@ExtensionMethod(StringUtils.class)
 public final class ItemRawOre extends Item {
 
     private static final Object2ReferenceMap<String, ItemRawOre> allItemRawOre = new Object2ReferenceOpenHashMap<>();
@@ -52,7 +50,7 @@ public final class ItemRawOre extends Item {
 
     public ItemRawOre(String name, Type type) {
         if (type == Type.BLOCK) throw new RuntimeException("Directly registering BlockRawOre is not allowed");
-        this.name = name.camelToSnake();
+        this.name = StringUtils.camelToSnake(name);
         this.type = type;
         this.setCreativeTab(rawOreTab);
         var key = type.getName() + "_" + this.name;
@@ -205,7 +203,7 @@ public final class ItemRawOre extends Item {
 
         Type(@NotNull String name) {
             this.odName = name;
-            this.name = name.camelToSnake();
+            this.name = StringUtils.camelToSnake(name);
             this.localizationKey = "novaeng.part." + this.name;
             this.defR = this.name().equals("BLOCK") ?
                     "blocks/raw_block/raw_block" : "items/raw_ore/" + this.name;

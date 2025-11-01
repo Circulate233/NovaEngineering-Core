@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.common.machine.Drills;
+package github.kasuminova.novaeng.common.machine.drills;
 
 public class VoidMiner extends Drill {
     public static final VoidMiner INSTANCE = new VoidMiner();

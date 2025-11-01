@@ -1,16 +1,16 @@
-package github.kasuminova.novaeng.common.machine.Drills;
+package github.kasuminova.novaeng.common.machine.drills;
 
-public class OrichalcosDrill extends Drill {
-    public static final OrichalcosDrill INSTANCE = new OrichalcosDrill();
+public class MineralExtractor extends Drill {
+    public static final MineralExtractor INSTANCE = new MineralExtractor();
 
     @Override
     protected String getCoreTheardName() {
-        return "novaeng.drill.thread.c";
+        return "novaeng.drill.thread.a";
     }
 
     @Override
     protected String getMachineName() {
-        return "orichalcos_drill";
+        return "mineral_extractor";
     }
 
     @Override

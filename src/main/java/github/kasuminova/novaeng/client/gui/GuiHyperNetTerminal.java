@@ -30,7 +30,6 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -58,7 +57,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ExtensionMethod(StringUtils.class)
 public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTerminal> {
     protected static final Comparator<ResearchCognitionData> comparator =
             (o1, o2) -> {
@@ -542,7 +540,7 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
 
         String searchFilter = searchTextField.getText();
         if (!searchFilter.isEmpty()) {
-            List<String> filtered = searchFilter.sortWithMatchRate(tmp.keySet());
+            List<String> filtered = StringUtils.sortWithMatchRate(searchFilter, tmp.keySet());
             if (filtered.isEmpty()) {
                 searchTextField.setTextColor(0xFF0000);
             } else {

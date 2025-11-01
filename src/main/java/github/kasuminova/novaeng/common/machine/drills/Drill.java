@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.common.machine.Drills;
+package github.kasuminova.novaeng.common.machine.drills;
 
 import blusunrize.immersiveengineering.api.tool.ExcavatorHandler;
 import blusunrize.immersiveengineering.common.Config;
@@ -10,7 +10,6 @@ import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent;
 import github.kasuminova.mmce.common.event.machine.MachineStructureFormedEvent;
 import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
 import github.kasuminova.novaeng.common.handler.OreHandler;
 import github.kasuminova.novaeng.common.machine.MachineSpecial;
@@ -25,7 +24,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import lombok.experimental.ExtensionMethod;
 import lombok.val;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -51,7 +49,6 @@ import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrim
 import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet.requireResearch;
 import static net.minecraft.util.text.translation.I18n.translateToLocalFormatted;
 
-@ExtensionMethod(RecipePrimerHyperNet.class)
 public abstract class Drill implements MachineSpecial {
     protected static final int[] tqsz = {-1, 0, 1};
     protected static final Object2IntMap<String> tqdzb = new Object2IntOpenHashMap<>();
@@ -805,7 +802,8 @@ public abstract class Drill implements MachineSpecial {
             upThread.addRecipe("research_mineral_utilization_" + name + "_" + fi);
             upThread.addRecipe("additional_component_loading_" + name + "_" + fi);
 
-            RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + fi, name, 10)
+
+            requireResearch(RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + fi, name, 10)
                     .addPreCheckHandler(event -> {
                         var ctrl = event.getController();
                         var data = ctrl.getCustomDataTag();
@@ -824,12 +822,13 @@ public abstract class Drill implements MachineSpecial {
                         ctrl.addPermanentModifier("research" + fi, RecipeModifierBuilder.create("modularmachinery:energy", "input", (float) (1 + (0.2 * (fi + 1))), 1, false).build());
                         data.setBoolean("research_mineral_" + fi, true);
                         data.setByte("research_progress", (byte) (research_progress + 1));
-                    }).requireResearch("research_mineral_utilization_" + fi)
+                    }), "research_mineral_utilization_" + fi)
                     .setParallelized(false)
                     .setThreadName(upThreadName)
                     .setLoadJEI(false)
                     .build();
-            RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + fi, name, 100, 1)
+
+            requireResearch(RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + fi, name, 100, 1)
                     .addItemInput(itemUtils.getItem("contenttweaker:additional_component_" + fi, 0))
                     .addPreCheckHandler(event -> {
                         var ctrl = event.getController();
@@ -851,16 +850,14 @@ public abstract class Drill implements MachineSpecial {
 
                         data.setBoolean("additional_component_" + fi, true);
                         data.setByte("additional_component_" + fi, (byte) (components_amount + 1));
-                    })
-                    .requireResearch("additional_component_loading_" + fi)
+                    }), "additional_component_loading_" + fi)
                     .setThreadName(upThreadName)
                     .setParallelized(false)
                     .setLoadJEI(false)
                     .build();
         }
         upThread.addRecipe("additional_component_loading_" + name + "_3");
-        requireResearch(
-                RecipeBuilder.newBuilder("additional_component_loading_" + name + "_3", name, 100, 1)
+        requireResearch(RecipeBuilder.newBuilder("additional_component_loading_" + name + "_3", name, 100, 1)
                         .addItemInput(itemUtils.getItem("contenttweaker:additional_component_3", 0))
                         .addPreCheckHandler(event -> {
                             var ctrl = event.getController();
@@ -890,7 +887,7 @@ public abstract class Drill implements MachineSpecial {
                 .build();
         upThread.addRecipe("additional_component_loading_" + name + "_raw_ore");
 
-        RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
+        requireResearch(RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
                 .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
                 .addPreCheckHandler(event -> {
                     var ctrl = event.getController();
@@ -908,8 +905,7 @@ public abstract class Drill implements MachineSpecial {
                     data.setBoolean("additional_component_raw_ore", true);
                     ctrl.addPermanentModifier("additional_raw_ore", RecipeModifierBuilder.create("modularmachinery:energy", "input", 2, 1, false).build());
                     ctrl.setCustomDataTag(data);
-                })
-                .requireResearch("additional_component_loading_raw_ore")
+                }), "additional_component_loading_raw_ore")
                 .setThreadName(upThreadName)
                 .setParallelized(false)
                 .setLoadJEI(false)
