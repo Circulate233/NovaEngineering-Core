@@ -295,10 +295,6 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool"), IConfigurab
         return registry
     }
 
-    override fun onFieldChanged(stack: ItemStack, field: IItemConfigField) {
-
-    }
-
     override fun getProfileCount(stack: ItemStack): Int {
         return 5
     }

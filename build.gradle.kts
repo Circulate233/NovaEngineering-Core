@@ -1,7 +1,5 @@
-import org.jetbrains.gradle.ext.Gradle
-import org.jetbrains.gradle.ext.RunConfigurationContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.*
+import java.util.Collections
 
 plugins {
     id("java-library")
@@ -350,74 +348,6 @@ publishing {
 //        isDownloadJavadoc = true
 //    }
 //}
-
-idea {
-    module {
-        isDownloadJavadoc = true
-        isDownloadSources = true
-        inheritOutputDirs = true // Fix resources in IJ-Native runs
-    }
-    project {
-        this.withGroovyBuilder {
-            "settings" {
-                "runConfigurations" {
-                    val self = this.delegate as RunConfigurationContainer
-                    self.add(Gradle("1. Run Client").apply {
-                        setProperty("taskNames", listOf("runClient"))
-                    })
-                    self.add(Gradle("2. Run Server").apply {
-                        setProperty("taskNames", listOf("runServer"))
-                    })
-                    self.add(Gradle("3. Run Obfuscated Client").apply {
-                        setProperty("taskNames", listOf("runObfClient"))
-                    })
-                    self.add(Gradle("4. Run Obfuscated Server").apply {
-                        setProperty("taskNames", listOf("runObfServer"))
-                    })
-                    self.add(Gradle("5. Build Jars").apply {
-                        setProperty("taskNames", listOf("build"))
-                    })
-                    /*
-                    These require extra configuration in IntelliJ, so are not enabled by default
-                    self.add(Application("Run Client (IJ Native, Deprecated)", project).apply {
-                      mainClass = "GradleStart"
-                      moduleName = project.name + ".ideVirtualMain"
-                      afterEvaluate {
-                        val runClient = tasks.runClient.get()
-                        workingDirectory = runClient.workingDir.absolutePath
-                        programParameters = runClient.calculateArgs(project).map { '"' + it + '"' }.joinToString(" ")
-                        jvmArgs = runClient.calculateJvmArgs(project).map { '"' + it + '"' }.joinToString(" ") +
-                          ' ' + runClient.systemProperties.map { "\"-D" + it.key + '=' + it.value.toString() + '"' }
-                          .joinToString(" ")
-                      }
-                    })
-                    self.add(Application("Run Server (IJ Native, Deprecated)", project).apply {
-                      mainClass = "GradleStartServer"
-                      moduleName = project.name + ".ideVirtualMain"
-                      afterEvaluate {
-                        val runServer = tasks.runServer.get()
-                        workingDirectory = runServer.workingDir.absolutePath
-                        programParameters = runServer.calculateArgs(project).map { '"' + it + '"' }.joinToString(" ")
-                        jvmArgs = runServer.calculateJvmArgs(project).map { '"' + it + '"' }.joinToString(" ") +
-                          ' ' + runServer.systemProperties.map { "\"-D" + it.key + '=' + it.value.toString() + '"' }
-                          .joinToString(" ")
-                      }
-                    })
-                    */
-                }
-                "compiler" {
-                    val self = this.delegate as org.jetbrains.gradle.ext.IdeaCompilerConfiguration
-                    afterEvaluate {
-                        self.javac.moduleJavacAdditionalOptions = mapOf(
-                                (project.name + ".main") to
-                                        tasks.compileJava.get().options.compilerArgs.joinToString(" ") { '"' + it + '"' }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 tasks.processIdeaSettings.configure {
     dependsOn(tasks.injectTags)

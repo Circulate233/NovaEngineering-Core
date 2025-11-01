@@ -14,6 +14,7 @@ import appeng.me.helpers.PlayerSource
 import appeng.util.item.AEItemStack
 import com.circulation.random_complement.common.util.MEHandler
 import com.glodblock.github.common.item.fake.FakeFluids
+import github.kasuminova.novaeng.NovaEngineeringCore
 import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.common.integration.ModIntegrationJEI
 import hellfirepvp.modularmachinery.common.integration.preview.StructurePreviewWrapper
@@ -87,7 +88,8 @@ class NEWMachineAssemblyManager {
 
         fun setConstructors(block: BlockPair, machine: NEWDynamicMachine) {
             ADDITIONAL_CONSTRUCTORS.computeIfAbsent(block.block) { Int2ObjectOpenHashMap() }[block.meta] = machine
-            ModIntegrationJEI.PREVIEW_WRAPPERS.add(StructurePreviewWrapper(machine))
+            if (NovaEngineeringCore.proxy.isClient)
+                ModIntegrationJEI.PREVIEW_WRAPPERS.add(StructurePreviewWrapper(machine))
         }
 
         fun addAssemblyMachine(player: EntityPlayer, array: BlockArray): AssemblyBlockArray {
