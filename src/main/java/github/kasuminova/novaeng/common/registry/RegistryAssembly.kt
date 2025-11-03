@@ -375,7 +375,7 @@ object RegistryAssembly {
 
         NEWMachineAssemblyManager.setConstructors(
             alfheimportal,
-            alfheimportalMachine.setName("tile.botania:alfheimPortal.name")
+            alfheimportalMachine.setName("tile.Alfheimportal.name")
         )
     }
 

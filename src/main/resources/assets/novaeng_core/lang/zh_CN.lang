@@ -27,6 +27,7 @@ gui.blueprint.popout.placed.dynamic_pattern.unload=当前结构预览已结束
 
 tile.Reactor.name=聚变反应堆
 tile.ThermalEvaporation.name=热力蒸馏塔
+tile.Alfheimportal.name=精灵传送门
 
 config.field.UsingAE.entry=使用AE
 text.machine_assembly_tool.config.UsingAE=允许使用背包内可用的第一个无线终端链接的网络内物品工作（支持饰品栏）
