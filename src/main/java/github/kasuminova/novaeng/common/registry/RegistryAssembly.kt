@@ -23,6 +23,11 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.translation.I18n
+import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.Optional
+import thelm.packagedastral.block.BlockAttunementCrafter
+import thelm.packagedastral.block.BlockConstellationCrafter
+import thelm.packagedastral.block.BlockTraitCrafter
 import vazkii.botania.common.block.ModBlocks
 import java.util.Arrays
 import java.util.stream.Collectors
@@ -43,11 +48,13 @@ object RegistryAssembly {
     }
 
     fun regAll() {
-        regAS()
-        regMEK()
-        regBot()
+        if (Loader.isModLoaded("astralsorcery")) regAS()
+        if (Loader.isModLoaded("mekanism")) regMEK()
+        if (Loader.isModLoaded("botania")) regBot()
+        if (Loader.isModLoaded("packagedastral")) regPackagedastral()
     }
 
+    @Optional.Method(modid = "astralsorcery")
     private fun regAS() {
         NEWMachineAssemblyManager.setConstructors(
             NEWMachineAssemblyManager.BlockPair(BlocksAS.blockAltar, 1),
@@ -121,6 +128,7 @@ object RegistryAssembly {
         )
     }
 
+    @Optional.Method(modid = "mekanism")
     @Suppress("UNCHECKED_CAST")
     private fun regMEK() {
         val reactorMachine = NEWDynamicMachine("")
@@ -325,6 +333,7 @@ object RegistryAssembly {
         )
     }
 
+    @Optional.Method(modid = "botania")
     private fun regBot() {
         val terraPlateMachine = NEWDynamicMachine("")
         if (terraPlateMachine is AccessorAbstractMachine) {
@@ -379,16 +388,73 @@ object RegistryAssembly {
         )
     }
 
+    @Optional.Method(modid = "packagedastral")
+    private fun regPackagedastral() {
+        val attunementCrafter = NEWMachineAssemblyManager.BlockPair(BlockAttunementCrafter.INSTANCE, 0)
+        val attunementCrafterMachine = transformationPackagedastralBlockArrays(
+            MultiBlockArrays.patternAltarAttunement,
+            "AltarAttunement".camelToSnake()
+        ).setName("tile.packagedastral.attunement_crafter.name")
+        attunementCrafterMachine.pattern.addBlock(BlockPos.ORIGIN, packBlock(attunementCrafter.blockState))
+        NEWMachineAssemblyManager.setConstructors(
+            attunementCrafter,
+            attunementCrafterMachine
+        )
+
+        val constellationCrafter = NEWMachineAssemblyManager.BlockPair(BlockConstellationCrafter.INSTANCE, 0)
+        val constellationCrafterMachine = transformationPackagedastralBlockArrays(
+            MultiBlockArrays.patternAltarConstellation,
+            "AltarConstellation".camelToSnake()
+        ).setName("tile.packagedastral.constellation_crafter.name")
+        constellationCrafterMachine.pattern.addBlock(BlockPos.ORIGIN, packBlock(constellationCrafter.blockState))
+        NEWMachineAssemblyManager.setConstructors(
+            constellationCrafter,
+            constellationCrafterMachine
+        )
+
+        val traitCrafter = NEWMachineAssemblyManager.BlockPair(BlockTraitCrafter.INSTANCE, 0)
+        val traitCrafterMachine = transformationPackagedastralBlockArrays(
+            MultiBlockArrays.patternAltarTrait,
+            "AltarTrait".camelToSnake()
+        ).setName("tile.packagedastral.trait_crafter.name")
+        traitCrafterMachine.pattern.addBlock(BlockPos.ORIGIN, packBlock(traitCrafter.blockState))
+        NEWMachineAssemblyManager.setConstructors(
+            traitCrafter,
+            traitCrafterMachine
+        )
+    }
+
     private class XY(val x: Int, val z: Int) {
         operator fun get(y: Int): BlockPos {
             return BlockPos(x, y, z)
         }
     }
 
-    private fun transformationBlockArrays(array: PatternBlockArray, name: String): NEWDynamicMachine {
+    @Optional.Method(modid = "astralsorcery")
+    private fun transformationBlockArrays(
+        array: PatternBlockArray,
+        name: String
+    ): NEWDynamicMachine {
         val machine = NEWDynamicMachine("")
         if (machine is AccessorAbstractMachine) {
             machine.setRL(ResourceLocation("astralsorcery", name))
+        }
+        val newBlcokArray = machine.pattern
+        for (entry in array.pattern) {
+            val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(entry.value.state)))
+            newBlcokArray.addBlock(entry.key, info)
+        }
+        return machine
+    }
+
+    @Optional.Method(modid = "packagedastral")
+    private fun transformationPackagedastralBlockArrays(
+        array: PatternBlockArray,
+        name: String
+    ): NEWDynamicMachine {
+        val machine = NEWDynamicMachine("")
+        if (machine is AccessorAbstractMachine) {
+            machine.setRL(ResourceLocation("packagedastral", name))
         }
         val newBlcokArray = machine.pattern
         for (entry in array.pattern) {

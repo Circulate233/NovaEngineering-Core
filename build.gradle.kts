@@ -203,14 +203,14 @@ dependencies {
 
     // Mixins
 //    implementation("zone.rong:mixinbooter:7.1")
-    val mixin : String = modUtils.enableMixins("zone.rong:mixinbooter:9.3", "mixins.novaeng_core.refmap.json").toString()
-    api (mixin) {
+    val mixin: String = modUtils.enableMixins("zone.rong:mixinbooter:9.3", "mixins.novaeng_core.refmap.json").toString()
+    api(mixin) {
         isTransitive = false
     }
     annotationProcessor("org.ow2.asm:asm-debug-all:5.2")
     annotationProcessor("com.google.guava:guava:32.0.1-android")
     annotationProcessor("com.google.code.gson:gson:2.8.9")
-    annotationProcessor (mixin) {
+    annotationProcessor(mixin) {
         isTransitive = false
     }
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
@@ -226,6 +226,7 @@ dependencies {
 
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
+    implementation(rfg.deobf("curse.maven:modularui-624243:7102461"))
     implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
     implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:6945422"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
@@ -311,7 +312,6 @@ dependencies {
     implementation(rfg.deobf("curse.maven:Flux-Networks-248020:3178199"))
     implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
-    implementation(rfg.deobf("curse.maven:packagedauto-308380:6312996"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
     implementation(rfg.deobf("curse.maven:random-complement-1198138:7155516"))
@@ -319,6 +319,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
     implementation(rfg.deobf("curse.maven:brandons-core-231382:3408276"))
     implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
+    implementation(rfg.deobf("curse.maven:packagedauto-308380:6932932"))
+    implementation(rfg.deobf("curse.maven:packagedastral-811828:7063119"))
 }
 
 // Publishing to a Maven repository

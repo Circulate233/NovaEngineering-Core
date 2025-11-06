@@ -64,11 +64,11 @@ public class NovaEngCoreConfig {
 
     public static class MachineAssemblyTool {
         @Config.Name("BuildQuantity")
-        @Config.RangeInt(min = 1, max = 1000)
+        @Config.RangeInt(min = 1)
         public int buildQuantity = 100;
 
         @Config.Name("BuildSpeed")
-        @Config.RangeInt(min = 1, max = 1000)
+        @Config.RangeInt(min = 1)
         public int buildSpeed = 20;
     }
 }
