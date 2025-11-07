@@ -30,9 +30,9 @@ public class StorageBar extends DynamicWidget {
     private static final int OFFSET_Y = 4;
 
     private static final TextureProperties BACKGROUND = new TextureProperties(
-            GuiECalculatorController.ELEMENT_1,
-            0, 0,
-            WIDTH, HEIGHT
+        GuiECalculatorController.ELEMENT_1,
+        0, 0,
+        WIDTH, HEIGHT
     );
 
     private final LongList usedMemory = new LongArrayList();

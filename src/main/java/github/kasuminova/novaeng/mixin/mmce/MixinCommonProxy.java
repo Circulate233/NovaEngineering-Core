@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinCommonProxy {
 
     @Inject(
-            method = "postInit",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lhellfirepvp/modularmachinery/common/machine/MachineRegistry;registerMachines(Ljava/util/Collection;)V",
-                    ordinal = 1,
-                    shift = At.Shift.AFTER
-            ),
-            remap = false
+        method = "postInit",
+        at = @At(
+            value = "INVOKE",
+            target = "Lhellfirepvp/modularmachinery/common/machine/MachineRegistry;registerMachines(Ljava/util/Collection;)V",
+            ordinal = 1,
+            shift = At.Shift.AFTER
+        ),
+        remap = false
     )
     private void hookAfterRegisterMachine(final CallbackInfo ci) {
         RegistryMachineSpecial.getSpecialMachineRegistry().forEach((registryName, machineSpecial) -> {

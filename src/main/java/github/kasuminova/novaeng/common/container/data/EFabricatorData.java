@@ -32,8 +32,8 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
         Levels level = Levels.values()[buf.readByte()];
         List<WorkerStatus> workers = new ArrayList<>(len);
         IntStream.range(0, len)
-                .mapToObj(i -> ByteBufUtils.readItemStack(buf))
-                .forEach(crafting -> workers.add(new WorkerStatus(crafting, buf.readInt())));
+                 .mapToObj(i -> ByteBufUtils.readItemStack(buf))
+                 .forEach(crafting -> workers.add(new WorkerStatus(crafting, buf.readInt())));
         return new EFabricatorData(len, overclocked, activeCooling, maxParallelism, coolant, maxCoolant, hotCoolant, maxHotCoolant, energyStored, totalCrafted, level, workers);
     }
 

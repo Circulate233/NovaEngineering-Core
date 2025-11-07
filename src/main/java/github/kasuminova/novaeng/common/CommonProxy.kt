@@ -257,6 +257,7 @@ open class CommonProxy : IGuiHandler {
                 }
                 return null
             }
+
             GuiType.MACHINE_ASSEMBLY_TOOL -> null
         }
     }

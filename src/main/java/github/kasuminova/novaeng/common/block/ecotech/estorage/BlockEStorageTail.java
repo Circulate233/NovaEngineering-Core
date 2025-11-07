@@ -23,8 +23,8 @@ public class BlockEStorageTail extends BlockEStorage {
 
     protected BlockEStorageTail(final String level) {
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(BlockController.FORMED, false)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(BlockController.FORMED, false)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_tail_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_tail_" + level);

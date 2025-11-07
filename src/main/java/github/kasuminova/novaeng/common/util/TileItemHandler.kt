@@ -3,16 +3,16 @@ package github.kasuminova.novaeng.common.util
 import hellfirepvp.modularmachinery.common.tiles.base.TileEntitySynchronized
 import hellfirepvp.modularmachinery.common.util.IItemHandlerImpl
 import hellfirepvp.modularmachinery.common.util.ItemUtils
-import java.util.Arrays
-import java.util.BitSet
-import java.util.function.IntConsumer
-import java.util.stream.IntStream
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTPrimitive
 import net.minecraft.nbt.NBTTagByte
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
+import java.util.Arrays
+import java.util.BitSet
+import java.util.function.IntConsumer
+import java.util.stream.IntStream
 import javax.annotation.Nonnull
 
 open class TileItemHandler(

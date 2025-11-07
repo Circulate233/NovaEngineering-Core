@@ -79,10 +79,10 @@ public class AssemblyInvCalculateCard extends AssemblyInv {
 
         Column slotCalculateCardExtOverlay = new Column();
         slotCalculateCardExtOverlay.addWidgets(
-                new OverlayCalculateCardExt(ext_0_0),
-                new OverlayCalculateCardExt(ext_1_0),
-                new OverlayCalculateCardExt(ext_2_0),
-                new OverlayCalculateCardExt(ext_3_0)
+            new OverlayCalculateCardExt(ext_0_0),
+            new OverlayCalculateCardExt(ext_1_0),
+            new OverlayCalculateCardExt(ext_2_0),
+            new OverlayCalculateCardExt(ext_3_0)
         ).setAbsX(147).setAbsY(59);
         widgetController.addWidgetContainer(slotCalculateCardExtOverlay);
     }

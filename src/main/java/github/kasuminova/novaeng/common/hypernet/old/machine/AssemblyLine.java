@@ -98,8 +98,8 @@ public class AssemblyLine extends NetNodeImpl {
             chipManager.unlock(recipeThread);
         } else {
             recipeThread
-                    .setStatus(CraftingStatus.SUCCESS)
-                    .setStatusInfo(String.format("工作中...（已锁定装配线片 #%s）", using));
+                .setStatus(CraftingStatus.SUCCESS)
+                .setStatusInfo(String.format("工作中...（已锁定装配线片 #%s）", using));
         }
     }
 

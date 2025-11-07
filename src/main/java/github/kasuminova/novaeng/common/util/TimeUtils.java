@@ -23,7 +23,7 @@ public class TimeUtils {
         long seconds = TimeUnit.SECONDS.convert(t, TimeUnit.MILLISECONDS);
 
         return I18n.format("gui.terminal_controller.screen.info.start.time",
-                hours, minutes, seconds, time / 50
+            hours, minutes, seconds, time / 50
         );
     }
 }

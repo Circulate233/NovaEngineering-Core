@@ -127,7 +127,7 @@ val runtimeOnlyNonPublishable: Configuration by configurations.creating {
 listOf(configurations.runtimeClasspath, configurations.testRuntimeClasspath).forEach {
     it.configure {
         extendsFrom(
-                runtimeOnlyNonPublishable
+            runtimeOnlyNonPublishable
         )
     }
 }
@@ -227,7 +227,7 @@ dependencies {
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("curse.maven:modularui-624243:7102461"))
-    implementation(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
+    compileOnly(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
     implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:6945422"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
@@ -259,7 +259,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:eternal-singularity-253077:2922583"))
     compileOnly(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
     compileOnly(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:3862197"))
-    compileOnly(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
+    implementation(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
 //    implementation(rfg.deobf("sddsd233:mekceu-9.8.11.185"))
     implementation(rfg.deobf("curse.maven:mekanism-ce-unofficial-840735:5946841"))
     implementation(rfg.deobf("curse.maven:RedstoneFlux-270789:2920436"))
@@ -268,7 +268,6 @@ dependencies {
     implementation(rfg.deobf("curse.maven:astral-sorcery-241721:3044416"))
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
     implementation(rfg.deobf("curse.maven:zenutil-401178:6895021"))
-    compileOnly(rfg.deobf("curse.maven:smooth-font-285742:3944565"))
     implementation(rfg.deobf("curse.maven:scalingguis-319656:2716334"))
     implementation(rfg.deobf("curse.maven:lolasm-460609:5257348"))
     compileOnly(rfg.deobf("curse.maven:matter-overdrive-community-edition-557428:4592069"))
@@ -321,6 +320,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6932932"))
     implementation(rfg.deobf("curse.maven:packagedastral-811828:7063119"))
+    implementation(rfg.deobf("curse.maven:Aroma1997Core-223735:2914062"))
+    implementation(rfg.deobf("curse.maven:tatw-263980:2585616"))
 }
 
 // Publishing to a Maven repository

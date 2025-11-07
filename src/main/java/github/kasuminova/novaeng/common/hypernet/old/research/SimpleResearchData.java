@@ -14,19 +14,19 @@ public record SimpleResearchData(String researchName, float techLevel, double re
 
     public static SimpleResearchData of(ResearchCognitionData data) {
         return new SimpleResearchData(
-                data.getTranslatedName().replaceAll("§.", ""),
-                data.getTechLevel(),
-                data.getRequiredPoints(),
-                data.getMinComputationPointPerTick(),
-                data.getDescriptions().stream()
-                        .map(desc -> desc.replaceAll("§.", ""))
-                        .collect(Collectors.toList()),
-                data.getUnlockedDescriptions().stream()
-                        .map(desc -> desc.replaceAll("§.", ""))
-                        .collect(Collectors.toList()),
-                data.getDependencies().stream()
-                        .map(dep -> dep.getTranslatedName().replaceAll("§.", ""))
-                        .collect(Collectors.toList())
+            data.getTranslatedName().replaceAll("§.", ""),
+            data.getTechLevel(),
+            data.getRequiredPoints(),
+            data.getMinComputationPointPerTick(),
+            data.getDescriptions().stream()
+                .map(desc -> desc.replaceAll("§.", ""))
+                .collect(Collectors.toList()),
+            data.getUnlockedDescriptions().stream()
+                .map(desc -> desc.replaceAll("§.", ""))
+                .collect(Collectors.toList()),
+            data.getDependencies().stream()
+                .map(dep -> dep.getTranslatedName().replaceAll("§.", ""))
+                .collect(Collectors.toList())
         );
     }
 }

@@ -34,8 +34,8 @@ public class BlockEFabricatorWorker extends BlockEFabricatorPart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(WorkerStatus.STATUS, WorkerStatus.OFF)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(WorkerStatus.STATUS, WorkerStatus.OFF)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_worker"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_worker");

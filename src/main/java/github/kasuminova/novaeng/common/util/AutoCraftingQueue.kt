@@ -12,10 +12,10 @@ import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.CommonProxy
 import github.kasuminova.novaeng.common.container.ContainerNEWCraftConfirm
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import java.util.Queue
-import java.util.concurrent.Future
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+import java.util.Queue
+import java.util.concurrent.Future
 
 class AutoCraftingQueue {
 

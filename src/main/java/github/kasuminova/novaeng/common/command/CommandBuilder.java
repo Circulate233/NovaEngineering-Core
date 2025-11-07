@@ -41,12 +41,12 @@ public class CommandBuilder extends CommandBase {
     public @NotNull List<String> getTabCompletions(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args,
-                    "tick", "quarry"
+                "tick", "quarry"
             );
         }
         if (args.length == 2) {
             return getListOfStringsMatchingLastWord(args,
-                    "true", "false"
+                "true", "false"
             );
         }
         return super.getTabCompletions(server, sender, args, targetPos);

@@ -64,9 +64,9 @@ public class ProgressBar extends DynamicWidget {
                 findProgressForegroundTex(percent).ifPresent(tex -> {
                     tex.bind(gui.mc.getTextureManager());
                     gui.drawTexturedModalRect(
-                            renderPos.posX(), renderPos.posY(),
-                            tex.texX(), tex.texY(),
-                            (int) (tex.width() * renderPercent), tex.height()
+                        renderPos.posX(), renderPos.posY(),
+                        tex.texX(), tex.texY(),
+                        (int) (tex.width() * renderPercent), tex.height()
                     );
                 });
             } else {
@@ -74,9 +74,9 @@ public class ProgressBar extends DynamicWidget {
                 findProgressForegroundTex(percent).ifPresent(tex -> {
                     tex.bind(gui.mc.getTextureManager());
                     gui.drawTexturedModalRect(
-                            renderPos.posX() + (int) (tex.width() * (1 - renderPercent)), renderPos.posY(),
-                            tex.texX(), tex.texY(),
-                            (int) (tex.width() * renderPercent), tex.height()
+                        renderPos.posX() + (int) (tex.width() * (1 - renderPercent)), renderPos.posY(),
+                        tex.texX(), tex.texY(),
+                        (int) (tex.width() * renderPercent), tex.height()
                     );
                 });
             }
@@ -87,9 +87,9 @@ public class ProgressBar extends DynamicWidget {
                 findProgressForegroundTex(percent).ifPresent(tex -> {
                     tex.bind(gui.mc.getTextureManager());
                     gui.drawTexturedModalRect(
-                            renderPos.posX(), renderPos.posY(),
-                            tex.texX(), tex.texY(),
-                            tex.width(), (int) (tex.height() * renderPercent)
+                        renderPos.posX(), renderPos.posY(),
+                        tex.texX(), tex.texY(),
+                        tex.width(), (int) (tex.height() * renderPercent)
                     );
                 });
             } else {
@@ -97,9 +97,9 @@ public class ProgressBar extends DynamicWidget {
                 findProgressForegroundTex(percent).ifPresent(tex -> {
                     tex.bind(gui.mc.getTextureManager());
                     gui.drawTexturedModalRect(
-                            renderPos.posX(), renderPos.posY() + (int) (tex.height() * (1 - renderPercent)),
-                            tex.texX(), tex.texY() + (int) (tex.height() * (1 - renderPercent)),
-                            tex.width(), (int) (tex.height() * renderPercent)
+                        renderPos.posX(), renderPos.posY() + (int) (tex.height() * (1 - renderPercent)),
+                        tex.texX(), tex.texY() + (int) (tex.height() * (1 - renderPercent)),
+                        tex.width(), (int) (tex.height() * renderPercent)
                     );
                 });
             }

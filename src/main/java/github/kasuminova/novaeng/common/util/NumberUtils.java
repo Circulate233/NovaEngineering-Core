@@ -32,8 +32,8 @@ public class NumberUtils {
 
     public static boolean canParse(String str) {
         return tryParseInt(str).isPresent() ||
-                tryParseLong(str).isPresent() ||
-                tryParseDouble(str).isPresent();
+            tryParseLong(str).isPresent() ||
+            tryParseDouble(str).isPresent();
     }
 
 }

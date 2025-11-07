@@ -39,13 +39,13 @@ public class AdapterShredder extends RecipeAdapter {
         List<MachineRecipe> recipes = new ObjectArrayList<>();
 
         recipes.addAll(PulverizerRecipeConverter.convert(
-                stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers));
+            stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers));
         recipes.addAll(NCOBasicRecipeConverter.convert(
-                stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
+            stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
         recipes.addAll(MekCrusherRecipeConverter.convert(
-                stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
+            stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
         recipes.addAll(IC2MachineRecipeConverter.convertMaceratorRecipes(
-                stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
+            stack -> createRecipeShell(owningMachineName, HashedItemStack.stackToString(stack), modifiers), stacks -> checkStackRegistered(registeredStack, stacks), modifiers, 10));
 
         incId++;
         return recipes;
@@ -53,9 +53,9 @@ public class AdapterShredder extends RecipeAdapter {
 
     protected MachineRecipe createRecipeShell(final ResourceLocation owningMachineName, final String suffix, final List<RecipeModifier> modifiers) {
         MachineRecipe machineRecipe = createRecipeShell(new ResourceLocation("novaeng_core", "shredder_" + suffix + "_" + incId),
-                owningMachineName, Math.round(RecipeModifier.applyModifiers(
-                        modifiers, RequirementTypesMM.REQUIREMENT_DURATION, IOType.INPUT, 200, false)),
-                sortId, false
+            owningMachineName, Math.round(RecipeModifier.applyModifiers(
+                modifiers, RequirementTypesMM.REQUIREMENT_DURATION, IOType.INPUT, 200, false)),
+            sortId, false
         );
         sortId++;
         return machineRecipe;

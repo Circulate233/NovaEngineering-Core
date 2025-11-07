@@ -38,7 +38,7 @@ public class PulverizerRecipeConverter {
 
             // Energy
             machineRecipe.addRequirement(new RequirementEnergy(IOType.INPUT, Math.round(RecipeModifier.applyModifiers(
-                    modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, (float) energy / 200, false)))
+                modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, (float) energy / 200, false)))
             );
             // Item Input
             int inAmount = Math.round(RecipeModifier.applyModifiers(modifiers, RequirementTypesMM.REQUIREMENT_ITEM, IOType.INPUT, input.getCount(), false));

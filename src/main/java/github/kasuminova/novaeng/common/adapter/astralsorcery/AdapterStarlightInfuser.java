@@ -80,9 +80,9 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
             }
 
             MachineRecipe recipe = createRecipeShell(
-                    new ResourceLocation("astralsorcery", "infusion_" + incId),
-                    owningMachineName,
-                    20, 0, false);
+                new ResourceLocation("astralsorcery", "infusion_" + incId),
+                owningMachineName,
+                20, 0, false);
 
             // Item / Fluid Input
             ItemHandle input = infusionRecipe.getInput();
@@ -136,7 +136,7 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
             recipe.addTooltip(Functions.getText("novaeng.illum_pool.input.mana", manaToConsume));
             addStarlightCatalystHandler(recipe);
             recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
-                    Functions.getText("top.illum_pool.mode.d")));
+                Functions.getText("top.illum_pool.mode.d")));
             recipe.addTooltip("novaeng.illum_pool.input.illum");
 
             recipes.add(recipe);

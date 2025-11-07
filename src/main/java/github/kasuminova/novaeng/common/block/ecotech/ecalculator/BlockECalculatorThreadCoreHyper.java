@@ -11,9 +11,9 @@ public class BlockECalculatorThreadCoreHyper extends BlockECalculatorThreadCore 
 
     protected BlockECalculatorThreadCoreHyper(final String level, final int threads, final int hyperThreads) {
         super(
-                new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_hyper_" + level),
-                NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_hyper_" + level,
-                threads, hyperThreads
+            new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_hyper_" + level),
+            NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_hyper_" + level,
+            threads, hyperThreads
         );
     }
 

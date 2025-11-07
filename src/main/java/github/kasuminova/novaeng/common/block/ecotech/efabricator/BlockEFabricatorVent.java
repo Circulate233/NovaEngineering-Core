@@ -23,7 +23,7 @@ public class BlockEFabricatorVent extends BlockEFabricator {
 
     protected BlockEFabricatorVent() {
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_vent"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_vent");

@@ -49,11 +49,11 @@ public class NetNodeCache {
         Class<? extends NetNode> ctrlType = RegistryHyperNet.getNodeType(machine);
         if (ctrlType == null) {
             throw new IllegalStateException(String.format(
-                    "Invalid NetNode controller type: %s", machine.getRegistryName()));
+                "Invalid NetNode controller type: %s", machine.getRegistryName()));
         }
         if (type != ctrlType) {
             throw new IllegalStateException(String.format(
-                    "Try to get node type %s, but controller type is %s.", type.getSimpleName(), ctrlType.getSimpleName()));
+                "Try to get node type %s, but controller type is %s.", type.getSimpleName(), ctrlType.getSimpleName()));
         }
 
         synchronized (ctrl) {
@@ -75,8 +75,8 @@ public class NetNodeCache {
                 return instance;
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(
-                        "Unable to find single parameter constructor in class! Please report this issue to the developers.",
-                        e
+                    "Unable to find single parameter constructor in class! Please report this issue to the developers.",
+                    e
                 );
             } catch (Exception e) {
                 NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));

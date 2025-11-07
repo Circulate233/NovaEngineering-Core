@@ -22,13 +22,13 @@ import java.util.List;
 public class MixinMachineRegistry {
 
     @Redirect(
-            method = "getWaitForLoadMachines",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-                    remap = false
-            ),
+        method = "getWaitForLoadMachines",
+        at = @At(
+            value = "INVOKE",
+            target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
             remap = false
+        ),
+        remap = false
     )
     @SuppressWarnings("SameReturnValue")
     private static boolean filterSpecialMachine(final List<Object> instance, final Object e) {

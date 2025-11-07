@@ -48,8 +48,8 @@ public class PatternPanel extends SizedColumn {
     public static final int INTERNAL_HEIGHT = 80;
 
     public static final TextureProperties BACKGROUND = TextureProperties.of(
-            GuiEFabricatorPatternSearch.TEXTURES_ELEMENTS,
-            1, 25, WIDTH, HEIGHT
+        GuiEFabricatorPatternSearch.TEXTURES_ELEMENTS,
+        1, 25, WIDTH, HEIGHT
     );
     public static final int INTERNAL_OFFSET = 3;
 
@@ -229,7 +229,7 @@ public class PatternPanel extends SizedColumn {
             }
         }
         internal.addWidget(
-                row.setUseScissor(false).setMarginDown(3)
+            row.setUseScissor(false).setMarginDown(3)
         );
     }
 
@@ -248,7 +248,7 @@ public class PatternPanel extends SizedColumn {
             }
         }
         internal.addWidget(
-                row.setUseScissor(false).setMarginDown(3)
+            row.setUseScissor(false).setMarginDown(3)
         );
     }
 
@@ -268,12 +268,12 @@ public class PatternPanel extends SizedColumn {
             scrollbar.setMargin(0, 0, 0, 0);
             scrollbar.setWidthHeight(5, 80);
             scrollbar.getScroll()
-                    .setMouseDownTexture(233, 1)
-                    .setHoveredTexture(233, 1)
-                    .setTexture(233, 1)
-                    .setUnavailableTexture(233, 1)
-                    .setTextureLocation(BACKGROUND.texRes())
-                    .setWidthHeight(5, 15);
+                     .setMouseDownTexture(233, 1)
+                     .setHoveredTexture(233, 1)
+                     .setTexture(233, 1)
+                     .setUnavailableTexture(233, 1)
+                     .setTextureLocation(BACKGROUND.texRes())
+                     .setWidthHeight(5, 15);
         }
 
         @Override
@@ -314,12 +314,12 @@ public class PatternPanel extends SizedColumn {
                 return;
             }
             RenderPos scrollbarRenderPos = new RenderPos(
-                    width + (scrollbar.getMarginLeft()),
-                    scrollbar.getMarginUp());
+                width + (scrollbar.getMarginLeft()),
+                scrollbar.getMarginUp());
             renderFunction.doRender(scrollbar, gui,
-                    new RenderSize(scrollbar.getWidth(), scrollbar.getHeight()).smaller(renderSize),
-                    renderPos.add(scrollbarRenderPos),
-                    mousePos.relativeTo(scrollbarRenderPos)
+                new RenderSize(scrollbar.getWidth(), scrollbar.getHeight()).smaller(renderSize),
+                renderPos.add(scrollbarRenderPos),
+                mousePos.relativeTo(scrollbarRenderPos)
             );
         }
 
@@ -327,7 +327,7 @@ public class PatternPanel extends SizedColumn {
         public boolean onMouseClick(final MousePos mousePos, final RenderPos renderPos, final int mouseButton) {
             if (!Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty()) {
                 NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorPatternSearchGUIAction(
-                        PktEFabricatorPatternSearchGUIAction.Action.PUT_PATTERN
+                    PktEFabricatorPatternSearchGUIAction.Action.PUT_PATTERN
                 ));
                 return true;
             }

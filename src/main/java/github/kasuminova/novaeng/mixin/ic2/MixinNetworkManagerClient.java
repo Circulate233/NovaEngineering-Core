@@ -20,26 +20,26 @@ public class MixinNetworkManagerClient {
     private static final InflaterOutputStream STELLAR_CORE$UNUSED = new InflaterOutputStream(new ByteArrayOutputStream());
 
     @Redirect(
-            method = "onPacketData",
-            at = @At(
-                    value = "NEW",
-                    target = "(Ljava/io/OutputStream;)Ljava/util/zip/InflaterOutputStream;",
-                    remap = false
-            ),
+        method = "onPacketData",
+        at = @At(
+            value = "NEW",
+            target = "(Ljava/io/OutputStream;)Ljava/util/zip/InflaterOutputStream;",
             remap = false
+        ),
+        remap = false
     )
     private InflaterOutputStream redirectOnPacketDataNewInflaterInst(final OutputStream outputStream) {
         return STELLAR_CORE$UNUSED;
     }
 
     @Redirect(
-            method = "onPacketData",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lic2/core/network/GrowingBuffer;writeTo(Ljava/io/OutputStream;)V",
-                    remap = false
-            ),
+        method = "onPacketData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lic2/core/network/GrowingBuffer;writeTo(Ljava/io/OutputStream;)V",
             remap = false
+        ),
+        remap = false
     )
     private void redirectOnPacketDataWriteTo(final GrowingBuffer input, final OutputStream os, @Local(name = "decompBuffer") GrowingBuffer decompBuffer) {
         // direct write data, do not decompress.
@@ -47,13 +47,13 @@ public class MixinNetworkManagerClient {
     }
 
     @Redirect(
-            method = "onPacketData",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Ljava/util/zip/InflaterOutputStream;close()V",
-                    remap = false
-            ),
+        method = "onPacketData",
+        at = @At(
+            value = "INVOKE",
+            target = "Ljava/util/zip/InflaterOutputStream;close()V",
             remap = false
+        ),
+        remap = false
     )
     private void redirectSendLargePacketDeflateClose(final InflaterOutputStream instance) {
         // do nothing

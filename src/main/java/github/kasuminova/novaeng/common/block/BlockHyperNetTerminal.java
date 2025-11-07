@@ -40,7 +40,7 @@ public class BlockHyperNetTerminal extends BlockController {
 
     public DynamicMachine getParentMachine() {
         return MachineRegistry.getRegistry().getMachine(
-                new ResourceLocation(ModularMachinery.MODID, "hypernet_terminal")
+            new ResourceLocation(ModularMachinery.MODID, "hypernet_terminal")
         );
     }
 

@@ -19,8 +19,8 @@ public class ContainerHyperNetTerminal extends ContainerBase<TileHyperNetTermina
         super(owner, opening);
 
         this.slotCard = addSlotToContainer(new SlotCard(
-                owner.getCardInventory().asGUIAccess(),
-                TileHyperNetTerminal.NETWORK_CONNECT_CARD_SLOT, 159, 226));
+            owner.getCardInventory().asGUIAccess(),
+            TileHyperNetTerminal.NETWORK_CONNECT_CARD_SLOT, 159, 226));
     }
 
     @Override

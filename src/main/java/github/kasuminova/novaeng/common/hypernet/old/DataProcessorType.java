@@ -47,9 +47,9 @@ public class DataProcessorType extends NetNodeType {
                                            final int heatDistribution,
                                            final int overheatThreshold) {
         return new DataProcessorType(typeName,
-                energyUsage,
-                heatDistribution,
-                overheatThreshold);
+            energyUsage,
+            heatDistribution,
+            overheatThreshold);
     }
 
     public void registerRecipesAndThreads() {
@@ -65,22 +65,22 @@ public class DataProcessorType extends NetNodeType {
         });
 
         RecipeBuilder.newBuilder(name + "_working", name, 20, 100, false)
-                .addEnergyPerTickInput(energyUsage)
-                .addPostCheckHandler(event -> {
-                    DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
-                    if (processor != null) processor.onRecipeCheck(event);
-                })
-                .addFactoryPreTickHandler(event -> {
-                    DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
-                    if (processor != null) processor.onWorkingTick(event);
-                })
-                .addRecipeTooltip(
-                        "novaeng.hypernet.data_processor.working.tooltip.0",
-                        "novaeng.hypernet.data_processor.working.tooltip.1"
-                )
-                .setThreadName(PROCESSOR_WORKING_THREAD_NAME)
-                .setParallelized(false)
-                .build();
+                     .addEnergyPerTickInput(energyUsage)
+                     .addPostCheckHandler(event -> {
+                         DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
+                         if (processor != null) processor.onRecipeCheck(event);
+                     })
+                     .addFactoryPreTickHandler(event -> {
+                         DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
+                         if (processor != null) processor.onWorkingTick(event);
+                     })
+                     .addRecipeTooltip(
+                         "novaeng.hypernet.data_processor.working.tooltip.0",
+                         "novaeng.hypernet.data_processor.working.tooltip.1"
+                     )
+                     .setThreadName(PROCESSOR_WORKING_THREAD_NAME)
+                     .setParallelized(false)
+                     .build();
 
         int counter = 0;
         for (final Tuple<Tuple<IIngredient[], IIngredient[]>, Integer> radiatorIngredient : radiatorIngredientList) {
@@ -89,43 +89,43 @@ public class DataProcessorType extends NetNodeType {
             IIngredient[] output = io.getSecond();
             int heatDistribution = radiatorIngredient.getSecond();
             RecipeBuilder.newBuilder(name + "_heat_dist_" + counter, name, 1, 101 + counter, false)
-                    .addEnergyPerTickInput(energyUsage / 2)
-                    .addInputs(input)
-                    .addOutputs(output)
-                    .addPostCheckHandler(event -> {
-                        DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
-                        if (processor == null) {
-                            event.setFailed("?");
-                            return;
-                        }
-                        processor.heatDistributionRecipeCheck(event, heatDistribution);
-                        if (!event.isFailure() && !dynamicPatternName.isEmpty()) {
-                            ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
-                            int parallelism = activeRecipe.getParallelism();
-                            IDynamicPatternInfo dynamicPattern = event.getController().getDynamicPattern(dynamicPatternName);
-                            if (dynamicPattern != null) {
-                                int storedHU = processor.getStoredHU();
-                                int maxParallelism = Math.min(storedHU / heatDistribution, activeRecipe.getMaxParallelism());
-                                if (parallelism > dynamicPattern.getSize() || parallelism > maxParallelism) {
-                                    event.setParallelism(Math.min(dynamicPattern.getSize(), maxParallelism));
-                                }
-                            } else {
-                                if (parallelism > 1) {
-                                    event.setParallelism(1);
-                                }
-                            }
-                        }
-                    })
-                    .addFactoryFinishHandler(event -> {
-                        DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
-                        if (processor != null)
-                            processor.setStoredHU(processor.getStoredHU() - (heatDistribution * event.getActiveRecipe().getParallelism()));
-                    })
-                    .addRecipeTooltip(FMLCommonHandler.instance().getSide().isClient()
-                            ? new String[]{I18n.format("novaeng.hypernet.radiator.tooltip", heatDistribution * 20)}
-                            : new String[0])
-                    .setThreadName(PROCESSOR_RADIATOR_THREAD_NAME)
-                    .build();
+                         .addEnergyPerTickInput(energyUsage / 2)
+                         .addInputs(input)
+                         .addOutputs(output)
+                         .addPostCheckHandler(event -> {
+                             DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
+                             if (processor == null) {
+                                 event.setFailed("?");
+                                 return;
+                             }
+                             processor.heatDistributionRecipeCheck(event, heatDistribution);
+                             if (!event.isFailure() && !dynamicPatternName.isEmpty()) {
+                                 ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
+                                 int parallelism = activeRecipe.getParallelism();
+                                 IDynamicPatternInfo dynamicPattern = event.getController().getDynamicPattern(dynamicPatternName);
+                                 if (dynamicPattern != null) {
+                                     int storedHU = processor.getStoredHU();
+                                     int maxParallelism = Math.min(storedHU / heatDistribution, activeRecipe.getMaxParallelism());
+                                     if (parallelism > dynamicPattern.getSize() || parallelism > maxParallelism) {
+                                         event.setParallelism(Math.min(dynamicPattern.getSize(), maxParallelism));
+                                     }
+                                 } else {
+                                     if (parallelism > 1) {
+                                         event.setParallelism(1);
+                                     }
+                                 }
+                             }
+                         })
+                         .addFactoryFinishHandler(event -> {
+                             DataProcessor processor = NetNodeCache.getCache(event.getController(), DataProcessor.class);
+                             if (processor != null)
+                                 processor.setStoredHU(processor.getStoredHU() - (heatDistribution * event.getActiveRecipe().getParallelism()));
+                         })
+                         .addRecipeTooltip(FMLCommonHandler.instance().getSide().isClient()
+                             ? new String[]{I18n.format("novaeng.hypernet.radiator.tooltip", heatDistribution * 20)}
+                             : new String[0])
+                         .setThreadName(PROCESSOR_RADIATOR_THREAD_NAME)
+                         .build();
             counter++;
         }
     }

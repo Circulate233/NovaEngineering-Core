@@ -35,9 +35,9 @@ public class BlockModelHider {
         }
 
         MultiblockWorldSavedData.addDisableModel(ctrlPos, posList.stream()
-                .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
-                .map(pos -> pos.add(ctrlPos))
-                .collect(Collectors.toList()));
+                                                                 .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
+                                                                 .map(pos -> pos.add(ctrlPos))
+                                                                 .collect(Collectors.toList()));
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -51,9 +51,9 @@ public class BlockModelHider {
         }
 
         MultiblockWorldSavedData.addDisableModel(ctrlPos, posList.stream()
-                .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
-                .map(pos -> pos.add(ctrlPos))
-                .collect(Collectors.toList()));
+                                                                 .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
+                                                                 .map(pos -> pos.add(ctrlPos))
+                                                                 .collect(Collectors.toList()));
     }
 
 }

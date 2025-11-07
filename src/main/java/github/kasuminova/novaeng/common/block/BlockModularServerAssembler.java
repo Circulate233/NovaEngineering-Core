@@ -40,7 +40,7 @@ public class BlockModularServerAssembler extends BlockController {
 
     public DynamicMachine getParentMachine() {
         return MachineRegistry.getRegistry().getMachine(
-                new ResourceLocation(ModularMachinery.MODID, "modular_server_assembler")
+            new ResourceLocation(ModularMachinery.MODID, "modular_server_assembler")
         );
     }
 

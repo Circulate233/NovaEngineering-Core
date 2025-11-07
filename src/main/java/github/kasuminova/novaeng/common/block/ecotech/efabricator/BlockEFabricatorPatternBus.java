@@ -37,7 +37,7 @@ public class BlockEFabricatorPatternBus extends BlockEFabricatorPart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_pattern_bus"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_pattern_bus");

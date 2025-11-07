@@ -21,7 +21,7 @@ public class ItemModelFileAutoGenerator {
 
     public static void generate(IResourceManager resourceManager, String newPath) throws IOException {
         IResource itemModelPattern = resourceManager.getResource(
-                new ResourceLocation(NovaEngineeringCore.MOD_ID, "models/item/item_model_pattern.json"));
+            new ResourceLocation(NovaEngineeringCore.MOD_ID, "models/item/item_model_pattern.json"));
 
         File newItemModelFile = new File("resources/novaeng_core/models/item/" + newPath + ".json");
         if (newItemModelFile.exists()) {

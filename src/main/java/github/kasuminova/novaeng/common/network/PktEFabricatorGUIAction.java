@@ -48,11 +48,11 @@ public class PktEFabricatorGUIAction implements IMessage, IMessageHandler<PktEFa
                     player.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.EFABRICATOR_PATTERN_SEARCH.ordinal(), owner.getWorld(), pos.getX(), pos.getY(), pos.getZ());
                     if (player.openContainer instanceof ContainerEFabricatorPatternSearch efPatternSearch) {
                         NovaEngineeringCore.NET_CHANNEL.sendTo(
-                                new PktEFabricatorPatternSearchGUIUpdate(
-                                        PktEFabricatorPatternSearchGUIUpdate.UpdateType.FULL,
-                                        EFabricatorPatternData.ofFull(efPatternSearch.getOwner())
-                                ),
-                                player
+                            new PktEFabricatorPatternSearchGUIUpdate(
+                                PktEFabricatorPatternSearchGUIUpdate.UpdateType.FULL,
+                                EFabricatorPatternData.ofFull(efPatternSearch.getOwner())
+                            ),
+                            player
                         );
                     }
                     return;

@@ -221,7 +221,7 @@ public final class ItemRawOre extends Item {
             this.name = StringUtils.camelToSnake(name);
             this.localizationKey = "novaeng.part." + this.name;
             this.defR = this.name().equals("BLOCK") ?
-                    "blocks/raw_block/raw_block" : "items/raw_ore/" + this.name;
+                "blocks/raw_block/raw_block" : "items/raw_ore/" + this.name;
         }
 
         public String getOdName(String name) {

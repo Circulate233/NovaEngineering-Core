@@ -38,8 +38,8 @@ public class RecipePrimerHyperNet {
                                                        @Optional final boolean triggerFailure) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             primer.addRecipeTooltip(
-                    I18n.format("novaeng.hypernet.computation_point_required.tip",
-                            NovaEngUtils.formatFLOPS(required)).intern()
+                I18n.format("novaeng.hypernet.computation_point_required.tip",
+                    NovaEngUtils.formatFLOPS(required)).intern()
             );
         }
 
@@ -96,9 +96,9 @@ public class RecipePrimerHyperNet {
     public static RecipePrimer requireResearch(final RecipePrimer primer,
                                                final String... researchNames) {
         return requireResearch(primer, Arrays.stream(researchNames)
-                .map(RegistryHyperNet::getResearchCognitionData)
-                .filter(Objects::nonNull)
-                .toArray(ResearchCognitionData[]::new));
+                                             .map(RegistryHyperNet::getResearchCognitionData)
+                                             .filter(Objects::nonNull)
+                                             .toArray(ResearchCognitionData[]::new));
     }
 
     @ZenMethod
@@ -106,8 +106,8 @@ public class RecipePrimerHyperNet {
                                                final ResearchCognitionData... researchRequired) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             String researchTip = Arrays.stream(researchRequired)
-                    .map(ResearchCognitionData::getTranslatedName)
-                    .collect(Collectors.joining(TextFormatting.RESET + ", "));
+                                       .map(ResearchCognitionData::getTranslatedName)
+                                       .collect(Collectors.joining(TextFormatting.RESET + ", "));
             primer.addRecipeTooltip(I18n.format("novaeng.hypernet.research_required.tip", researchTip).intern());
         }
 

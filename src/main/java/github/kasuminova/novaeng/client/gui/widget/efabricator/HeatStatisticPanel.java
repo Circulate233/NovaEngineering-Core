@@ -28,7 +28,7 @@ public class HeatStatisticPanel extends SizedColumn {
     public static final int WIDTH = 51;
     public static final int HEIGHT = 77;
     public static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS, 204, 24, WIDTH, HEIGHT
+        GuiEFabricatorController.TEXTURES_ELEMENTS, 204, 24, WIDTH, HEIGHT
     );
 
     private final BackgroundLabel energyUsage;
@@ -42,63 +42,63 @@ public class HeatStatisticPanel extends SizedColumn {
 
         energyUsage = new BackgroundLabel(Collections.singletonList(I18n.format("gui.efabricator.max_energy_usage", 0)));
         energyUsage
-                .setTooltipFunction(label -> Collections.singletonList(I18n.format("gui.efabricator.max_energy_usage.tip")))
-                .setBackground(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 102, 45, 9))
-                .setPadding(1);
+            .setTooltipFunction(label -> Collections.singletonList(I18n.format("gui.efabricator.max_energy_usage.tip")))
+            .setBackground(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 102, 45, 9))
+            .setPadding(1);
         energyUsage.getLabel()
-                .setAutoRecalculateSize(false)
-                .setAutoWrap(false)
-                .setVerticalCentering(true)
-                .setScale(0.6f)
-                .setWidthHeight(43, 6)
-                .setMarginDown(2);
+                   .setAutoRecalculateSize(false)
+                   .setAutoWrap(false)
+                   .setVerticalCentering(true)
+                   .setScale(0.6f)
+                   .setWidthHeight(43, 6)
+                   .setMarginDown(2);
         activeCooling = new BackgroundLabel(Collections.singletonList(I18n.format(
-                "gui.efabricator.active_cooling", I18n.format("gui.efabricator.active_cooling.off")
+            "gui.efabricator.active_cooling", I18n.format("gui.efabricator.active_cooling.off")
         )));
         activeCooling
-                .setBackground(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 102, 45, 9))
-                .setPadding(1);
+            .setBackground(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 102, 45, 9))
+            .setPadding(1);
         activeCooling.getLabel()
-                .setAutoRecalculateSize(false)
-                .setAutoWrap(false)
-                .setVerticalCentering(true)
-                .setScale(0.75f)
-                .setWidthHeight(43, 7);
+                     .setAutoRecalculateSize(false)
+                     .setAutoWrap(false)
+                     .setVerticalCentering(true)
+                     .setScale(0.75f)
+                     .setWidthHeight(43, 7);
 
         energyUsageBar = new ProgressBar();
         coolantBar = new ProgressBar();
         hotCoolantBar = new ProgressBar();
         addWidgets(
-                energyUsage
-                        .setWidthHeight(45, 9)
-                        .setMargin(3, 0, 3, 0),
-                energyUsageBar
-                        .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 122, 45, 9))
-                        .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 112, 45, 9))
-                        .setLeftToRight(true)
+            energyUsage
+                .setWidthHeight(45, 9)
+                .setMargin(3, 0, 3, 0),
+            energyUsageBar
+                .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 122, 45, 9))
+                .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 112, 45, 9))
+                .setLeftToRight(true)
+                .setMaxProgress(1f)
+                .setWidthHeight(45, 9)
+                .setMargin(3, 0, 3, 0),
+            activeCooling
+                .setWidthHeight(45, 9)
+                .setMargin(3, 0, 3, 0),
+            new Row()
+                .addWidgets(
+                    coolantBar
+                        .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 212, 134, 21, 36))
+                        .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 108, 149, 21, 36))
+                        .setDownToUp(true)
                         .setMaxProgress(1f)
-                        .setWidthHeight(45, 9)
-                        .setMargin(3, 0, 3, 0),
-                activeCooling
-                        .setWidthHeight(45, 9)
-                        .setMargin(3, 0, 3, 0),
-                new Row()
-                        .addWidgets(
-                                coolantBar
-                                        .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 212, 134, 21, 36))
-                                        .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 108, 149, 21, 36))
-                                        .setDownToUp(true)
-                                        .setMaxProgress(1f)
-                                        .setWidthHeight(21, 36)
-                                        .setMarginRight(2),
-                                hotCoolantBar
-                                        .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 234, 134, 21, 36))
-                                        .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 130, 149, 21, 36))
-                                        .setDownToUp(true)
-                                        .setMaxProgress(1f)
-                                        .setWidthHeight(21, 36)
-                        )
-                        .setMargin(3, 0, 3, 0)
+                        .setWidthHeight(21, 36)
+                        .setMarginRight(2),
+                    hotCoolantBar
+                        .setBackgroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 234, 134, 21, 36))
+                        .addForegroundTexture(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 130, 149, 21, 36))
+                        .setDownToUp(true)
+                        .setMaxProgress(1f)
+                        .setWidthHeight(21, 36)
+                )
+                .setMargin(3, 0, 3, 0)
         );
     }
 
@@ -111,12 +111,12 @@ public class HeatStatisticPanel extends SizedColumn {
             }
 
             this.activeCooling.getLabel()
-                    .setContents(Collections.singletonList(
-                            I18n.format("gui.efabricator.active_cooling", data.activeCooling()
-                                    ? I18n.format("gui.efabricator.active_cooling.on")
-                                    : I18n.format("gui.efabricator.active_cooling.off")
-                            )
-                    ));
+                              .setContents(Collections.singletonList(
+                                  I18n.format("gui.efabricator.active_cooling", data.activeCooling()
+                                      ? I18n.format("gui.efabricator.active_cooling.on")
+                                      : I18n.format("gui.efabricator.active_cooling.off")
+                                  )
+                              ));
 
             int length = data.length();
             int queueDepth = EFabricatorWorker.MAX_QUEUE_DEPTH;
@@ -126,23 +126,23 @@ public class HeatStatisticPanel extends SizedColumn {
 
             int maxEnergy = EFabricatorWorker.MAX_ENERGY_CACHE * length;
             this.energyUsageBar.setMaxProgress(maxEnergy)
-                    .setProgress(data.energyStored());
+                               .setProgress(data.energyStored());
 
             int energyUsage = EFabricatorWorker.ENERGY_USAGE * length * queueDepth;
             if (data.overclocked() && !data.activeCooling()) {
                 energyUsage = data.level().applyOverclockEnergyUsage(energyUsage);
             }
             this.energyUsage.getLabel()
-                    .setContents(Collections.singletonList(
-                            I18n.format("gui.efabricator.max_energy_usage", NovaEngUtils.formatNumber(energyUsage, 1))
-                    ));
+                            .setContents(Collections.singletonList(
+                                I18n.format("gui.efabricator.max_energy_usage", NovaEngUtils.formatNumber(energyUsage, 1))
+                            ));
 
             this.coolantBar
-                    .setMaxProgress(data.maxCoolant())
-                    .setProgress(data.coolant());
+                .setMaxProgress(data.maxCoolant())
+                .setProgress(data.coolant());
             this.hotCoolantBar
-                    .setMaxProgress(data.maxHotCoolant())
-                    .setProgress(data.hotCoolant());
+                .setMaxProgress(data.maxHotCoolant())
+                .setProgress(data.hotCoolant());
         }
         return super.onGuiEvent(event);
     }

@@ -12,23 +12,23 @@ import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.Levels;
 public class ParallelProcStatus extends DynamicWidget {
 
     public static final TextureProperties L4 = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            1, 145, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        1, 145, 18, 18
     );
 
     public static final TextureProperties L6 = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            20, 145, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        20, 145, 18, 18
     );
 
     public static final TextureProperties L9 = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            39, 145, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        39, 145, 18, 18
     );
 
     private static final TextureProperties TEXTURE_UNAVAILABLE = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            58, 126, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        58, 126, 18, 18
     );
 
     protected Levels level = Levels.L4;

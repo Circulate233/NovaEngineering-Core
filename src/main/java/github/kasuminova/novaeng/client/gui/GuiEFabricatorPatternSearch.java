@@ -24,11 +24,11 @@ import java.util.Collections;
 public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEFabricatorPatternSearch> {
 
     public static final ResourceLocation TEXTURES_BACKGROUND_DARK = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_pattern_search_bg_dark.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_pattern_search_bg_dark.png");
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_search.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_search.png");
     public static final ResourceLocation TEXTURES_INVENTORY = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
 
     @Getter
     private EFabricatorPatternData data = null;
@@ -39,7 +39,7 @@ public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEF
         this.ySize = 202 + 10;
         this.widgetController = new WidgetController(WidgetGui.of(this));
         this.widgetController.addWidget(new MultiLineLabel(Collections.singletonList(I18n.format("gui.efabricator.pattern_search.title")))
-                .setScale(.8f).setAutoWrap(false).setAbsXY(7, 3)
+            .setScale(.8f).setAutoWrap(false).setAbsXY(7, 3)
         );
         this.widgetController.addWidget(new SearchPanel(this.widgetController).setAbsXY(7, 15));
         this.widgetController.addWidget(new PatternPanel().setAbsXY(7, 39));

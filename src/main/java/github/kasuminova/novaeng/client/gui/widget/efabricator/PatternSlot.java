@@ -54,7 +54,7 @@ public class PatternSlot extends SlotItemVirtual {
             return false;
         }
         NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorPatternSearchGUIAction(
-                PktEFabricatorPatternSearchGUIAction.Action.PICKUP_PATTERN, slotOwnerPos, slotIndex
+            PktEFabricatorPatternSearchGUIAction.Action.PICKUP_PATTERN, slotOwnerPos, slotIndex
         ));
         return true;
     }

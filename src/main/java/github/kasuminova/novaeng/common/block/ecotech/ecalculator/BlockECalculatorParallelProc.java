@@ -36,8 +36,8 @@ public class BlockECalculatorParallelProc extends BlockECalculatorPart {
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_parallel_proc_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_parallel_proc_" + level);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(ParallelProcStatus.STATUS, ParallelProcStatus.OFF)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(ParallelProcStatus.STATUS, ParallelProcStatus.OFF)
         );
     }
 

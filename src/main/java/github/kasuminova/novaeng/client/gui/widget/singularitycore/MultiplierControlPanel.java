@@ -33,42 +33,42 @@ public class MultiplierControlPanel extends SizedColumn {
         this.coreGUI = coreGUI;
         this.setWidthHeight(WIDTH, HEIGHT);
         this.addWidgets(
-                new MultiLineLabel(Collections.singletonList("§c工作倍率设置"))
-                        .setAutoWrap(false)
-                        .setAutoRecalculateSize(false)
-                        .setWidthHeight(70, 10)
-                        .setMargin(20, 0, 4, 3),
-                new ProgressBar()
-                        // 0.25 ~ 1.75
-                        .setMaxProgress(1.5f)
-                        .setProgress(.75f)
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c工作倍率：%s%%",
-                                        NovaEngUtils.formatDouble((0.25f + progressBar.getProgress()) * 100, 2))
-                                )
+            new MultiLineLabel(Collections.singletonList("§c工作倍率设置"))
+                .setAutoWrap(false)
+                .setAutoRecalculateSize(false)
+                .setWidthHeight(70, 10)
+                .setMargin(20, 0, 4, 3),
+            new ProgressBar()
+                // 0.25 ~ 1.75
+                .setMaxProgress(1.5f)
+                .setProgress(.75f)
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c工作倍率：%s%%",
+                        NovaEngUtils.formatDouble((0.25f + progressBar.getProgress()) * 100, 2))
+                    )
+                )
+                .setWidthHeight(87, 15)
+                .setMarginLeft(3),
+            new Row()
+                .addWidgets(
+                    new InputBox()
+                        .setEnableBackground(false)
+                        .setInputType(InputBox.InputType.NUMBER)
+                        .setTooltipFunction(inputBox ->
+                            Collections.singletonList("§c在此处输入新的工作倍率（1.0 = 100%）。")
                         )
-                        .setWidthHeight(87, 15)
-                        .setMarginLeft(3),
-                new Row()
-                        .addWidgets(
-                                new InputBox()
-                                        .setEnableBackground(false)
-                                        .setInputType(InputBox.InputType.NUMBER)
-                                        .setTooltipFunction(inputBox ->
-                                                Collections.singletonList("§c在此处输入新的工作倍率（1.0 = 100%）。")
-                                        )
-                                        .setWidthHeight(45, 10)
-                                        .setMargin(6, 5, 6, 0),
-                                new Button4State()
-                                        .setMouseDownTexture(65, 19)
-                                        .setHoveredTexture(102, 0)
-                                        .setTexture(65, 0)
-                                        .setUnavailableTexture(102, 19)
-                                        .setTextureLocation(BUTTON_TEX_RES)
-                                        .setTooltipFunction(button -> Collections.singletonList("§c单击应用新数值。"))
-                                        .setWidthHeight(36, 18)
-                                        .setMargin(0, 0, 2, 0)
-                        )
+                        .setWidthHeight(45, 10)
+                        .setMargin(6, 5, 6, 0),
+                    new Button4State()
+                        .setMouseDownTexture(65, 19)
+                        .setHoveredTexture(102, 0)
+                        .setTexture(65, 0)
+                        .setUnavailableTexture(102, 19)
+                        .setTextureLocation(BUTTON_TEX_RES)
+                        .setTooltipFunction(button -> Collections.singletonList("§c单击应用新数值。"))
+                        .setWidthHeight(36, 18)
+                        .setMargin(0, 0, 2, 0)
+                )
         );
     }
 
@@ -77,9 +77,9 @@ public class MultiplierControlPanel extends SizedColumn {
         GuiScreen gui = widgetGui.getGui();
         gui.mc.getTextureManager().bindTexture(BG_TEX_RES);
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY(),
-                TEX_X, TEX_Y,
-                WIDTH, HEIGHT
+            renderPos.posX(), renderPos.posY(),
+            TEX_X, TEX_Y,
+            WIDTH, HEIGHT
         );
         super.preRenderInternal(widgetGui, renderSize, renderPos, mousePos);
     }

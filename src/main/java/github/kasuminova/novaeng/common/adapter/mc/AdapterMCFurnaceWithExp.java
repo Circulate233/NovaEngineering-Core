@@ -49,9 +49,9 @@ public class AdapterMCFurnaceWithExp extends RecipeAdapter {
             float experience = furnaceRecipes.getSmeltingExperience(output);
 
             MachineRecipe recipe = createRecipeShell(
-                    new ResourceLocation("minecraft", "smelting_with_exp_" + incId + "_" + HashedItemStack.stackToString(input) + "_" + HashedItemStack.stackToString(output)),
-                    owningMachineName,
-                    tickTime, 0, false);
+                new ResourceLocation("minecraft", "smelting_with_exp_" + incId + "_" + HashedItemStack.stackToString(input) + "_" + HashedItemStack.stackToString(output)),
+                owningMachineName,
+                tickTime, 0, false);
 
             recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                 ActiveMachineRecipe machineRecipe = event.getActiveRecipe();

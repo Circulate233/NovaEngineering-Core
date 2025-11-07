@@ -41,8 +41,8 @@ public class BlockEStorageEnergyCell extends BlockEStoragePart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(EnergyCellStatus.STATUS, EnergyCellStatus.EMPTY)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(EnergyCellStatus.STATUS, EnergyCellStatus.EMPTY)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_energy_cell_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_energy_cell_" + level);

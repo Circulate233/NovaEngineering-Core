@@ -86,20 +86,20 @@ public class EStorageInfoProvider implements IProbeInfoProvider {
         double maxEnergyStore = cell.getMaxEnergyStore();
 
         String progressStr = String.format("%sAE / %sAE",
-                NovaEngUtils.formatNumber(Math.round(energyStored)),
-                NovaEngUtils.formatNumber(Math.round(maxEnergyStore))
+            NovaEngUtils.formatNumber(Math.round(energyStored)),
+            NovaEngUtils.formatNumber(Math.round(maxEnergyStore))
         );
 
         probeInfo.horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .progress(Math.round((energyStored / maxEnergyStore) * 200), 200, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(0xCC42B8FF)
-                        .alternateFilledColor(0xCC42BDFF)
-                        .borderColor(0xCC97FFFF)
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(120)
-                );
+                 .progress(Math.round((energyStored / maxEnergyStore) * 200), 200, probeInfo.defaultProgressStyle()
+                                                                                            .prefix(progressStr)
+                                                                                            .filledColor(0xCC42B8FF)
+                                                                                            .alternateFilledColor(0xCC42BDFF)
+                                                                                            .borderColor(0xCC97FFFF)
+                                                                                            .backgroundColor(0xFF000000)
+                                                                                            .numberFormat(NumberFormat.NONE)
+                                                                                            .width(120)
+                 );
     }
 
     private static IProbeInfo newVertical(final IProbeInfo probeInfo) {

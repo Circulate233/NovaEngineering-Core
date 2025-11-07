@@ -46,7 +46,7 @@ public class ResearchStation extends NetNode {
     public ResearchStation(final TileMultiblockMachineController owner) {
         super(owner);
         this.type = RegistryHyperNet.getResearchStationType(
-                Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
+            Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
         );
     }
 
@@ -81,8 +81,8 @@ public class ResearchStation extends NetNode {
         }
 
         if (nodes.stream()
-                .map(Database.class::cast)
-                .noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
+                 .map(Database.class::cast)
+                 .noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
             event.setFailed("网络中所有的数据库存储已满！");
         }
     }
@@ -110,8 +110,8 @@ public class ResearchStation extends NetNode {
         double consumed = center.researchConsumeComputationPoint(required);
         if (consumed < required) {
             event.preventProgressing("算力不足！预期："
-                    + NovaEngUtils.formatFLOPS(required) + "，当前："
-                    + NovaEngUtils.formatFLOPS(consumed));
+                + NovaEngUtils.formatFLOPS(required) + "，当前："
+                + NovaEngUtils.formatFLOPS(consumed));
         } else {
             doResearch(event, consumed);
         }
@@ -152,8 +152,8 @@ public class ResearchStation extends NetNode {
         event.getRecipeThread().setStatus(CraftingStatus.SUCCESS).setStatusInfo("研究中...");
 
         HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
-                center.getComputationPointGeneration() - center.getComputationPointConsumption(),
-                Math.min(baseConsumption * overclockingValue, getComputationLeft())))
+            center.getComputationPointGeneration() - center.getComputationPointConsumption(),
+            Math.min(baseConsumption * overclockingValue, getComputationLeft())))
         );
     }
 
@@ -175,8 +175,8 @@ public class ResearchStation extends NetNode {
         recipe.setTick(recipe.getTotalTick() + 1);
 
         Collection<Database> databases = center.getNode(Database.class).stream()
-                .filter(Database::isWorking)
-                .collect(Collectors.toList());
+                                               .filter(Database::isWorking)
+                                               .collect(Collectors.toList());
         if (databases.isEmpty()) {
             return;
         }
@@ -255,11 +255,11 @@ public class ResearchStation extends NetNode {
         this.taskProvider = taskProvider.getUniqueID();
         this.consumption = data.getMinComputationPointPerTick();
         double progress = center.getNode(Database.class)
-                .stream()
-                .map(database -> database.getResearchingData(data))
-                .filter(d -> d != -1D)
-                .findFirst()
-                .orElse(-1D);
+                                .stream()
+                                .map(database -> database.getResearchingData(data))
+                                .filter(d -> d != -1D)
+                                .findFirst()
+                                .orElse(-1D);
 
         if (progress == -1) {
             for (final Database database : center.getNode(Database.class)) {

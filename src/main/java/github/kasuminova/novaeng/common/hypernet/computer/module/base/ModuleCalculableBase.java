@@ -43,9 +43,9 @@ public abstract class ModuleCalculableBase<T extends ServerModule & Calculable> 
         for (final CalculateType type : CalculateTypes.getAvailableTypes().values()) {
             double typeEfficiency = moduleInstance.getCalculateTypeEfficiency(type);
             efficiencyTips.add(new EfficiencyTip(typeEfficiency, I18n.format("novaeng.hypernet.calculate.tip.efficiency",
-                    type.getFormattedTypeName(),
-                    type.format(baseGeneration * typeEfficiency),
-                    Calculable.formatEfficiency(typeEfficiency)
+                type.getFormattedTypeName(),
+                type.format(baseGeneration * typeEfficiency),
+                Calculable.formatEfficiency(typeEfficiency)
             )));
         }
 

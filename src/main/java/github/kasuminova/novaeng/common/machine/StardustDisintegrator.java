@@ -23,8 +23,8 @@ public class StardustDisintegrator implements MachineSpecial {
     public static final StardustDisintegrator INSTANCE = new StardustDisintegrator();
 
     public static final List<BlockPos> CRYSTALS_POS_PRESET = Arrays.asList(
-            // LEFT - MID - RIGHT
-            withXZ(-6, 6), withXZ(0, 12), withXZ(6, 6)
+        // LEFT - MID - RIGHT
+        withXZ(-6, 6), withXZ(0, 12), withXZ(6, 6)
     );
 
     private StardustDisintegrator() {
@@ -37,8 +37,8 @@ public class StardustDisintegrator implements MachineSpecial {
         EnumFacing facing = ctrl.getControllerRotation();
 
         if (CRYSTALS_POS_PRESET.stream()
-                .map(pos -> ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))
-                .anyMatch(crystalPos -> !world.canSeeSky(crystalPos))) {
+                               .map(pos -> ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))
+                               .anyMatch(crystalPos -> !world.canSeeSky(crystalPos))) {
             ctrl.getCustomDataTag().removeTag("canSeeSky");
         } else {
             ctrl.getCustomDataTag().setBoolean("canSeeSky", true);

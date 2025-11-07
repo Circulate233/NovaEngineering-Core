@@ -11,17 +11,17 @@ public class FTBHandler {
 
     private static final Int2ObjectMap<TextComponentTranslation> ids = new Int2ObjectOpenHashMap<>() {{
         put(-697329152,
-                new TextComponentTranslation("new.ftb.as.tooltip",
-                        new TextComponentTranslation("new.ftb.as.tooltip.0")));
+            new TextComponentTranslation("new.ftb.as.tooltip",
+                new TextComponentTranslation("new.ftb.as.tooltip.0")));
         put(1304181469,
-                new TextComponentTranslation("new.ftb.as.tooltip",
-                        new TextComponentTranslation("new.ftb.as.tooltip.1")));
+            new TextComponentTranslation("new.ftb.as.tooltip",
+                new TextComponentTranslation("new.ftb.as.tooltip.1")));
         put(-845382584,
-                new TextComponentTranslation("new.ftb.as.tooltip",
-                        new TextComponentTranslation("new.ftb.as.tooltip.2")));
+            new TextComponentTranslation("new.ftb.as.tooltip",
+                new TextComponentTranslation("new.ftb.as.tooltip.2")));
         put(-739358833,
-                new TextComponentTranslation("new.ftb.as.tooltip",
-                        new TextComponentTranslation("new.ftb.as.tooltip.3")));
+            new TextComponentTranslation("new.ftb.as.tooltip",
+                new TextComponentTranslation("new.ftb.as.tooltip.3")));
     }};
     public static FTBHandler INSTANCE = new FTBHandler();
 

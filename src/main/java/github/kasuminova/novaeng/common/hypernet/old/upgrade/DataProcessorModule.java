@@ -26,7 +26,7 @@ public abstract class DataProcessorModule extends DynamicMachineUpgrade {
 
     protected void getEnergyDurabilityTip(final List<String> desc, ProcessorModuleType moduleType) {
         desc.add(I18n.format("upgrade.data_processor.module.energy.tip",
-                MiscUtils.formatNumber(getEnergyConsumption()) + " RF"));
+            MiscUtils.formatNumber(getEnergyConsumption()) + " RF"));
     }
 
     @Override

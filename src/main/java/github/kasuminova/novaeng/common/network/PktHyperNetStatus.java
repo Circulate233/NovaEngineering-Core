@@ -46,9 +46,9 @@ public class PktHyperNetStatus implements IMessage, IMessageHandler<PktHyperNetS
         }
 
         if (!statusTag.hasKey("centerType")
-                || !statusTag.hasKey("totalConnected")
-                || !statusTag.hasKey("computationPointGeneration")
-                || !statusTag.hasKey("computationPointConsumption")) {
+            || !statusTag.hasKey("totalConnected")
+            || !statusTag.hasKey("computationPointGeneration")
+            || !statusTag.hasKey("computationPointConsumption")) {
             return null;
         }
 

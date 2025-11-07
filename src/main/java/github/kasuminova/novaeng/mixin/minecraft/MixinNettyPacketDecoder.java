@@ -17,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinNettyPacketDecoder {
 
     @Redirect(method = "decode",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/Packet;readPacketData(Lnet/minecraft/network/PacketBuffer;)V")
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/Packet;readPacketData(Lnet/minecraft/network/PacketBuffer;)V")
     )
     private void onDecode(final Packet<?> packet, final PacketBuffer packetBuffer, final ChannelHandlerContext ctx) throws Exception {
         final int prevIndex = packetBuffer.readerIndex();

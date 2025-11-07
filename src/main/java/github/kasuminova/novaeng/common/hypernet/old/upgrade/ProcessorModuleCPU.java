@@ -68,7 +68,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
         desc.add(I18n.format("upgrade.data_processor.module.cpu.tip.0"));
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
+            NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
         ));
 
         getEnergyDurabilityTip(desc, moduleType);
@@ -81,7 +81,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
         List<String> desc = new ArrayList<>();
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
+            NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
         ));
 
         getEnergyDurabilityTip(desc, moduleType);

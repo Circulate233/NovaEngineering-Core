@@ -23,24 +23,24 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
 
     public PktEFabricatorGUIData(final EFabricatorController controller) {
         data = new EFabricatorData(
-                controller.getLength(),
-                controller.getOverclocked(),
-                controller.getActiveCooling(),
-                controller.getParallelism(),
-                controller.getCoolantInputFluids(),
-                controller.getCoolantInputCap(),
-                controller.getCoolantOutputFluids(),
-                controller.getCoolantOutputCap(),
-                controller.getEnergyStored(),
-                controller.getTotalCrafted(),
-                controller.getLevel(),
-                controller.getWorkers().stream()
-                        .map(EFabricatorWorker::getQueue)
-                        .map(queue -> {
-                            EFabricatorWorker.CraftWork peek = queue.peek();
-                            return new EFabricatorData.WorkerStatus(peek != null ? peek.getOutput() : ItemStack.EMPTY, queue.size());
-                        })
-                        .collect(Collectors.toList())
+            controller.getLength(),
+            controller.getOverclocked(),
+            controller.getActiveCooling(),
+            controller.getParallelism(),
+            controller.getCoolantInputFluids(),
+            controller.getCoolantInputCap(),
+            controller.getCoolantOutputFluids(),
+            controller.getCoolantOutputCap(),
+            controller.getEnergyStored(),
+            controller.getTotalCrafted(),
+            controller.getLevel(),
+            controller.getWorkers().stream()
+                      .map(EFabricatorWorker::getQueue)
+                      .map(queue -> {
+                          EFabricatorWorker.CraftWork peek = queue.peek();
+                          return new EFabricatorData.WorkerStatus(peek != null ? peek.getOutput() : ItemStack.EMPTY, queue.size());
+                      })
+                      .collect(Collectors.toList())
         );
     }
 

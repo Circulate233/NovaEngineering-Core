@@ -44,8 +44,8 @@ public abstract class EStorageCell<T extends IAEStack<T>> extends AEBaseItem imp
     protected void addCheckedInformation(final ItemStack stack, final World world, final List<String> lines, final ITooltipFlag advancedTooltips) {
         super.addCheckedInformation(stack, world, lines, advancedTooltips);
         AEApi.instance()
-                .client()
-                .addCellInformation(EStorageCellHandler.getHandler(stack).getCellInventory(stack, null, this.getChannel()), lines);
+             .client()
+             .addCellInformation(EStorageCellHandler.getHandler(stack).getCellInventory(stack, null, this.getChannel()), lines);
         lines.add(I18n.format("novaeng.estorage_cell.insert.tip"));
         lines.add(I18n.format("novaeng.estorage_cell.extract.tip"));
         if (level == DriveStorageLevel.B) {

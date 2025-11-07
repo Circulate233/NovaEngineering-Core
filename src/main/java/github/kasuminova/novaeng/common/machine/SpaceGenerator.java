@@ -31,14 +31,14 @@ public class SpaceGenerator implements MachineSpecial {
 
     private static void oreProcessing(List<String> orenames, Map<String, Long> singularitys) {
         var rec = RecipeBuilder.newBuilder("hxzk3", "space_generator", 1, 99999)
-                .addPreCheckHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var hxzt = data.getByte("hxzt");
-                    if (hxzt != 3) {
-                        event.setFailed("novaeng.space_generator.failed.no_output");
-                    }
-                });
+                               .addPreCheckHandler(event -> {
+                                   var ctrl = event.getController();
+                                   var data = ctrl.getCustomDataTag();
+                                   var hxzt = data.getByte("hxzt");
+                                   if (hxzt != 3) {
+                                       event.setFailed("novaeng.space_generator.failed.no_output");
+                                   }
+                               });
 
         for (String orename : orenames) {
             var singularityname = orename.substring(oreOD.length());
@@ -64,13 +64,13 @@ public class SpaceGenerator implements MachineSpecial {
             }
         }
         rec.setParallelized(false).addFactoryFinishHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    data.setByte("hxzt", (byte) 0);
-                })
-                .setLoadJEI(false)
-                .setThreadName("novaeng.space_generator.thread.core")
-                .build();
+               var ctrl = event.getController();
+               var data = ctrl.getCustomDataTag();
+               data.setByte("hxzt", (byte) 0);
+           })
+           .setLoadJEI(false)
+           .setThreadName("novaeng.space_generator.thread.core")
+           .build();
     }
 
     private static IItemStack output(String i, IMachineController ctrl, IItemStack oldItem, long qdsl) {
@@ -139,47 +139,47 @@ public class SpaceGenerator implements MachineSpecial {
             ores = dust;
         }
         RecipeBuilder.newBuilder("space_singularity1" + singularityname, "space_generator", 20, 3)
-                .addEnergyPerTickInput(100000000)
-                .addIngredientArrayInput(IngredientArrayBuilder.newBuilder().addIngredients(
-                        block.amount(arg0),
-                        ores.amount(arg1 * arg0),
-                        nugget.amount(9 * arg1 * arg0)
-                ))
-                .addPreCheckHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var hxzt = data.getInteger("hxzt");
-                    if (hxzt != 2) {
-                        event.setFailed("novaeng.space_generator.failed.singularity");
-                    }
-                })
-                .addOutput(singularity)
-                .setMaxThreads(1)
-                .setParallelized(true)
-                .addRecipeTooltip(
-                        "novaeng.space_generator.tooltip0",
-                        "novaeng.space_generator.tooltip1"
-                )
-                .build();
+                     .addEnergyPerTickInput(100000000)
+                     .addIngredientArrayInput(IngredientArrayBuilder.newBuilder().addIngredients(
+                         block.amount(arg0),
+                         ores.amount(arg1 * arg0),
+                         nugget.amount(9 * arg1 * arg0)
+                     ))
+                     .addPreCheckHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         var hxzt = data.getInteger("hxzt");
+                         if (hxzt != 2) {
+                             event.setFailed("novaeng.space_generator.failed.singularity");
+                         }
+                     })
+                     .addOutput(singularity)
+                     .setMaxThreads(1)
+                     .setParallelized(true)
+                     .addRecipeTooltip(
+                         "novaeng.space_generator.tooltip0",
+                         "novaeng.space_generator.tooltip1"
+                     )
+                     .build();
         RecipeBuilder.newBuilder("space_singularity2" + singularityname, "space_generator", 20, 3)
-                .addEnergyPerTickInput(100000000)
-                .addInput(singularity)
-                .addPreCheckHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var hxzt = data.getInteger("hxzt");
-                    if (hxzt != 2) {
-                        event.setFailed("novaeng.space_generator.failed.singularity");
-                    }
-                })
-                .addOutputs(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName())).amount((int) (arg1 * arg2)))
-                .setMaxThreads(1)
-                .setParallelized(true)
-                .addRecipeTooltip(
-                        "novaeng.space_generator.tooltip0",
-                        "novaeng.space_generator.tooltip1"
-                )
-                .build();
+                     .addEnergyPerTickInput(100000000)
+                     .addInput(singularity)
+                     .addPreCheckHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         var hxzt = data.getInteger("hxzt");
+                         if (hxzt != 2) {
+                             event.setFailed("novaeng.space_generator.failed.singularity");
+                         }
+                     })
+                     .addOutputs(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName())).amount((int) (arg1 * arg2)))
+                     .setMaxThreads(1)
+                     .setParallelized(true)
+                     .addRecipeTooltip(
+                         "novaeng.space_generator.tooltip0",
+                         "novaeng.space_generator.tooltip1"
+                     )
+                     .build();
     }
 
     @Override
@@ -210,83 +210,83 @@ public class SpaceGenerator implements MachineSpecial {
                 if (ores != null) {
                     orenames.add("Ore" + ore);
                     var rec0 = RecipeBuilder.newBuilder("space_Ore" + ore, "space_generator", 20, 2)
-                            .addInput(ench)
-                            .addPreCheckHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var hxzt = data.getByte("hxzt");
-                                if (hxzt != 1) {
-                                    event.setFailed("novaeng.space_generator.failed.item.input");
-                                }
-                            })
-                            .addFactoryFinishHandler(event -> {
-                                var ctrl = event.getController();
-                                var data = ctrl.getCustomDataTag();
-                                var Ore1 = data.getLong("Ore" + ore);
-                                var thread = event.getFactoryRecipeThread();
-                                var bx = thread.getActiveRecipe().getParallelism();
+                                            .addInput(ench)
+                                            .addPreCheckHandler(event -> {
+                                                var ctrl = event.getController();
+                                                var data = ctrl.getCustomDataTag();
+                                                var hxzt = data.getByte("hxzt");
+                                                if (hxzt != 1) {
+                                                    event.setFailed("novaeng.space_generator.failed.item.input");
+                                                }
+                                            })
+                                            .addFactoryFinishHandler(event -> {
+                                                var ctrl = event.getController();
+                                                var data = ctrl.getCustomDataTag();
+                                                var Ore1 = data.getLong("Ore" + ore);
+                                                var thread = event.getFactoryRecipeThread();
+                                                var bx = thread.getActiveRecipe().getParallelism();
 
-                                data.setLong("Ore" + ore, Ore1 + bx);
-                                data.setLong("kwzl", data.getLong("kwzl") + bx);
-                            })
-                            .setMaxThreads(1)
-                            .setParallelized(true)
-                            .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.ore.tooltips"));
+                                                data.setLong("Ore" + ore, Ore1 + bx);
+                                                data.setLong("kwzl", data.getLong("kwzl") + bx);
+                                            })
+                                            .setMaxThreads(1)
+                                            .setParallelized(true)
+                                            .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.ore.tooltips"));
                     if (!singularity.isEmpty())
                         RecipePrimerEx.setLore(rec0.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
                     RecipePrimerEx.setLore(rec0.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();
                     if (!rawOre.isEmpty()) {
                         var rec1 = RecipeBuilder.newBuilder("space_Ore1" + ore, "space_generator", 20, 2)
-                                .addInput(rawOre.amount(3))
-                                .addPreCheckHandler(event -> {
-                                    var ctrl = event.getController();
-                                    var data = ctrl.getCustomDataTag();
-                                    var hxzt = data.getByte("hxzt");
-                                    if (hxzt != 1) {
-                                        event.setFailed("novaeng.space_generator.failed.item.input");
-                                    }
-                                })
-                                .addFactoryFinishHandler(event -> {
-                                    var ctrl = event.getController();
-                                    var data = ctrl.getCustomDataTag();
-                                    var Ore1 = data.getLong("Ore" + ore);
-                                    var thread = event.getFactoryRecipeThread();
-                                    var bx = thread.getActiveRecipe().getParallelism();
+                                                .addInput(rawOre.amount(3))
+                                                .addPreCheckHandler(event -> {
+                                                    var ctrl = event.getController();
+                                                    var data = ctrl.getCustomDataTag();
+                                                    var hxzt = data.getByte("hxzt");
+                                                    if (hxzt != 1) {
+                                                        event.setFailed("novaeng.space_generator.failed.item.input");
+                                                    }
+                                                })
+                                                .addFactoryFinishHandler(event -> {
+                                                    var ctrl = event.getController();
+                                                    var data = ctrl.getCustomDataTag();
+                                                    var Ore1 = data.getLong("Ore" + ore);
+                                                    var thread = event.getFactoryRecipeThread();
+                                                    var bx = thread.getActiveRecipe().getParallelism();
 
-                                    data.setLong("Ore" + ore, Ore1 + (bx * 2L));
-                                    data.setLong("kwzl", data.getLong("kwzl") + (bx * 2L));
-                                })
-                                .setMaxThreads(1)
-                                .setParallelized(true)
-                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.raw_ore.tooltips"));
+                                                    data.setLong("Ore" + ore, Ore1 + (bx * 2L));
+                                                    data.setLong("kwzl", data.getLong("kwzl") + (bx * 2L));
+                                                })
+                                                .setMaxThreads(1)
+                                                .setParallelized(true)
+                                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.raw_ore.tooltips"));
                         if (!singularity.isEmpty())
                             RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
                         RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();
                     }
                     if (!rawOreGem.isEmpty()) {
                         var rec1 = RecipeBuilder.newBuilder("space_Ore1" + ore, "space_generator", 20, 2)
-                                .addInput(rawOreGem)
-                                .addPreCheckHandler(event -> {
-                                    var ctrl = event.getController();
-                                    var data = ctrl.getCustomDataTag();
-                                    var hxzt = data.getByte("hxzt");
-                                    if (hxzt != 1) {
-                                        event.setFailed("novaeng.space_generator.failed.item.input");
-                                    }
-                                })
-                                .addFactoryFinishHandler(event -> {
-                                    var ctrl = event.getController();
-                                    var data = ctrl.getCustomDataTag();
-                                    var Ore1 = data.getLong("Ore" + ore);
-                                    var thread = event.getFactoryRecipeThread();
-                                    var bx = thread.getActiveRecipe().getParallelism();
+                                                .addInput(rawOreGem)
+                                                .addPreCheckHandler(event -> {
+                                                    var ctrl = event.getController();
+                                                    var data = ctrl.getCustomDataTag();
+                                                    var hxzt = data.getByte("hxzt");
+                                                    if (hxzt != 1) {
+                                                        event.setFailed("novaeng.space_generator.failed.item.input");
+                                                    }
+                                                })
+                                                .addFactoryFinishHandler(event -> {
+                                                    var ctrl = event.getController();
+                                                    var data = ctrl.getCustomDataTag();
+                                                    var Ore1 = data.getLong("Ore" + ore);
+                                                    var thread = event.getFactoryRecipeThread();
+                                                    var bx = thread.getActiveRecipe().getParallelism();
 
-                                    data.setLong("Ore" + ore, Ore1 + bx);
-                                    data.setLong("kwzl", data.getLong("kwzl") + bx);
-                                })
-                                .setMaxThreads(1)
-                                .setParallelized(true)
-                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.gem.tooltips"));
+                                                    data.setLong("Ore" + ore, Ore1 + bx);
+                                                    data.setLong("kwzl", data.getLong("kwzl") + bx);
+                                                })
+                                                .setMaxThreads(1)
+                                                .setParallelized(true)
+                                                .addRecipeTooltip(StringUtils.getTexts("novaeng.space_generator.recipe.gem.tooltips"));
                         if (!singularity.isEmpty())
                             RecipePrimerEx.setLore(rec1.addOutput(singularity.getFirstItem()).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips");
                         RecipePrimerEx.setLore(rec1.addOutput(CraftTweakerMC.getIItemStack(OreHandler.OreDictHelper.getPriorityItemFromOreDict(ores.getName()))).setChance(0), "novaeng.space_generator.recipe.ore.output.tooltips").build();

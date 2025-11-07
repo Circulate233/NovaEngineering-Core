@@ -32,23 +32,23 @@ public class OreControlList extends IngredientList {
         scrollbar.setMargin(5, 1, 1, 1);
         scrollbar.setWidthHeight(9, 52);
         scrollbar.getScroll()
-                .setMouseDownTexture(198, 0)
-                .setHoveredTexture(187, 0)
-                .setTexture(176, 0)
-                .setUnavailableTexture(209, 0)
-                .setTextureLocation(GuiGeocentricDrill.GUI_TEXTURE)
-                .setWidthHeight(9, 18);
+                 .setMouseDownTexture(198, 0)
+                 .setHoveredTexture(187, 0)
+                 .setTexture(176, 0)
+                 .setUnavailableTexture(209, 0)
+                 .setTextureLocation(GuiGeocentricDrill.GUI_TEXTURE)
+                 .setWidthHeight(9, 18);
     }
 
     public OreControlList setStackList(final Map<String, ItemStack> oreList, final Set<String> accelerateOres) {
         getWidgets().clear();
 
         Map<String, ItemStack> accelerateOreList = oreList.entrySet().stream()
-                .filter(entry -> accelerateOres.contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
+                                                          .filter(entry -> accelerateOres.contains(entry.getKey()))
+                                                          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
         Map<String, ItemStack> defaultOreList = oreList.entrySet().stream()
-                .filter(entry -> !accelerateOres.contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
+                                                       .filter(entry -> !accelerateOres.contains(entry.getKey()))
+                                                       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
 
         Map<String, ItemStack> merged = new Object2ObjectLinkedOpenHashMap<>();
         merged.putAll(accelerateOreList);
@@ -57,7 +57,7 @@ public class OreControlList extends IngredientList {
         float chance = 1F / (merged.size() + (accelerateOres.size() * GeocentricDrill.ACCELERATE_MULTIPLIER));
         Row row = new Row();
         row = addSlots(merged, row, merged.size(),
-                entry -> SlotOreControl.of(entry.getKey(), entry.getValue(), chance, accelerateOres.contains(entry.getKey()))
+            entry -> SlotOreControl.of(entry.getKey(), entry.getValue(), chance, accelerateOres.contains(entry.getKey()))
         );
 
         addWidget(row.setUseScissor(false));

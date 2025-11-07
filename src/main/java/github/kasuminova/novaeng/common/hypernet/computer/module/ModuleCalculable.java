@@ -36,7 +36,7 @@ public abstract class ModuleCalculable extends ServerModule implements Calculabl
 
         ModifierManager modifier = request.modifier();
         double maxCanGenerated = modifier.apply(ModifierKeys.GLOBAL_CALCULATE_EFFICIENCY,
-                modifier.apply(request.type().getModifierKey(), baseGeneration * efficiency)
+            modifier.apply(request.type().getModifierKey(), baseGeneration * efficiency)
         );
 
         double generated = Math.min(maxCanGenerated, request.maxRequired());

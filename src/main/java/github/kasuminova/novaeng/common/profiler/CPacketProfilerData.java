@@ -95,8 +95,8 @@ public class CPacketProfilerData implements Comparable<CPacketProfilerData> {
         @Override
         public String toString() {
             return "PacketData[" +
-                    "count=" + count + ", " +
-                    "totalSize=" + totalSize + ']';
+                "count=" + count + ", " +
+                "totalSize=" + totalSize + ']';
         }
 
         @Override

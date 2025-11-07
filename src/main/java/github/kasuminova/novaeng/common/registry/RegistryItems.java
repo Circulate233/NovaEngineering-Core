@@ -95,10 +95,10 @@ public class RegistryItems {
         item.getSubItems(Objects.requireNonNull(item.getCreativeTab()), list);
         if (list.isEmpty()) {
             ModelLoader.setCustomModelResourceLocation(
-                    item, 0, new ModelResourceLocation(registryName, "inventory"));
+                item, 0, new ModelResourceLocation(registryName, "inventory"));
         } else {
             list.forEach(stack -> ModelLoader.setCustomModelResourceLocation(
-                    item, stack.getItemDamage(), new ModelResourceLocation(registryName, "inventory")));
+                item, stack.getItemDamage(), new ModelResourceLocation(registryName, "inventory")));
         }
 
         NovaEngineeringCore.log.debug("REGISTERED ITEM MODEL: {}", registryName);
@@ -112,10 +112,10 @@ public class RegistryItems {
         item.getSubItems(Objects.requireNonNull(item.getCreativeTab()), list);
         if (list.isEmpty()) {
             ModelLoader.setCustomModelResourceLocation(
-                    item, 0, new ModelResourceLocation(modelLocation, "inventory"));
+                item, 0, new ModelResourceLocation(modelLocation, "inventory"));
         } else {
             list.forEach(stack -> ModelLoader.setCustomModelResourceLocation(
-                    item, stack.getItemDamage(), new ModelResourceLocation(modelLocation, "inventory")));
+                item, stack.getItemDamage(), new ModelResourceLocation(modelLocation, "inventory")));
         }
 
         NovaEngineeringCore.log.debug("REGISTERED ITEM MODEL: {}", modelLocation);

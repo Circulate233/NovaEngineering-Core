@@ -42,11 +42,11 @@ public class SlotOreControl extends SlotItemVirtualJEI {
         if (!tooltips.isEmpty()) {
             float chance = (accelerated ? this.chance * GeocentricDrill.ACCELERATE_MULTIPLIER : this.chance) * 100;
             tooltips.add(I18n.format("gui.geocentric_drill.ore_control.tooltip.chance",
-                    NovaEngUtils.formatFloat(chance, 1))
+                NovaEngUtils.formatFloat(chance, 1))
             );
             tooltips.add(accelerated
-                    ? I18n.format("gui.geocentric_drill.ore_control.tooltip.unmark")
-                    : I18n.format("gui.geocentric_drill.ore_control.tooltip.mark")
+                ? I18n.format("gui.geocentric_drill.ore_control.tooltip.unmark")
+                : I18n.format("gui.geocentric_drill.ore_control.tooltip.mark")
             );
         }
         return tooltips;

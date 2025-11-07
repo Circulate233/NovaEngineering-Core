@@ -11,8 +11,10 @@
   ],
   "client": [
     "AccessorParticleManager",
+    "MixinBlockColors",
     "MixinFontRenderer",
     "MixinGuiScreen",
+    "MixinItemColors",
     "MixinNetHandlerPlayClient",
     "MixinNettyCompressionDecoder",
     "forge.MixinForgeHooksClient"

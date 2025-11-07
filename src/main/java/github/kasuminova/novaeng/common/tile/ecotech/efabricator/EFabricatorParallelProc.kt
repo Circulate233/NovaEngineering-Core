@@ -4,7 +4,6 @@ import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Type.ADD
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Type.MULTIPLY
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import java.util.function.Consumer
 import net.minecraft.client.resources.I18n
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
@@ -12,6 +11,7 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import java.util.function.Consumer
 import kotlin.math.abs
 
 open class EFabricatorParallelProc : EFabricatorPart {

@@ -36,7 +36,7 @@ public class RawOreModelLoader implements ICustomModelLoader {
         final boolean isBlock = location.getPath().contains("block");
         final String[] split = location.getPath().split("\\.")[0].split("/");
         final var s = split[split.length - 1].split("_",
-                isBlock ? 3 : split[split.length - 1].contains("gem") ? 4 : 3);
+            isBlock ? 3 : split[split.length - 1].contains("gem") ? 4 : 3);
         final String id = s[s.length - 1];
         final ItemRawOre.BlockRawOre block = ItemRawOre.getRawBlock(id);
         final ItemRawOre.Type type;
@@ -58,17 +58,19 @@ public class RawOreModelLoader implements ICustomModelLoader {
             mngr.getAllResources(NovaEngineeringCore.getRL("textures/" + name + ".png"));
         } catch (IOException e) {
             name = type.getDefR();
-            ClientProxy.colorsItems.add(item);
-            if (isBlock) ClientProxy.colorsBlocks.add(block);
+            ClientProxy.addColorRawOreItem(item);
+            if (isBlock) ClientProxy.addColorRawOreBlock(block);
         }
-        try {
-            if (isBlock) {
-                return ModelLoaderRegistry.getModel(NovaEngineeringCore.getRL("block/raw_block/raw_block")).retexture(ImmutableMap.of("all", NovaEngineeringCore.getRL(name).toString()));
-            } else {
-                return new ItemLayerModel(ImmutableList.of(NovaEngineeringCore.getRL(name)), overrideList);
+        if (isBlock) {
+            IModel model;
+            try {
+                model = ModelLoaderRegistry.getModel(NovaEngineeringCore.getRL("block/raw_block/raw_block"));
+            } catch (Exception e) {
+                return ModelLoaderRegistry.getMissingModel();
             }
-        } catch (Exception e) {
-            return ModelLoaderRegistry.getMissingModel();
+            return model.retexture(ImmutableMap.of("all", NovaEngineeringCore.getRL(name).toString()));
+        } else {
+            return new ItemLayerModel(ImmutableList.of(NovaEngineeringCore.getRL(name)), overrideList);
         }
     }
 

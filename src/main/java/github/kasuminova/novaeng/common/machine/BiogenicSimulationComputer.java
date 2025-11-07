@@ -30,10 +30,10 @@ public class BiogenicSimulationComputer implements MachineSpecial {
     private static final String MachineID = "biogenic_simulation_computer";
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
     private static final String[] inscriberModels = {
-            "数位演算模块-α",
-            "数位演算模块-β",
-            "数位演算模块-δ",
-            "数位演算模块-Ω"
+        "数位演算模块-α",
+        "数位演算模块-β",
+        "数位演算模块-δ",
+        "数位演算模块-Ω"
     };
     final IItemStack clay = CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_POLYMER_CLAY));
 
@@ -51,115 +51,115 @@ public class BiogenicSimulationComputer implements MachineSpecial {
             final String prepare = "prepare" + i;
 
             var r = RecipeBuilder.newBuilder("moxll" + i, MachineID, 1, 0)
-                    .addItemInput(CraftTweakerAPI.oreDict.get("dataModel")).setTag("dataModel")
-                    .setNBTChecker((ctrl, iitem) -> {
-                        var item = CraftTweakerMC.getItemStack(iitem);
-                        var data = ctrl.getController().getCustomDataTag();
+                                 .addItemInput(CraftTweakerAPI.oreDict.get("dataModel")).setTag("dataModel")
+                                 .setNBTChecker((ctrl, iitem) -> {
+                                     var item = CraftTweakerMC.getItemStack(iitem);
+                                     var data = ctrl.getController().getCustomDataTag();
 
-                        data.setTag(prepare, item.writeToNBT(new NBTTagCompound()));
-                        return true;
-                    })
-                    .addPreCheckHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
+                                     data.setTag(prepare, item.writeToNBT(new NBTTagCompound()));
+                                     return true;
+                                 })
+                                 .addPreCheckHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
 
-                        if (data.hasKey(ysqname)) {
-                            event.setFailed("数据模块注入完成,可以开始演算");
+                                     if (data.hasKey(ysqname)) {
+                                         event.setFailed("数据模块注入完成,可以开始演算");
 
-                            for (int ii = 0; ii < inscriberModels.length; ii++) {
-                                data.removeTag("prepare" + ii);
-                            }
-                        }
-                    })
-                    .addFactoryStartHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
+                                         for (int ii = 0; ii < inscriberModels.length; ii++) {
+                                             data.removeTag("prepare" + ii);
+                                         }
+                                     }
+                                 })
+                                 .addFactoryStartHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
 
-                        if (!data.hasKey(ysqname)) {
-                            var itemData = (NBTTagCompound) data.getTag(prepare);
-                            var preItem = new ItemStack(itemData);
-                            int tier = DataModelHelper.getTier(preItem);
-                            int dataCount = DataModelHelper.getCurrentTierDataCount(preItem);
-                            int tierend = (tier <= 1) ? 32 * tier + dataCount : dataCount + (tier - 1) * 10000 + 32;
+                                     if (!data.hasKey(ysqname)) {
+                                         var itemData = (NBTTagCompound) data.getTag(prepare);
+                                         var preItem = new ItemStack(itemData);
+                                         int tier = DataModelHelper.getTier(preItem);
+                                         int dataCount = DataModelHelper.getCurrentTierDataCount(preItem);
+                                         int tierend = (tier <= 1) ? 32 * tier + dataCount : dataCount + (tier - 1) * 10000 + 32;
 
-                            data.setTag(ysqname, itemData);
-                            data.setLong(ysqddcs, tierend);
+                                         data.setTag(ysqname, itemData);
+                                         data.setLong(ysqddcs, tierend);
 
-                            for (int ii = 0; ii < inscriberModels.length; ii++) {
-                                data.removeTag("prepare" + ii);
-                            }
-                        }
-                    })
-                    .addOutput(CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_DATA_MODEL_BLANK)))
-                    .setParallelized(false)
-                    .addRecipeTooltip("将数据模型写入数位演算模块", "请将数据模型放入控制器正上方的微型物品输入仓中")
-                    .setThreadName(inscriberModels[i]);
+                                         for (int ii = 0; ii < inscriberModels.length; ii++) {
+                                             data.removeTag("prepare" + ii);
+                                         }
+                                     }
+                                 })
+                                 .addOutput(CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_DATA_MODEL_BLANK)))
+                                 .setParallelized(false)
+                                 .addRecipeTooltip("将数据模型写入数位演算模块", "请将数据模型放入控制器正上方的微型物品输入仓中")
+                                 .setThreadName(inscriberModels[i]);
             if (i != 0) {
                 r.setLoadJEI(false);
             }
             r.build();
 
             var o = RecipeBuilder.newBuilder("moni" + i, MachineID, 60, 0)
-                    .addEnergyPerTickInput(1000000)
-                    .addItemInput(clay)
-                    .addPreCheckHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
-                        var parallelism = Math.max(data.getInteger("parallelism"), 1);
+                                 .addEnergyPerTickInput(1000000)
+                                 .addItemInput(clay)
+                                 .addPreCheckHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
+                                     var parallelism = Math.max(data.getInteger("parallelism"), 1);
 
-                        if (!data.hasKey(ysqname)) {
-                            event.setFailed("没有数据模型！");
-                            return;
-                        }
+                                     if (!data.hasKey(ysqname)) {
+                                         event.setFailed("没有数据模型！");
+                                         return;
+                                     }
 
-                        event.getActiveRecipe().setMaxParallelism(parallelism);
-                    })
-                    .addFactoryStartHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
-                        var ysqddcss = data.getInteger(ysqddcs);
-                        var bl = event.getFactoryRecipeThread();
-                        if (ysqddcss < 32) {
-                            bl.addModifier("duration", RecipeModifierBuilder.create("modularmachinery:duration", "input", 60, 1, false).build());
-                            bl.addModifier("energy", RecipeModifierBuilder.create("modularmachinery:energy", "input", 20, 1, false).build());
-                        }
-                    })
-                    .addItemOutput(CraftTweakerAPI.oreDict.get("pristine")).addItemModifier((ctrl, Item) -> outputPristineMatter(ctrl, ysqname, ysqddcs))
-                    .addItemOutput(CraftTweakerAPI.oreDict.get("livingMatter")).addItemModifier((ctrl, Item) -> outputLivingMatter(ctrl, ysqname))
-                    .addFactoryFinishHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
-                        var bx = event.getFactoryRecipeThread().getActiveRecipe().getParallelism();
+                                     event.getActiveRecipe().setMaxParallelism(parallelism);
+                                 })
+                                 .addFactoryStartHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
+                                     var ysqddcss = data.getInteger(ysqddcs);
+                                     var bl = event.getFactoryRecipeThread();
+                                     if (ysqddcss < 32) {
+                                         bl.addModifier("duration", RecipeModifierBuilder.create("modularmachinery:duration", "input", 60, 1, false).build());
+                                         bl.addModifier("energy", RecipeModifierBuilder.create("modularmachinery:energy", "input", 20, 1, false).build());
+                                     }
+                                 })
+                                 .addItemOutput(CraftTweakerAPI.oreDict.get("pristine")).addItemModifier((ctrl, Item) -> outputPristineMatter(ctrl, ysqname, ysqddcs))
+                                 .addItemOutput(CraftTweakerAPI.oreDict.get("livingMatter")).addItemModifier((ctrl, Item) -> outputLivingMatter(ctrl, ysqname))
+                                 .addFactoryFinishHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
+                                     var bx = event.getFactoryRecipeThread().getActiveRecipe().getParallelism();
 
-                        data.setLong(ysqddcs, data.getLong(ysqddcs) + bx);
-                    })
-                    .addRecipeTooltip(
-                            "使用数位演算模块进行模拟,并且输出物质",
-                            "概率继承自模拟室,并且每个等级额外提高2%",
-                            "等级为0的模型需要60倍的时间和20倍能量来进行初步推算"
-                    )
-                    .setThreadName(inscriberModels[i]);
+                                     data.setLong(ysqddcs, data.getLong(ysqddcs) + bx);
+                                 })
+                                 .addRecipeTooltip(
+                                     "使用数位演算模块进行模拟,并且输出物质",
+                                     "概率继承自模拟室,并且每个等级额外提高2%",
+                                     "等级为0的模型需要60倍的时间和20倍能量来进行初步推算"
+                                 )
+                                 .setThreadName(inscriberModels[i]);
             if (i != 0) {
                 o.setLoadJEI(false);
             }
             requireComputationPoint(o, 100.0F).build();
 
             var d = RecipeBuilder.newBuilder("mxdc" + i, MachineID, 1)
-                    .addItemInput(CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_DATA_MODEL_BLANK)))
-                    .addPreCheckHandler(event -> {
-                        var ctrl = event.getController();
-                        var data = ctrl.getCustomDataTag();
+                                 .addItemInput(CraftTweakerMC.getIItemStack(new ItemStack(DMLRegistry.ITEM_DATA_MODEL_BLANK)))
+                                 .addPreCheckHandler(event -> {
+                                     var ctrl = event.getController();
+                                     var data = ctrl.getCustomDataTag();
 
-                        if (!data.hasKey(ysqname)) {
-                            event.setFailed("没有可以导出的数据");
-                        }
-                    })
-                    .addOutput(CraftTweakerAPI.oreDict.get("dataModel"));
+                                     if (!data.hasKey(ysqname)) {
+                                         event.setFailed("没有可以导出的数据");
+                                     }
+                                 })
+                                 .addOutput(CraftTweakerAPI.oreDict.get("dataModel"));
             setLore(d, "§6提取出写入的模型")
-                    .addItemModifier((ctrl, Item) -> outputdata(ctrl, ysqname, ysqddcs))
-                    .setParallelized(false)
-                    .addRecipeTooltip("将数据模型从数位演算模块导出", "会先从哪个数据里导出？谁知道呢,试试不就知道了")
-                    .setThreadName(inscriberModels[i]);
+                .addItemModifier((ctrl, Item) -> outputdata(ctrl, ysqname, ysqddcs))
+                .setParallelized(false)
+                .addRecipeTooltip("将数据模型从数位演算模块导出", "会先从哪个数据里导出？谁知道呢,试试不就知道了")
+                .setThreadName(inscriberModels[i]);
             if (i > 0) {
                 d.setLoadJEI(false);
             }

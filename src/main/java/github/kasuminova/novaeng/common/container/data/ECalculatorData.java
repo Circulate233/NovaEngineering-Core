@@ -29,9 +29,9 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         final List<ThreadCoreData> dataList = new ArrayList<>();
         for (final ECalculatorThreadCore threadCore : threadCores) {
             final int hyperThreads = (int) threadCore.getCpus().stream()
-                    .map(ECPUCluster::from)
-                    .filter(ecpuCluster -> ecpuCluster.novaeng_ec$getUsedExtraStorage() > 0)
-                    .count();
+                                                     .map(ECPUCluster::from)
+                                                     .filter(ecpuCluster -> ecpuCluster.novaeng_ec$getUsedExtraStorage() > 0)
+                                                     .count();
             dataList.add(new ThreadCoreData(threadCore.getControllerLevel(), threadCore.getCpus().size() - hyperThreads, hyperThreads, threadCore.getMaxThreads(), threadCore.getMaxHyperThreads()));
         }
         final List<ECPUData> ecpuData = getEcpuData(controller);
@@ -61,9 +61,9 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
                 }
 
                 ecpuData.add(new ECPUData(
-                        cpu.getFinalOutput(), cpu.getAvailableStorage(), ecpu.novaeng_ec$getUsedExtraStorage(),
-                        ecpu.novaeng_ec$getParallelismRecorder().usedTimeAvg(),
-                        ecpu.novaeng_ec$getTimeRecorder().usedTimeAvg()
+                    cpu.getFinalOutput(), cpu.getAvailableStorage(), ecpu.novaeng_ec$getUsedExtraStorage(),
+                    ecpu.novaeng_ec$getParallelismRecorder().usedTimeAvg(),
+                    ecpu.novaeng_ec$getTimeRecorder().usedTimeAvg()
                 ));
             }
         } catch (GridAccessException ignored) {

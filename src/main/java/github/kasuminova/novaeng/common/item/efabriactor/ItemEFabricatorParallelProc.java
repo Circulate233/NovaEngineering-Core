@@ -25,11 +25,11 @@ public class ItemEFabricatorParallelProc extends ItemBlock {
 
         tooltip.add(I18n.format("novaeng.efabricator_parallel_proc.modifiers"));
         proc.getModifiers()
-                .forEach(modifier -> tooltip.add("  " + modifier.getDesc()));
+            .forEach(modifier -> tooltip.add("  " + modifier.getDesc()));
 
         tooltip.add(I18n.format("novaeng.efabricator_parallel_proc.overclock_modifiers"));
         proc.getOverclockModifiers()
-                .forEach(modifier -> tooltip.add("  " + modifier.getDesc()));
+            .forEach(modifier -> tooltip.add("  " + modifier.getDesc()));
 
         tooltip.add(I18n.format("novaeng.efabricator_parallel_proc.info.2"));
         tooltip.add(I18n.format("novaeng.efabricator_parallel_proc.info.3"));

@@ -89,8 +89,8 @@ public abstract class AssemblyInvToggleable extends AssemblyInv {
             if (closedBgTexLocation != null) {
                 gui.getGui().mc.getTextureManager().bindTexture(closedBgTexLocation);
                 gui.getGui().drawTexturedModalRect(renderPos.posX(), renderPos.posY(),
-                        closedInvBgTexOffsetX, closedInvBgTexOffsetY,
-                        closedInvBgTexWidth, closedInvBgTexHeight
+                    closedInvBgTexOffsetX, closedInvBgTexOffsetY,
+                    closedInvBgTexWidth, closedInvBgTexHeight
                 );
             }
         } else {
@@ -119,8 +119,8 @@ public abstract class AssemblyInvToggleable extends AssemblyInv {
             if (openedBgTexLocation != null) {
                 gui.getGui().mc.getTextureManager().bindTexture(openedBgTexLocation);
                 gui.getGui().drawTexturedModalRect(renderPos.posX(), renderPos.posY(),
-                        openedInvBgTexOffsetX, openedInvBgTexOffsetY,
-                        openedInvBgTexWidth, openedInvBgTexHeight
+                    openedInvBgTexOffsetX, openedInvBgTexOffsetY,
+                    openedInvBgTexWidth, openedInvBgTexHeight
                 );
             }
         }

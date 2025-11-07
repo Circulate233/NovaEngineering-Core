@@ -50,16 +50,16 @@ public class GuiSingularityCore extends GuiContainerDynamic<ContainerSingularity
         this.ySize = 268;
         this.widgetController = new WidgetController(WidgetGui.of(this));
         this.widgetController.addWidget(
-                new Column()
-                        .addWidgets(
-                                new StatusPanel(this).setMarginDown(2),
-                                new StartStopPanel(this).setMarginDown(2),
-                                new MultiplierControlPanel(this)
-                        )
-                        .setAbsXY(18, 28)
+            new Column()
+                .addWidgets(
+                    new StatusPanel(this).setMarginDown(2),
+                    new StartStopPanel(this).setMarginDown(2),
+                    new MultiplierControlPanel(this)
+                )
+                .setAbsXY(18, 28)
         );
         this.widgetController.addWidget(
-                new Rings(this).setAbsXY(127, 28)
+            new Rings(this).setAbsXY(127, 28)
         );
     }
 
@@ -100,9 +100,9 @@ public class GuiSingularityCore extends GuiContainerDynamic<ContainerSingularity
         Framebuffer fbo = mc.getFramebuffer();
 
         if (bloomFBO == null ||
-                bloomFBO.framebufferWidth != fbo.framebufferWidth ||
-                bloomFBO.framebufferHeight != fbo.framebufferHeight ||
-                (fbo.isStencilEnabled() && !bloomFBO.isStencilEnabled())) {
+            bloomFBO.framebufferWidth != fbo.framebufferWidth ||
+            bloomFBO.framebufferHeight != fbo.framebufferHeight ||
+            (fbo.isStencilEnabled() && !bloomFBO.isStencilEnabled())) {
             if (bloomFBO == null) {
                 bloomFBO = new Framebuffer(fbo.framebufferWidth, fbo.framebufferHeight, false);
                 bloomFBO.setFramebufferColor(0, 0, 0, 0);

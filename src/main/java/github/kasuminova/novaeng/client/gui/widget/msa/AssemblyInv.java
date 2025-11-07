@@ -51,16 +51,16 @@ public abstract class AssemblyInv extends Row {
             if (closedBgTexLocation != null) {
                 gui.mc.getTextureManager().bindTexture(closedBgTexLocation);
                 gui.drawTexturedModalRect(renderPos.posX(), renderPos.posY(),
-                        closedInvBgTexOffsetX, closedInvBgTexOffsetY,
-                        closedInvBgTexWidth, closedInvBgTexHeight
+                    closedInvBgTexOffsetX, closedInvBgTexOffsetY,
+                    closedInvBgTexWidth, closedInvBgTexHeight
                 );
             }
         } else {
             if (openedBgTexLocation != null) {
                 gui.mc.getTextureManager().bindTexture(openedBgTexLocation);
                 gui.drawTexturedModalRect(renderPos.posX(), renderPos.posY(),
-                        openedInvBgTexOffsetX, openedInvBgTexOffsetY,
-                        openedInvBgTexWidth, openedInvBgTexHeight
+                    openedInvBgTexOffsetX, openedInvBgTexOffsetY,
+                    openedInvBgTexWidth, openedInvBgTexHeight
                 );
             }
         }

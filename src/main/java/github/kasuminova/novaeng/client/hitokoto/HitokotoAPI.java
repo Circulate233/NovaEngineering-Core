@@ -16,8 +16,8 @@ import java.nio.charset.StandardCharsets;
 public class HitokotoAPI {
     public static final String API_URL = "https://v1.hitokoto.cn/";
     private static final Gson DESERIALIZER = new GsonBuilder()
-            .registerTypeHierarchyAdapter(HitokotoResult.class, new HitokotoDeserializer())
-            .create();
+        .registerTypeHierarchyAdapter(HitokotoResult.class, new HitokotoDeserializer())
+        .create();
     @Getter
     public static String hitokotoCache = null;
 
@@ -78,7 +78,7 @@ public class HitokotoAPI {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
             String line;
             StringBuilder stringBuilder = new StringBuilder();

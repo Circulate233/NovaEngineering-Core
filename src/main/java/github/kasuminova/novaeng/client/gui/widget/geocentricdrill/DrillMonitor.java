@@ -52,12 +52,12 @@ public class DrillMonitor extends SizedColumn {
 
         List<String> subContents = new ArrayList<>();
         String depth = I18n.format("gui.geocentric_drill.monitor.depth",
-                NovaEngUtils.formatFloat(controller.getDepth(), 1),
-                NovaEngUtils.formatDecimal(controller.getTargetDepth())
+            NovaEngUtils.formatFloat(controller.getDepth(), 1),
+            NovaEngUtils.formatDecimal(controller.getTargetDepth())
         );
         subContents.addAll(fr.listFormattedStringToWidth(depth, TEXT_WIDTH));
         String outputMultiplier = I18n.format("gui.geocentric_drill.monitor.output_multiplier",
-                (int) controller.getDepth() / GeocentricDrill.PARALLELISM_PER_DEPTH
+            (int) controller.getDepth() / GeocentricDrill.PARALLELISM_PER_DEPTH
         );
         subContents.addAll(fr.listFormattedStringToWidth(outputMultiplier, TEXT_WIDTH));
         contents.add(subContents);

@@ -19,11 +19,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinSimpleIndexedCodec {
 
     @Redirect(method = "decodeInto(Lio/netty/channel/ChannelHandlerContext;Lio/netty/buffer/ByteBuf;Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;fromBytes(Lio/netty/buffer/ByteBuf;)V",
-                    remap = false),
-            remap = false
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;fromBytes(Lio/netty/buffer/ByteBuf;)V",
+            remap = false),
+        remap = false
     )
     private void onDecodePre(final IMessage message, final ByteBuf byteBuf, final ChannelHandlerContext ctx) {
         final int prevIndex = byteBuf.readerIndex();

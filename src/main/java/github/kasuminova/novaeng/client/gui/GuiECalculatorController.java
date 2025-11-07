@@ -22,8 +22,8 @@ public class GuiECalculatorController extends GuiContainerDynamic<ContainerECalc
     public static final ResourceLocation ELEMENT_1 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_1.png");
     public static final ResourceLocation ELEMENT_2 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_2.png");
     private static final TextureProperties BACKGROUND = new TextureProperties(
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_background.png"),
-            0, 0, 255, 221
+        new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_background.png"),
+        0, 0, 255, 221
     );
 
     private ECalculatorData data = null;

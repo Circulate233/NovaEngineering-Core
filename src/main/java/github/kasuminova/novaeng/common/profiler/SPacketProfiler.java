@@ -41,26 +41,26 @@ public class SPacketProfiler {
     public static List<String> getProfilerMessages() {
         Map<Class<?>, AtomicLong> packetCounter = new ConcurrentHashMap<>();
         PLAYER_CLIENT_PACKETS.forEach((profile, map) ->
-                map.forEach((pClass, counter) ->
-                        packetCounter.computeIfAbsent(pClass, v -> new AtomicLong(0)).addAndGet(counter.get())));
+            map.forEach((pClass, counter) ->
+                packetCounter.computeIfAbsent(pClass, v -> new AtomicLong(0)).addAndGet(counter.get())));
 
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, AtomicLong>> largest = packetCounter.entrySet().stream()
-                .sorted((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()))
-                .limit(Math.min(50, packetCounter.size() / 2 + packetCounter.size() % 2))
-                .collect(Collectors.toList());
+                                                                     .sorted((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()))
+                                                                     .limit(Math.min(50, packetCounter.size() / 2 + packetCounter.size() % 2))
+                                                                     .collect(Collectors.toList());
 
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, AtomicLong>> smallest = packetCounter.entrySet().stream()
-                .sorted(Comparator.comparingLong(o -> o.getValue().get()))
-                .limit(Math.min(50, packetCounter.size() / 2))
-                .collect(Collectors.toList());
+                                                                      .sorted(Comparator.comparingLong(o -> o.getValue().get()))
+                                                                      .limit(Math.min(50, packetCounter.size() / 2))
+                                                                      .collect(Collectors.toList());
 
         Map<Class<?>, Map<GameProfile, AtomicLong>> pClassCounter = new ConcurrentHashMap<>();
         PLAYER_CLIENT_PACKETS.forEach((profile, map) -> map.forEach((pClass, counter) -> pClassCounter
-                .computeIfAbsent(pClass, v -> new ConcurrentHashMap<>())
-                .computeIfAbsent(profile, v -> new AtomicLong(0))
-                .addAndGet(counter.get()))
+            .computeIfAbsent(pClass, v -> new ConcurrentHashMap<>())
+            .computeIfAbsent(profile, v -> new AtomicLong(0))
+            .addAndGet(counter.get()))
         );
 
         List<String> messages = new ArrayList<>();
@@ -97,12 +97,12 @@ public class SPacketProfiler {
         PLAYER_CLIENT_PACKETS.forEach((profile, map) -> {
             messages.add(TextFormatting.BLUE + profile.getName() + " (" + profile.getId() + ")");
             map.entrySet().stream()
-                    .sorted((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()))
-                    .forEach(entry -> {
-                        Class<?> pClass = entry.getKey();
-                        AtomicLong counter = entry.getValue();
-                        messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());
-                    });
+               .sorted((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()))
+               .forEach(entry -> {
+                   Class<?> pClass = entry.getKey();
+                   AtomicLong counter = entry.getValue();
+                   messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());
+               });
         });
 
         return messages;

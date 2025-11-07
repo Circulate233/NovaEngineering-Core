@@ -20,13 +20,13 @@ public class MixinFMLProxyPacket {
     String channel;
 
     @Inject(
-            method = "processPacket",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraftforge/fml/common/network/handshake/NetworkDispatcher;rejectHandshake(Ljava/lang/String;)V",
-                    remap = false,
-                    ordinal = 1
-            )
+        method = "processPacket",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/fml/common/network/handshake/NetworkDispatcher;rejectHandshake(Ljava/lang/String;)V",
+            remap = false,
+            ordinal = 1
+        )
     )
     private void injectExceptionAndRELog1(final INetHandler inethandler, final CallbackInfo ci, @Local(name = "t") final Throwable t) {
         NovaEngineeringCore.log.error("[NovaEng-RELog] Caught critical exception handling a packet on channel {}, re-log exception.", channel);
@@ -34,13 +34,13 @@ public class MixinFMLProxyPacket {
     }
 
     @Inject(
-            method = "processPacket",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraftforge/fml/common/network/handshake/NetworkDispatcher;rejectHandshake(Ljava/lang/String;)V",
-                    remap = false,
-                    ordinal = 0
-            )
+        method = "processPacket",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/fml/common/network/handshake/NetworkDispatcher;rejectHandshake(Ljava/lang/String;)V",
+            remap = false,
+            ordinal = 0
+        )
     )
     private void injectExceptionAndRELog0(final INetHandler inethandler, final CallbackInfo ci, @Local(name = "ne") final FMLNetworkException ne) {
         NovaEngineeringCore.log.error("[NovaEng-RELog] Caught critical exception handling a packet on channel {}, re-log exception.", channel);

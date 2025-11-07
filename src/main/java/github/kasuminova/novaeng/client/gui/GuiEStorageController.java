@@ -28,7 +28,7 @@ import java.util.List;
 @Getter
 public class GuiEStorageController extends GuiContainerDynamic<ContainerEStorageController> {
     public static final ResourceLocation TEXTURES_BACKGROUND = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/estorage_controller.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/estorage_controller.png");
 
     protected List<EStorageCellData> cellDataList = new ArrayList<>();
     protected EStorageEnergyData energyData = null;

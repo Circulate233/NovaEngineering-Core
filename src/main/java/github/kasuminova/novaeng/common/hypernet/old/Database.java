@@ -37,7 +37,7 @@ public class Database extends NetNode {
     public Database(final TileMultiblockMachineController owner) {
         super(owner);
         this.type = RegistryHyperNet.getDatabaseType(
-                Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
+            Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
         );
 
         researchingCognition.defaultReturnValue(-1D);
@@ -64,9 +64,9 @@ public class Database extends NetNode {
         float energyUsage = Math.max(1, 1 + storedResearchCognition.size() * 0.1F);
 
         thread.addModifier("energy", new RecipeModifier(
-                RequirementTypesMM.REQUIREMENT_ENERGY,
-                IOType.INPUT, energyUsage, RecipeModifier.OPERATION_MULTIPLY,
-                false));
+            RequirementTypesMM.REQUIREMENT_ENERGY,
+            IOType.INPUT, energyUsage, RecipeModifier.OPERATION_MULTIPLY,
+            false));
     }
 
     @Override
@@ -87,10 +87,10 @@ public class Database extends NetNode {
             NBTTagList tagList = customData.getTagList("storedResearchCognition", Constants.NBT.TAG_STRING);
             int bound = tagList.tagCount();
             IntStream.range(0, bound)
-                    .mapToObj(tagList::getStringTagAt)
-                    .map(RegistryHyperNet::getResearchCognitionData)
-                    .filter(Objects::nonNull)
-                    .forEach(storedResearchCognition::add);
+                     .mapToObj(tagList::getStringTagAt)
+                     .map(RegistryHyperNet::getResearchCognitionData)
+                     .filter(Objects::nonNull)
+                     .forEach(storedResearchCognition::add);
         }
 
         researchingCognition.clear();

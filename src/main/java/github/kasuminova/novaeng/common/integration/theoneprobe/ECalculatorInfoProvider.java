@@ -48,7 +48,7 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         final boolean online = threadCore.getController() != null;
         IProbeInfo box = newBox(probeInfo);
         box.text("{*top.ecalculator.thread_core.status*}" +
-                (online ? "{*top.ecalculator.thread_core.status.online*}" : "{*top.ecalculator.thread_core.status.offline*}")
+            (online ? "{*top.ecalculator.thread_core.status.online*}" : "{*top.ecalculator.thread_core.status.offline*}")
         );
         if (!online) {
             return;
@@ -59,20 +59,20 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         final int maxHyperThreads = threadCore.getMaxHyperThreads();
         float percent = (float) cpus.size() / (maxThreads + maxHyperThreads);
         final int color = ColorUtils.getGradientColor(new Color[]{
-                LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
+            LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
         }, 0xCC, percent).getRGB();
         final String progressStr = String.format("%s / %s %s(+%s)%s", cpus.size(), maxThreads, TextFormatting.YELLOW, maxHyperThreads, TextFormatting.RESET);
         newBox(probeInfo).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.AQUA + "{*top.ecalculator.thread_core.threads*}")
-                .progress((int) (percent * 75), 75, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(color)
-                        .alternateFilledColor(darkenColor(color))
-                        .borderColor(lightenColor(color))
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(75)
-                );
+                         .text(TextFormatting.AQUA + "{*top.ecalculator.thread_core.threads*}")
+                         .progress((int) (percent * 75), 75, probeInfo.defaultProgressStyle()
+                                                                      .prefix(progressStr)
+                                                                      .filledColor(color)
+                                                                      .alternateFilledColor(darkenColor(color))
+                                                                      .borderColor(lightenColor(color))
+                                                                      .backgroundColor(0xFF000000)
+                                                                      .numberFormat(NumberFormat.NONE)
+                                                                      .width(75)
+                         );
 
         if (cpus.isEmpty()) {
             return;
@@ -124,40 +124,40 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         final long usedMemory = controller.getUsedBytes();
         float percent = (float) usedMemory / totalMemory;
         int color = ColorUtils.getGradientColor(new Color[]{
-                LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
+            LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
         }, 0xCC, percent).getRGB();
         String progressStr = String.format("%s / %s", NovaEngUtils.formatNumber(usedMemory), NovaEngUtils.formatNumber(totalMemory));
         newBox(probeInfo).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.AQUA + "{*top.ecalculator.controller.storage*}")
-                .progress((int) (percent * 150), 150, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(color)
-                        .alternateFilledColor(darkenColor(color))
-                        .borderColor(lightenColor(color))
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(150)
-                );
+                         .text(TextFormatting.AQUA + "{*top.ecalculator.controller.storage*}")
+                         .progress((int) (percent * 150), 150, probeInfo.defaultProgressStyle()
+                                                                        .prefix(progressStr)
+                                                                        .filledColor(color)
+                                                                        .alternateFilledColor(darkenColor(color))
+                                                                        .borderColor(lightenColor(color))
+                                                                        .backgroundColor(0xFF000000)
+                                                                        .numberFormat(NumberFormat.NONE)
+                                                                        .width(150)
+                         );
 
         final int totalWorking = controller.getThreadCores().stream().mapToInt(core -> core.getCpus().size()).sum();
         final int maxThreads = controller.getThreadCores().stream().mapToInt(ECalculatorThreadCore::getMaxThreads).sum();
         final int maxHyperThreads = controller.getThreadCores().stream().mapToInt(ECalculatorThreadCore::getMaxHyperThreads).sum();
         percent = (float) totalWorking / (maxThreads + maxHyperThreads);
         color = ColorUtils.getGradientColor(new Color[]{
-                LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
+            LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
         }, 0xCC, percent).getRGB();
         progressStr = String.format("%s / %s %s(+%s)%s", totalWorking, maxThreads, TextFormatting.YELLOW, maxHyperThreads, TextFormatting.RESET);
         newBox(probeInfo).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.AQUA + "{*top.ecalculator.controller.threads*}")
-                .progress((int) (percent * 100), 100, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(color)
-                        .alternateFilledColor(darkenColor(color))
-                        .borderColor(lightenColor(color))
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(100)
-                );
+                         .text(TextFormatting.AQUA + "{*top.ecalculator.controller.threads*}")
+                         .progress((int) (percent * 100), 100, probeInfo.defaultProgressStyle()
+                                                                        .prefix(progressStr)
+                                                                        .filledColor(color)
+                                                                        .alternateFilledColor(darkenColor(color))
+                                                                        .borderColor(lightenColor(color))
+                                                                        .backgroundColor(0xFF000000)
+                                                                        .numberFormat(NumberFormat.NONE)
+                                                                        .width(100)
+                         );
 
         final IProbeInfo box = newBox(probeInfo);
         final IProbeInfo leftInfo = newVertical(box);
@@ -168,21 +168,21 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         rightInfo.text(TextFormatting.DARK_PURPLE + NovaEngUtils.formatDecimal(parallelism));
 
         final int totalParallelismPerSecond = controller.getThreadCores().stream()
-                .flatMap(core -> core.getCpus().stream())
-                .map(ECPUCluster::from)
-                .map(ECPUCluster::novaeng_ec$getParallelismRecorder)
-                .mapToInt(TimeRecorder::usedTimeAvg)
-                .sum();
+                                                        .flatMap(core -> core.getCpus().stream())
+                                                        .map(ECPUCluster::from)
+                                                        .map(ECPUCluster::novaeng_ec$getParallelismRecorder)
+                                                        .mapToInt(TimeRecorder::usedTimeAvg)
+                                                        .sum();
 
         leftInfo.text("{*top.ecalculator.controller.avg_parallelism*}");
         rightInfo.text(TextFormatting.DARK_PURPLE + NovaEngUtils.formatDecimal(totalParallelismPerSecond) + "/t");
 
         final int totalCPUUsagePerSecond = controller.getThreadCores().stream()
-                .flatMap(core -> core.getCpus().stream())
-                .map(ECPUCluster::from)
-                .map(ECPUCluster::novaeng_ec$getTimeRecorder)
-                .mapToInt(TimeRecorder::usedTimeAvg)
-                .sum();
+                                                     .flatMap(core -> core.getCpus().stream())
+                                                     .map(ECPUCluster::from)
+                                                     .map(ECPUCluster::novaeng_ec$getTimeRecorder)
+                                                     .mapToInt(TimeRecorder::usedTimeAvg)
+                                                     .sum();
 
         TextFormatting cpuUsageColor;
         if (totalCPUUsagePerSecond < GLOBAL_CPU_USAGE_GREEN_THRESHOLD) {

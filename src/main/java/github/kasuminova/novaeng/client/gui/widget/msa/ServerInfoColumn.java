@@ -44,27 +44,27 @@ public class ServerInfoColumn extends ScrollingColumn {
     protected static int getInstalledSlots(final TileItemHandler inv, final AssemblySlotManager slotManager, final String invName, Predicate<SlotConditionItemHandler> slotFilter) {
         int[] installedSlots = {0};
         inv.getAvailableSlotsStream()
-                .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
-                .filter(slotFilter)
-                .filter(SlotConditionItemHandler::isInstalled)
-                .forEach(slot -> installedSlots[0]++);
+           .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
+           .filter(slotFilter)
+           .filter(SlotConditionItemHandler::isInstalled)
+           .forEach(slot -> installedSlots[0]++);
         return installedSlots[0];
     }
 
     protected static void addUninstalledDependenciesTip(final TileItemHandler inv, final AssemblySlotManager slotManager, final String invName, List<String> tip) {
         inv.getAvailableSlotsStream()
-                .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
-                .filter(SlotConditionItemHandler::isInstalled)
-                .forEach(slot -> {
-                    slot.getDependencies().stream()
-                            .filter(dependency -> !dependency.isInstalled())
-                            .map(dependency -> dependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
-                            .forEach(tip::add);
-                    slot.getSoftDependencies().stream()
-                            .filter(softDependency -> !softDependency.isInstalled())
-                            .map(softDependency -> softDependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
-                            .forEach(tip::add);
-                });
+           .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
+           .filter(SlotConditionItemHandler::isInstalled)
+           .forEach(slot -> {
+               slot.getDependencies().stream()
+                   .filter(dependency -> !dependency.isInstalled())
+                   .map(dependency -> dependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
+                   .forEach(tip::add);
+               slot.getSoftDependencies().stream()
+                   .filter(softDependency -> !softDependency.isInstalled())
+                   .map(softDependency -> softDependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
+                   .forEach(tip::add);
+           });
     }
 
     protected static void addUninstalledDependenciesTip(final TileItemHandler cpu, final AssemblySlotManager slotManager, final TileItemHandler calculateCard, final TileItemHandler extension, final TileItemHandler power, final List<String> errorTips) {
@@ -116,7 +116,7 @@ public class ServerInfoColumn extends ScrollingColumn {
         addErrorTips(installedCPUModules, errorTips, installedRAMModules, installedPSUModules, installedCapacitorModules, cpu, slotManager, calculateCard, extension, power);
 
         addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.can_start",
-                I18n.format("gui.modular_server_assembler.info.can_start." + (errorTips.isEmpty() ? "true" : "false"))))));
+            I18n.format("gui.modular_server_assembler.info.can_start." + (errorTips.isEmpty() ? "true" : "false"))))));
         if (!errorTips.isEmpty()) {
             errorTips.add(0, I18n.format("gui.modular_server_assembler.error"));
             addWidget(createLabel(errorTips));
@@ -190,14 +190,14 @@ public class ServerInfoColumn extends ScrollingColumn {
 
         for (final CalculateType type : CalculateTypes.getAvailableTypes().values()) {
             tip.add(I18n.format("gui.modular_server_assembler.calculate.name",
-                    type.getFormattedTypeName()
+                type.getFormattedTypeName()
             ));
             tip.add(I18n.format("gui.modular_server_assembler.calculate.value",
-                    type.format(server.calculate(
-                                    new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new Object2ObjectOpenHashMap<>()))
-                            .generated()
-                    ),
-                    Calculable.formatEfficiency(server.getCalculateAvgEfficiency(type))
+                type.format(server.calculate(
+                                      new CalculateRequest(Double.MAX_VALUE, true, type, CalculateStage.START, server.getOwner(), new ModifierManager(), new Object2ObjectOpenHashMap<>()))
+                                  .generated()
+                ),
+                Calculable.formatEfficiency(server.getCalculateAvgEfficiency(type))
             ));
         }
 

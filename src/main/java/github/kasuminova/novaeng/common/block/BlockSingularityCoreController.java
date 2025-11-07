@@ -33,7 +33,7 @@ public class BlockSingularityCoreController extends BlockController {
 
     public DynamicMachine getParentMachine() {
         return MachineRegistry.getRegistry().getMachine(
-                new ResourceLocation(ModularMachinery.MODID, "singularity_core")
+            new ResourceLocation(ModularMachinery.MODID, "singularity_core")
         );
     }
 

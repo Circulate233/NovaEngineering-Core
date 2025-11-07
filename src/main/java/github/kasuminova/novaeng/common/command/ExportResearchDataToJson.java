@@ -46,18 +46,18 @@ public class ExportResearchDataToJson extends CommandBase {
                         @Nonnull final ICommandSender sender,
                         @Nonnull final String[] args) {
         List<SimpleResearchData> dataList = RegistryHyperNet.getAllResearchCognitionData().stream()
-                .map(SimpleResearchData::of)
-                .collect(Collectors.toList());
+                                                            .map(SimpleResearchData::of)
+                                                            .collect(Collectors.toList());
         String jsonString = GSON.toJson(new ToSerialize(dataList));
 
         try {
             FileUtils.write(new File("./hypernet_research_data.json"), jsonString, StandardCharsets.UTF_8);
             sender.sendMessage(new TextComponentString(
-                    TextFormatting.GREEN + "Successfully export research data to hypernet_research_data.json!"));
+                TextFormatting.GREEN + "Successfully export research data to hypernet_research_data.json!"));
         } catch (IOException e) {
             NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));
             sender.sendMessage(new TextComponentString(
-                    TextFormatting.RED + "Failed to export research data!"));
+                TextFormatting.RED + "Failed to export research data!"));
         }
     }
 

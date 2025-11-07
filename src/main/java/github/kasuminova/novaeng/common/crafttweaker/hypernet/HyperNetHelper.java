@@ -77,13 +77,13 @@ public class HyperNetHelper {
             if (node.isConnected()) {
                 tips.add(I18n.format("gui.hypernet.controller.connected"));
                 tips.add(I18n.format(
-                        "gui.hypernet.controller.computation_point_consumption.total",
-                        NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointConsumption()),
-                        NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointGeneration()))
+                    "gui.hypernet.controller.computation_point_consumption.total",
+                    NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointConsumption()),
+                    NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointGeneration()))
                 );
                 if (node.isWorking()) {
                     tips.add(I18n.format("gui.hypernet.controller.computation_point_consumption") +
-                            NovaEngUtils.formatFLOPS(node.getComputationPointConsumption())
+                        NovaEngUtils.formatFLOPS(node.getComputationPointConsumption())
                     );
                 }
             } else {

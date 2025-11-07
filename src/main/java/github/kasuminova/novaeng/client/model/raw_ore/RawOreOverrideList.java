@@ -48,13 +48,13 @@ public class RawOreOverrideList extends ItemOverrideList {
 
     private static TRSRTransformation leftify(TRSRTransformation transform) {
         return TRSRTransformation.blockCenterToCorner(
-                flipX.compose(TRSRTransformation.blockCornerToCenter(transform)).compose(flipX));
+            flipX.compose(TRSRTransformation.blockCornerToCenter(transform)).compose(flipX));
     }
 
     private static TRSRTransformation get(float tx, float ty, float tz, float ax, float ay, float az, float s) {
         return TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
-                new Vector3f(tx / 16, ty / 16, tz / 16),
-                TRSRTransformation.quatFromXYZDegrees(new Vector3f(ax, ay, az)), new Vector3f(s, s, s), null));
+            new Vector3f(tx / 16, ty / 16, tz / 16),
+            TRSRTransformation.quatFromXYZDegrees(new Vector3f(ax, ay, az)), new Vector3f(s, s, s), null));
     }
 
     @NotNull
@@ -65,11 +65,11 @@ public class RawOreOverrideList extends ItemOverrideList {
             return out;
         }
         out = new BakedItemModel(
-                (ImmutableList<BakedQuad>) base.getQuads(null, null, 0),
-                base.getParticleTexture(),
-                itemTransforms(),
-                ItemOverrideList.NONE,
-                true
+            (ImmutableList<BakedQuad>) base.getQuads(null, null, 0),
+            base.getParticleTexture(),
+            itemTransforms(),
+            ItemOverrideList.NONE,
+            true
         );
         synchronized (cache) {
             cache.put(stack.getItem(), out);

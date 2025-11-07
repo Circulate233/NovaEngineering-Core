@@ -47,9 +47,9 @@ public class AdapterNCOPressurizer extends AdapterNCOMachine {
 
         for (BasicRecipe basicRecipe : recipeList) {
             MachineRecipe recipe = createRecipeShell(new ResourceLocation("nuclearcraft", "pressurizer_" + incId),
-                    owningMachineName, (int) basicRecipe.getBaseProcessTime(Math.round(RecipeModifier.applyModifiers(
-                            modifiers, RequirementTypesMM.REQUIREMENT_DURATION, IOType.INPUT, WORK_TIME, false))),
-                    incId, false
+                owningMachineName, (int) basicRecipe.getBaseProcessTime(Math.round(RecipeModifier.applyModifiers(
+                    modifiers, RequirementTypesMM.REQUIREMENT_DURATION, IOType.INPUT, WORK_TIME, false))),
+                incId, false
             );
 
             for (IItemIngredient iItemIngredient : basicRecipe.getItemIngredients()) {
@@ -97,7 +97,7 @@ public class AdapterNCOPressurizer extends AdapterNCOMachine {
             }
 
             recipe.addRequirement(new RequirementEnergy(IOType.INPUT, Math.round(RecipeModifier.applyModifiers(
-                    modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, BASE_ENERGY_USAGE, false)))
+                modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, BASE_ENERGY_USAGE, false)))
             );
 
             machineRecipeList.add(recipe);

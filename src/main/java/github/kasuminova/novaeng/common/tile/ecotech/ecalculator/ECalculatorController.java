@@ -27,39 +27,39 @@ import java.util.List;
 public class ECalculatorController extends EPartController<ECalculatorPart> {
 
     public static final List<BlockPos> HIDE_POS_LIST = Arrays.asList(
-            // Center
-            new BlockPos(0, 1, 0),
-            new BlockPos(0, -1, 0),
+        // Center
+        new BlockPos(0, 1, 0),
+        new BlockPos(0, -1, 0),
 
-            new BlockPos(0, 1, 1),
-            new BlockPos(0, 0, 1),
-            new BlockPos(0, -1, 1),
+        new BlockPos(0, 1, 1),
+        new BlockPos(0, 0, 1),
+        new BlockPos(0, -1, 1),
 
-            // Left
-            new BlockPos(1, 1, 0),
-            new BlockPos(1, 0, 0),
-            new BlockPos(1, -1, 0),
+        // Left
+        new BlockPos(1, 1, 0),
+        new BlockPos(1, 0, 0),
+        new BlockPos(1, -1, 0),
 
-            new BlockPos(1, 1, 1),
-            new BlockPos(1, 0, 1),
-            new BlockPos(1, -1, 1),
+        new BlockPos(1, 1, 1),
+        new BlockPos(1, 0, 1),
+        new BlockPos(1, -1, 1),
 
-            // Right
-            new BlockPos(-1, 1, 0),
-            new BlockPos(-1, 0, 0),
-            new BlockPos(-1, -1, 0),
+        // Right
+        new BlockPos(-1, 1, 0),
+        new BlockPos(-1, 0, 0),
+        new BlockPos(-1, -1, 0),
 
-            new BlockPos(-1, 1, 1),
-            new BlockPos(-1, 0, 1),
-            new BlockPos(-1, -1, 1)
+        new BlockPos(-1, 1, 1),
+        new BlockPos(-1, 0, 1),
+        new BlockPos(-1, -1, 1)
     );
 
     public static final List<BlockPos> TAIL_HIDE_POS_LIST = Arrays.asList(
-            new BlockPos(0, -1, 1),
-            new BlockPos(0, -1, 0),
-            new BlockPos(0, 0, 1),
-            new BlockPos(0, 1, 1),
-            new BlockPos(0, 1, 0)
+        new BlockPos(0, -1, 1),
+        new BlockPos(0, -1, 0),
+        new BlockPos(0, 0, 1),
+        new BlockPos(0, 1, 1),
+        new BlockPos(0, 1, 0)
     );
 
     protected BlockECalculatorController parentController = null;
@@ -124,18 +124,18 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
     @SuppressWarnings("DataFlowIssue")
     protected void recalculateParallelism() {
         this.parallelism = getParallelProcs().stream()
-                .mapToInt(ECalculatorParallelProc::getParallelism).sum();
+                                             .mapToInt(ECalculatorParallelProc::getParallelism).sum();
 
         // Update accelerators
         getThreadCores().forEach(threadCore -> threadCore.getCpus().stream()
-                .map(ECPUCluster::from)
-                .forEach(ecpuCluster -> ecpuCluster.novaeng_ec$setAccelerators(this.parallelism))
+                                                         .map(ECPUCluster::from)
+                                                         .forEach(ecpuCluster -> ecpuCluster.novaeng_ec$setAccelerators(this.parallelism))
         );
     }
 
     protected void recalculateTotalBytes() {
         this.totalBytes = getCellDrives().stream()
-                .mapToLong(ECalculatorCellDrive::getSuppliedBytes).sum();
+                                         .mapToLong(ECalculatorCellDrive::getSuppliedBytes).sum();
     }
 
     public long getTotalBytes() {

@@ -14,8 +14,8 @@ public class AEPktInvActionSpamHandler {
 
     protected static final int LIMIT_PER_SECOND = 8;
     protected static final Cache<EntityPlayer, PacketCounter> PLAYER_PKT_COUNTER = CacheBuilder.newBuilder()
-            .expireAfterAccess(3, TimeUnit.SECONDS)
-            .build();
+                                                                                               .expireAfterAccess(3, TimeUnit.SECONDS)
+                                                                                               .build();
 
     public static boolean receivePacketAndCheckSpam(final EntityPlayer player) {
         try {

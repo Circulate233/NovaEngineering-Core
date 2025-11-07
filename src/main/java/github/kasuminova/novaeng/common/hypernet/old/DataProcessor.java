@@ -54,7 +54,7 @@ public class DataProcessor extends NetNode {
     public DataProcessor(final TileMultiblockMachineController owner) {
         super(owner);
         this.type = RegistryHyperNet.getDataProcessorType(
-                Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
+            Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
         );
     }
 
@@ -120,8 +120,8 @@ public class DataProcessor extends NetNode {
 
         float mul = (float) ((double) (energyUsage + baseEnergyUsage) / baseEnergyUsage);
         event.getRecipeThread().addModifier("energy", new RecipeModifier(
-                RequirementTypesMM.REQUIREMENT_ENERGY,
-                IOType.INPUT, mul, 1, false
+            RequirementTypesMM.REQUIREMENT_ENERGY,
+            IOType.INPUT, mul, 1, false
         ));
     }
 

@@ -59,9 +59,9 @@ public class EStorageMEChannel extends EStoragePart implements ICellContainer, I
     public List<IMEInventoryHandler> getCellArray(final IStorageChannel<?> channel) {
         if (partController != null) {
             return partController.getCellDrives().stream()
-                    .map(drive -> drive.getHandler(channel))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                                 .map(drive -> drive.getHandler(channel))
+                                 .filter(Objects::nonNull)
+                                 .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

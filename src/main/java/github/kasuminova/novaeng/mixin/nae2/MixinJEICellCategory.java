@@ -14,13 +14,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinJEICellCategory {
 
     @Redirect(
-            method = "getCellInfo",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lappeng/api/storage/ICellRegistry;getHandler(Lnet/minecraft/item/ItemStack;)Lappeng/api/storage/ICellHandler;",
-                    remap = false
-            ),
+        method = "getCellInfo",
+        at = @At(
+            value = "INVOKE",
+            target = "Lappeng/api/storage/ICellRegistry;getHandler(Lnet/minecraft/item/ItemStack;)Lappeng/api/storage/ICellHandler;",
             remap = false
+        ),
+        remap = false
     )
     private static ICellHandler redirectGetEStorageCellHandler(final ICellRegistry instance, final ItemStack stack) {
         EStorageCellHandler handler = EStorageCellHandler.getHandler(stack);

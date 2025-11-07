@@ -65,10 +65,10 @@ public class GeocentricDrill implements MachineSpecial {
             if (geoDrill.diveOrAscend()) {
                 if (!geoDrill.hasModifier("diveOrAscend")) {
                     geoDrill.addModifier("diveOrAscend",
-                            new RecipeModifier(RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT,
-                                    2F, RecipeModifier.OPERATION_MULTIPLY,
-                                    false
-                            )
+                        new RecipeModifier(RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT,
+                            2F, RecipeModifier.OPERATION_MULTIPLY,
+                            false
+                        )
                     );
                 }
                 geoDrill.markNoUpdateSync();
@@ -144,15 +144,15 @@ public class GeocentricDrill implements MachineSpecial {
 
         Map<String, ItemStack> rawOres = new Object2ObjectLinkedOpenHashMap<>();
         Arrays.stream(OreDictionary.getOreNames())
-                .filter(oreName -> oreName.startsWith("rawOre"))
-                .forEach(oreName -> {
-                    NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
-                    if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
-                        ItemStack stack = ores.get(0).copy();
-                        stack.setCount(ORE_COUNT);
-                        rawOres.put(oreName, stack);
-                    }
-                });
+              .filter(oreName -> oreName.startsWith("rawOre"))
+              .forEach(oreName -> {
+                  NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
+                  if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
+                      ItemStack stack = ores.get(0).copy();
+                      stack.setCount(ORE_COUNT);
+                      rawOres.put(oreName, stack);
+                  }
+              });
 
         addOres(rawOres);
         addGeocentricQuartzCrystalOre(rawOres);
@@ -186,7 +186,7 @@ public class GeocentricDrill implements MachineSpecial {
         float chance = 1F / (rawOres.size() + (accelerateOres.size() * (GeocentricDrill.ACCELERATE_MULTIPLIER - 1)));
         List<ChancedIngredientStack> output = new ObjectArrayList<>();
         rawOres.forEach((oreName, ore) -> output.add(new ChancedIngredientStack(
-                ore.copy(), accelerateOres.contains(oreName) ? chance * GeocentricDrill.ACCELERATE_MULTIPLIER : chance)
+            ore.copy(), accelerateOres.contains(oreName) ? chance * GeocentricDrill.ACCELERATE_MULTIPLIER : chance)
         ));
         recipe.addRequirement(new RequirementIngredientArray(output, IOType.OUTPUT));
         original.getRecipeEventHandlers().forEach((eventClass, handlerList) -> {

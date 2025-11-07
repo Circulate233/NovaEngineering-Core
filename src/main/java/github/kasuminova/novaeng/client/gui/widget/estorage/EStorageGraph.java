@@ -56,12 +56,12 @@ public class EStorageGraph extends Row {
 
         public FluidGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    10, 32,
-                    60, 16,
-                    2,
-                    6, 225,
-                    60, 6,
-                    true, false);
+                10, 32,
+                60, 16,
+                2,
+                6, 225,
+                60, 6,
+                true, false);
         }
 
         @Override
@@ -69,8 +69,8 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.fluid.percent",
-                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                    I18n.format("gui.estorage_controller.graph.fluid.percent",
+                        NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
             }
         }
@@ -98,12 +98,12 @@ public class EStorageGraph extends Row {
 
         public ItemGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    9, 51,
-                    65, 16,
-                    2,
-                    1, 232,
-                    65, 6,
-                    true, false);
+                9, 51,
+                65, 16,
+                2,
+                1, 232,
+                65, 6,
+                true, false);
         }
 
         @Override
@@ -111,8 +111,8 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.item.percent",
-                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                    I18n.format("gui.estorage_controller.graph.item.percent",
+                        NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
             }
         }
@@ -140,12 +140,12 @@ public class EStorageGraph extends Row {
 
         public GasGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    10, 70,
-                    60, 16,
-                    2,
-                    1, 232,
-                    65, 6,
-                    true, false);
+                10, 70,
+                60, 16,
+                2,
+                1, 232,
+                65, 6,
+                true, false);
         }
 
         @Override
@@ -153,8 +153,8 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.gas.percent",
-                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                    I18n.format("gui.estorage_controller.graph.gas.percent",
+                        NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
             }
         }
@@ -182,12 +182,12 @@ public class EStorageGraph extends Row {
 
         public TotalGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    8, getMekEngLoad() ? 70 + 19 : 70,
-                    64, 16,
-                    2,
-                    2, 239,
-                    64, 6,
-                    true, false);
+                8, getMekEngLoad() ? 70 + 19 : 70,
+                64, 16,
+                2,
+                2, 239,
+                64, 6,
+                true, false);
             focused = true;
             graphParent.getGraphBar().setPercentage(value, false);
         }
@@ -197,8 +197,8 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.total.percent",
-                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                    I18n.format("gui.estorage_controller.graph.total.percent",
+                        NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
             }
         }
@@ -227,12 +227,12 @@ public class EStorageGraph extends Row {
 
         public FluidTypeGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    85, 46,
-                    60, 16,
-                    1,
-                    1, 197,
-                    60, 6,
-                    false, false);
+                85, 46,
+                60, 16,
+                1,
+                1, 197,
+                60, 6,
+                false, false);
         }
 
         @Override
@@ -240,10 +240,10 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.fluid_type",
-                                NovaEngUtils.formatNumber((long) totalUsedFluidTypes.get(), 1),
-                                NovaEngUtils.formatNumber((long) totalMaxFluidTypes.get(), 1)
-                        ))
+                    I18n.format("gui.estorage_controller.graph.fluid_type",
+                        NovaEngUtils.formatNumber((long) totalUsedFluidTypes.get(), 1),
+                        NovaEngUtils.formatNumber((long) totalMaxFluidTypes.get(), 1)
+                    ))
                 );
             }
         }
@@ -274,12 +274,12 @@ public class EStorageGraph extends Row {
 
         public ItemTypeGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    82, 29,
-                    59, 16,
-                    1,
-                    1, 197,
-                    59, 6,
-                    false, false);
+                82, 29,
+                59, 16,
+                1,
+                1, 197,
+                59, 6,
+                false, false);
         }
 
         @Override
@@ -287,10 +287,10 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.item_type",
-                                NovaEngUtils.formatNumber((long) totalUsedItemTypes.get(), 1),
-                                NovaEngUtils.formatNumber((long) totalMaxItemTypes.get(), 1)
-                        ))
+                    I18n.format("gui.estorage_controller.graph.item_type",
+                        NovaEngUtils.formatNumber((long) totalUsedItemTypes.get(), 1),
+                        NovaEngUtils.formatNumber((long) totalMaxItemTypes.get(), 1)
+                    ))
                 );
             }
         }
@@ -321,12 +321,12 @@ public class EStorageGraph extends Row {
 
         public GasTypeGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    82, 63,
-                    59, 16,
-                    1,
-                    1, 197,
-                    59, 6,
-                    false, false);
+                82, 63,
+                59, 16,
+                1,
+                1, 197,
+                59, 6,
+                false, false);
         }
 
         @Override
@@ -334,10 +334,10 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.gas_type",
-                                NovaEngUtils.formatNumber((long) totalUsedGasTypes.get(), 1),
-                                NovaEngUtils.formatNumber((long) totalMaxGasTypes.get(), 1)
-                        ))
+                    I18n.format("gui.estorage_controller.graph.gas_type",
+                        NovaEngUtils.formatNumber((long) totalUsedGasTypes.get(), 1),
+                        NovaEngUtils.formatNumber((long) totalMaxGasTypes.get(), 1)
+                    ))
                 );
             }
         }
@@ -367,12 +367,12 @@ public class EStorageGraph extends Row {
 
         public EnergyUsageGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    83, getMekEngLoad() ? 80 : 63,
-                    61, 16,
-                    1,
-                    1, 211,
-                    61, 6,
-                    false, false);
+                83, getMekEngLoad() ? 80 : 63,
+                61, 16,
+                1,
+                1, 211,
+                61, 6,
+                false, false);
         }
 
         @Override
@@ -380,8 +380,8 @@ public class EStorageGraph extends Row {
             super.update(gui);
             if (!value.isAnimFinished()) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.energy_usage",
-                                NovaEngUtils.formatNumber((long) energyConsumePerTick.get())))
+                    I18n.format("gui.estorage_controller.graph.energy_usage",
+                        NovaEngUtils.formatNumber((long) energyConsumePerTick.get())))
                 );
             }
         }
@@ -410,33 +410,33 @@ public class EStorageGraph extends Row {
 
         public EnergyCapacityGraph(final EStorageGraph graphParent) {
             super(graphParent,
-                    83, getMekEngLoad() ? 97 : 80,
-                    60, 16,
-                    1,
-                    1, 218,
-                    60, 6,
-                    false, true);
+                83, getMekEngLoad() ? 97 : 80,
+                60, 16,
+                1,
+                1, 218,
+                60, 6,
+                false, true);
         }
 
         @Override
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (value.isAnimFinished()
-                    && (!shiftDown || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
-                    && ((shiftDown || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) && !Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
+                && (!shiftDown || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
+                && ((shiftDown || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) && !Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
                 return;
             }
             shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
             if (shiftDown) {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.energy_stored",
-                                NovaEngUtils.formatNumber((long) energyStored.get()),
-                                NovaEngUtils.formatNumber((long) maxEnergyStore.get()))
+                    I18n.format("gui.estorage_controller.graph.energy_stored",
+                        NovaEngUtils.formatNumber((long) energyStored.get()),
+                        NovaEngUtils.formatNumber((long) maxEnergyStore.get()))
                 ));
             } else {
                 label.setContents(Collections.singletonList(
-                        I18n.format("gui.estorage_controller.graph.energy_stored.percent",
-                                NovaEngUtils.formatDouble(value.get() * 100, 1)))
+                    I18n.format("gui.estorage_controller.graph.energy_stored.percent",
+                        NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
             }
         }

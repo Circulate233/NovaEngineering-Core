@@ -31,7 +31,7 @@ public class ProcessorModuleGPU extends ProcessorModuleCPU {
         desc.add(I18n.format("upgrade.data_processor.module.gpu.tip.0"));
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
+            NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))
         ));
 
         getEnergyDurabilityTip(desc, moduleType);

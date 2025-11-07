@@ -40,15 +40,15 @@ public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
         if (stack.isEmpty()) return empty;
         var nbt = stack.getTagCompound();
         return chane.computeIfAbsent(stack.getItem(), intMap)
-                .computeIfAbsent(stack.getItemDamage())
-                .computeIfAbsent(nbt == null ? NullNbt : nbt, n -> new SimpleItem(stack));
+                    .computeIfAbsent(stack.getItemDamage())
+                    .computeIfAbsent(nbt == null ? NullNbt : nbt, n -> new SimpleItem(stack));
     }
 
     public static SimpleItem getNoNBTInstance(final ItemStack stack) {
         if (stack.isEmpty()) return empty;
         return chane.computeIfAbsent(stack.getItem(), intMap)
-                .computeIfAbsent(stack.getItemDamage())
-                .computeIfAbsent(NullNbt, n -> new SimpleItem(stack));
+                    .computeIfAbsent(stack.getItemDamage())
+                    .computeIfAbsent(NullNbt, n -> new SimpleItem(stack));
     }
 
     public boolean isEmpty() {

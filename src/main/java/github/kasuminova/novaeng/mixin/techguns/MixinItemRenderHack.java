@@ -19,12 +19,12 @@ public class MixinItemRenderHack {
 
     @Unique
     private static final Set<ItemCameraTransforms.TransformType> novaEngineering_Core$set = new HashSet<>(
-            Arrays.asList(
-                    ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
-                    ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
-                    ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
-                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
-            )
+        Arrays.asList(
+            ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
+            ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
+            ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
+            ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
+        )
     );
 
     /**

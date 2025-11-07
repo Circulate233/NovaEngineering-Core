@@ -50,7 +50,7 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
         float percent = (float) queue.size() / queueDepth;
 
         int color = ColorUtils.getGradientColor(new Color[]{
-                LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
+            LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
         }, 0xCC, percent).getRGB();
 
         // Energy bar
@@ -58,36 +58,36 @@ public class EFabricatorInfoProvider implements IProbeInfoProvider {
         int maxEnergyCache = worker.getMaxEnergyCache();
 
         String progressStr = String.format("%sAE / %sAE",
-                NovaEngUtils.formatNumber(energyCache),
-                NovaEngUtils.formatNumber(maxEnergyCache)
+            NovaEngUtils.formatNumber(energyCache),
+            NovaEngUtils.formatNumber(maxEnergyCache)
         );
         box = newBox(probeInfo).vertical();
 
         box.horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .progress(Math.round(((float) energyCache / maxEnergyCache) * 80), 80, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(0xCC42B8FF)
-                        .alternateFilledColor(0xCC42BDFF)
-                        .borderColor(0xCC97FFFF)
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(120)
-                );
+           .progress(Math.round(((float) energyCache / maxEnergyCache) * 80), 80, probeInfo.defaultProgressStyle()
+                                                                                           .prefix(progressStr)
+                                                                                           .filledColor(0xCC42B8FF)
+                                                                                           .alternateFilledColor(0xCC42BDFF)
+                                                                                           .borderColor(0xCC97FFFF)
+                                                                                           .backgroundColor(0xFF000000)
+                                                                                           .numberFormat(NumberFormat.NONE)
+                                                                                           .width(120)
+           );
 
         // Queue bar
         progressStr = String.format("%s / %s", queue.size(), queueDepth);
         IProbeInfo progressLine = box.horizontal(box.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER));
         progressLine.text("{*top.efabricator.worker.queue_status*} ");
         progressLine.horizontal(box.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .progress(Math.round(percent * queueDepth), queueDepth, box.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(color)
-                        .alternateFilledColor(darkenColor(color, .8))
-                        .borderColor(lightenColor(color, .8))
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(queueDepthToBarLength(queueDepth))
-                );
+                    .progress(Math.round(percent * queueDepth), queueDepth, box.defaultProgressStyle()
+                                                                               .prefix(progressStr)
+                                                                               .filledColor(color)
+                                                                               .alternateFilledColor(darkenColor(color, .8))
+                                                                               .borderColor(lightenColor(color, .8))
+                                                                               .backgroundColor(0xFF000000)
+                                                                               .numberFormat(NumberFormat.NONE)
+                                                                               .width(queueDepthToBarLength(queueDepth))
+                    );
 
         Deque<EFabricatorWorker.CraftWork> workDeque = queue.getQueue();
         if (workDeque.isEmpty()) {

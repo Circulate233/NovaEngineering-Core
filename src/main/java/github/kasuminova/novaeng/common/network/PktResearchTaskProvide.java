@@ -83,12 +83,12 @@ public class PktResearchTaskProvide implements IMessage, IMessageHandler<PktRese
 
         Collection<ResearchStation> stations = center.getNode(ResearchStation.class);
         Optional<ResearchStation> first = stations.stream().findFirst();
-        if (!first.isPresent()) {
+        if (first.isEmpty()) {
             return null;
         }
 
         ModularMachinery.EXECUTE_MANAGER.addSyncTask(() ->
-                first.get().provideTask(researchTask, ctx.getServerHandler().player));
+            first.get().provideTask(researchTask, ctx.getServerHandler().player));
         return null;
     }
 }

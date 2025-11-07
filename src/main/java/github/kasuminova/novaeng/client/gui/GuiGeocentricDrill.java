@@ -26,7 +26,7 @@ import java.util.Collections;
 public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricDrill> {
 
     public static final ResourceLocation GUI_TEXTURE =
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/guigeocentricdrill.png");
+        new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/guigeocentricdrill.png");
 
     private final OreControlList oreControlList = new OreControlList();
 
@@ -49,9 +49,9 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
         this.dive.setWidthHeight(12, 12);
         this.dive.setAbsXY(142, 55);
         this.dive.setMouseDownTexture(TextureProperties.of(GUI_TEXTURE, 200, 20, 12, 12))
-                .setHoveredTexture(TextureProperties.of(GUI_TEXTURE, 188, 20, 12, 12))
-                .setUnavailableTexture(TextureProperties.of(GUI_TEXTURE, 212, 20, 12, 12))
-                .setTexture(TextureProperties.of(GUI_TEXTURE, 176, 20, 12, 12));
+                 .setHoveredTexture(TextureProperties.of(GUI_TEXTURE, 188, 20, 12, 12))
+                 .setUnavailableTexture(TextureProperties.of(GUI_TEXTURE, 212, 20, 12, 12))
+                 .setTexture(TextureProperties.of(GUI_TEXTURE, 176, 20, 12, 12));
         this.dive.setTooltipFunction(button -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
             if (isControlDown) {
@@ -68,9 +68,9 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
         this.ascend.setWidthHeight(12, 12);
         this.ascend.setAbsXY(157, 55);
         this.ascend.setMouseDownTexture(TextureProperties.of(GUI_TEXTURE, 200, 34, 12, 12))
-                .setHoveredTexture(TextureProperties.of(GUI_TEXTURE, 188, 34, 12, 12))
-                .setUnavailableTexture(TextureProperties.of(GUI_TEXTURE, 212, 34, 12, 12))
-                .setTexture(TextureProperties.of(GUI_TEXTURE, 176, 34, 12, 12));
+                   .setHoveredTexture(TextureProperties.of(GUI_TEXTURE, 188, 34, 12, 12))
+                   .setUnavailableTexture(TextureProperties.of(GUI_TEXTURE, 212, 34, 12, 12))
+                   .setTexture(TextureProperties.of(GUI_TEXTURE, 176, 34, 12, 12));
         this.ascend.setTooltipFunction(button -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
             if (isControlDown) {

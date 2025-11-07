@@ -39,30 +39,30 @@ public class ResearchStationType extends NetNodeType {
         MachineModifier.addCoreThread(name, FactoryRecipeThread.createCoreThread(RESEARCH_STATION_WORKING_THREAD_NAME));
 
         RecipeBuilder.newBuilder(name + "_working", name, 100, 100, false)
-                .addEnergyPerTickInput(energyUsage)
-                .addPostCheckHandler(event -> {
-                    ResearchStation station = NetNodeCache.getCache(event.getController(), ResearchStation.class);
-                    if (station != null) {
-                        station.onRecipeCheck(event);
-                    }
-                })
-                .addFactoryPreTickHandler(event -> {
-                    ResearchStation station = NetNodeCache.getCache(event.getController(), ResearchStation.class);
-                    if (station != null) {
-                        station.onWorkingTick(event);
-                    }
-                })
-                .addRecipeTooltip(
-                        "novaeng.hypernet.research_station.working.tooltip.0",
-                        "novaeng.hypernet.research_station.working.tooltip.1"
-                )
-                .setThreadName(RESEARCH_STATION_WORKING_THREAD_NAME)
-                .build();
+                     .addEnergyPerTickInput(energyUsage)
+                     .addPostCheckHandler(event -> {
+                         ResearchStation station = NetNodeCache.getCache(event.getController(), ResearchStation.class);
+                         if (station != null) {
+                             station.onRecipeCheck(event);
+                         }
+                     })
+                     .addFactoryPreTickHandler(event -> {
+                         ResearchStation station = NetNodeCache.getCache(event.getController(), ResearchStation.class);
+                         if (station != null) {
+                             station.onWorkingTick(event);
+                         }
+                     })
+                     .addRecipeTooltip(
+                         "novaeng.hypernet.research_station.working.tooltip.0",
+                         "novaeng.hypernet.research_station.working.tooltip.1"
+                     )
+                     .setThreadName(RESEARCH_STATION_WORKING_THREAD_NAME)
+                     .build();
         MachineModifier.addSmartInterfaceType(name,
-                SmartInterfaceType.create("overclocking", 1)
-                        .setHeaderInfo("novaeng.hypernet.research_station.overclocking.name")
-                        .setValueInfo(I18n.translateToLocalFormatted("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
-                        .setFooterInfo("novaeng.hypernet.research_station.overclocking.tooltip.1")
+            SmartInterfaceType.create("overclocking", 1)
+                              .setHeaderInfo("novaeng.hypernet.research_station.overclocking.name")
+                              .setValueInfo(I18n.translateToLocalFormatted("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
+                              .setFooterInfo("novaeng.hypernet.research_station.overclocking.tooltip.1")
         );
         MMEvents.onMachinePostTick(name, event -> {
             var ctrl = event.getController();

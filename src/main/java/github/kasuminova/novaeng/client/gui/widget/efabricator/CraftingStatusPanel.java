@@ -22,8 +22,8 @@ public class CraftingStatusPanel extends SizedColumn {
     public static final int HEIGHT = 58;
 
     public static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_INVENTORY,
-            1, 197, WIDTH, HEIGHT
+        GuiEFabricatorController.TEXTURES_INVENTORY,
+        1, 197, WIDTH, HEIGHT
     );
 
     public static final int MAX_COL = 12;

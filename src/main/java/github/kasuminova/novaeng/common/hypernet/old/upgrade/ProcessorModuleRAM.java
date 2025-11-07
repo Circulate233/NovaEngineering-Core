@@ -75,7 +75,7 @@ public class ProcessorModuleRAM extends DataProcessorModule {
         desc.add(I18n.format("upgrade.data_processor.module.ram.tip.0"));
 
         desc.add(I18n.format("upgrade.data_processor.module.ram.limit_provision",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGenerationLimit()))
+            NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGenerationLimit()))
         ));
 
         getEnergyDurabilityTip(desc, moduleType);
@@ -88,7 +88,7 @@ public class ProcessorModuleRAM extends DataProcessorModule {
         List<String> desc = new ArrayList<>();
 
         desc.add(I18n.format("upgrade.data_processor.module.ram.limit_provision",
-                NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGenerationLimit()))
+            NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGenerationLimit()))
         ));
         getEnergyDurabilityTip(desc, moduleType);
 

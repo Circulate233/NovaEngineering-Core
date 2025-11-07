@@ -20,7 +20,7 @@ public class BlockEStorageVent extends BlockEStorage {
 
     protected BlockEStorageVent() {
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_vent"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_vent");

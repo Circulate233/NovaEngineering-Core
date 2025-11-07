@@ -264,11 +264,11 @@ public abstract class MixinCraftingCPUClusterTwo {
                                             ItemStack is = CoreModHooks.removeFluidPackets(ic, x);
                                             if (!is.isEmpty()) {
                                                 this.inventory.injectItems(
-                                                        CoreModHooks.wrapFluidPacketStack(
-                                                                AEItemStack.fromItemStack(is)
-                                                        ),
-                                                        Actionable.MODULATE,
-                                                        this.machineSrc
+                                                    CoreModHooks.wrapFluidPacketStack(
+                                                        AEItemStack.fromItemStack(is)
+                                                    ),
+                                                    Actionable.MODULATE,
+                                                    this.machineSrc
                                                 );
                                             }
                                         }
@@ -337,7 +337,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                     }
 
                                     if (m instanceof DualityInterface di &&
-                                            (di.getConfigManager().getSetting(Settings.BLOCK) == YesNo.YES && ((RCIConfigurableObject) di).r$getConfigManager().getSetting(RCSettings.IntelligentBlocking) == IntelligentBlocking.CLOSE)
+                                        (di.getConfigManager().getSetting(Settings.BLOCK) == YesNo.YES && ((RCIConfigurableObject) di).r$getConfigManager().getSetting(RCSettings.IntelligentBlocking) == IntelligentBlocking.CLOSE)
                                     )
                                         break;
                                 }
@@ -373,7 +373,7 @@ public abstract class MixinCraftingCPUClusterTwo {
     private MediumType r$specialMediumTreatment(ICraftingMedium m, ICraftingPatternDetails details) {
         if (m instanceof MEPatternProviderNova mep) {
             if (mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
-                    || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
+                || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
 
                 for (IAEItemStack input : details.getCondensedInputs()) {
                     long size = input.getStackSize() * this.r$craftingFrequency;
@@ -436,22 +436,22 @@ public abstract class MixinCraftingCPUClusterTwo {
     }
 
     @WrapOperation(
-            method = "injectItems",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lappeng/crafting/CraftingLink;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;)Lappeng/api/storage/data/IAEItemStack;"
-            )
+        method = "injectItems",
+        at = @At(
+            value = "INVOKE",
+            target = "Lappeng/crafting/CraftingLink;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;)Lappeng/api/storage/data/IAEItemStack;"
+        )
     )
     protected IAEItemStack wrapInjectItems(CraftingLink link, IAEItemStack item, Actionable actionable, Operation<IAEItemStack> operation) {
         return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable);
     }
 
     @WrapOperation(
-            method = "injectItems",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lappeng/crafting/MECraftingInventory;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;Lappeng/api/networking/security/IActionSource;)Lappeng/api/storage/data/IAEItemStack;"
-            )
+        method = "injectItems",
+        at = @At(
+            value = "INVOKE",
+            target = "Lappeng/crafting/MECraftingInventory;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;Lappeng/api/networking/security/IActionSource;)Lappeng/api/storage/data/IAEItemStack;"
+        )
     )
     protected IAEItemStack wrapInjectItems(MECraftingInventory link, IAEItemStack item, Actionable actionable, IActionSource source, Operation<IAEItemStack> operation) {
         return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable, source);

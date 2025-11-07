@@ -18,8 +18,8 @@ public class EPartMap<P extends EPart<?>> {
     public P addPart(final P part) {
         parts.computeIfAbsent(part.getClass(), k -> new ObjectArrayList<>()).add(part);
         ClassUtils.getAllSuperClasses(part.getClass(), EPart.class).stream()
-                .map(clazz -> parts.computeIfAbsent(clazz, k -> new ObjectArrayList<>()))
-                .forEach(partList -> partList.add(part));
+                  .map(clazz -> parts.computeIfAbsent(clazz, k -> new ObjectArrayList<>()))
+                  .forEach(partList -> partList.add(part));
         return part;
     }
 

@@ -282,7 +282,6 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     // typeModules
 
-    @SuppressWarnings("unchecked")
     public <T> List<T> getModulesByType(Class<T> type) {
         List<Object> cache = typeModulesCache.get(type);
         if (cache != null) {
@@ -358,7 +357,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     public void createDefaultAssemblyCPUInv() {
         assemblyCPUInv = TileItemHandler.create(owner, AssemblyInvCPUConst.INV_SIZE, "cpu")
-                .setOnChangedListener(this::onAssemblyInvUpdate);
+                                        .setOnChangedListener(this::onAssemblyInvUpdate);
     }
 
     public void readAssemblyCalculateCardInv(final NBTTagCompound stackTag) {
@@ -371,7 +370,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     public void createDefaultAssemblyCalculateCardInv() {
         assemblyCalculateCardInv = TileItemHandler.create(owner, AssemblyInvCalculateCardConst.INV_SIZE, "calculate_card")
-                .setOnChangedListener(this::onAssemblyInvUpdate);
+                                                  .setOnChangedListener(this::onAssemblyInvUpdate);
     }
 
     public void readAssemblyExtensionInv(final NBTTagCompound stackTag) {
@@ -384,7 +383,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     public void createDefaultAssemblyExtensionInv() {
         assemblyExtensionInv = TileItemHandler.create(owner, AssemblyInvExtensionConst.INV_SIZE, "extension")
-                .setOnChangedListener(this::onAssemblyInvUpdate);
+                                              .setOnChangedListener(this::onAssemblyInvUpdate);
     }
 
     public void readAssemblyPowerInv(final NBTTagCompound stackTag) {
@@ -397,7 +396,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     public void createDefaultAssemblyPowerInv() {
         assemblyPowerInv = TileItemHandler.create(owner, AssemblyInvPowerConst.INV_SIZE, "power")
-                .setOnChangedListener(this::onAssemblyInvUpdate);
+                                          .setOnChangedListener(this::onAssemblyInvUpdate);
     }
 
     @Override

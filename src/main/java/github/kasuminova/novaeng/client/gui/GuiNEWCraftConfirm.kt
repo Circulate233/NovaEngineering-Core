@@ -6,9 +6,9 @@ import com.circulation.random_complement.client.RCGuiCraftConfirm
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm
 import github.kasuminova.novaeng.mixin.ae2.AccessorGuiCraftConfirm
-import java.io.IOException
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.entity.player.InventoryPlayer
+import java.io.IOException
 
 open class GuiNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : GuiCraftConfirm(ip, te) {
 

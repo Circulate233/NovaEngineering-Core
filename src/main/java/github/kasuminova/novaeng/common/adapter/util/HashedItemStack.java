@@ -24,10 +24,10 @@ public record HashedItemStack(ItemStack stack, int stackHashCode, boolean hasTag
         int hash;
         if (hasTag) {
             hash = Objects.hash(stack.getItem(),
-                    stack.isItemStackDamageable() ? stack.getItemDamage() : stack.getHasSubtypes() ? stack.getMetadata() : 0, tag);
+                stack.isItemStackDamageable() ? stack.getItemDamage() : stack.getHasSubtypes() ? stack.getMetadata() : 0, tag);
         } else {
             hash = Objects.hash(stack.getItem(),
-                    stack.isItemStackDamageable() ? stack.getItemDamage() : stack.getHasSubtypes() ? stack.getMetadata() : 0);
+                stack.isItemStackDamageable() ? stack.getItemDamage() : stack.getHasSubtypes() ? stack.getMetadata() : 0);
         }
         return new HashedItemStack(stack, hash, hasTag);
     }
@@ -65,9 +65,9 @@ public record HashedItemStack(ItemStack stack, int stackHashCode, boolean hasTag
         Item oItem = other.getItem();
         if (sItem.getHasSubtypes() || oItem.getHasSubtypes()) {
             return sItem.equals(other.getItem()) &&
-                    (stack.getItemDamage() == other.getItemDamage() ||
-                            stack.getItemDamage() == OreDictionary.WILDCARD_VALUE ||
-                            other.getItemDamage() == OreDictionary.WILDCARD_VALUE);
+                (stack.getItemDamage() == other.getItemDamage() ||
+                    stack.getItemDamage() == OreDictionary.WILDCARD_VALUE ||
+                    other.getItemDamage() == OreDictionary.WILDCARD_VALUE);
         } else {
             return sItem.equals(other.getItem());
         }

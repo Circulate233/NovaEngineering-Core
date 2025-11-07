@@ -80,22 +80,22 @@ public class HyperNetEventHandler {
     private static void sendResultMessage(final ConnectResult result, final EntityPlayer player, final ComputationCenter center, final NetNode cached) {
         switch (result) {
             case SUCCESS -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.success",
-                    center.getConnectedMachineryCount(), center.getType().getMaxConnections()
+                "novaeng.hypernet.connect.result.success",
+                center.getConnectedMachineryCount(), center.getType().getMaxConnections()
             ));
             case UNKNOWN_CENTER -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
+                "novaeng.hypernet.connect.result.unknown_center"));
             case CENTER_NOT_WORKING -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.center_not_working"));
+                "novaeng.hypernet.connect.result.center_not_working"));
             case UNSUPPORTED_NODE -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unsupported_node"));
+                "novaeng.hypernet.connect.result.unsupported_node"));
             case CENTER_REACHED_CONNECTION_LIMIT -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.center_reached_connection_limit",
-                    center.getType().getMaxConnections()
+                "novaeng.hypernet.connect.result.center_reached_connection_limit",
+                center.getType().getMaxConnections()
             ));
             case NODE_TYPE_REACHED_MAX_PRESENCES -> player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.node_type_reached_max_presences",
-                    cached.getNodeMaxPresences()
+                "novaeng.hypernet.connect.result.node_type_reached_max_presences",
+                cached.getNodeMaxPresences()
             ));
         }
     }
@@ -104,18 +104,18 @@ public class HyperNetEventHandler {
         HyperNetConnectCardInfo info = HyperNetHelper.readConnectCardInfo(ctrl, stack);
         if (info == null || !world.isBlockLoaded(info.pos())) {
             player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
+                "novaeng.hypernet.connect.result.unknown_center"));
             return;
         }
 
         BlockPos centerPos = info.pos();
         TileEntity centerTE = world.getTileEntity(centerPos);
         TileFactoryController centerCtrl = centerTE instanceof TileFactoryController
-                ? (TileFactoryController) centerTE
-                : null;
+            ? (TileFactoryController) centerTE
+            : null;
         if (centerCtrl == null || !HyperNetHelper.isComputationCenter(centerCtrl)) {
             player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
+                "novaeng.hypernet.connect.result.unknown_center"));
             return;
         }
 
@@ -123,13 +123,13 @@ public class HyperNetEventHandler {
         ComputationCenter center = ComputationCenter.from(centerCtrl);
         if (cached == null || center == null) {
             player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.unknown_center"));
+                "novaeng.hypernet.connect.result.unknown_center"));
             return;
         }
 
         if (!info.networkOwner().equals(center.getNetworkOwner())) {
             player.sendMessage(new TextComponentTranslation(
-                    "novaeng.hypernet.connect.result.no_permission"));
+                "novaeng.hypernet.connect.result.no_permission"));
             return;
         }
 
@@ -258,8 +258,8 @@ public class HyperNetEventHandler {
         }
 
         ComputationCenter center = HyperNetHelper.isComputationCenter(ctrl)
-                ? ComputationCenter.from(ctrl)
-                : getCenterFromNode(ctrl);
+            ? ComputationCenter.from(ctrl)
+            : getCenterFromNode(ctrl);
 
         if (center != null) {
             NovaEngineeringCore.NET_CHANNEL.sendTo(new PktHyperNetStatus(center), player);

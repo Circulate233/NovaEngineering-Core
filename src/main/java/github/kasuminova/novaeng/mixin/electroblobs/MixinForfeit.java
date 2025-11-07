@@ -17,7 +17,7 @@ public class MixinForfeit {
 
     @Unique
     private static final List<String> novaEngineering_Core$banList = Arrays.asList(
-            "bury_self"
+        "bury_self"
     );
 
     @Inject(method = "add", at = @At("HEAD"), cancellable = true)

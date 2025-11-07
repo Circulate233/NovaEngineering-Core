@@ -53,7 +53,7 @@ public class ComputationCenter {
     public ComputationCenter(final TileMultiblockMachineController owner, final NBTTagCompound customData) {
         this.owner = owner;
         this.type = RegistryHyperNet.getComputationCenterType(
-                Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
+            Objects.requireNonNull(owner.getFoundMachine()).getRegistryName().getPath()
         );
         readNBT(customData);
     }
@@ -115,8 +115,8 @@ public class ComputationCenter {
             return;
         }
         float consumeChance =
-                (float) ((double) getConnectedMachineryCount() / type.getMaxConnections() +
-                        getComputationPointGeneration() / type.getMaxComputationPointCarrying());
+            (float) ((double) getConnectedMachineryCount() / type.getMaxConnections() +
+                getComputationPointGeneration() / type.getMaxComputationPointCarrying());
         if (!(RandomUtils.nextFloat() <= Math.max(type.getCircuitConsumeChance() * consumeChance, 0.01F))) {
             return;
         }
@@ -195,7 +195,6 @@ public class ComputationCenter {
         nodes.computeIfAbsent(node.getClass(), v -> new ConcurrentHashMap<>()).remove(machinery.getPos());
     }
 
-    @SuppressWarnings("unchecked")
     public <N extends NetNode> Collection<N> getNode(Class<N> type) {
         return (Collection<N>) nodes.computeIfAbsent(type, v -> new ConcurrentHashMap<>()).values();
     }

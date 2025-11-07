@@ -25,7 +25,7 @@ public class ContainerEFabricatorPatternBus extends AEBaseContainer {
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
                 this.addSlotToContainer(new SlotRestrictedInput(SlotRestrictedInput.PlacableItemType.ENCODED_PATTERN, patterns,
-                        (row * COLS) + col, 8 + (col * 18), 28 + (row * 18), getInventoryPlayer()));
+                    (row * COLS) + col, 8 + (col * 18), 28 + (row * 18), getInventoryPlayer()));
             }
         }
     }

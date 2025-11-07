@@ -12,7 +12,7 @@ import net.minecraft.util.ResourceLocation;
 public class GuiEFabricatorPatternBus extends AEBaseGui {
 
     public static final ResourceLocation GUI_TEXTURE =
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_pattern_bus.png");
+        new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_pattern_bus.png");
 
     public GuiEFabricatorPatternBus(final EFabricatorPatternBus owner, final EntityPlayer player) {
         super(new ContainerEFabricatorPatternBus(owner, player));

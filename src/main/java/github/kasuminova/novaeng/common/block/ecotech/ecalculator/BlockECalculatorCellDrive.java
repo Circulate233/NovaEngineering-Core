@@ -34,10 +34,10 @@ public class BlockECalculatorCellDrive extends BlockECalculatorPart {
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_cell_drive"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_cell_drive");
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(DriveLink.LINK, DriveLink.NONE)
-                .withProperty(DriveStatus.STATUS, DriveStatus.OFF)
-                .withProperty(DriveStorageLevel.STORAGE_LEVEL, DriveStorageLevel.EMPTY)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(DriveLink.LINK, DriveLink.NONE)
+                                            .withProperty(DriveStatus.STATUS, DriveStatus.OFF)
+                                            .withProperty(DriveStorageLevel.STORAGE_LEVEL, DriveStorageLevel.EMPTY)
         );
     }
 

@@ -51,16 +51,16 @@ public class BlockECalculatorThreadCore extends BlockECalculatorPart {
         this.setRegistryName(registryName);
         this.setTranslationKey(translationKey);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(ThreadCoreStatus.STATUS, ThreadCoreStatus.OFF)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(ThreadCoreStatus.STATUS, ThreadCoreStatus.OFF)
         );
     }
 
     protected BlockECalculatorThreadCore(final String level, final int threads, final int hyperThreads) {
         this(
-                new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_" + level),
-                NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_" + level,
-                threads, hyperThreads
+            new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_" + level),
+            NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_" + level,
+            threads, hyperThreads
         );
     }
 

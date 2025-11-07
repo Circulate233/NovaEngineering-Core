@@ -34,8 +34,8 @@ public class BlockECalculatorTail extends BlockECalculatorPart {
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_tail_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_tail_" + level);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(BlockController.FORMED, false)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(BlockController.FORMED, false)
         );
     }
 

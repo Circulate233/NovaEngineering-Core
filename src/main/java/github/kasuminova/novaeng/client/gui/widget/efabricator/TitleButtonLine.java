@@ -17,30 +17,30 @@ public class TitleButtonLine extends Row {
     public TitleButtonLine(final boolean isSearch) {
         if (isSearch) {
             addWidget(new Button()
-                    .setTexture(TextureProperties.of(151, 97))
-                    .setHoveredTexture(TextureProperties.of(151, 97))
-                    .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
-                    .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.default")))
-                    .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
-                    .setWidthHeight(14, 9)
+                .setTexture(TextureProperties.of(151, 97))
+                .setHoveredTexture(TextureProperties.of(151, 97))
+                .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
+                .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.default")))
+                .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
+                .setWidthHeight(14, 9)
             );
         } else {
             addWidget(new Button()
-                    .setTexture(TextureProperties.of(151, 87))
-                    .setHoveredTexture(TextureProperties.of(151, 87))
-                    .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
-                    .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.pattern_search")))
-                    .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
-                    .setWidthHeight(14, 9)
+                .setTexture(TextureProperties.of(151, 87))
+                .setHoveredTexture(TextureProperties.of(151, 87))
+                .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
+                .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.pattern_search")))
+                .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
+                .setWidthHeight(14, 9)
             );
         }
         addWidget(new Button4State()
-                .setMouseDownTexture(TextureProperties.of(183, 75))
-                .setTexture(TextureProperties.of(151, 75))
-                .setHoveredTexture(TextureProperties.of(167, 75))
-                .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
-                .setOnClickedListener(button -> Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.closeScreen()))
-                .setWidthHeight(15, 11));
+            .setMouseDownTexture(TextureProperties.of(183, 75))
+            .setTexture(TextureProperties.of(151, 75))
+            .setHoveredTexture(TextureProperties.of(167, 75))
+            .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
+            .setOnClickedListener(button -> Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.closeScreen()))
+            .setWidthHeight(15, 11));
     }
 
 }

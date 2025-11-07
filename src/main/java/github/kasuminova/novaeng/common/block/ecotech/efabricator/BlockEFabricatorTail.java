@@ -36,8 +36,8 @@ public class BlockEFabricatorTail extends BlockEFabricatorPart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(BlockController.FORMED, false)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(BlockController.FORMED, false)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_tail_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_tail_" + level);

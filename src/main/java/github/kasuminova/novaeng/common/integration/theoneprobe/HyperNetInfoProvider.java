@@ -118,7 +118,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
         leftInfo.text("{*top.hypernet.processor.generation*}");
         rightInfo.text(TextFormatting.AQUA + NovaEngUtils.formatFLOPS(load) +
-                " / " + NovaEngUtils.formatFLOPS(maxGeneration));
+            " / " + NovaEngUtils.formatFLOPS(maxGeneration));
 
         leftInfo.text("{*top.hypernet.processor.load*}");
         rightInfo.text(TextFormatting.AQUA + formatPercent(load, maxGeneration));
@@ -128,7 +128,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
         leftInfo.text("{*top.hypernet.processor.heat*}");
         rightInfo.text(TextFormatting.RED + MiscUtils.formatDecimal(storedHU) + "HU (" +
-                formatPercent(heatPercent, 1.0F) + ")");
+            formatPercent(heatPercent, 1.0F) + ")");
     }
 
     private static IProbeInfo newVertical(final IProbeInfo probeInfo) {
@@ -160,21 +160,21 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
         // Example: 3.955K / 90K (4.39%)
         String progressStr = NovaEngUtils.formatNumber(Math.round(completedPoints))
-                + " / "
-                + NovaEngUtils.formatNumber(Math.round(requiredPoints))
-                + " (" + NovaEngUtils.formatFloat(progress, 2) + "%)";
+            + " / "
+            + NovaEngUtils.formatNumber(Math.round(requiredPoints))
+            + " (" + NovaEngUtils.formatFloat(progress, 2) + "%)";
 
         newBox(probeInfo).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text(TextFormatting.AQUA + "{*top.hypernet.research_station.progress*}:  ")
-                .progress(Math.round(progress), 100, probeInfo.defaultProgressStyle()
-                        .prefix(progressStr)
-                        .filledColor(0xCC1EB4FF)
-                        .alternateFilledColor(0xCC1E90FF)
-                        .borderColor(0xCC1E90B9)
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(120)
-                );
+                         .text(TextFormatting.AQUA + "{*top.hypernet.research_station.progress*}:  ")
+                         .progress(Math.round(progress), 100, probeInfo.defaultProgressStyle()
+                                                                       .prefix(progressStr)
+                                                                       .filledColor(0xCC1EB4FF)
+                                                                       .alternateFilledColor(0xCC1E90FF)
+                                                                       .borderColor(0xCC1E90B9)
+                                                                       .backgroundColor(0xFF000000)
+                                                                       .numberFormat(NumberFormat.NONE)
+                                                                       .width(120)
+                         );
     }
 
     private static void processDatabaseTOP(final Database database,
@@ -188,7 +188,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
         int size = database.getStoredResearchCognition().size();
         leftInfo.text("{*top.hypernet.database.stored.research*}");
         rightInfo.text(String.format("%s%s %s(%s) / %s%d",
-                TextFormatting.AQUA, size, TextFormatting.YELLOW, researching, TextFormatting.YELLOW, database.getType().getMaxResearchDataStoreSize())
+            TextFormatting.AQUA, size, TextFormatting.YELLOW, researching, TextFormatting.YELLOW, database.getType().getMaxResearchDataStoreSize())
         );
     }
 
@@ -215,13 +215,13 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
         int maxConnections = center.getType().getMaxConnections();
         leftInfo.text("{*top.hypernet.connected*}");
         rightInfo.text(TextFormatting.AQUA +
-                String.valueOf(connections) + " / " + TextFormatting.YELLOW + maxConnections);
+            String.valueOf(connections) + " / " + TextFormatting.YELLOW + maxConnections);
 
         double consumption = center.getComputationPointConsumption();
         double generation = center.getComputationPointGeneration();
         leftInfo.text("{*top.hypernet.computation_point.total*}");
         rightInfo.text(TextFormatting.AQUA +
-                NovaEngUtils.formatFLOPS(consumption) + " / " + NovaEngUtils.formatFLOPS(generation));
+            NovaEngUtils.formatFLOPS(consumption) + " / " + NovaEngUtils.formatFLOPS(generation));
     }
 
     @Override

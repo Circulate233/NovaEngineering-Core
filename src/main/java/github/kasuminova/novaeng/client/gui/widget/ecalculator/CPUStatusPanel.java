@@ -34,9 +34,9 @@ public class CPUStatusPanel extends SizedColumn {
     private static final int OFFSET_Y = 3;
 
     private static final TextureProperties BACKGROUND = new TextureProperties(
-            GuiECalculatorController.ELEMENT_1,
-            0, 51,
-            WIDTH, HEIGHT
+        GuiECalculatorController.ELEMENT_1,
+        0, 51,
+        WIDTH, HEIGHT
     );
 
     public CPUStatusPanel() {
@@ -95,28 +95,28 @@ public class CPUStatusPanel extends SizedColumn {
         private static final int TEXT_OFFSET_Y = 24;
 
         private static final ResourceLocation L4 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/thread_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/thread_module");
         private static final ResourceLocation L4_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/hyper_threading_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/hyper_threading_module");
 
         private static final ResourceLocation L6 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_thread_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_thread_module");
         private static final ResourceLocation L6_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_hyper_threading_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_hyper_threading_module");
 
         private static final ResourceLocation L9 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_thread_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_thread_module");
         private static final ResourceLocation L9_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
-                "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_hyper_threading_module");
+            "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_hyper_threading_module");
 
         private static final TextureProperties BACKGROUND = new TextureProperties(
-                GuiECalculatorController.ELEMENT_2, 70, 0, WIDTH, HEIGHT
+            GuiECalculatorController.ELEMENT_2, 70, 0, WIDTH, HEIGHT
         );
         private static final TextureProperties BACKGROUND_OVERLAY = new TextureProperties(
-                GuiECalculatorController.ELEMENT_2, 70, 35, WIDTH, HEIGHT
+            GuiECalculatorController.ELEMENT_2, 70, 35, WIDTH, HEIGHT
         );
         private static final TextureProperties BACKGROUND_OVERLAY_HYPER = new TextureProperties(
-                GuiECalculatorController.ELEMENT_2, 109, 35, WIDTH, HEIGHT
+            GuiECalculatorController.ELEMENT_2, 109, 35, WIDTH, HEIGHT
         );
 
         private final TextureAtlasSprite overlay;

@@ -17,11 +17,11 @@ public class MixinEntityTachyonBullet {
      * 杀杀杀杀杀
      */
     @Redirect(
-            method = "onUpdate",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/EntityLivingBase;setHealth(F)V"
-            )
+        method = "onUpdate",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/EntityLivingBase;setHealth(F)V"
+        )
     )
     private void redirectSetHealth(final EntityLivingBase instance, final float health) {
         DataParameter<Float> healthType = EntityLivingBaseValues.HEALTH;

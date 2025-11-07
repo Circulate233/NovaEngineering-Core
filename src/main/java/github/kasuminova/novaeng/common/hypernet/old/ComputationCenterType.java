@@ -54,13 +54,13 @@ public class ComputationCenterType extends NetNodeTypeRepairable {
                                                final int maxCircuitConsumeAmount,
                                                final float circuitConsumeChance) {
         return new ComputationCenterType(typeName,
-                energyUsage,
-                maxConnections,
-                maxComputationPointCarrying,
-                circuitDurability,
-                minCircuitConsumeAmount,
-                maxCircuitConsumeAmount,
-                circuitConsumeChance);
+            energyUsage,
+            maxConnections,
+            maxComputationPointCarrying,
+            circuitDurability,
+            minCircuitConsumeAmount,
+            maxCircuitConsumeAmount,
+            circuitConsumeChance);
     }
 
     public void registerRecipesAndThreads() {
@@ -69,32 +69,32 @@ public class ComputationCenterType extends NetNodeTypeRepairable {
         MachineModifier.addCoreThread(name, FactoryRecipeThread.createCoreThread(FIX_THREAD_NAME));
 
         RecipeBuilder.newBuilder(name + "_working", name, 20, 100, false)
-                .addEnergyPerTickInput(energyUsage)
-                .addPostCheckHandler(event ->
-                        ComputationCenter.from(event.getController()).onRecipeCheck(event))
-                .addFactoryPreTickHandler(event ->
-                        ComputationCenter.from(event.getController()).onWorkingTick())
-                .addRecipeTooltip("novaeng.hypernet.computation_center.working.tooltip.0")
-                .addRecipeTooltip("novaeng.hypernet.computation_center.working.tooltip.1")
-                .setThreadName(CENTER_WORKING_THREAD_NAME)
-                .build();
+                     .addEnergyPerTickInput(energyUsage)
+                     .addPostCheckHandler(event ->
+                         ComputationCenter.from(event.getController()).onRecipeCheck(event))
+                     .addFactoryPreTickHandler(event ->
+                         ComputationCenter.from(event.getController()).onWorkingTick())
+                     .addRecipeTooltip("novaeng.hypernet.computation_center.working.tooltip.0")
+                     .addRecipeTooltip("novaeng.hypernet.computation_center.working.tooltip.1")
+                     .setThreadName(CENTER_WORKING_THREAD_NAME)
+                     .build();
 
         int counter = 0;
         for (final Tuple<List<IIngredient>, Integer> fixIngredient : fixIngredientList) {
             List<IIngredient> input = fixIngredient.getFirst();
             int durability = fixIngredient.getSecond();
             RecipeBuilder.newBuilder(name + "_fix_" + counter, name, 100, 101 + counter, false)
-                    .addEnergyPerTickInput(energyUsage / 2)
-                    .addInputs(input.toArray(new IIngredient[0]))
-                    .addPostCheckHandler(event ->
-                            ComputationCenter.from(event.getController()).onDurabilityFixRecipeCheck(event, durability))
-                    .addFactoryFinishHandler(event ->
-                            ComputationCenter.from(event.getController()).fixCircuit(durability))
-                    .addRecipeTooltip(FMLCommonHandler.instance().getSide().isClient()
-                            ? new String[]{I18n.format("novaeng.hypernet.repair.tooltip", durability)}
-                            : new String[0])
-                    .setThreadName(FIX_THREAD_NAME)
-                    .build();
+                         .addEnergyPerTickInput(energyUsage / 2)
+                         .addInputs(input.toArray(new IIngredient[0]))
+                         .addPostCheckHandler(event ->
+                             ComputationCenter.from(event.getController()).onDurabilityFixRecipeCheck(event, durability))
+                         .addFactoryFinishHandler(event ->
+                             ComputationCenter.from(event.getController()).fixCircuit(durability))
+                         .addRecipeTooltip(FMLCommonHandler.instance().getSide().isClient()
+                             ? new String[]{I18n.format("novaeng.hypernet.repair.tooltip", durability)}
+                             : new String[0])
+                         .setThreadName(FIX_THREAD_NAME)
+                         .build();
 
             counter++;
         }

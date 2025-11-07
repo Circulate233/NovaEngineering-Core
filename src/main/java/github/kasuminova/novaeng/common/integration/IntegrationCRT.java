@@ -42,8 +42,8 @@ public class IntegrationCRT {
     @Optional.Method(modid = "zenutils")
     public void onScriptsReloadedPre(ScriptReloadEvent.Post event) {
         RegistryHyperNet.registerHyperNetNode(
-                new ResourceLocation(ModularMachinery.MODID, "hypernet_terminal"),
-                HyperNetTerminal.class
+            new ResourceLocation(ModularMachinery.MODID, "hypernet_terminal"),
+            HyperNetTerminal.class
         );
 
         AssemblyLine.registerNetNode();

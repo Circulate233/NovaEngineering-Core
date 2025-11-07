@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.client.util;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.common.util.Functions;
 import github.kasuminova.novaeng.common.util.SimpleItem;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.ItemName;
@@ -16,16 +17,13 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ExJEI {
 
-    private static final List<String> blockList = Arrays.asList(
-            "mekanismgenerators", "artisanworktables"
-    );
+    private static final String[] blockList = {
+        "mekanismgenerators", "artisanworktables"
+    };
 
     public static void jeiCreate() {
         IItemStack pattern_storage = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.pattern_storage));
@@ -33,18 +31,18 @@ public class ExJEI {
         MCJeiPanel JeiP = new MCJeiPanel("replicator_jei", I18n.format("gui." + NovaEngineeringCore.MOD_ID + ".replicator"));
         JeiP.setModid("ic2");
         JeiP.recipeCatalysts.addAll(
-                Arrays.asList(
-                        pattern_storage,
-                        replicator,
-                        CraftTweakerMC.getIItemStack(ItemName.crystal_memory.getItemStack())
-                )
+            Functions.asList(
+                pattern_storage,
+                replicator,
+                CraftTweakerMC.getIItemStack(ItemName.crystal_memory.getItemStack())
+            )
         );
         JeiP.background = IJeiUtils.createBackground(80, 32);
         JeiP.slots.addAll(
-                Arrays.asList(
-                        IJeiUtils.createItemSlot(30, 0, true, false),
-                        IJeiUtils.createItemSlot(30, 0, false, false)
-                )
+            Functions.asList(
+                IJeiUtils.createItemSlot(30, 0, true, false),
+                IJeiUtils.createItemSlot(30, 0, false, false)
+            )
         );
         JeiP.icon = replicator;
         JeiP.register();
@@ -54,18 +52,43 @@ public class ExJEI {
         Map<SimpleItem, ItemStack> uniqueKeys = new Object2ObjectOpenHashMap<>();
 
         UuGraph.iterator().forEachRemaining(item -> {
-            ItemStack stack = item.getKey().copy();
+            ItemStack stack = item.getKey();
 
             ItemStack canonicalKey = uniqueKeys.computeIfAbsent(SimpleItem.getInstance(stack), k -> stack);
 
             if (stack == canonicalKey) {
-                if (item.getValue() != Double.POSITIVE_INFINITY && !blockList.contains(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())) {
+                if (item.getValue() == Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
                     double bValue = item.getValue() / 100000;
-                    new MCJeiRecipe("replicator_jei").addInput(CraftTweakerMC.getIItemStack(stack)).addOutput(CraftTweakerMC.getIItemStack(stack)).addElement(IJeiUtils.createFontInfoElement(I18n.format("gui." + NovaEngineeringCore.MOD_ID + ".replicator.tooltips1", Util.toSiString(bValue, 2)), 0, 20, 0x000000, 0, 0)).build();
+                    new MCJeiRecipe("replicator_jei")
+                        .addInput(CraftTweakerMC.getIItemStack(stack))
+                        .addOutput(CraftTweakerMC.getIItemStack(stack))
+                        .addElement(
+                            IJeiUtils.createFontInfoElement(
+                                I18n.format(
+                                    "gui." + NovaEngineeringCore.MOD_ID + ".replicator.tooltips1",
+                                    Util.toSiString(bValue, 2)
+                                ),
+                                0,
+                                20,
+                                0x000000,
+                                0,
+                                0
+                            )
+                        )
+                        .build();
                 }
             }
         });
 
         uniqueKeys.clear();
+    }
+
+    private static boolean isBlock(String s) {
+        for (var string : blockList) {
+            if (string.equals(s)){
+                return true;
+            }
+        }
+        return false;
     }
 }

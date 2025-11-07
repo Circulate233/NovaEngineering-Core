@@ -20,7 +20,7 @@ public class TotalCraftedLabel extends Row {
 
     public TotalCraftedLabel() {
         this.label = new MultiLineLabel(Collections.singletonList(
-                I18n.format("gui.efabricator.total_crafted", 0)
+            I18n.format("gui.efabricator.total_crafted", 0)
         ));
         this.label.setScale(.8f);
         this.label.setAutoWrap(false);
@@ -53,7 +53,7 @@ public class TotalCraftedLabel extends Row {
                 updateLabel(newValue, avgCraftPerTick);
             } else {
                 this.label.setContents(Collections.singletonList(
-                        I18n.format("gui.efabricator.total_crafted", NovaEngUtils.formatDecimal(newValue))
+                    I18n.format("gui.efabricator.total_crafted", NovaEngUtils.formatDecimal(newValue))
                 ));
             }
         }
@@ -62,10 +62,10 @@ public class TotalCraftedLabel extends Row {
 
     private void updateLabel(final long newValue, final double avgCraftPerTick) {
         this.label.setContents(Collections.singletonList(
-                I18n.format("gui.efabricator.total_crafted.update",
-                        NovaEngUtils.formatDecimal(newValue),
-                        avgCraftPerTick <= 0.1 ? "<0.1" : NovaEngUtils.formatDouble(avgCraftPerTick, 1)
-                )
+            I18n.format("gui.efabricator.total_crafted.update",
+                NovaEngUtils.formatDecimal(newValue),
+                avgCraftPerTick <= 0.1 ? "<0.1" : NovaEngUtils.formatDouble(avgCraftPerTick, 1)
+            )
         ));
     }
 

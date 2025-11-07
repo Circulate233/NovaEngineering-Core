@@ -121,11 +121,11 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     }
 
     @WrapOperation(
-            method = "updateCraftingLogic",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lappeng/tile/crafting/TileCraftingTile;isActive()Z"
-            )
+        method = "updateCraftingLogic",
+        at = @At(
+            value = "INVOKE",
+            target = "Lappeng/tile/crafting/TileCraftingTile;isActive()Z"
+        )
     )
     private boolean redirectUpdateCraftingLogicIsActive(final TileCraftingTile instance, final Operation<Boolean> original) {
         if (this.novaeng_ec$core != null) {

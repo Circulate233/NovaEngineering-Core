@@ -24,8 +24,8 @@ public class RecipePrimerAssemblyLine {
         ResourceLocation machineName = primer.getParentMachineName();
         if (!machineName.equals(ASSEMBLY_LINE)) {
             CraftTweakerAPI.logError(
-                    "Cannot proxy AssemblyLine recipe for `" + primer.getRecipeRegistryName() +
-                            "`, because parent machine is not `assembly_line`!");
+                "Cannot proxy AssemblyLine recipe for `" + primer.getRecipeRegistryName() +
+                    "`, because parent machine is not `assembly_line`!");
             return primer;
         }
 
@@ -56,7 +56,7 @@ public class RecipePrimerAssemblyLine {
     public static RecipePrimer convertAssemblyLineRecipeToDefaultRecipeAndRegister(RecipePrimer primer, String machineName) {
         String recipeName = primer.getRecipeRegistryName().getPath() + ".copy." + machineName;
         RecipePrimer newPrimer = RecipeBuilder.newBuilder(
-                recipeName, machineName, primer.getTotalProcessingTickTime(), primer.getPriority(), primer.voidPerTickFailure()
+            recipeName, machineName, primer.getTotalProcessingTickTime(), primer.getPriority(), primer.voidPerTickFailure()
         );
 
         List<ComponentRequirement<?, ?>> components = newPrimer.getComponents();

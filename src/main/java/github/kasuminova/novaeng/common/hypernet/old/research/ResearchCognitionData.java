@@ -113,20 +113,20 @@ public class ResearchCognitionData {
                                                final String[] unlockedDescriptions,
                                                final String[] dependenciesArr) {
         List<ResearchCognitionData> dependencies = Arrays.stream(dependenciesArr)
-                .map(RegistryHyperNet::getResearchCognitionData)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                                                         .map(RegistryHyperNet::getResearchCognitionData)
+                                                         .filter(Objects::nonNull)
+                                                         .collect(Collectors.toList());
 
         return new ResearchCognitionData(
-                researchName,
-                translatedName,
-                CraftTweakerMC.getItemStack(previewStackCT),
-                techLevel,
-                requiredPoints,
-                minComputationPointPerTick,
-                ObjectArrayList.wrap(descriptions),
-                ObjectArrayList.wrap(unlockedDescriptions),
-                dependencies);
+            researchName,
+            translatedName,
+            CraftTweakerMC.getItemStack(previewStackCT),
+            techLevel,
+            requiredPoints,
+            minComputationPointPerTick,
+            ObjectArrayList.wrap(descriptions),
+            ObjectArrayList.wrap(unlockedDescriptions),
+            dependencies);
     }
 
     @ZenMethod
@@ -141,21 +141,21 @@ public class ResearchCognitionData {
                                                     final String[] dependenciesArr,
                                                     final int maxCycle) {
         List<ResearchCognitionData> dependencies = Arrays.stream(dependenciesArr)
-                .map(RegistryHyperNet::getResearchCognitionData)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                                                         .map(RegistryHyperNet::getResearchCognitionData)
+                                                         .filter(Objects::nonNull)
+                                                         .collect(Collectors.toList());
 
         return new ResearchCognitionData(
-                researchName,
-                translatedName,
-                CraftTweakerMC.getItemStack(previewStackCT),
-                techLevel,
-                requiredPoints,
-                minComputationPointPerTick,
-                ObjectArrayList.wrap(descriptions),
-                ObjectArrayList.wrap(unlockedDescriptions),
-                dependencies,
-                maxCycle);
+            researchName,
+            translatedName,
+            CraftTweakerMC.getItemStack(previewStackCT),
+            techLevel,
+            requiredPoints,
+            minComputationPointPerTick,
+            ObjectArrayList.wrap(descriptions),
+            ObjectArrayList.wrap(unlockedDescriptions),
+            dependencies,
+            maxCycle);
     }
 
     @ZenMethod

@@ -192,11 +192,11 @@ public class OreHandler {
 
     public static class OreDictHelper {
         private static final String[] MOD_PRIORITY = {
-                "minecraft",
-                "thermalfoundation",
-                "ic2",
-                "mekanism",
-                "immersiveengineering"
+            "minecraft",
+            "thermalfoundation",
+            "ic2",
+            "mekanism",
+            "immersiveengineering"
         };
 
         public static ItemStack getPriorityItemFromOreDict(String oreName) {

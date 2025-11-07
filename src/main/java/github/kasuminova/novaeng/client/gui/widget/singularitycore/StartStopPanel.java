@@ -30,31 +30,31 @@ public class StartStopPanel extends SizedColumn {
         this.coreGUI = coreGUI;
         setWidthHeight(WIDTH, HEIGHT);
         addWidgets(
-                new MultiLineLabel(Collections.singletonList("§c状态：§a已启动§6（环数：3）"))
-                        .setVerticalCentering(true)
-                        .setAutoWrap(false)
-                        .setAutoRecalculateSize(false)
-                        .setWidthHeight(84, 10)
-                        .setMargin(6, 0, 4, 3),
-                new Row().addWidgets(
-                        new Button4State()
-                                .setMouseDownTexture(1, 32)
-                                .setHoveredTexture(1, 16)
-                                .setTexture(1, 0)
-                                .setUnavailableTexture(1, 48)
-                                .setTextureLocation(BUTTON_TEX_RES)
-                                .setTooltipFunction(button -> Collections.singletonList("§c单击停止工作进程。"))
-                                .setWidthHeight(31, 15)
-                                .setMarginRight(3),
-                        new Button4State()
-                                .setMouseDownTexture(33, 32)
-                                .setHoveredTexture(33, 16)
-                                .setTexture(33, 0)
-                                .setUnavailableTexture(33, 48)
-                                .setTextureLocation(BUTTON_TEX_RES)
-                                .setTooltipFunction(button -> Collections.singletonList("§a单击开始启动进程。"))
-                                .setWidthHeight(31, 15)
-                ).setMarginLeft(25)
+            new MultiLineLabel(Collections.singletonList("§c状态：§a已启动§6（环数：3）"))
+                .setVerticalCentering(true)
+                .setAutoWrap(false)
+                .setAutoRecalculateSize(false)
+                .setWidthHeight(84, 10)
+                .setMargin(6, 0, 4, 3),
+            new Row().addWidgets(
+                new Button4State()
+                    .setMouseDownTexture(1, 32)
+                    .setHoveredTexture(1, 16)
+                    .setTexture(1, 0)
+                    .setUnavailableTexture(1, 48)
+                    .setTextureLocation(BUTTON_TEX_RES)
+                    .setTooltipFunction(button -> Collections.singletonList("§c单击停止工作进程。"))
+                    .setWidthHeight(31, 15)
+                    .setMarginRight(3),
+                new Button4State()
+                    .setMouseDownTexture(33, 32)
+                    .setHoveredTexture(33, 16)
+                    .setTexture(33, 0)
+                    .setUnavailableTexture(33, 48)
+                    .setTextureLocation(BUTTON_TEX_RES)
+                    .setTooltipFunction(button -> Collections.singletonList("§a单击开始启动进程。"))
+                    .setWidthHeight(31, 15)
+            ).setMarginLeft(25)
         );
     }
 
@@ -63,9 +63,9 @@ public class StartStopPanel extends SizedColumn {
         GuiScreen gui = widgetGui.getGui();
         gui.mc.getTextureManager().bindTexture(BG_TEX_RES);
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY(),
-                TEX_X, TEX_Y,
-                WIDTH, HEIGHT
+            renderPos.posX(), renderPos.posY(),
+            TEX_X, TEX_Y,
+            WIDTH, HEIGHT
         );
         super.preRenderInternal(widgetGui, renderSize, renderPos, mousePos);
     }

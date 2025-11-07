@@ -86,13 +86,13 @@ public class MixinPacketHandler {
             instance.getChannels().get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.ALLAROUNDPOINT);
             instance.getChannels().get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS)
                     .set(
-                            new NetworkRegistry.TargetPoint(
-                                    theTile.getWorld().provider.getDimension(),
-                                    theTile.getPos().getX(),
-                                    theTile.getPos().getY(),
-                                    theTile.getPos().getZ(),
-                                    192.0
-                            )
+                        new NetworkRegistry.TargetPoint(
+                            theTile.getWorld().provider.getDimension(),
+                            theTile.getPos().getX(),
+                            theTile.getPos().getY(),
+                            theTile.getPos().getZ(),
+                            192.0
+                        )
                     );
             instance.getChannels().get(Side.SERVER).writeAndFlush(message);
         });

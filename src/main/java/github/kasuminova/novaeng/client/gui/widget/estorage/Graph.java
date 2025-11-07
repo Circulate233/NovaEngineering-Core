@@ -53,18 +53,18 @@ public abstract class Graph extends SizedColumn {
         this.bgTexHeight = bgTexHeight;
         this.reverseColor = reverseColor;
         this.label.setAutoWrap(false)
-                .setScale(0.6F)
-                .setVerticalCentering(true)
-                .setRightAligned(!leftAlign)
-                .setHeight(10)
-                .setMargin(2, 2, 0, 0);
+                  .setScale(0.6F)
+                  .setVerticalCentering(true)
+                  .setRightAligned(!leftAlign)
+                  .setHeight(10)
+                  .setMargin(2, 2, 0, 0);
         setWidthHeight(width, height);
         setRightAligned(!leftAlign);
         addWidget(this.label);
         setUseScissor(false);
         setAbsXY(
-                absX + (RandomUtils.nextInt(randomOffset * 2) - randomOffset),
-                absY + (RandomUtils.nextInt(randomOffset * 2) - randomOffset)
+            absX + (RandomUtils.nextInt(randomOffset * 2) - randomOffset),
+            absY + (RandomUtils.nextInt(randomOffset * 2) - randomOffset)
         );
     }
 
@@ -96,9 +96,9 @@ public abstract class Graph extends SizedColumn {
         GuiScreen gui = widgetGui.getGui();
         gui.mc.getTextureManager().bindTexture(BG_TEX_RES);
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY() + this.label.getHeight(),
-                bgTexX, bgTexY,
-                bgTexWidth, bgTexHeight
+            renderPos.posX(), renderPos.posY() + this.label.getHeight(),
+            bgTexX, bgTexY,
+            bgTexWidth, bgTexHeight
         );
         GlStateManager.color(1F, 1F, 1F, 1F);
         super.renderInternal(widgetGui, renderSize, renderPos, mousePos);

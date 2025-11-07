@@ -45,16 +45,16 @@ public class ClientEventHandler {
         if (totalParticles > 50000) {
             effectRenderer.clearEffects(Minecraft.getMinecraft().world);
             NovaEngineeringCore.log.warn(
-                    "Particle effect renderer has been cleared due to too many particles (Current: {}, Limit: {}).",
-                    totalParticles, 50000
+                "Particle effect renderer has been cleared due to too many particles (Current: {}, Limit: {}).",
+                totalParticles, 50000
             );
         }
     }
 
     private static long getTotalParticles(final AccessorParticleManager accessor) {
         return Arrays.stream(accessor.getFxLayers())
-                .flatMapToLong(layers -> Arrays.stream(layers).mapToLong(ArrayDeque::size))
-                .sum();
+                     .flatMapToLong(layers -> Arrays.stream(layers).mapToLong(ArrayDeque::size))
+                     .sum();
     }
 
     @SubscribeEvent

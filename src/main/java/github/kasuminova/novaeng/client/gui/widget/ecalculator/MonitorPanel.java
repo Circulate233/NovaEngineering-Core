@@ -31,16 +31,16 @@ public class MonitorPanel extends SizedRow {
     private static final int OFFSET_Y = 1;
 
     private static final TextureProperties BACKGROUND = new TextureProperties(
-            GuiECalculatorController.ELEMENT_1,
-            0, 129,
-            WIDTH, HEIGHT
+        GuiECalculatorController.ELEMENT_1,
+        0, 129,
+        WIDTH, HEIGHT
     );
 
     public MonitorPanel() {
         setWidthHeight(WIDTH, HEIGHT);
         addWidgets(
-                new DataPanel().setMarginLeft(3).setMarginUp(3),
-                new TaskPanel().setUseScissor(true).setMarginLeft(5).setMarginUp(5)
+            new DataPanel().setMarginLeft(3).setMarginUp(3),
+            new TaskPanel().setUseScissor(true).setMarginLeft(5).setMarginUp(5)
         );
     }
 
@@ -123,10 +123,10 @@ public class MonitorPanel extends SizedRow {
                     final String maxThreads = String.valueOf(this.maxThreads);
                     final String maxHyperThreads = String.valueOf(this.maxHyperThreads);
                     final String formatted = String.format("%s (%s%s%s) / %s (%s%s%s)",
-                            threads,
-                            TextFormatting.RED, hyperThreads, TextFormatting.RESET,
-                            maxThreads,
-                            TextFormatting.YELLOW, maxHyperThreads, TextFormatting.RESET
+                        threads,
+                        TextFormatting.RED, hyperThreads, TextFormatting.RESET,
+                        maxThreads,
+                        TextFormatting.YELLOW, maxHyperThreads, TextFormatting.RESET
                     );
 
                     fr.drawStringWithShadow(formatted, 0, 0, 0xFFFFFF);
@@ -217,12 +217,12 @@ public class MonitorPanel extends SizedRow {
 
             final TextureProperties scrollTexture = TextureProperties.of(207, 208);
             scrollbar.getScroll()
-                    .setMouseDownTexture(scrollTexture)
-                    .setUnavailableTexture(scrollTexture)
-                    .setHoveredTexture(scrollTexture)
-                    .setTexture(scrollTexture)
-                    .setTextureLocation(GuiECalculatorController.ELEMENT_1)
-                    .setWidthHeight(5, 15);
+                     .setMouseDownTexture(scrollTexture)
+                     .setUnavailableTexture(scrollTexture)
+                     .setHoveredTexture(scrollTexture)
+                     .setTexture(scrollTexture)
+                     .setTextureLocation(GuiECalculatorController.ELEMENT_1)
+                     .setWidthHeight(5, 15);
         }
 
         @Override
@@ -260,13 +260,13 @@ public class MonitorPanel extends SizedRow {
             private static final int ITEM_OFFSET_Y = 4;
 
             private static final TextureProperties BACKGROUND = new TextureProperties(
-                    GuiECalculatorController.ELEMENT_1, 1, 208, WIDTH, HEIGHT
+                GuiECalculatorController.ELEMENT_1, 1, 208, WIDTH, HEIGHT
             );
             private static final TextureProperties MEMORY_ICON = new TextureProperties(
-                    GuiECalculatorController.ELEMENT_1, 215, 208, 7, 7
+                GuiECalculatorController.ELEMENT_1, 215, 208, 7, 7
             );
             private static final TextureProperties PARALLELISM_ICON = new TextureProperties(
-                    GuiECalculatorController.ELEMENT_1, 215, 218, 7, 7
+                GuiECalculatorController.ELEMENT_1, 215, 218, 7, 7
             );
 
             private final long usedMemory;

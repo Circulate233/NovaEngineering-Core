@@ -30,20 +30,20 @@ import java.util.Queue;
 public class EStorageController extends EPartController<EStoragePart> {
 
     public static final List<BlockPos> HIDE_POS_LIST = Arrays.asList(
-            new BlockPos(0, 1, 0),
-            new BlockPos(0, -1, 0),
+        new BlockPos(0, 1, 0),
+        new BlockPos(0, -1, 0),
 
-            new BlockPos(1, 1, 0),
-            new BlockPos(1, 0, 0),
-            new BlockPos(1, -1, 0),
+        new BlockPos(1, 1, 0),
+        new BlockPos(1, 0, 0),
+        new BlockPos(1, -1, 0),
 
-            new BlockPos(0, 1, 1),
-            new BlockPos(0, 0, 1),
-            new BlockPos(0, -1, 1),
+        new BlockPos(0, 1, 1),
+        new BlockPos(0, 0, 1),
+        new BlockPos(0, -1, 1),
 
-            new BlockPos(1, 1, 1),
-            new BlockPos(1, 0, 1),
-            new BlockPos(1, -1, 1)
+        new BlockPos(1, 1, 1),
+        new BlockPos(1, 0, 1),
+        new BlockPos(1, -1, 1)
     );
 
     protected final Queue<EStorageEnergyCell> energyCellsMin = new PriorityQueue<>(Comparator.reverseOrder());

@@ -39,6 +39,8 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatt
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
+import github.kasuminova.novaeng.mixin.util.NovaBlockColors;
+import github.kasuminova.novaeng.mixin.util.NovaItemColors;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -47,7 +49,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import lombok.Getter;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -90,6 +91,8 @@ public class ClientProxy extends CommonProxy {
     private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
     @Getter
     private static List<String> itemDisplayTooltip;
+    private static List<Item> colorsItems = new ReferenceArrayList<>();
+    private static List<ItemRawOre.BlockRawOre> colorsBlocks = new ReferenceArrayList<>();
 
     static {
         colorCache.defaultReturnValue(-1);
@@ -121,12 +124,12 @@ public class ClientProxy extends CommonProxy {
             if (stack.getItem() instanceof ItemBlock) {
                 Minecraft mc = Minecraft.getMinecraft();
                 IBlockState state = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(mc.world,
-                        new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, stack.getMetadata(), mc.player);
+                    new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, stack.getMetadata(), mc.player);
                 List<BakedQuad> quads = mc.getBlockRendererDispatcher().getModelForState(state).getQuads(state, EnumFacing.NORTH, 0);
                 if (quads.isEmpty()) return Color.WHITE;
                 sprite = quads.get(0).getSprite();
             } else sprite = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null)
-                    .getQuads(null, null, 0).get(0).getSprite();
+                                     .getQuads(null, null, 0).get(0).getSprite();
             IntList colours = new IntArrayList();
             for (int[] rows : sprite.getFrameTextureData(0))
                 for (int colour : rows) if ((colour & 0xFF) > 0) colours.add(colour);
@@ -140,6 +143,14 @@ public class ClientProxy extends CommonProxy {
         } catch (Exception e) {
             return Color.WHITE;
         }
+    }
+
+    public static void addColorRawOreItem(Item item) {
+        if (item != null) colorsItems.add(item);
+    }
+
+    public static void addColorRawOreBlock(ItemRawOre.BlockRawOre block) {
+        if (block != null) colorsBlocks.add(block);
     }
 
     public void setColor(String od, int color) {
@@ -183,9 +194,6 @@ public class ClientProxy extends CommonProxy {
         TitleUtils.setRandomTitle("*PreInit*");
     }
 
-    public static List<Item> colorsItems = new ReferenceArrayList<>();
-    public static List<Block> colorsBlocks = new ReferenceArrayList<>();
-
     @Override
     public void init() {
         super.init();
@@ -202,27 +210,26 @@ public class ClientProxy extends CommonProxy {
         super.postInit();
 
         Minecraft mc = Minecraft.getMinecraft();
-        var blockColors = mc.getBlockColors();
-        var itemColors = mc.getItemColors();
+        var blockColors = (NovaBlockColors) mc.getBlockColors();
+        var itemColors = (NovaItemColors) mc.getItemColors();
 
-        itemColors.registerItemColorHandler((stack, i) -> {
-            var item = stack.getItem();
+        for (var item : colorsItems) {
             if (item instanceof ItemRawOre r) {
-                return getColorForODFirst(r.getPartOD());
+                final int i = getColorForODFirst(r.getPartOD());
+                itemColors.n$put(item, (stark, ii) -> i);
+                continue;
             }
             if (item instanceof ItemRawOre.BlockRawOre.ItemBLockRawOre r) {
-                return getColorForODFirst(r.getPartOD());
+                final int i = getColorForODFirst(r.getPartOD());
+                itemColors.n$put(item, (stark, ii) -> i);
             }
-            return Color.WHITE.getRGB();
-        }, colorsItems.toArray(new Item[0]));
+        }
         colorsItems = null;
 
-        blockColors.registerBlockColorHandler((state, worldIn, pos, i) -> {
-            if (state.getBlock() instanceof ItemRawOre.BlockRawOre blockRawOre) {
-                return getColorForODFirst(blockRawOre.getPartOD());
-            }
-            return Color.WHITE.getRGB();
-        }, colorsBlocks.toArray(new Block[0]));
+        for (var block : colorsBlocks) {
+            final int i = getColorForODFirst(block.getPartOD());
+            blockColors.n$put(block, (state, worldIn, pos, ii) -> i);
+        }
         colorsBlocks = null;
 
         ClientCommandHandler.instance.registerCommand(ExportResearchDataToJson.INSTANCE);
@@ -269,7 +276,7 @@ public class ClientProxy extends CommonProxy {
         return switch (type) {
             case HYPERNET_TERMINAL -> new GuiHyperNetTerminal((TileHyperNetTerminal) present, player);
             case MODULAR_SERVER_ASSEMBLER ->
-                    new GuiModularServerAssembler((TileModularServerAssembler) present, player);
+                new GuiModularServerAssembler((TileModularServerAssembler) present, player);
             case ESTORAGE_CONTROLLER -> new GuiEStorageController((EStorageController) present, player);
             case SINGULARITY_CORE -> new GuiSingularityCore((SingularityCore) present, player);
             case EFABRICATOR_CONTROLLER -> new GuiEFabricatorController((EFabricatorController) present, player);
@@ -279,10 +286,10 @@ public class ClientProxy extends CommonProxy {
             case ECALCULATOR_CONTROLLER -> new GuiECalculatorController((ECalculatorController) present, player);
             case AUTO_CRAFTGUI -> {
                 var stack = y == 1 ? BaublesApi.getBaublesHandler(player).getStackInSlot(x)
-                        : player.inventory.getStackInSlot(x);
+                    : player.inventory.getStackInSlot(x);
                 if (stack.getItem() instanceof IWirelessTermHandler wt) {
                     yield new GuiNEWCraftConfirm(player.inventory,
-                            new WirelessTerminalGuiObject(wt, stack, player, player.world, x, y, Integer.MIN_VALUE));
+                        new WirelessTerminalGuiObject(wt, stack, player, player.world, x, y, Integer.MIN_VALUE));
                 } else yield null;
             }
             case MACHINE_ASSEMBLY_TOOL -> new GuiMachineAssemblyTool(player);

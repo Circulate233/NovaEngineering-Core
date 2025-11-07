@@ -24,9 +24,9 @@ public class Button4StateWithText extends Button4State {
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
         int stringWidth = fr.getStringWidth(content);
         fr.drawStringWithShadow(content,
-                renderPos.posX() + (float) renderSize.width() / 2 - (float) stringWidth / 2,
-                renderPos.posY() + (float) renderSize.height() / 2 - (float) fr.FONT_HEIGHT / 2,
-                textColor
+            renderPos.posX() + (float) renderSize.width() / 2 - (float) stringWidth / 2,
+            renderPos.posY() + (float) renderSize.height() / 2 - (float) fr.FONT_HEIGHT / 2,
+            textColor
         );
     }
 

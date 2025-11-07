@@ -18,8 +18,8 @@ public class SearchPanel extends SizedRow {
     public static final int HEIGHT = 21;
 
     public static final TextureProperties BACKGROUND = TextureProperties.of(
-            GuiEFabricatorPatternSearch.TEXTURES_ELEMENTS,
-            1, 1, WIDTH, HEIGHT
+        GuiEFabricatorPatternSearch.TEXTURES_ELEMENTS,
+        1, 1, WIDTH, HEIGHT
     );
 
     public SearchPanel(final WidgetController controller) {
@@ -27,20 +27,20 @@ public class SearchPanel extends SizedRow {
         InputBox inputContent = new InputBox();
         InputBox outputContent = new InputBox();
         addWidgets(
-                inputContent
-                        .setEnableBackground(false)
-                        .setPrompt(I18n.format("gui.efabricator.pattern_search.input"))
-                        .setOnContentChange((inputBox, content) -> controller.postGuiEvent(
-                                new EFPatternSearchContentUpdateEvent(inputContent.getText(), outputContent.getText())))
-                        .setWidthHeight(88, 10)
-                        .setMargin(23, 0, 6, 0),
-                outputContent
-                        .setEnableBackground(false)
-                        .setPrompt(I18n.format("gui.efabricator.pattern_search.output"))
-                        .setOnContentChange((inputBox, content) -> controller.postGuiEvent(
-                                new EFPatternSearchContentUpdateEvent(inputContent.getText(), outputContent.getText())))
-                        .setWidthHeight(88, 10)
-                        .setMargin(24, 0, 6, 0)
+            inputContent
+                .setEnableBackground(false)
+                .setPrompt(I18n.format("gui.efabricator.pattern_search.input"))
+                .setOnContentChange((inputBox, content) -> controller.postGuiEvent(
+                    new EFPatternSearchContentUpdateEvent(inputContent.getText(), outputContent.getText())))
+                .setWidthHeight(88, 10)
+                .setMargin(23, 0, 6, 0),
+            outputContent
+                .setEnableBackground(false)
+                .setPrompt(I18n.format("gui.efabricator.pattern_search.output"))
+                .setOnContentChange((inputBox, content) -> controller.postGuiEvent(
+                    new EFPatternSearchContentUpdateEvent(inputContent.getText(), outputContent.getText())))
+                .setWidthHeight(88, 10)
+                .setMargin(24, 0, 6, 0)
         );
     }
 

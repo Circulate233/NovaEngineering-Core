@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinNettyCompressionDecoder {
 
     @Redirect(method = "decode",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/PacketBuffer;readBytes(I)Lio/netty/buffer/ByteBuf;")
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/PacketBuffer;readBytes(I)Lio/netty/buffer/ByteBuf;")
     )
     private ByteBuf onDecodeLen(final PacketBuffer packetBuffer, final int len) {
         final int prevIndex = packetBuffer.readerIndex();
@@ -27,9 +27,9 @@ public class MixinNettyCompressionDecoder {
     }
 
     @Redirect(method = "decode",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/PacketBuffer;readBytes([B)Lio/netty/buffer/ByteBuf;")
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/PacketBuffer;readBytes([B)Lio/netty/buffer/ByteBuf;")
     )
     private ByteBuf onDecodeByteArray(final PacketBuffer packetBuffer, final byte[] data) {
         final int prevIndex = packetBuffer.readerIndex();

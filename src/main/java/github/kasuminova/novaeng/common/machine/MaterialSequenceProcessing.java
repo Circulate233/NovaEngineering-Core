@@ -38,17 +38,17 @@ public class MaterialSequenceProcessing implements MachineSpecial {
                         tagname.append("在右").append(i - 2).append("仓室执行此配方");
                     } else break;
                     requireResearch(RecipeBuilder.newBuilder(MachineID + item.getItem().getRegistryName() + i, MachineID, 20, 1)
-                                    .addEnergyPerTickInput(204800)
-                                    .addInputs(CraftTweakerMC.getIItemStack(item)).setTag(tag.toString())
-                                    .addCatalystInput(
-                                            CraftTweakerAPI.itemUtils.getItem("contenttweaker:hxs", 0),
-                                            new String[]{"输入核心素催化物质重组,产物增加25%,每并行需要一个", "并不能增加单次产出低于4的产物数量.."},
-                                            new RecipeModifier[]{RecipeModifierBuilder.create("modularmachinery:item", "output", 1.25f, 1, false).build()}
-                                    ).setChance(0.01f)
-                                    .addOutputs(CraftTweakerMC.getIItemStack(item0))
-                            , "pristine")
-                            .addRecipeTooltip(tagname.toString(), "核心素可以在任意仓内")
-                            .build();
+                                                 .addEnergyPerTickInput(204800)
+                                                 .addInputs(CraftTweakerMC.getIItemStack(item)).setTag(tag.toString())
+                                                 .addCatalystInput(
+                                                     CraftTweakerAPI.itemUtils.getItem("contenttweaker:hxs", 0),
+                                                     new String[]{"输入核心素催化物质重组,产物增加25%,每并行需要一个", "并不能增加单次产出低于4的产物数量.."},
+                                                     new RecipeModifier[]{RecipeModifierBuilder.create("modularmachinery:item", "output", 1.25f, 1, false).build()}
+                                                 ).setChance(0.01f)
+                                                 .addOutputs(CraftTweakerMC.getIItemStack(item0))
+                        , "pristine")
+                        .addRecipeTooltip(tagname.toString(), "核心素可以在任意仓内")
+                        .build();
                 }
             }
         }

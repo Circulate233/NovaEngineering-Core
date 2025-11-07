@@ -30,8 +30,8 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
             GlStateManager.colorMask(true, true, true, false);
 
             Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
-                    renderPos.posX() + 17, renderPos.posY() + 17,
-                    0x8096FF96
+                renderPos.posX() + 17, renderPos.posY() + 17,
+                0x8096FF96
             );
             GlStateManager.color(1F, 1F, 1F, 1F);
 
@@ -59,8 +59,8 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
 
         if (isAvailable() && slot.isInvalid()) {
             Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
-                    renderPos.posX() + 17, renderPos.posY() + 17,
-                    0x80FF9696
+                renderPos.posX() + 17, renderPos.posY() + 17,
+                0x80FF9696
             );
             return;
         }
@@ -85,13 +85,13 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
 
             if (isInstalled()) {
                 Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
-                        renderPos.posX() + 17, renderPos.posY() + 17,
-                        0x80FFFF96
+                    renderPos.posX() + 17, renderPos.posY() + 17,
+                    0x80FFFF96
                 );
             } else {
                 Gui.drawRect(renderPos.posX() + 1, renderPos.posY() + 1,
-                        renderPos.posX() + 17, renderPos.posY() + 17,
-                        0x80FF9696
+                    renderPos.posX() + 17, renderPos.posY() + 17,
+                    0x80FF9696
                 );
             }
             GlStateManager.color(1F, 1F, 1F, 1F);

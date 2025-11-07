@@ -15,13 +15,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinTileEntityExcavator {
 
     @Redirect(
-            method = "doProcessOutput",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lblusunrize/immersiveengineering/common/util/Utils;dropStackAtPos(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/EnumFacing;)V",
-                    remap = false
-            ),
+        method = "doProcessOutput",
+        at = @At(
+            value = "INVOKE",
+            target = "Lblusunrize/immersiveengineering/common/util/Utils;dropStackAtPos(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/EnumFacing;)V",
             remap = false
+        ),
+        remap = false
     )
     private void redirectDoProcessOutput(final World ei, final BlockPos world, final ItemStack pos, final EnumFacing stack) {
         // 销毁物品！为什么不做掉落物清理！

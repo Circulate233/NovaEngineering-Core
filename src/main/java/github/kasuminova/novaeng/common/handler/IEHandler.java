@@ -33,30 +33,30 @@ public class IEHandler {
 
     private static final byte[] NEXT_MODES = {1, 2, 3, 0};
     private static final String[] MESSAGE_KEYS = {
-            "new.orevisualdetector.advanced.tooltips1",
-            "new.orevisualdetector.advanced.tooltips2",
-            "new.orevisualdetector.advanced.tooltips3",
-            "new.orevisualdetector.advanced.tooltips0"
+        "new.orevisualdetector.advanced.tooltips1",
+        "new.orevisualdetector.advanced.tooltips2",
+        "new.orevisualdetector.advanced.tooltips3",
+        "new.orevisualdetector.advanced.tooltips0"
     };
 
     private static void giveCoresample(PlayerInteractEvent.RightClickItem event, World world, BlockPos eventpos, EntityPlayer player, ItemStack item) {
         world.setBlockState(eventpos, BlockMetalDevice1.getStateById(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
         val drill = (TileEntitySampleDrill) world.getTileEntity(eventpos);
         val worldInfo = ExcavatorHandler.getMineralWorldInfo(
-                world,
-                player.chunkCoordX,
-                player.chunkCoordZ
+            world,
+            player.chunkCoordX,
+            player.chunkCoordZ
         );
         var coresample = drill.createCoreSample(
-                world,
-                player.chunkCoordX,
-                player.chunkCoordZ,
-                worldInfo
+            world,
+            player.chunkCoordX,
+            player.chunkCoordZ,
+            worldInfo
         );
         val oilInfo = PumpjackHandler.getOilWorldInfo(
-                world,
-                player.chunkCoordX,
-                player.chunkCoordZ
+            world,
+            player.chunkCoordX,
+            player.chunkCoordZ
         );
         if (oilInfo != null && oilInfo.getType() != null) {
             var nbt = coresample.getTagCompound();
@@ -80,9 +80,9 @@ public class IEHandler {
         val item = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
         EntityPlayer player;
         if (event.getHand() != EnumHand.MAIN_HAND
-                || (player = event.getEntityPlayer()) instanceof FakePlayer
-                || event.isCanceled()
-                || world.isRemote
+            || (player = event.getEntityPlayer()) instanceof FakePlayer
+            || event.isCanceled()
+            || world.isRemote
         ) return;
         val eventpos = new BlockPos(event.getPos().getX(), 250, event.getPos().getZ());
         if (tky.equals(item.getItem().getRegistryName())) {
@@ -93,10 +93,10 @@ public class IEHandler {
             if (player.isSneaking()) {
                 nbt.setByte("mode", NEXT_MODES[mode]);
                 player.sendMessage(
-                        new TextComponentTranslation(
-                                "new.orevisualdetector.scan",
-                                new TextComponentTranslation(MESSAGE_KEYS[mode])
-                        )
+                    new TextComponentTranslation(
+                        "new.orevisualdetector.scan",
+                        new TextComponentTranslation(MESSAGE_KEYS[mode])
+                    )
                 );
                 event.setCanceled(true);
             } else if (mode == 3)

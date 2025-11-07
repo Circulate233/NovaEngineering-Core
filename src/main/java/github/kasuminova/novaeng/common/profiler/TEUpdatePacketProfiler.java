@@ -32,8 +32,8 @@ public class TEUpdatePacketProfiler {
             }
 
             TE_UPDATE_PACKET_TOTAL_SIZE.compute(te.getClass(), (key, value) -> value == null
-                    ? new Tuple<>(1L, (long) packetSize)
-                    : new Tuple<>(value.getFirst() + 1, value.getSecond() + packetSize));
+                ? new Tuple<>(1L, (long) packetSize)
+                : new Tuple<>(value.getFirst() + 1, value.getSecond() + packetSize));
         }
     }
 
@@ -46,9 +46,9 @@ public class TEUpdatePacketProfiler {
 
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted = TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet().stream()
-                .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                .limit(limit)
-                .collect(Collectors.toList());
+                                                                                                                  .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
+                                                                                                                  .limit(limit)
+                                                                                                                  .collect(Collectors.toList());
 
         messages.add("SPacketUpdateTileEntity stat:");
         for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : teSorted) {
@@ -57,14 +57,14 @@ public class TEUpdatePacketProfiler {
             long packetTotalSize = entry.getValue().getSecond();
 
             messages.add(
-                    String.format("TE Class: %s",
-                            TextFormatting.BLUE + tClass.getName() + TextFormatting.WHITE)
+                String.format("TE Class: %s",
+                    TextFormatting.BLUE + tClass.getName() + TextFormatting.WHITE)
             );
             messages.add(
-                    String.format("Amt: %s, Size Total: %s, Size Avg: %s",
-                            TextFormatting.GOLD + MiscUtils.formatDecimal(packetTotalAmount) + TextFormatting.WHITE,
-                            TextFormatting.RED + MiscUtils.formatNumber(packetTotalSize) + 'B' + TextFormatting.WHITE,
-                            TextFormatting.YELLOW + MiscUtils.formatNumber(packetTotalSize / packetTotalAmount)) + 'B' + TextFormatting.WHITE
+                String.format("Amt: %s, Size Total: %s, Size Avg: %s",
+                    TextFormatting.GOLD + MiscUtils.formatDecimal(packetTotalAmount) + TextFormatting.WHITE,
+                    TextFormatting.RED + MiscUtils.formatNumber(packetTotalSize) + 'B' + TextFormatting.WHITE,
+                    TextFormatting.YELLOW + MiscUtils.formatNumber(packetTotalSize / packetTotalAmount)) + 'B' + TextFormatting.WHITE
             );
         }
 

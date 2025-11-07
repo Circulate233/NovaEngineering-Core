@@ -13,9 +13,9 @@ public class SingularityCore implements MachineSpecial {
     @Override
     public void init(final DynamicMachine machine) {
         GeoMachineModel.registerGeoMachineModel("singularity_core",
-                "modularmachinery:geo/singularity_core.geo.json",
-                "modularmachinery:textures/singularity_core.png",
-                "modularmachinery:animations/singularity_core.animation.json"
+            "modularmachinery:geo/singularity_core.geo.json",
+            "modularmachinery:textures/singularity_core.png",
+            "modularmachinery:animations/singularity_core.animation.json"
         );
         MachineModifier.setMachineGeoModel("singularity_core", "singularity_core");
     }

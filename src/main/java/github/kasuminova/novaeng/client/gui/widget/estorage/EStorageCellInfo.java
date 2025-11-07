@@ -30,39 +30,39 @@ public class EStorageCellInfo extends SizedColumn {
     public static final int CELL_TYPE_BACKGROUND_HEIGHT = 26;
 
     public static final TextureProperties CELL_BACKGROUND_L4 = new TextureProperties(BG_TEX_RES,
-            1, 1,
-            CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
+        1, 1,
+        CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
     );
 
     public static final TextureProperties CELL_BACKGROUND_L6 = new TextureProperties(BG_TEX_RES,
-            1, 28,
-            CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
+        1, 28,
+        CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
     );
 
     public static final TextureProperties CELL_BACKGROUND_L9 = new TextureProperties(BG_TEX_RES,
-            1, 55,
-            CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
+        1, 55,
+        CELL_BACKGROUND_TEXTURE_WIDTH, CELL_BACKGROUND_TEXTURE_HEIGHT
     );
 
     public static final TextureProperties CELL_TYPE_BACKGROUND_ITEM = new TextureProperties(BG_TEX_RES,
-            19, 82,
-            CELL_TYPE_BACKGROUND_WIDTH,
-            CELL_TYPE_BACKGROUND_HEIGHT
+        19, 82,
+        CELL_TYPE_BACKGROUND_WIDTH,
+        CELL_TYPE_BACKGROUND_HEIGHT
     );
 
     public static final TextureProperties CELL_TYPE_BACKGROUND_FLUID = new TextureProperties(BG_TEX_RES,
-            10, 82,
-            CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
+        10, 82,
+        CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
     );
 
     public static final TextureProperties CELL_TYPE_BACKGROUND_GAS = new TextureProperties(BG_TEX_RES,
-            28, 82,
-            CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
+        28, 82,
+        CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
     );
 
     public static final TextureProperties CELL_TYPE_BACKGROUND_EMPTY = new TextureProperties(BG_TEX_RES,
-            1, 82,
-            CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
+        1, 82,
+        CELL_TYPE_BACKGROUND_WIDTH, CELL_TYPE_BACKGROUND_HEIGHT
     );
     protected final EStorageCellData data;
     protected TextureProperties cellBackground = TextureProperties.EMPTY;
@@ -95,7 +95,7 @@ public class EStorageCellInfo extends SizedColumn {
             case ITEM -> cellTypeBackground = CELL_TYPE_BACKGROUND_ITEM;
             case FLUID -> cellTypeBackground = CELL_TYPE_BACKGROUND_FLUID;
             case GAS ->
-                    cellTypeBackground = Mods.MEKENG.isPresent() ? CELL_TYPE_BACKGROUND_GAS : CELL_TYPE_BACKGROUND_EMPTY;
+                cellTypeBackground = Mods.MEKENG.isPresent() ? CELL_TYPE_BACKGROUND_GAS : CELL_TYPE_BACKGROUND_EMPTY;
         }
     }
 
@@ -124,18 +124,18 @@ public class EStorageCellInfo extends SizedColumn {
 
         // Type
         addWidget(new MultiLineLabel(Collections.singletonList(
-                I18n.format("gui.estorage_controller.cell_info.tip.0", typeName, levelName))
+            I18n.format("gui.estorage_controller.cell_info.tip.0", typeName, levelName))
         ).setAutoWrap(false).setScale(.6F).setHeight(7).setMargin(10, 0, 2, 0));
         // StoredTypes / MaxTypes
         addWidget(new MultiLineLabel(Collections.singletonList(
-                I18n.format("gui.estorage_controller.cell_info.tip.1", usedTypes, maxTypes))
+            I18n.format("gui.estorage_controller.cell_info.tip.1", usedTypes, maxTypes))
         ).setAutoWrap(false).setScale(.6F).setHeight(7).setMargin(10, 0, 0, 0));
         // UsedBytes / MaxBytes
         addWidget(new MultiLineLabel(Collections.singletonList(
-                I18n.format("gui.estorage_controller.cell_info.tip.2",
-                        NovaEngUtils.formatNumber(usedBytes, 1),
-                        NovaEngUtils.formatNumber(maxBytes, 1)
-                ))
+            I18n.format("gui.estorage_controller.cell_info.tip.2",
+                NovaEngUtils.formatNumber(usedBytes, 1),
+                NovaEngUtils.formatNumber(maxBytes, 1)
+            ))
         ).setAutoWrap(false).setScale(.6F).setHeight(7).setMargin(10, 0, 0, 0));
     }
 

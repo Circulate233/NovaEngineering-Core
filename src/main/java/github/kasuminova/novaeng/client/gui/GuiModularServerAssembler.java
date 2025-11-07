@@ -21,10 +21,10 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiModularServerAssembler extends GuiContainerDynamic<ContainerModularServerAssembler> {
     public static final ResourceLocation TEXTURES_BACKGROUND = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/modular_server_assembler.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/modular_server_assembler.png");
 
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/msa_elements.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/msa_elements.png");
 
     public static final int MAIN_GUI_WIDTH = 329;
     public static final int MAIN_GUI_HEIGHT = 206;

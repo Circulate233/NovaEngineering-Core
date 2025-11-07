@@ -31,8 +31,8 @@ public class CPacketProfiler {
         }
 
         PACKET_TOTAL_SIZE.compute(packet.getClass(), (key, value) -> value == null
-                ? new Tuple<>(1L, (long) packetSize)
-                : new Tuple<>(value.getFirst() + 1, value.getSecond() + packetSize));
+            ? new Tuple<>(1L, (long) packetSize)
+            : new Tuple<>(value.getFirst() + 1, value.getSecond() + packetSize));
 
         if (packet instanceof SPacketUpdateTileEntity) {
             TEUpdatePacketProfiler.onPacketReceived((SPacketUpdateTileEntity) packet, packetSize);
@@ -54,14 +54,14 @@ public class CPacketProfiler {
 
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = CPacketProfiler.PACKET_TOTAL_SIZE.entrySet().stream()
-                .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                .limit(limit)
-                .collect(Collectors.toList());
+                                                                                               .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
+                                                                                               .limit(limit)
+                                                                                               .collect(Collectors.toList());
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted = TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet().stream()
-                .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                .limit(limit)
-                .collect(Collectors.toList());
+                                                                                                                  .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
+                                                                                                                  .limit(limit)
+                                                                                                                  .collect(Collectors.toList());
 
         CPacketProfilerData data = new CPacketProfilerData((float) networkBandwidthPerSec);
         sorted.forEach((entry) -> {
@@ -86,8 +86,8 @@ public class CPacketProfiler {
         double networkBandwidthPerSec = profileTimeExisted <= 0 ? 0 : (totalPacketSize / ((double) profileTimeExisted / 1000D));
 
         messages.add(
-                String.format("Network BandWidth Per Second: %s",
-                        TextFormatting.GREEN + MiscUtils.formatNumber((long) networkBandwidthPerSec) + "B/s" + TextFormatting.WHITE)
+            String.format("Network BandWidth Per Second: %s",
+                TextFormatting.GREEN + MiscUtils.formatNumber((long) networkBandwidthPerSec) + "B/s" + TextFormatting.WHITE)
         );
 
         if (limit <= 0) {
@@ -96,9 +96,9 @@ public class CPacketProfiler {
 
         @SuppressWarnings("SimplifyStreamApiCallChains")
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = CPacketProfiler.PACKET_TOTAL_SIZE.entrySet().stream()
-                .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                .limit(limit)
-                .collect(Collectors.toList());
+                                                                                               .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
+                                                                                               .limit(limit)
+                                                                                               .collect(Collectors.toList());
 
         for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : sorted) {
             Class<?> pClass = entry.getKey();
@@ -107,23 +107,23 @@ public class CPacketProfiler {
 
             if (pClass.getName().startsWith("net.minecraft")) {
                 messages.add(
-                        String.format("Pkt Class: %s",
-                                TextFormatting.BLUE + pClass.getSimpleName() + TextFormatting.WHITE
-                        )
+                    String.format("Pkt Class: %s",
+                        TextFormatting.BLUE + pClass.getSimpleName() + TextFormatting.WHITE
+                    )
                 );
             } else {
                 messages.add(
-                        String.format("Mod Pkt Class: %s",
-                                TextFormatting.BLUE + pClass.getName() + TextFormatting.WHITE
-                        )
+                    String.format("Mod Pkt Class: %s",
+                        TextFormatting.BLUE + pClass.getName() + TextFormatting.WHITE
+                    )
                 );
             }
 
             messages.add(
-                    String.format("Amt: %s, Size Total: %s, Size Avg: %s",
-                            TextFormatting.GOLD + MiscUtils.formatDecimal(packetTotalAmount) + TextFormatting.WHITE,
-                            TextFormatting.RED + MiscUtils.formatNumber(packetTotalSize) + 'B' + TextFormatting.WHITE,
-                            TextFormatting.YELLOW + MiscUtils.formatNumber(packetTotalSize / packetTotalAmount)) + 'B' + TextFormatting.WHITE
+                String.format("Amt: %s, Size Total: %s, Size Avg: %s",
+                    TextFormatting.GOLD + MiscUtils.formatDecimal(packetTotalAmount) + TextFormatting.WHITE,
+                    TextFormatting.RED + MiscUtils.formatNumber(packetTotalSize) + 'B' + TextFormatting.WHITE,
+                    TextFormatting.YELLOW + MiscUtils.formatNumber(packetTotalSize / packetTotalAmount)) + 'B' + TextFormatting.WHITE
             );
         }
 

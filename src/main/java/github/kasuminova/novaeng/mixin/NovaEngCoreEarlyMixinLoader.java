@@ -71,12 +71,12 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
                 return;
             }
             int input = JOptionPane.showConfirmDialog(null,
-                    """
-                            客户端已侦测到 CleanroomLoader，但是你***可能***正在使用不兼容的启动器来启动客户端。
-                            使用不兼容的启动器会出现预期外的问题，并导致性能下降，甚至崩溃。
-                            如果可能，请检查你的整合包的版本是否是最新版本。你可以点击“确定”强制启动客户端，但是这可能会导致大概率游戏崩溃。
-                            """, "侦测到不兼容的启动器",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                """
+                    客户端已侦测到 CleanroomLoader，但是你***可能***正在使用不兼容的启动器来启动客户端。
+                    使用不兼容的启动器会出现预期外的问题，并导致性能下降，甚至崩溃。
+                    如果可能，请检查你的整合包的版本是否是最新版本。你可以点击“确定”强制启动客户端，但是这可能会导致大概率游戏崩溃。
+                    """, "侦测到不兼容的启动器",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (input != JOptionPane.YES_OPTION) {
                 throw new RuntimeException("Unsupported launcher detected.");
             }
@@ -108,9 +108,9 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
             }
 
             ResourceBundle bundle = ResourceBundle.getBundle(
-                    "messages",
-                    Locale.getDefault(),
-                    Thread.currentThread().getContextClassLoader()
+                "messages",
+                Locale.getDefault(),
+                Thread.currentThread().getContextClassLoader()
             );
 
             int major = Integer.parseInt(mainParts[0]);
@@ -145,8 +145,8 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         }
 
         int input = JOptionPane.showConfirmDialog(null, message,
-                getString("java.version.warning.title"),
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            getString("java.version.warning.title"),
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (input != JOptionPane.YES_OPTION) {
             throw new RuntimeException(getString("java.version.blocked"));
@@ -173,8 +173,8 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
     @Override
     public List<String> getMixinConfigs() {
         return Arrays.asList(
-                "mixins.novaeng_core_vanilla.json",
-                "mixins.novaeng_core.json"
+            "mixins.novaeng_core_vanilla.json",
+            "mixins.novaeng_core.json"
         );
     }
 

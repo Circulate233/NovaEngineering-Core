@@ -148,20 +148,20 @@ public class AssemblyInvCPU extends AssemblyInvToggleable {
 
         Column cpuOverlayCol = new Column();
         cpuOverlayCol.addWidgets(
-                new OverlayRAM(ram_0_0).setMarginDown(1),
-                new OverlayRAM(ram_0_1).setMarginDown(4),
+            new OverlayRAM(ram_0_0).setMarginDown(1),
+            new OverlayRAM(ram_0_1).setMarginDown(4),
 
-                new OverlayCPU(cpu_0_0).setMarginLeft(13).setMarginDown(4),
+            new OverlayCPU(cpu_0_0).setMarginLeft(13).setMarginDown(4),
 
-                new OverlayRAM(ram_0_2),
-                new OverlayRAM(ram_0_3).setMarginDown(1),
-                new OverlayRAM(ram_1_0),
-                new OverlayRAM(ram_1_1).setMarginDown(4),
+            new OverlayRAM(ram_0_2),
+            new OverlayRAM(ram_0_3).setMarginDown(1),
+            new OverlayRAM(ram_1_0),
+            new OverlayRAM(ram_1_1).setMarginDown(4),
 
-                new OverlayCPU(cpu_1_0).setMarginLeft(13).setMarginDown(4),
+            new OverlayCPU(cpu_1_0).setMarginLeft(13).setMarginDown(4),
 
-                new OverlayRAM(ram_1_2).setMarginDown(1),
-                new OverlayRAM(ram_1_3)
+            new OverlayRAM(ram_1_2).setMarginDown(1),
+            new OverlayRAM(ram_1_3)
         ).setAbsX(203).setAbsY(28);
         widgetController.addWidgetContainer(cpuOverlayCol);
     }

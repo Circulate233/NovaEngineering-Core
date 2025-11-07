@@ -22,13 +22,13 @@ import net.minecraft.util.ResourceLocation;
 public class GuiEFabricatorController extends GuiContainerDynamic<ContainerEFabricatorController> {
 
     public static final ResourceLocation TEXTURES_BACKGROUND_LIGHT = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_light.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_light.png");
     public static final ResourceLocation TEXTURES_BACKGROUND_DARK = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_dark.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_dark.png");
     public static final ResourceLocation TEXTURES_INVENTORY = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-            NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_elements.png");
+        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_elements.png");
 
     @Getter
     private EFabricatorData data = null;

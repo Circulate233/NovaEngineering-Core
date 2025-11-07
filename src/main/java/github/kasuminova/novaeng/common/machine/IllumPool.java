@@ -65,11 +65,11 @@ public class IllumPool implements MachineSpecial {
      * x x x
      */
     public static final List<BlockPos> CATALYST_POS_PRESET = Functions.asList(
-            withXZ(1, 1), withXZ(0, 1), withXZ(-1, 1),
-            withXZ(2, 2), withXZ(1, 2), withXZ(0, 2), withXZ(-1, 2), withXZ(-2, 2),
-            withXZ(2, 3), withXZ(1, 3), withXZ(0, 3), withXZ(-1, 3), withXZ(-2, 3),
-            withXZ(2, 4), withXZ(1, 4), withXZ(0, 4), withXZ(-1, 4), withXZ(-2, 4),
-            withXZ(1, 5), withXZ(0, 5), withXZ(-1, 5)
+        withXZ(1, 1), withXZ(0, 1), withXZ(-1, 1),
+        withXZ(2, 2), withXZ(1, 2), withXZ(0, 2), withXZ(-1, 2), withXZ(-2, 2),
+        withXZ(2, 3), withXZ(1, 3), withXZ(0, 3), withXZ(-1, 3), withXZ(-2, 3),
+        withXZ(2, 4), withXZ(1, 4), withXZ(0, 4), withXZ(-1, 4), withXZ(-2, 4),
+        withXZ(1, 5), withXZ(0, 5), withXZ(-1, 5)
     );
     /**
      * c x x x x x c
@@ -81,8 +81,8 @@ public class IllumPool implements MachineSpecial {
      * c x x x x x c
      */
     public static final List<BlockPos> CRYSTAL_POS_PRESET = Functions.asList(
-            new BlockPos(3, 2, 6), new BlockPos(-3, 2, 6),
-            new BlockPos(3, 2, 0), new BlockPos(-3, 2, 0)
+        new BlockPos(3, 2, 6), new BlockPos(-3, 2, 6),
+        new BlockPos(3, 2, 0), new BlockPos(-3, 2, 0)
     );
     public static final BlockPos ASTRAL_CRYSTAL_POS = new BlockPos(0, 5, 3);
 
@@ -294,34 +294,34 @@ public class IllumPool implements MachineSpecial {
 
         // 普通模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(NORMAL_CATALYST,
-                buildModifierReplacementBlockArray(blockBifrostPerm, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
-                ObjectLists.emptyList(),
-                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.e"),
-                StackUtils.getStackFromBlockState(blockBifrostPerm.getDefaultState())));
+            buildModifierReplacementBlockArray(blockBifrostPerm, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
+            ObjectLists.emptyList(),
+            StringUtils.getText("novaeng.illum_pool.illum_pool.mode.e"),
+            StackUtils.getStackFromBlockState(blockBifrostPerm.getDefaultState())));
         // 炼金模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(ALCHEMY_CATALYST,
-                buildModifierReplacementBlockArray(blockAlchemyCatalyst, CATALYST_POS_PRESET),
-                ObjectLists.emptyList(),
-                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.a"),
-                StackUtils.getStackFromBlockState(blockAlchemyCatalyst.getDefaultState())));
+            buildModifierReplacementBlockArray(blockAlchemyCatalyst, CATALYST_POS_PRESET),
+            ObjectLists.emptyList(),
+            StringUtils.getText("novaeng.illum_pool.illum_pool.mode.a"),
+            StackUtils.getStackFromBlockState(blockAlchemyCatalyst.getDefaultState())));
         // 炼造模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(CONJURATION_CATALYST,
-                buildModifierReplacementBlockArray(blockConjurationCatalyst, CATALYST_POS_PRESET),
-                ObjectLists.emptyList(),
-                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.b"),
-                StackUtils.getStackFromBlockState(blockConjurationCatalyst.getDefaultState())));
+            buildModifierReplacementBlockArray(blockConjurationCatalyst, CATALYST_POS_PRESET),
+            ObjectLists.emptyList(),
+            StringUtils.getText("novaeng.illum_pool.illum_pool.mode.b"),
+            StackUtils.getStackFromBlockState(blockConjurationCatalyst.getDefaultState())));
         // 次元模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(DIMENSION_CATALYST,
-                buildModifierReplacementBlockArray(blockDimensionCatalyst, CATALYST_POS_PRESET),
-                ObjectLists.emptyList(),
-                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.c"),
-                StackUtils.getStackFromBlockState(blockDimensionCatalyst.getDefaultState())));
+            buildModifierReplacementBlockArray(blockDimensionCatalyst, CATALYST_POS_PRESET),
+            ObjectLists.emptyList(),
+            StringUtils.getText("novaeng.illum_pool.illum_pool.mode.c"),
+            StackUtils.getStackFromBlockState(blockDimensionCatalyst.getDefaultState())));
         // 星光模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(STARLIGHT_CATALYST,
-                buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
-                ObjectLists.emptyList(),
-                StringUtils.getText("novaeng.illum_pool.illum_pool.mode.d"),
-                StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));
+            buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
+            ObjectLists.emptyList(),
+            StringUtils.getText("novaeng.illum_pool.illum_pool.mode.d"),
+            StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));
 
         machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
             TileMultiblockMachineController controller = event.getController();
@@ -421,9 +421,9 @@ public class IllumPool implements MachineSpecial {
             Vector3 astralCrystalPos = new Vector3(MiscUtils.rotateYCCWNorthUntil(ASTRAL_CRYSTAL_POS, facing));
             Vector3 crystalPos = new Vector3(MiscUtils.rotateYCCWNorthUntil(CRYSTAL_POS_PRESET.get(RandomUtils.nextInt(CRYSTAL_POS_PRESET.size())), facing));
             AstralSorcery.proxy.fireLightning(world,
-                    astralCrystalPos.add(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5),
-                    crystalPos.add(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5),
-                    color
+                astralCrystalPos.add(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5),
+                crystalPos.add(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5),
+                color
             );
         }
     }
@@ -442,39 +442,39 @@ public class IllumPool implements MachineSpecial {
         float manaPercent = (float) manaStored / MAX_MANA_STORE;
         // Example: 724K / 10M (7.24%)
         String manaPercentStr = NovaEngUtils.formatNumber(manaStored)
-                + " / "
-                + NovaEngUtils.formatNumber(MAX_MANA_STORE)
-                + " (" + NovaEngUtils.formatFloat(manaPercent * 100, 2) + "%)";
+            + " / "
+            + NovaEngUtils.formatNumber(MAX_MANA_STORE)
+            + " (" + NovaEngUtils.formatFloat(manaPercent * 100, 2) + "%)";
         MachineSpecial.newBox(box).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text("{*top.illum_pool.mana.stored*}")
-                .progress(Math.round(manaPercent * 100), 100, probeInfo.defaultProgressStyle()
-                        .prefix(manaPercentStr)
-                        .filledColor(0xCC63B8FF)
-                        .alternateFilledColor(0xCC00BFFF)
-                        .borderColor(0xCC4F94CD)
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(120)
-                );
+                      .text("{*top.illum_pool.mana.stored*}")
+                      .progress(Math.round(manaPercent * 100), 100, probeInfo.defaultProgressStyle()
+                                                                             .prefix(manaPercentStr)
+                                                                             .filledColor(0xCC63B8FF)
+                                                                             .alternateFilledColor(0xCC00BFFF)
+                                                                             .borderColor(0xCC4F94CD)
+                                                                             .backgroundColor(0xFF000000)
+                                                                             .numberFormat(NumberFormat.NONE)
+                                                                             .width(120)
+                      );
 
         int illumStored = getIllumStored(tag);
         float illumPercent = (float) illumStored / MAX_ILLUM_STORE;
         // Example: 724K / 10M (7.24%)
         String illumPercentStr = NovaEngUtils.formatNumber(illumStored)
-                + " / "
-                + NovaEngUtils.formatNumber(MAX_ILLUM_STORE)
-                + " (" + NovaEngUtils.formatFloat(illumPercent * 100, 2) + "%)";
+            + " / "
+            + NovaEngUtils.formatNumber(MAX_ILLUM_STORE)
+            + " (" + NovaEngUtils.formatFloat(illumPercent * 100, 2) + "%)";
         MachineSpecial.newBox(box).horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
-                .text("{*top.illum_pool.illum.stored*}")
-                .progress(Math.round(illumPercent * 100), 100, probeInfo.defaultProgressStyle()
-                        .prefix(illumPercentStr)
-                        .filledColor(0xCCFFFF00)
-                        .alternateFilledColor(0xCCFFD700)
-                        .borderColor(0xCCEEC900)
-                        .backgroundColor(0xFF000000)
-                        .numberFormat(NumberFormat.NONE)
-                        .width(80)
-                );
+                      .text("{*top.illum_pool.illum.stored*}")
+                      .progress(Math.round(illumPercent * 100), 100, probeInfo.defaultProgressStyle()
+                                                                              .prefix(illumPercentStr)
+                                                                              .filledColor(0xCCFFFF00)
+                                                                              .alternateFilledColor(0xCCFFD700)
+                                                                              .borderColor(0xCCEEC900)
+                                                                              .backgroundColor(0xFF000000)
+                                                                              .numberFormat(NumberFormat.NONE)
+                                                                              .width(80)
+                      );
 
         box = MachineSpecial.newBox(probeInfo);
         IProbeInfo left = MachineSpecial.newVertical(box);
@@ -506,19 +506,19 @@ public class IllumPool implements MachineSpecial {
         left.text("{*top.illum_pool.crystal.size*}");
         mid.text(String.valueOf(crystalSize));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
-                maxParallelism, crystalSizeRatio * 100, maxParallelism = Math.round(maxParallelism * crystalSizeRatio)));
+            maxParallelism, crystalSizeRatio * 100, maxParallelism = Math.round(maxParallelism * crystalSizeRatio)));
 
         left.text("{*top.illum_pool.crystal.purity*}");
         mid.text(String.valueOf(crystalPurity));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
-                maxParallelism, crystalPurityRatio * 100, maxParallelism = Math.round(maxParallelism * crystalPurityRatio)) + ' ' +
-                TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalPurityEfficiency(crystalPurity) * 100));
+            maxParallelism, crystalPurityRatio * 100, maxParallelism = Math.round(maxParallelism * crystalPurityRatio)) + ' ' +
+            TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalPurityEfficiency(crystalPurity) * 100));
 
         left.text("{*top.illum_pool.crystal.polishing*}");
         mid.text(String.valueOf(crystalCollectiveCapability));
         right.text(TextFormatting.DARK_GREEN + String.format(" (%s x %.1f%% = %s)",
-                maxParallelism, crystalCollectiveCapabilityRatio * 100, Math.round(maxParallelism * crystalCollectiveCapabilityRatio)) + ' ' +
-                TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalCollectiveCapabilityEfficiency(crystalCollectiveCapability) * 100));
+            maxParallelism, crystalCollectiveCapabilityRatio * 100, Math.round(maxParallelism * crystalCollectiveCapabilityRatio)) + ' ' +
+            TextFormatting.DARK_AQUA + String.format("(-%.1f%%)", calculateCrystalCollectiveCapabilityEfficiency(crystalCollectiveCapability) * 100));
 
         left.text("§9{*top.max_parallelism*}：§2");
         mid.text(String.valueOf(parallelism));

@@ -80,15 +80,15 @@ public class EStorageGraphBar extends DynamicWidget {
         Color midColor = new Color(255, 255, 0);
         Color endColor = new Color(255, 0, 0);
         Color barColor = ColorUtils.getGradientColor(reverseColor ? new Color[]{endColor, midColor, startColor, startColor} : new Color[]{startColor, startColor, midColor, endColor},
-                (int) (255 * .75F),
-                (float) percentage.get()
+            (int) (255 * .75F),
+            (float) percentage.get()
         );
 
         GlStateManager.color(
-                (float) barColor.getRed() / 255,
-                (float) barColor.getGreen() / 255,
-                (float) barColor.getBlue() / 255,
-                .75F
+            (float) barColor.getRed() / 255,
+            (float) barColor.getGreen() / 255,
+            (float) barColor.getBlue() / 255,
+            .75F
         );
 
         GlStateManager.enableBlend();
@@ -96,9 +96,9 @@ public class EStorageGraphBar extends DynamicWidget {
 
         // 渲染顶部
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY() + ((BAR_HEIGHT - (barHeight + BOTTOM_AND_TOP_HEIGHT))),
-                TOP_TEX_X, TOP_TEX_Y,
-                BAR_WIDTH, BOTTOM_AND_TOP_HEIGHT
+            renderPos.posX(), renderPos.posY() + ((BAR_HEIGHT - (barHeight + BOTTOM_AND_TOP_HEIGHT))),
+            TOP_TEX_X, TOP_TEX_Y,
+            BAR_WIDTH, BOTTOM_AND_TOP_HEIGHT
         );
 
         // 渲染中间部分
@@ -106,17 +106,17 @@ public class EStorageGraphBar extends DynamicWidget {
         int finalYOffset = renderPos.posY() + BAR_HEIGHT - BOTTOM_AND_TOP_HEIGHT + (BOTTOM_AND_TOP_HEIGHT / 2) + 1;
         for (int i = yOffset; i < finalYOffset; i++) {
             gui.drawTexturedModalRect(
-                    renderPos.posX(), i,
-                    MID_TEX_X, MID_TEX_Y,
-                    BAR_WIDTH, MID_TEX_HEIGHT
+                renderPos.posX(), i,
+                MID_TEX_X, MID_TEX_Y,
+                BAR_WIDTH, MID_TEX_HEIGHT
             );
         }
 
         // 渲染底部
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY() + BAR_HEIGHT - BOTTOM_AND_TOP_HEIGHT,
-                BOTTOM_TEX_X, BOTTOM_TEX_Y,
-                BAR_WIDTH, BOTTOM_AND_TOP_HEIGHT
+            renderPos.posX(), renderPos.posY() + BAR_HEIGHT - BOTTOM_AND_TOP_HEIGHT,
+            BOTTOM_TEX_X, BOTTOM_TEX_Y,
+            BAR_WIDTH, BOTTOM_AND_TOP_HEIGHT
         );
 
         GlStateManager.color(1F, 1F, 1F, 1F);

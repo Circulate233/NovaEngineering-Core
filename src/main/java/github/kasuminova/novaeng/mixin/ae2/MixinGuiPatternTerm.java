@@ -36,8 +36,8 @@ public class MixinGuiPatternTerm extends GuiMEMonitorable {
     @Inject(method = "initGui", at = @At("RETURN"))
     private void injectInitGui(final CallbackInfo ci) {
         novaeng_core$uploadPatternButton = new GuiTabButton(
-                this.guiLeft + 173, this.guiTop + this.ySize - 155,
-                new ItemStack(BlockEFabricatorController.L4), I18n.format("gui.efabricator.button.upload_pattern"), this.itemRender
+            this.guiLeft + 173, this.guiTop + this.ySize - 155,
+            new ItemStack(BlockEFabricatorController.L4), I18n.format("gui.efabricator.button.upload_pattern"), this.itemRender
         );
         this.buttonList.add(this.novaeng_core$uploadPatternButton);
     }

@@ -28,31 +28,31 @@ import java.util.List;
 public class BlockEFabricatorParallelProc extends BlockEFabricatorPart {
 
     public static final BlockEFabricatorParallelProc L4 = new BlockEFabricatorParallelProc("l4",
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 24, false)
-            ),
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 32, false),
-                    new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.99, true)
-            )
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 24, false)
+        ),
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 32, false),
+            new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.99, true)
+        )
     );
     public static final BlockEFabricatorParallelProc L6 = new BlockEFabricatorParallelProc("l6",
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 72, false)
-            ),
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 96, false),
-                    new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.98, true)
-            )
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 72, false)
+        ),
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 96, false),
+            new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.98, true)
+        )
     );
     public static final BlockEFabricatorParallelProc L9 = new BlockEFabricatorParallelProc("l9",
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 256, false)
-            ),
-            Arrays.asList(
-                    new Modifier(EFabricatorParallelProc.Type.ADD, 384, false),
-                    new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.97, true)
-            )
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 256, false)
+        ),
+        Arrays.asList(
+            new Modifier(EFabricatorParallelProc.Type.ADD, 384, false),
+            new Modifier(EFabricatorParallelProc.Type.MULTIPLY, 0.97, true)
+        )
     );
 
     protected final List<Modifier> modifiers;
@@ -66,7 +66,7 @@ public class BlockEFabricatorParallelProc extends BlockEFabricatorPart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_parallel_proc_" + level));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_parallel_proc_" + level);

@@ -75,10 +75,10 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
 
         NBTTagList unlocked = tag.getTagList("unlockedData", Constants.NBT.TAG_STRING);
         IntStream.range(0, unlocked.tagCount())
-                .mapToObj(unlocked::getStringTagAt)
-                .map(RegistryHyperNet::getResearchCognitionData)
-                .filter(Objects::nonNull)
-                .forEach(UNLOCKED_DATA::add);
+                 .mapToObj(unlocked::getStringTagAt)
+                 .map(RegistryHyperNet::getResearchCognitionData)
+                 .filter(Objects::nonNull)
+                 .forEach(UNLOCKED_DATA::add);
 
         NBTTagList researching = tag.getTagList("researchingData", Constants.NBT.TAG_COMPOUND);
         IntStream.range(0, researching.tagCount()).mapToObj(researching::getCompoundTagAt).forEach(tagAt -> {
@@ -95,10 +95,10 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
 
         NBTTagList databases = tag.getTagList("databases", Constants.NBT.TAG_COMPOUND);
         IntStream.range(0, databases.tagCount())
-                .mapToObj(databases::getCompoundTagAt)
-                .map(Database.Status::readFromNBT)
-                .filter(Objects::nonNull)
-                .forEach(DATABASES::add);
+                 .mapToObj(databases::getCompoundTagAt)
+                 .map(Database.Status::readFromNBT)
+                 .filter(Objects::nonNull)
+                 .forEach(DATABASES::add);
 
         researchStationType = RegistryHyperNet.getResearchStationType(tag.getString("researchStationType"));
     }
@@ -120,17 +120,17 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
         }
 
         Collection<Database> databases = center.getNode(Database.class).stream()
-                .filter(Database::isWorking)
-                .collect(Collectors.toList());
+                                               .filter(Database::isWorking)
+                                               .collect(Collectors.toList());
 
         Set<ResearchCognitionData> researchCognition = databases.stream()
-                .flatMap(database -> database.getStoredResearchCognition().stream())
-                .collect(Collectors.toSet());
+                                                                .flatMap(database -> database.getStoredResearchCognition().stream())
+                                                                .collect(Collectors.toSet());
 
         NBTTagList unlocked = new NBTTagList();
         researchCognition.stream()
-                .map(data -> new NBTTagString(data.getResearchName()))
-                .forEach(unlocked::appendTag);
+                         .map(data -> new NBTTagString(data.getResearchName()))
+                         .forEach(unlocked::appendTag);
         tag.setTag("unlockedData", unlocked);
 
         NBTTagList databasesTag = new NBTTagList();

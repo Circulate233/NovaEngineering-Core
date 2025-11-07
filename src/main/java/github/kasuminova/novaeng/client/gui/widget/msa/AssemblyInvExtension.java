@@ -133,34 +133,34 @@ public class AssemblyInvExtension extends AssemblyInvToggleable {
 
         Column slotExtensionCardOverlayCol = new Column();
         slotExtensionCardOverlayCol.addWidgets(
-                new Row().addWidgets(
-                        new OverlayExtensionCard(ext_c_0_0).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_0_1).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_0_2).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_0_3).setMarginRight(4),
-                        new OverlayExtensionCardExtension(ext_0_0).setMarginUp(1)
-                ).setMarginDown(4),
-                new Row().addWidgets(
-                        new OverlayExtensionCard(ext_c_1_0).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_1_1).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_1_2).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_1_3).setMarginRight(4),
-                        new OverlayExtensionCardExtension(ext_1_0).setMarginUp(1)
-                ).setMarginDown(4),
-                new Row().addWidgets(
-                        new OverlayExtensionCard(ext_c_2_0).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_2_1).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_2_2).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_2_3).setMarginRight(4),
-                        new OverlayExtensionCardExtension(ext_2_0).setMarginUp(1)
-                ).setMarginDown(4),
-                new Row().addWidgets(
-                        new OverlayExtensionCard(ext_c_3_0).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_3_1).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_3_2).setMarginRight(2),
-                        new OverlayExtensionCard(ext_c_3_3).setMarginRight(4),
-                        new OverlayExtensionCardExtension(ext_3_0).setMarginUp(1)
-                )
+            new Row().addWidgets(
+                new OverlayExtensionCard(ext_c_0_0).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_0_1).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_0_2).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_0_3).setMarginRight(4),
+                new OverlayExtensionCardExtension(ext_0_0).setMarginUp(1)
+            ).setMarginDown(4),
+            new Row().addWidgets(
+                new OverlayExtensionCard(ext_c_1_0).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_1_1).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_1_2).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_1_3).setMarginRight(4),
+                new OverlayExtensionCardExtension(ext_1_0).setMarginUp(1)
+            ).setMarginDown(4),
+            new Row().addWidgets(
+                new OverlayExtensionCard(ext_c_2_0).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_2_1).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_2_2).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_2_3).setMarginRight(4),
+                new OverlayExtensionCardExtension(ext_2_0).setMarginUp(1)
+            ).setMarginDown(4),
+            new Row().addWidgets(
+                new OverlayExtensionCard(ext_c_3_0).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_3_1).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_3_2).setMarginRight(2),
+                new OverlayExtensionCard(ext_c_3_3).setMarginRight(4),
+                new OverlayExtensionCardExtension(ext_3_0).setMarginUp(1)
+            )
         ).setAbsX(260).setAbsY(21);
         widgetController.addWidgetContainer(slotExtensionCardOverlayCol);
     }

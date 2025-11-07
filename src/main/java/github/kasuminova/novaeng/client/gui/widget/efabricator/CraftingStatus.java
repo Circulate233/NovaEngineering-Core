@@ -16,23 +16,23 @@ import java.util.Collections;
 public class CraftingStatus extends SizedColumn {
 
     private static final TextureProperties TEXTURE_BACKGROUND = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            20, 126, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        20, 126, 18, 18
     );
 
     private static final TextureProperties TEXTURE_BACKGROUND_DISABLED = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            39, 126, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        39, 126, 18, 18
     );
 
     private static final TextureProperties TEXTURE_UNAVAILABLE = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            58, 126, 18, 18
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        58, 126, 18, 18
     );
 
     private static final TextureProperties TEXTURE_PROGRESS_FOREGROUND = new TextureProperties(
-            GuiEFabricatorController.TEXTURES_ELEMENTS,
-            77, 126, 14, 3
+        GuiEFabricatorController.TEXTURES_ELEMENTS,
+        77, 126, 14, 3
     );
 
     private final SlotItemVirtualJEISmall slot = SlotItemVirtualJEISmall.of();
@@ -49,7 +49,7 @@ public class CraftingStatus extends SizedColumn {
                 .addForegroundTexture(TEXTURE_PROGRESS_FOREGROUND)
                 .setMaxProgress(100)
                 .setTooltipFunction(input -> Collections.singletonList(
-                        I18n.format("gui.efabricator.queue.status", (int) input.getProgress(), (int) input.getMaxProgress())
+                    I18n.format("gui.efabricator.queue.status", (int) input.getProgress(), (int) input.getMaxProgress())
                 ))
                 .setWidthHeight(14, 3)
                 .setMarginLeft(2);

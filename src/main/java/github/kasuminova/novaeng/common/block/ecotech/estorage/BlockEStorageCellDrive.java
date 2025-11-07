@@ -51,11 +51,11 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
         this.setHarvestLevel("pickaxe", 2);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(DriveStorageType.STORAGE_TYPE, DriveStorageType.EMPTY)
-                .withProperty(DriveStorageLevel.STORAGE_LEVEL, DriveStorageLevel.EMPTY)
-                .withProperty(DriveStorageCapacity.STORAGE_CAPACITY, DriveStorageCapacity.EMPTY)
-                .withProperty(DriveStatus.STATUS, DriveStatus.IDLE)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(DriveStorageType.STORAGE_TYPE, DriveStorageType.EMPTY)
+                                            .withProperty(DriveStorageLevel.STORAGE_LEVEL, DriveStorageLevel.EMPTY)
+                                            .withProperty(DriveStorageCapacity.STORAGE_CAPACITY, DriveStorageCapacity.EMPTY)
+                                            .withProperty(DriveStatus.STATUS, DriveStatus.IDLE)
         );
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_cell_drive"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_cell_drive");
@@ -135,9 +135,9 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
         }
 
         return state.withProperty(DriveStorageLevel.STORAGE_LEVEL, level)
-                .withProperty(DriveStorageType.STORAGE_TYPE, type)
-                .withProperty(DriveStatus.STATUS, drive.isWriting() ? DriveStatus.RUN : DriveStatus.IDLE)
-                .withProperty(DriveStorageCapacity.STORAGE_CAPACITY, EStorageCellDrive.getCapacity(cellInventory));
+                    .withProperty(DriveStorageType.STORAGE_TYPE, type)
+                    .withProperty(DriveStatus.STATUS, drive.isWriting() ? DriveStatus.RUN : DriveStatus.IDLE)
+                    .withProperty(DriveStorageCapacity.STORAGE_CAPACITY, EStorageCellDrive.getCapacity(cellInventory));
     }
 
     @Nonnull
@@ -178,11 +178,11 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this,
-                FacingProp.HORIZONTALS,
-                DriveStorageType.STORAGE_TYPE,
-                DriveStorageLevel.STORAGE_LEVEL,
-                DriveStorageCapacity.STORAGE_CAPACITY,
-                DriveStatus.STATUS
+            FacingProp.HORIZONTALS,
+            DriveStorageType.STORAGE_TYPE,
+            DriveStorageLevel.STORAGE_LEVEL,
+            DriveStorageCapacity.STORAGE_CAPACITY,
+            DriveStatus.STATUS
         );
     }
 

@@ -173,8 +173,8 @@ public class DreamEnergyCore implements MachineSpecial {
 
     private static FixedSizeDeque<String> getEnergyInfo(World world, BlockPos pos) {
         return map.computeIfAbsent(world, k ->
-                        Collections.synchronizedMap(new BlockPos2ValueMap<>()))
-                .computeIfAbsent(pos, m -> new FixedSizeDeque<>(MinuteScale));
+                      Collections.synchronizedMap(new BlockPos2ValueMap<>()))
+                  .computeIfAbsent(pos, m -> new FixedSizeDeque<>(MinuteScale));
     }
 
     @Override
@@ -225,64 +225,64 @@ public class DreamEnergyCore implements MachineSpecial {
 
         // 输出配方
         RecipeBuilder.newBuilder("extract", MachineID, 1, 1, true)
-                .addEnergyPerTickOutput(defaultTransferAmount)
-                .addPreCheckHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    if (data.getBoolean("wireless")) {
-                        event.setFailed("当前处于通量模式");
-                        return;
-                    }
-                    var speed = Math.max(1.0f, data.getFloat("speed"));
-                    if (!canExtract(data, speed)) {
-                        event.setFailed("内部能量储量不足！");
-                        return;
-                    }
-                    ctrl.addPermanentModifier("extract", RecipeModifierBuilder.create("modularmachinery:energy", "output", speed, 1, false).build());
-                })
-                .addFactoryFinishHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var speed = Math.max(1.0f, data.getFloat("speed"));
-                    extractEnergy(data, speed, defaultTransferAmount);
-                    ctrl.markNoUpdateSync();
-                })
-                .setParallelized(false)
-                .addRecipeTooltip("由梦之收集者运行。", "在智能数据接口处修改速度。")
-                .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
-                .setThreadName(outputThreadName)
-                .build();
+                     .addEnergyPerTickOutput(defaultTransferAmount)
+                     .addPreCheckHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         if (data.getBoolean("wireless")) {
+                             event.setFailed("当前处于通量模式");
+                             return;
+                         }
+                         var speed = Math.max(1.0f, data.getFloat("speed"));
+                         if (!canExtract(data, speed)) {
+                             event.setFailed("内部能量储量不足！");
+                             return;
+                         }
+                         ctrl.addPermanentModifier("extract", RecipeModifierBuilder.create("modularmachinery:energy", "output", speed, 1, false).build());
+                     })
+                     .addFactoryFinishHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         var speed = Math.max(1.0f, data.getFloat("speed"));
+                         extractEnergy(data, speed, defaultTransferAmount);
+                         ctrl.markNoUpdateSync();
+                     })
+                     .setParallelized(false)
+                     .addRecipeTooltip("由梦之收集者运行。", "在智能数据接口处修改速度。")
+                     .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
+                     .setThreadName(outputThreadName)
+                     .build();
 
         // 输入配方
         RecipeBuilder.newBuilder("receive", MachineID, 1, 2, true)
-                .addEnergyPerTickInput(defaultTransferAmount)
-                .addPreCheckHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    if (data.getBoolean("wireless")) {
-                        event.setFailed("当前处于通量模式");
-                    }
-                    var speed = Math.max(1.0f, data.getFloat("speed"));
-                    ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
-                })
-                .addFactoryPreTickHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var speed = Math.max(1.0f, data.getFloat("speed"));
-                    ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
-                })
-                .addFactoryPostTickHandler(event -> {
-                    var ctrl = event.getController();
-                    var data = ctrl.getCustomDataTag();
-                    var speed = Math.max(1.0f, data.getFloat("speed"));
-                    receiveEnergy(data, speed, defaultTransferAmount);
-                    ctrl.markNoUpdateSync();
-                })
-                .setParallelized(false)
-                .addRecipeTooltip("由梦之释放者运行。", "在智能数据接口处修改速度。")
-                .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
-                .setThreadName(inputThreadName)
-                .build();
+                     .addEnergyPerTickInput(defaultTransferAmount)
+                     .addPreCheckHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         if (data.getBoolean("wireless")) {
+                             event.setFailed("当前处于通量模式");
+                         }
+                         var speed = Math.max(1.0f, data.getFloat("speed"));
+                         ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
+                     })
+                     .addFactoryPreTickHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         var speed = Math.max(1.0f, data.getFloat("speed"));
+                         ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());
+                     })
+                     .addFactoryPostTickHandler(event -> {
+                         var ctrl = event.getController();
+                         var data = ctrl.getCustomDataTag();
+                         var speed = Math.max(1.0f, data.getFloat("speed"));
+                         receiveEnergy(data, speed, defaultTransferAmount);
+                         ctrl.markNoUpdateSync();
+                     })
+                     .setParallelized(false)
+                     .addRecipeTooltip("由梦之释放者运行。", "在智能数据接口处修改速度。")
+                     .addSmartInterfaceDataInput("speed", minSpeed, maxSpeed)
+                     .setThreadName(inputThreadName)
+                     .build();
     }
 
     @SideOnly(Side.CLIENT)
@@ -295,11 +295,11 @@ public class DreamEnergyCore implements MachineSpecial {
             var chance = data.getString("chance");
 
             String[] info = {
-                    "§b/////////// 梦之管理者 ///////////",
-                    "§b能量储存:§a" + formatNumber(getBigInt(energyStored)) + " RF",
-                    data.getBoolean("wireless") ? "§b输入输出速度:#FF6347-FFA54F-FFFF00-7FFF00-40E0D0-00BFFFInfinity" : "§b输入输出速度:§a" + formatNumber((long) (defaultTransferAmount * speed), 1) + " RF/t",
-                    "§b一分钟内平均交互速度:§a" + (chance.isEmpty() ? "0" : chance) + " RF/t",
-                    "§b///////////////////////////////////"
+                "§b/////////// 梦之管理者 ///////////",
+                "§b能量储存:§a" + formatNumber(getBigInt(energyStored)) + " RF",
+                data.getBoolean("wireless") ? "§b输入输出速度:#FF6347-FFA54F-FFFF00-7FFF00-40E0D0-00BFFFInfinity" : "§b输入输出速度:§a" + formatNumber((long) (defaultTransferAmount * speed), 1) + " RF/t",
+                "§b一分钟内平均交互速度:§a" + (chance.isEmpty() ? "0" : chance) + " RF/t",
+                "§b///////////////////////////////////"
             };
 
             event.setExtraInfo(info);

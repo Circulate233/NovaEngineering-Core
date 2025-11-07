@@ -31,9 +31,9 @@ public class BlockECalculatorTransmitterBus extends BlockECalculatorPart {
         this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_transmitter_bus"));
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_transmitter_bus");
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
-                .withProperty(TransmitterBusLink.LINK, TransmitterBusLink.NONE)
-                .withProperty(TransmitterBusLinkLevel.LINK_LEVEL, TransmitterBusLinkLevel.NONE)
+                                            .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
+                                            .withProperty(TransmitterBusLink.LINK, TransmitterBusLink.NONE)
+                                            .withProperty(TransmitterBusLinkLevel.LINK_LEVEL, TransmitterBusLinkLevel.NONE)
         );
     }
 

@@ -24,7 +24,7 @@ public abstract class MixinTileCore extends TileEntity {
         if (this.world != null) {
             if (side == Side.CLIENT && ServerHelper.isServerWorld(this.world)) {
                 NovaEngineeringCore.PARALLEL_NETWORK_MANAGER.offerAction(PacketHandler.INSTANCE, () ->
-                        PacketHandler.sendToAllAround(this.getTilePacket(), this));
+                    PacketHandler.sendToAllAround(this.getTilePacket(), this));
                 ci.cancel();
             }
         }

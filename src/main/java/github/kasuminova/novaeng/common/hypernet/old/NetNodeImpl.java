@@ -57,8 +57,8 @@ public class NetNodeImpl extends NetNode {
         double generation = center.getComputationPointGeneration() - center.getComputationPointConsumption();
         if (generation < pointRequired) {
             event.setFailed("算力不足！预期："
-                    + NovaEngUtils.formatFLOPS(pointRequired) + "，当前："
-                    + NovaEngUtils.formatFLOPS(generation));
+                + NovaEngUtils.formatFLOPS(pointRequired) + "，当前："
+                + NovaEngUtils.formatFLOPS(generation));
             return;
         }
 
@@ -113,7 +113,7 @@ public class NetNodeImpl extends NetNode {
 
         if (!center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
-                    NovaEngUtils.formatFLOPS(required);
+                NovaEngUtils.formatFLOPS(required);
 
             if (triggerFailure) {
                 event.setFailed(event.getActiveRecipe().getRecipe().doesCancelRecipeOnPerTickFailure(), failureMessage);
@@ -137,7 +137,7 @@ public class NetNodeImpl extends NetNode {
 
         if (!center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
-                    NovaEngUtils.formatFLOPS(required);
+                NovaEngUtils.formatFLOPS(required);
 
             if (triggerFailure) {
                 event.setFailed(event.getActiveRecipe().getRecipe().doesCancelRecipeOnPerTickFailure(), failureMessage);

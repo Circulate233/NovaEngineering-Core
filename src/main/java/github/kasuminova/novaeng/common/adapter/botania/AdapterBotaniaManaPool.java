@@ -68,9 +68,9 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
         List<MachineRecipe> recipes = new ArrayList<>();
         for (final RecipeManaInfusion infusionRecipe : BotaniaAPI.manaInfusionRecipes) {
             MachineRecipe recipe = createRecipeShell(
-                    new ResourceLocation("botania", "mana_infusion_" + incId),
-                    owningMachineName,
-                    20, 0, false);
+                new ResourceLocation("botania", "mana_infusion_" + incId),
+                owningMachineName,
+                20, 0, false);
 
             // Item Input
             int inAmount = Math.round(RecipeModifier.applyModifiers(modifiers, RequirementTypesMM.REQUIREMENT_ITEM, IOType.INPUT, 1, false));
@@ -108,7 +108,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
             if (catalyst == null) {
                 addDefaultCatalystHandler(recipe);
                 recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
-                        Functions.getText("top.illum_pool.mode.e")));
+                    Functions.getText("top.illum_pool.mode.e")));
             } else if (catalyst.equals(RecipeManaInfusion.conjurationState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -118,7 +118,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                     }
                 });
                 recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
-                        Functions.getText("top.illum_pool.mode.b")));
+                    Functions.getText("top.illum_pool.mode.b")));
             } else if (catalyst.equals(RecipeManaInfusion.alchemyState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -128,7 +128,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                     }
                 });
                 recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
-                        Functions.getText("top.illum_pool.mode.a")));
+                    Functions.getText("top.illum_pool.mode.a")));
             } else if (catalyst.equals(ExtraBotanyAPI.dimensionState)) {
                 recipe.addRecipeEventHandler(RecipeCheckEvent.class, (IEventHandler<RecipeCheckEvent>) event -> {
                     if (event.phase != Phase.START) return;
@@ -138,7 +138,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                     }
                 });
                 recipe.addTooltip(Functions.getText("novaeng.illum_pool.illum_pool.mode",
-                        Functions.getText("top.illum_pool.mode.c")));
+                    Functions.getText("top.illum_pool.mode.c")));
             } else {
                 addDefaultCatalystHandler(recipe);
             }

@@ -15,13 +15,13 @@ public class MixinAppEngServerPacketHandler {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Redirect(
-            method = "onPacketData",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lappeng/core/sync/AppEngPacket;setCallParam(Lappeng/core/sync/PacketCallState;)V",
-                    remap = false
-            ),
+        method = "onPacketData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lappeng/core/sync/AppEngPacket;setCallParam(Lappeng/core/sync/PacketCallState;)V",
             remap = false
+        ),
+        remap = false
     )
     private void redirectParsePacket(AppEngPacket instance, PacketCallState call,
                                      @Local(name = "player") EntityPlayer player) {

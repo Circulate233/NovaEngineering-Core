@@ -51,10 +51,10 @@ public class BlockAngelRendererHandler {
 
         vb.begin(GL11.GL_QUADS, blockFormat);
         brd.renderBlock(
-                BlockAngel.INSTANCE.getDefaultState(),
-                BlockPos.ORIGIN,
-                Minecraft.getMinecraft().world,
-                vb
+            BlockAngel.INSTANCE.getDefaultState(),
+            BlockPos.ORIGIN,
+            Minecraft.getMinecraft().world,
+            vb
         );
         tes.draw();
 

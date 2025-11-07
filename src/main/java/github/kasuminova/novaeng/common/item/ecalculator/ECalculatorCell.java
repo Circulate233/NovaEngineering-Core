@@ -47,7 +47,7 @@ public class ECalculatorCell extends Item {
         final ECalculatorCell cell = (ECalculatorCell) stack.getItem();
         final boolean shiftPressed = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
         tooltip.add(I18n.format("novaeng.ecalculator_cell.tip.3",
-                shiftPressed ? NovaEngUtils.formatNumber(cell.totalBytes) : NovaEngUtils.formatDecimal(cell.totalBytes))
+            shiftPressed ? NovaEngUtils.formatNumber(cell.totalBytes) : NovaEngUtils.formatDecimal(cell.totalBytes))
         );
         if (cell == L6) {
             tooltip.add(I18n.format("novaeng.ecalculator_cell.l6.tip"));

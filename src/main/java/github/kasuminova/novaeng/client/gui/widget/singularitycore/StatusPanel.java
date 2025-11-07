@@ -39,66 +39,66 @@ public class StatusPanel extends SizedRow {
         this.coreGUI = coreGUI;
         this.setWidthHeight(WIDTH, HEIGHT);
         this.addWidgets(
-                new ProgressBar()
-                        .setVertical(true)
-                        .setDownToUp(true)
-                        .addForegroundTexture(new TextureProperties(BAR_TEX_RES, LEFT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
-                        .setProgress(0.75f) // For testing
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c内部能源存储：%s%%",
-                                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
-                                )
-                        )
-                        .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
-                        .setMargin(8, 3, 3, 0),
-                new ProgressBar()
-                        .setVertical(true)
-                        .setDownToUp(true)
-                        .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
-                        .setProgress(0.4f) // For testing
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c奇点质量：%s%%",
-                                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
-                                )
-                        )
-                        .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
-                        .setMargin(0, 3, 3, 0),
-                new ProgressBar()
-                        .setVertical(true)
-                        .setDownToUp(true)
-                        .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
-                        .setProgress(0.35f) // For testing
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c奇点引力场强度：%s%%",
-                                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
-                                )
-                        )
-                        .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
-                        .setMargin(0, 3, 3, 0),
-                new ProgressBar()
-                        .setVertical(true)
-                        .setDownToUp(true)
-                        .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
-                        .setProgress(0.35f) // For testing
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c控制力场强度：%s%%",
-                                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
-                                )
-                        )
-                        .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
-                        .setMargin(0, 3, 3, 0),
-                new ProgressBar()
-                        .setVertical(true)
-                        .setDownToUp(true)
-                        .addForegroundTexture(new TextureProperties(BAR_TEX_RES, RIGHT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
-                        .setProgress(0.46f) // For testing
-                        .setTooltipFunction(progressBar ->
-                                Collections.singletonList(String.format("§c核心负载：%s%%",
-                                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
-                                )
-                        )
-                        .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
-                        .setMargin(0, 0, 3, 0)
+            new ProgressBar()
+                .setVertical(true)
+                .setDownToUp(true)
+                .addForegroundTexture(new TextureProperties(BAR_TEX_RES, LEFT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
+                .setProgress(0.75f) // For testing
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c内部能源存储：%s%%",
+                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
+                    )
+                )
+                .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
+                .setMargin(8, 3, 3, 0),
+            new ProgressBar()
+                .setVertical(true)
+                .setDownToUp(true)
+                .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
+                .setProgress(0.4f) // For testing
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c奇点质量：%s%%",
+                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
+                    )
+                )
+                .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
+                .setMargin(0, 3, 3, 0),
+            new ProgressBar()
+                .setVertical(true)
+                .setDownToUp(true)
+                .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
+                .setProgress(0.35f) // For testing
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c奇点引力场强度：%s%%",
+                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
+                    )
+                )
+                .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
+                .setMargin(0, 3, 3, 0),
+            new ProgressBar()
+                .setVertical(true)
+                .setDownToUp(true)
+                .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
+                .setProgress(0.35f) // For testing
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c控制力场强度：%s%%",
+                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
+                    )
+                )
+                .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
+                .setMargin(0, 3, 3, 0),
+            new ProgressBar()
+                .setVertical(true)
+                .setDownToUp(true)
+                .addForegroundTexture(new TextureProperties(BAR_TEX_RES, RIGHT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
+                .setProgress(0.46f) // For testing
+                .setTooltipFunction(progressBar ->
+                    Collections.singletonList(String.format("§c核心负载：%s%%",
+                        NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
+                    )
+                )
+                .setWidthHeight(BAR_WIDTH, BAR_HEIGHT)
+                .setMargin(0, 0, 3, 0)
         );
     }
 
@@ -107,9 +107,9 @@ public class StatusPanel extends SizedRow {
         GuiScreen gui = widgetGui.getGui();
         gui.mc.getTextureManager().bindTexture(BG_TEX_RES);
         gui.drawTexturedModalRect(
-                renderPos.posX(), renderPos.posY(),
-                TEX_X, TEX_Y,
-                WIDTH, HEIGHT
+            renderPos.posX(), renderPos.posY(),
+            TEX_X, TEX_Y,
+            WIDTH, HEIGHT
         );
         super.preRenderInternal(widgetGui, renderSize, renderPos, mousePos);
     }

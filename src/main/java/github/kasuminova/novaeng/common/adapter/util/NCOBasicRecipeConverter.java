@@ -91,8 +91,8 @@ public class NCOBasicRecipeConverter {
 
         for (BasicRecipe basicRecipe : recipeList) {
             LinkedList<ItemStack> inputList = basicRecipe.getItemIngredients().stream()
-                    .flatMap(ingredient -> ingredient.getInputStackHashingList().stream())
-                    .collect(Collectors.toCollection(LinkedList::new));
+                                                         .flatMap(ingredient -> ingredient.getInputStackHashingList().stream())
+                                                         .collect(Collectors.toCollection(LinkedList::new));
             if (inputList.isEmpty() || !inputFilter.test(inputList)) {
                 continue;
             }
@@ -101,21 +101,21 @@ public class NCOBasicRecipeConverter {
 
             // Item Input
             basicRecipe.getItemIngredients().stream()
-                    .filter(ingredient -> !(ingredient instanceof EmptyItemIngredient))
-                    .forEach(ingredient -> addItemIngredient(modifiers, ingredient, recipe, ingredient.getStack(), IOType.INPUT));
+                       .filter(ingredient -> !(ingredient instanceof EmptyItemIngredient))
+                       .forEach(ingredient -> addItemIngredient(modifiers, ingredient, recipe, ingredient.getStack(), IOType.INPUT));
             // Item Output
             basicRecipe.getItemProducts().stream()
-                    .filter(itemProduct -> !(itemProduct instanceof EmptyItemIngredient))
-                    .forEach(itemProduct -> addItemIngredient(modifiers, itemProduct, recipe, itemProduct.getStack(), IOType.OUTPUT));
+                       .filter(itemProduct -> !(itemProduct instanceof EmptyItemIngredient))
+                       .forEach(itemProduct -> addItemIngredient(modifiers, itemProduct, recipe, itemProduct.getStack(), IOType.OUTPUT));
             // Fluid Input
             basicRecipe.getFluidIngredients()
-                    .forEach(fluidIngredient -> addFluidIngredient(modifiers, fluidIngredient, recipe, IOType.INPUT));
+                       .forEach(fluidIngredient -> addFluidIngredient(modifiers, fluidIngredient, recipe, IOType.INPUT));
             // Fluid Output
             basicRecipe.getFluidProducts()
-                    .forEach(fluidProduct -> addFluidIngredient(modifiers, fluidProduct, recipe, IOType.OUTPUT));
+                       .forEach(fluidProduct -> addFluidIngredient(modifiers, fluidProduct, recipe, IOType.OUTPUT));
 
             recipe.addRequirement(new RequirementEnergy(IOType.INPUT, Math.round(RecipeModifier.applyModifiers(
-                    modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, baseEnergyUsage, false)))
+                modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, baseEnergyUsage, false)))
             );
 
             machineRecipes.add(recipe);
