@@ -28,11 +28,6 @@ import hellfirepvp.modularmachinery.common.machine.MachineRegistry
 import hellfirepvp.modularmachinery.common.util.ItemUtils
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import java.util.function.Consumer
-import java.util.function.IntFunction
-import java.util.stream.Collectors
-import java.util.stream.IntStream
-import java.util.stream.Stream
 import net.minecraft.block.Block
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -43,6 +38,11 @@ import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fml.common.FMLCommonHandler
+import java.util.function.Consumer
+import java.util.function.IntFunction
+import java.util.stream.Collectors
+import java.util.stream.IntStream
+import java.util.stream.Stream
 import kotlin.concurrent.Volatile
 import kotlin.math.max
 import kotlin.math.min

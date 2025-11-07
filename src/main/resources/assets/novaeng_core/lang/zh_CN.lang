@@ -128,6 +128,7 @@ novaeng.extendable_calculate_subsystem.info.6=  分配完成后，如果系统�
 novaeng.extendable_calculate_subsystem.info.7=  只要系统中已分配的 §bvCPU§7 数不超过§e最大线程数§7，则可以一直分配新的 §bvCPU§7，直到上限。
 novaeng.extendable_calculate_subsystem.info.8=  §bvCPU§7 会在合成任务完成后，并且§e物品全部返还§7时§a立刻销毁§7。
 
+novaeng.efabricator_parallel_proc.tooltip.0=网络已有类似的合成样板,已跳过上传并返还空白样板！
 novaeng.efabricator_parallel_proc.info.0=§5并行核心§7为合成子系统提供§5并行数§7。
 novaeng.efabricator_parallel_proc.info.1=§5并行数§7可提高§b工作核心§7每次处理合成任务的§a处理数量§7（最大不超过队列深度）。
 novaeng.efabricator_parallel_proc.modifiers=§5并行数§7修正:
