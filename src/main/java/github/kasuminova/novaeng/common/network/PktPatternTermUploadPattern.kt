@@ -1,106 +1,99 @@
-package github.kasuminova.novaeng.common.network;
+package github.kasuminova.novaeng.common.network
 
-import appeng.api.AEApi;
-import appeng.api.implementations.guiobjects.IGuiItemObject;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.IMachineSet;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.container.implementations.ContainerPatternEncoder;
-import appeng.container.slot.SlotRestrictedInput;
-import appeng.items.misc.ItemEncodedPattern;
-import appeng.me.GridAccessException;
-import appeng.parts.reporting.AbstractPartEncoder;
-import com.glodblock.github.util.EmptyMachineSet;
-import com.glodblock.github.util.FluidPatternDetails;
-import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel;
-import github.kasuminova.novaeng.mixin.ae2.AccessorContainerPatternEncoder;
-import hellfirepvp.modularmachinery.ModularMachinery;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import appeng.api.AEApi
+import appeng.api.networking.crafting.ICraftingPatternDetails
+import appeng.api.networking.security.IActionHost
+import appeng.api.storage.data.IAEItemStack
+import appeng.container.implementations.ContainerPatternEncoder
+import appeng.items.misc.ItemEncodedPattern
+import appeng.me.GridAccessException
+import com.glodblock.github.util.FluidPatternDetails
+import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel
+import github.kasuminova.novaeng.mixin.ae2.AccessorContainerPatternEncoder
+import hellfirepvp.modularmachinery.ModularMachinery
+import io.netty.buffer.ByteBuf
+import net.minecraft.item.ItemStack
+import net.minecraft.util.text.TextComponentTranslation
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 
-public class PktPatternTermUploadPattern implements IMessage, IMessageHandler<PktPatternTermUploadPattern, IMessage> {
-
-    @Override
-    public void fromBytes(final ByteBuf buf) {
+class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUploadPattern, IMessage> {
+    override fun fromBytes(buf: ByteBuf) {
     }
 
-    @Override
-    public void toBytes(final ByteBuf buf) {
+    override fun toBytes(buf: ByteBuf) {
     }
 
-    @Override
-    public IMessage onMessage(final PktPatternTermUploadPattern message, final MessageContext ctx) {
-        final EntityPlayerMP player = ctx.getServerHandler().player;
-        ModularMachinery.EXECUTE_MANAGER.addSyncTask(() -> {
-            final Container container = player.openContainer;
-            if (!(container instanceof ContainerPatternEncoder encoder)) {
-                return;
+    override fun onMessage(message: PktPatternTermUploadPattern, ctx: MessageContext): IMessage? {
+        val player = ctx.serverHandler.player
+        ModularMachinery.EXECUTE_MANAGER.addSyncTask {
+            val container = player.openContainer
+            if (container !is ContainerPatternEncoder) {
+                return@addSyncTask
             }
 
-            final SlotRestrictedInput patternSlotOUT = ((AccessorContainerPatternEncoder) encoder).getPatternSlotOUT();
-            final ItemStack patternStack = patternSlotOUT.getStack();
-            if (patternStack.isEmpty()) {
-                return;
+            val patternSlotOUT = (container as AccessorContainerPatternEncoder).getPatternSlotOUT()
+            val patternStack = patternSlotOUT.stack
+            if (patternStack.isEmpty) {
+                return@addSyncTask
             }
 
-            AbstractPartEncoder part = encoder.getPart();
-            IGuiItemObject itemObject = ((AccessorContainerPatternEncoder) encoder).getIGuiItemObject();
-            IMachineSet channelNodes;
-                if (part != null) {
-                    try {
-                        channelNodes = part.getProxy().getGrid().getMachines(EFabricatorMEChannel.class);
-                    } catch (GridAccessException ignored) {
-                        channelNodes = EmptyMachineSet.create(EFabricatorMEChannel.class);
-                    }
-                } else if (itemObject instanceof IActionHost wirelessTerm) {
-                    channelNodes = wirelessTerm.getActionableNode().getGrid().getMachines(EFabricatorMEChannel.class);
-                } else {
-                    return;
+            val part = container.part
+            val itemObject = (container as AccessorContainerPatternEncoder).getIGuiItemObject()
+            val channelNodes = if (part != null) {
+                try {
+                    part.proxy.grid.getMachines(EFabricatorMEChannel::class.java)
+                } catch (ignored: GridAccessException) {
+                    return@addSyncTask
                 }
+            } else if (itemObject is IActionHost) {
+                itemObject.actionableNode.grid.getMachines(EFabricatorMEChannel::class.java)
+            } else {
+                return@addSyncTask
+            }
 
-            final IAEItemStack out;
-            if (patternStack.getItem() instanceof ItemEncodedPattern item) {
-                var pattern = item.getPatternForItem(patternStack, player.world);
-                if (pattern.isCraftable() || pattern instanceof FluidPatternDetails) {
-                    out = pattern.getCondensedOutputs()[0];
-                } else return;
-            } else return;
+            if (channelNodes.isEmpty) return@addSyncTask
 
-            for (final IGridNode channelNode : channelNodes) {
-                EFabricatorMEChannel channel = (EFabricatorMEChannel) channelNode.getMachine();
-                for (var patternBus : channel.getController().getPatternBuses()) {
-                    if (patternBus.getAePatterns().contains(out)) {
-                        player.sendMessage(
-                                new TextComponentTranslation(
-                                        "novaeng.efabricator_parallel_proc.tooltip.0"
+            val item = patternStack.item
+            val out: IAEItemStack? = if (item is ItemEncodedPattern) {
+                val pattern: ICraftingPatternDetails = item.getPatternForItem(patternStack, player.world)
+                if (pattern.isCraftable || pattern is FluidPatternDetails) {
+                    pattern.condensedOutputs[0]
+                } else return@addSyncTask
+            } else return@addSyncTask
+
+            for (channelNode in channelNodes) {
+                val channel = channelNode.machine as EFabricatorMEChannel
+                channel.controller?.let {
+                    for (patternBus in it.patternBuses) {
+                        if (patternBus.aePatterns.contains(out)) {
+                            player.sendMessage(
+                                TextComponentTranslation(
+                                    "novaeng.efabricator_parallel_proc.tooltip.0"
                                 )
-                        );
-                        player.inventory.placeItemBackInInventory(
+                            )
+                            player.inventory.placeItemBackInInventory(
                                 player.world,
-                                AEApi.instance().definitions().materials().blankPattern().maybeStack(patternSlotOUT.getStack().getCount()).orElse(ItemStack.EMPTY)
-                        );
-                        patternSlotOUT.putStack(ItemStack.EMPTY);
-                        return;
+                                AEApi.instance().definitions().materials().blankPattern()
+                                    .maybeStack(patternSlotOUT.stack.count).orElse(
+                                        ItemStack.EMPTY
+                                    )
+                            )
+                            patternSlotOUT.putStack(ItemStack.EMPTY)
+                            return@addSyncTask
+                        }
                     }
                 }
             }
-
-            for (final IGridNode channelNode : channelNodes) {
-                    EFabricatorMEChannel channel = (EFabricatorMEChannel) channelNode.getMachine();
-                    if (channel.insertPattern(patternStack)) {
-                        patternSlotOUT.putStack(ItemStack.EMPTY);
-                        break;
-                    }
+            for (channelNode in channelNodes) {
+                val channel = channelNode.machine as EFabricatorMEChannel
+                if (channel.insertPattern(patternStack)) {
+                    patternSlotOUT.putStack(ItemStack.EMPTY)
+                    break
                 }
-
-        });
-        return null;
+            }
+        }
+        return null
     }
 }

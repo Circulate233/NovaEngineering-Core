@@ -465,7 +465,7 @@ open class EFabricatorController() : EPartController<EFabricatorPart>() {
     val parallelProcs: List<EFabricatorParallelProc>
         get() = parts.getParts(EFabricatorParallelProc::class.java)
 
-    val availableParallelism: Int
+    val availableParallelism
         get() = max(0, parallelism - consumedParallelism)
 
     val energyStored: Int
@@ -500,7 +500,7 @@ open class EFabricatorController() : EPartController<EFabricatorPart>() {
                     }
                     if (MachineCoolants.INSTANCE.getCoolant(contents.fluid) != null) {
                         total += min(contents.amount, Int.MAX_VALUE - total)
-                        if (total == Int.MAX_VALUE) {
+                        if (total >= Int.MAX_VALUE) {
                             return Int.MAX_VALUE
                         }
                     }
