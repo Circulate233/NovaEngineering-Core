@@ -1,11 +1,9 @@
 package github.kasuminova.novaeng.common.handler;
 
-import com.feed_the_beast.ftblib.lib.data.Universe;
 import crafttweaker.annotations.ZenRegister;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -58,7 +56,7 @@ public class WorldLoadedHandler {
         }
     }
 
-    private void request(MinecraftServer server) {
+    private void request() {
         if (init) {
             loadWorld(0, 1, -1);
             init = false;
@@ -73,7 +71,7 @@ public class WorldLoadedHandler {
             case START -> {
                 if (SERVER.forceChunkHandler) {
                     if (time % 100 == 0) {
-                        request(Universe.get().server);
+                        request();
                     }
                     ++time;
                 }

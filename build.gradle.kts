@@ -320,8 +320,8 @@ dependencies {
     implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
     implementation(rfg.deobf("curse.maven:packagedauto-308380:6932932"))
     implementation(rfg.deobf("curse.maven:packagedastral-811828:7063119"))
-    implementation(rfg.deobf("curse.maven:Aroma1997Core-223735:2914062"))
-    implementation(rfg.deobf("curse.maven:tatw-263980:2585616"))
+    compileOnly(rfg.deobf("curse.maven:Aroma1997Core-223735:2914062"))
+    compileOnly(rfg.deobf("curse.maven:tatw-263980:2585616"))
 }
 
 // Publishing to a Maven repository

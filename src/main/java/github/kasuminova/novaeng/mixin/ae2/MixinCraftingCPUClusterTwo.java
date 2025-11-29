@@ -154,7 +154,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                         didPatternCraft = false;
 
                         if (!this.visitedMediums.containsKey(key) || this.visitedMediums.get(key).isEmpty()) {
-                            this.visitedMediums.put(key, new ArrayDeque<>(cc.getMediums(key).stream().filter(Objects::nonNull).collect(Collectors.toList())));
+                            this.visitedMediums.put(key, cc.getMediums(key).stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new)));
                         }
 
                         while (!this.visitedMediums.get(key).isEmpty()) {
@@ -372,8 +372,8 @@ public abstract class MixinCraftingCPUClusterTwo {
     @NotNull
     private MediumType r$specialMediumTreatment(ICraftingMedium m, ICraftingPatternDetails details) {
         if (m instanceof MEPatternProviderNova mep) {
-            if (mep.getWorkMode() == MEPatternProvider.WorkModeSetting.DEFAULT
-                || mep.getWorkMode() == MEPatternProvider.WorkModeSetting.ENHANCED_BLOCKING_MODE) {
+            if (mep.getWorkMode() != MEPatternProvider.WorkModeSetting.BLOCKING_MODE
+                && mep.getWorkMode() != MEPatternProvider.WorkModeSetting.CRAFTING_LOCK_MODE) {
 
                 for (IAEItemStack input : details.getCondensedInputs()) {
                     long size = input.getStackSize() * this.r$craftingFrequency;

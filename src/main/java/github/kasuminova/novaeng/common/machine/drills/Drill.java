@@ -49,6 +49,7 @@ import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrim
 import static github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet.requireResearch;
 import static net.minecraft.util.text.translation.I18n.translateToLocalFormatted;
 
+//TODO:未消耗液态魔力等额外材料
 public abstract class Drill implements MachineSpecial {
     protected static final int[] tqsz = {-1, 0, 1};
     protected static final Object2IntMap<String> tqdzb = new Object2IntOpenHashMap<>();

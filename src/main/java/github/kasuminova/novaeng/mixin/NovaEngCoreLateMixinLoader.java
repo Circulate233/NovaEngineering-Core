@@ -51,6 +51,7 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_packagedauto.json", "packagedauto");
         addModdedMixinCFG("mixins.novaeng_core_rftools.json", "rftools");
         addModdedMixinCFG("mixins.novaeng_core_advancedrocketry.json", "advancedrocketry");
+        addModdedMixinCFG("mixins.novaeng_core_aroma1997core.json", "aroma1997core");
 
         addMixinCFG("mixins.novaeng_core_botania_r.json", () -> {
             ConfigManager.sync(MOD_ID, Config.Type.INSTANCE);
