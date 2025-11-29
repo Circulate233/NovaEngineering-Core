@@ -205,6 +205,7 @@ public class BiogenicSimulationComputer implements MachineSpecial {
     private IItemStack outputPristineMatter(IMachineController ctrl, String ysqnamess, String ysqddcss) {
         var data = ctrl.getController().getCustomDataTag();
         var name = data.getTag(ysqnamess);
+        if (name == null) return null;
         var ysqddcs = data.getLong(ysqddcss);
         var world = ctrl.getController().getWorld();
         var Random = world.rand.nextInt(99) + 1;
