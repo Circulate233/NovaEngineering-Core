@@ -218,6 +218,7 @@ public class ResearchStation extends NetNode {
             return;
         }
 
+        final var center = this.center;
         if (center == null) return;
         for (Database database : center.getNode(Database.class)) {
             if (database.writeResearchingData(currentResearching, completedPoints)) {

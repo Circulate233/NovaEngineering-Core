@@ -25,6 +25,7 @@
     "MixinCraftingCPUClusterTwo$AccessorTaskProgress",
     "MixinCraftingCPUStatus",
     "MixinCraftingGridCache",
+    "MixinGridStorageCache",
     "MixinTileChestFilter",
     "MixinTileDriveFilter"
   ]
