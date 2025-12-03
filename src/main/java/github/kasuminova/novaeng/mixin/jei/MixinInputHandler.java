@@ -3,7 +3,7 @@ package github.kasuminova.novaeng.mixin.jei;
 import com.circulation.random_complement.client.handler.ItemTooltipHandler;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.ClientProxy;
-import github.kasuminova.novaeng.common.network.ItemDisplayPkt;
+import github.kasuminova.novaeng.common.network.PktItemDisplay;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.val;
 import mezz.jei.bookmarks.BookmarkItem;
@@ -80,7 +80,7 @@ public abstract class MixinInputHandler {
                 }
             }
             if (!stack.isEmpty())
-                NovaEngineeringCore.NET_CHANNEL.sendToServer(new ItemDisplayPkt(stack, Minecraft.getMinecraft().player));
+                NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktItemDisplay(stack, Minecraft.getMinecraft().player));
         }
     }
 

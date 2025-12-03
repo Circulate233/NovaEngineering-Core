@@ -5,7 +5,7 @@ import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
-import github.kasuminova.novaeng.common.network.ItemDisplayPkt;
+import github.kasuminova.novaeng.common.network.PktItemDisplay;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
@@ -124,7 +124,7 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktCProfilerRequest.class, PktCProfilerRequest.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktECalculatorGUIData.class, PktECalculatorGUIData.class, start++, Side.CLIENT);
         NET_CHANNEL.registerMessage(PktMouseItemUpdate.class, PktMouseItemUpdate.class, start++, Side.CLIENT);
-        NET_CHANNEL.registerMessage(ItemDisplayPkt.class, ItemDisplayPkt.class, start++, Side.CLIENT);
+        NET_CHANNEL.registerMessage(PktItemDisplay.class, PktItemDisplay.class, start++, Side.CLIENT);
 
         start = 64;
 
@@ -136,7 +136,7 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktEFabricatorPatternSearchGUIAction.class, PktEFabricatorPatternSearchGUIAction.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
-        NET_CHANNEL.registerMessage(ItemDisplayPkt.class, ItemDisplayPkt.class, start++, Side.SERVER);
+        NET_CHANNEL.registerMessage(PktItemDisplay.class, PktItemDisplay.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
         proxy.preInit();

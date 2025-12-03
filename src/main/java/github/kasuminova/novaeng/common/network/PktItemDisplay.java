@@ -15,18 +15,18 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemDisplayPkt implements IMessage, IMessageHandler<ItemDisplayPkt, IMessage> {
+public class PktItemDisplay implements IMessage, IMessageHandler<PktItemDisplay, IMessage> {
 
     @Getter
     private ItemStack stack;
     @Getter
     private ITextComponent name;
 
-    public ItemDisplayPkt() {
+    public PktItemDisplay() {
 
     }
 
-    public ItemDisplayPkt(ItemStack stack, EntityPlayer player) {
+    public PktItemDisplay(ItemStack stack, EntityPlayer player) {
         this.stack = stack;
         this.name = player.getDisplayName();
     }
@@ -44,7 +44,7 @@ public class ItemDisplayPkt implements IMessage, IMessageHandler<ItemDisplayPkt,
     }
 
     @Override
-    public IMessage onMessage(ItemDisplayPkt message, MessageContext ctx) {
+    public IMessage onMessage(PktItemDisplay message, MessageContext ctx) {
         switch (ctx.side) {
             case SERVER -> NovaEngineeringCore.NET_CHANNEL.sendToAll(message);
             case CLIENT -> onClient(message, ctx);
@@ -53,7 +53,7 @@ public class ItemDisplayPkt implements IMessage, IMessageHandler<ItemDisplayPkt,
     }
 
     @SideOnly(Side.CLIENT)
-    public void onClient(ItemDisplayPkt message, MessageContext ctx) {
+    public void onClient(PktItemDisplay message, MessageContext ctx) {
         Minecraft.getMinecraft().player.sendMessage(message.name.appendText(":").appendSibling(message.stack.getTextComponent()));
     }
 
