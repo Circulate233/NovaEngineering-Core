@@ -13,6 +13,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.common.block.BlockFluxStorage;
 import sonar.fluxnetworks.common.registry.RegistryBlocks;
 import sonar.fluxnetworks.common.registry.RegistryItems;
@@ -45,7 +46,7 @@ public class BlockDreamEnergyPort extends BlockFluxStorage {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
+    public void addInformation(@NotNull ItemStack stack, @Nullable World player, @NotNull List<String> tooltip, @NotNull ITooltipFlag advanced) {
         super.addInformation(stack, player, tooltip, advanced);
         tooltip.add(I18n.format("text.dream_energy_port.0"));
         tooltip.add(I18n.format("text.dream_energy_port.1"));

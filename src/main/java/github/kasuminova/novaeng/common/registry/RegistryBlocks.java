@@ -83,6 +83,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -243,7 +244,7 @@ public class RegistryBlocks {
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(registryName, "inventory"));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
 

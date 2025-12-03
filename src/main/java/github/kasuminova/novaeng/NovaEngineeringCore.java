@@ -5,7 +5,6 @@ import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
-import github.kasuminova.novaeng.common.network.PktItemDisplay;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
@@ -18,6 +17,7 @@ import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate
 import github.kasuminova.novaeng.common.network.PktEStorageGUIData;
 import github.kasuminova.novaeng.common.network.PktGeocentricDrillControl;
 import github.kasuminova.novaeng.common.network.PktHyperNetStatus;
+import github.kasuminova.novaeng.common.network.PktItemDisplay;
 import github.kasuminova.novaeng.common.network.PktMouseItemUpdate;
 import github.kasuminova.novaeng.common.network.PktPatternTermUploadPattern;
 import github.kasuminova.novaeng.common.network.PktResearchTaskComplete;
@@ -51,12 +51,13 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PR
 @Mod(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_NAME, version = NovaEngineeringCore.VERSION,
     dependencies = "required-after:forge@[14.23.5.2847,);" +
         "required-after:modularmachinery@[2.1.0,);" +
-        "required:theoneprobe@[1.12-1.4.28,);" +
-        "required:appliedenergistics2@[v0.56.4,);" +
-        "required:ae2fc@[2.6.3-r,);" +
-        "required:configanytime@[2.0,);" +
-        "required:mixinbooter@[8.0,);" +
-        "required:lumenized@[1.0.2,);",
+        "required-after:theoneprobe@[1.12-1.4.28,);" +
+        "required-after:appliedenergistics2@[v0.56.4,);" +
+        "required-after:ae2fc@[2.6.3-r,);" +
+        "required-after:configanytime@[2.0,);" +
+        "required-after:mixinbooter@[8.0,);" +
+        "required-after:lumenized@[1.0.2,);" +
+        "after:fluxnetworks@[4.1.0,);",
     acceptedMinecraftVersions = "[1.12, 1.13)",
     acceptableRemoteVersions = "[1.21.7, 1.23.0)"
 )
