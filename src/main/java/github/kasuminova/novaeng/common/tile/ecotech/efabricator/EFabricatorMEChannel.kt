@@ -33,7 +33,7 @@ import net.minecraftforge.fluids.FluidStack
 import javax.annotation.Nonnull
 import kotlin.math.min
 
-open class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, IGridProxyable {
+class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, IGridProxyable {
 
     companion object {
         private fun getContainerItem(stackInSlot: ItemStack?): ItemStack {
@@ -88,7 +88,7 @@ open class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionH
     }
 
     // Crafting Provider
-    protected fun postPatternChangeEvent() {
+    private fun postPatternChangeEvent() {
         val currentActive = this.aEProxy.isActive
         if (this.wasActive != currentActive) {
             this.wasActive = currentActive
@@ -147,7 +147,7 @@ open class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionH
         return partController.offerWork(CraftWork(remaining, output, size))
     }
 
-    protected fun pushFluidPattern(pattern: FluidCraftingPatternDetails, table: InventoryCrafting): Boolean {
+    private fun pushFluidPattern(pattern: FluidCraftingPatternDetails, table: InventoryCrafting): Boolean {
         val outputs = pattern.outputs
         val output =
             if (outputs[0] != null) outputs[0]!!.getCachedItemStack(outputs[0]!!.stackSize) else ItemStack.EMPTY

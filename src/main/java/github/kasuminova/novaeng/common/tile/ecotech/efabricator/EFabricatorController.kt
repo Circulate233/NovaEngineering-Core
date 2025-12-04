@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 @Suppress("unused")
-open class EFabricatorController() : EPartController<EFabricatorPart>() {
+class EFabricatorController() : EPartController<EFabricatorPart>() {
 
     companion object {
         const val MAX_COOLANT_CACHE: Int = 100000

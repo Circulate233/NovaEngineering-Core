@@ -35,7 +35,7 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 import javax.annotation.Nonnull
 
-open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
+class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
     companion object {
         val PATTERN_SLOTS = 12 * 6
@@ -43,7 +43,7 @@ open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
     val aePatterns = ObjectOpenHashSet<IAEItemStack>()
     val patterns = AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE)
-    protected val details = ObjectArrayList<ICraftingPatternDetails?>(PATTERN_SLOTS)
+    private val details = ObjectArrayList<ICraftingPatternDetails?>(PATTERN_SLOTS)
 
     init {
         // Initialize details...
@@ -51,14 +51,14 @@ open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
             .forEach { e: ICraftingPatternDetails? -> details.add(e) }
     }
 
-    protected fun refreshPatterns() {
+    private fun refreshPatterns() {
         for (i in 0..<PATTERN_SLOTS) {
             refreshPattern(i)
         }
         notifyPatternChanged()
     }
 
-    protected fun refreshPattern(slot: Int) {
+    private fun refreshPattern(slot: Int) {
         details[slot] = null
 
         val pattern = patterns.getStackInSlot(slot)

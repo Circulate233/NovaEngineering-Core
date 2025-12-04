@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly
 import java.util.function.Consumer
 import kotlin.math.abs
 
-open class EFabricatorParallelProc : EFabricatorPart {
+class EFabricatorParallelProc : EFabricatorPart {
     val modifiers: MutableList<Modifier> = ObjectArrayList<Modifier>()
     val overclockModifiers: MutableList<Modifier> = ObjectArrayList<Modifier>()
 

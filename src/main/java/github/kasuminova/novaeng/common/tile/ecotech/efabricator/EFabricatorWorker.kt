@@ -23,7 +23,7 @@ import java.util.Deque
 import kotlin.math.max
 import kotlin.math.min
 
-open class EFabricatorWorker : EFabricatorPart() {
+class EFabricatorWorker : EFabricatorPart() {
 
     companion object {
         const val MAX_ENERGY_CACHE: Int = 500000
