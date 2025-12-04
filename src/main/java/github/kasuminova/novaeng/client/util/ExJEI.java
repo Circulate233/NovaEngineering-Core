@@ -57,7 +57,7 @@ public class ExJEI {
             ItemStack canonicalKey = uniqueKeys.computeIfAbsent(SimpleItem.getInstance(stack), k -> stack);
 
             if (stack == canonicalKey) {
-                if (item.getValue() == Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
+                if (item.getValue() != Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
                     double bValue = item.getValue() / 100000;
                     new MCJeiRecipe("replicator_jei")
                         .addInput(CraftTweakerMC.getIItemStack(stack))
