@@ -85,7 +85,7 @@ public class ExJEI {
 
     private static boolean isBlock(String s) {
         for (var string : blockList) {
-            if (string.equals(s)){
+            if (string.equals(s)) {
                 return true;
             }
         }

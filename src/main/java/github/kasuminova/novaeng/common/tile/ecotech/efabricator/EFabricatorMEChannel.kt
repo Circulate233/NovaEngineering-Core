@@ -102,7 +102,7 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
     override fun provideCrafting(craftingTracker: ICraftingProviderHelper) {
         val controller: EFabricatorController = controller ?: return
 
-        val patternBuses: List<EFabricatorPatternBus> = controller.patternBuses
+        val patternBuses: List<EFabricatorPatternBus> = controller.getPatternBuses()
         patternBuses.stream()
             .flatMap { patternBus: EFabricatorPatternBus? ->
                 patternBus!!.getDetails().stream()
@@ -190,7 +190,7 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
 
     override fun isBusy(): Boolean {
         if (partController != null) {
-            return partController.isQueueFull
+            return partController.isQueueFull()
         }
         return true
     }

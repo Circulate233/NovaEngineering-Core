@@ -66,7 +66,7 @@ class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUplo
             for (channelNode in channelNodes) {
                 val channel = channelNode.machine as EFabricatorMEChannel
                 channel.controller?.let {
-                    for (patternBus in it.patternBuses) {
+                    for (patternBus in it.getPatternBuses()) {
                         if (patternBus.aePatterns.contains(out)) {
                             player.sendMessage(
                                 TextComponentTranslation(

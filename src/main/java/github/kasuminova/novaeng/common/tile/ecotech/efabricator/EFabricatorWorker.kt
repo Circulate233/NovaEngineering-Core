@@ -46,7 +46,7 @@ class EFabricatorWorker : EFabricatorPart() {
         get() {
             val controller = getController()
             if (controller != null && controller.overclocked) {
-                return controller.level.applyOverclockQueueDepth(field)
+                return controller.getLevel().applyOverclockQueueDepth(field)
             }
             return field
         }
@@ -67,7 +67,7 @@ class EFabricatorWorker : EFabricatorPart() {
         val controller = partController
         val coolantCache = controller.coolantCache
         val energyUsage: Int = if (controller.overclocked && !controller.activeCooling) {
-            controller.level.applyOverclockEnergyUsage(ENERGY_USAGE)
+            controller.getLevel().applyOverclockEnergyUsage(ENERGY_USAGE)
         } else {
             ENERGY_USAGE
         }
@@ -81,7 +81,7 @@ class EFabricatorWorker : EFabricatorPart() {
             } catch (ignored: GridAccessException) {
             }
         }
-        var parallelism = min(max(controller.availableParallelism, 1).toDouble(), energy / energyUsage).toInt()
+        var parallelism = min(max(controller.getAvailableParallelism(), 1).toDouble(), energy / energyUsage).toInt()
         if (controller.activeCooling) {
             parallelism = min(parallelism, coolantCache / COOLANT_USAGE)
         }
