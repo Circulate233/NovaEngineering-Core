@@ -110,7 +110,7 @@ open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
     private fun addPattern(stack: ItemStack) {
         val item = stack.item
         if (item is ItemEncodedPattern) {
-            val pattern = item.getPatternForItem(stack, this.world)
+            val pattern = item.getPatternForItem(stack, this.world) ?: return
             if (pattern.isCraftable || pattern is FluidPatternDetails) {
                 aePatterns.add(pattern.condensedOutputs[0])
             }
@@ -120,7 +120,7 @@ open class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
     private fun removePattern(stack: ItemStack) {
         val item = stack.item
         if (item is ItemEncodedPattern) {
-            val pattern = item.getPatternForItem(stack, this.world)
+            val pattern = item.getPatternForItem(stack, this.world) ?: return
             if (pattern.isCraftable || pattern is FluidPatternDetails) {
                 aePatterns.remove(pattern.condensedOutputs[0])
             }
