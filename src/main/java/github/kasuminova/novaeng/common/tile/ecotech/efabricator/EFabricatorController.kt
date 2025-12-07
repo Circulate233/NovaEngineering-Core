@@ -275,11 +275,12 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
         val workers = getDynamicPattern("workers")
         this.length = workers?.size ?: 0
         this.foundComponents.values.forEach {
-            val handler = it.providedComponent()
-            if (handler is IFluidHandler) {
-                if (it.getComponent().ioType == IOType.INPUT) {
-                    coolantInputHandlers.add(handler)
-                } else coolantOutputHandlers.add(handler)
+            it.values.forEach { component ->
+                val handler = component.providedComponent()
+                if (handler is IFluidHandler) {
+                    if (component.getComponent().ioType == IOType.INPUT) coolantInputHandlers.add(handler)
+                    else coolantOutputHandlers.add(handler)
+                }
             }
         }
         updateParallelism()

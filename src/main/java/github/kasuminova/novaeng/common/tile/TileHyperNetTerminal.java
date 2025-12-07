@@ -15,6 +15,7 @@ import hellfirepvp.modularmachinery.common.util.IOInventory;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
@@ -23,6 +24,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 public class TileHyperNetTerminal extends TileCustomController {
     public static final int NETWORK_CONNECT_CARD_SLOT = 0;
@@ -81,11 +83,13 @@ public class TileHyperNetTerminal extends TileCustomController {
         super.updateComponents();
 
         energyHandlers.clear();
-        for (ProcessingComponent<?> foundComponent : foundComponents.values()) {
-            if (foundComponent.getComponent().getIOType() == IOType.INPUT) {
-                Object providedComponent = foundComponent.getProvidedComponent();
-                if (providedComponent instanceof final IEnergyHandlerAsync iEnergyHandlerAsync) {
-                    energyHandlers.add(iEnergyHandlerAsync);
+        for (Map<TileEntity, ProcessingComponent<?>> map : foundComponents.values()) {
+            for (var value : map.values()) {
+                if (value.getComponent().getIOType() == IOType.INPUT) {
+                    Object providedComponent = value.getProvidedComponent();
+                    if (providedComponent instanceof final IEnergyHandlerAsync iEnergyHandlerAsync) {
+                        energyHandlers.add(iEnergyHandlerAsync);
+                    }
                 }
             }
         }

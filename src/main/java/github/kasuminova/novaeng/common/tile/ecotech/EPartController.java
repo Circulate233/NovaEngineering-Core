@@ -158,7 +158,11 @@ public abstract class EPartController<P extends EPart<?>> extends TileCustomCont
     public void invalidate() {
         tileEntityInvalid = true;
         loaded = false;
-        foundComponents.forEach((te, component) -> MachineComponentManager.INSTANCE.removeOwner(te, this));
+        foundComponents.forEach(
+            (k, v) -> v.forEach((te, component) ->
+                MachineComponentManager.INSTANCE.removeOwner(te, this)
+            )
+        );
         disassemble();
     }
 

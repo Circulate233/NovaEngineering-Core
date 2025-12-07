@@ -228,7 +228,7 @@ dependencies {
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation(rfg.deobf("curse.maven:modularui-624243:7102461"))
     compileOnly(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
-    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:6945422"))
+    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:7304276"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))

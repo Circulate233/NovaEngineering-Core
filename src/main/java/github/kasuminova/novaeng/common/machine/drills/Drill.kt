@@ -28,7 +28,6 @@ import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeModifi
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
-import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList
@@ -52,13 +51,139 @@ import kotlin.math.pow
 
 abstract class Drill : MachineSpecial {
 
-    val resourceLocation = ResourceLocation(ModularMachinery.MODID, this.getMachineName())
+    companion object {
+        protected val tqsz: IntArray = intArrayOf(-1, 0, 1)
+        protected val tqdzb = Object2IntOpenHashMap<String>()
+        val errorStone: IItemStack
+        val stone: IItemStack = itemUtils.getItem("minecraft:stone", 0)
+        val circuit_0: IOreDictEntry = oreDict.get("programmingCircuit")
+        val dust: IOreDictEntry = oreDict.get("itemPulsatingPowder")
+        protected var basicMineralMix: Int
+        protected var MMMineralMix: Int
+
+        init {
+            var j = 0
+            for (i in tqsz) {
+                for (ii in tqsz) {
+                    tqdzb.put("" + (i + 1) + (ii + 1), ++j)
+                }
+            }
+            basicMineralMix = Config.IEConfig.Machines.excavator_depletion
+            MMMineralMix = basicMineralMix * 3
+
+            val item = ItemStack(Blocks.STONE)
+            val nbt = NBTTagCompound()
+            nbt.setByte("error", 1.toByte())
+            item.tagCompound = nbt
+            errorStone = CraftTweakerMC.getIItemStack(item)
+        }
+
+        protected fun chunkCoord(posValue: Int): Int {
+            return posValue shr 4
+        }
+
+        private fun getOreOutput(ctrl: TileMultiblockMachineController, pos: BlockPos, worldid: Int): IItemStack {
+            return getOreOutput(ctrl, pos, worldid, 0, 0)
+        }
+
+        private fun getOreOutput(
+            ctrl: TileMultiblockMachineController,
+            pos: BlockPos,
+            worldid: Int,
+            k: Int,
+            kk: Int
+        ): IItemStack {
+            val world = DimensionManager.getWorld(worldid) ?: return errorStone.mutable().copy()
+            val data = ctrl.customDataTag
+            val research_progress = data.getByte("research_progress")
+            val components_amount = data.getByte("components_amount")
+            val sfsh = max(
+                (if (data.hasKey("sfsh")) data.getInteger("sfsh") else 10000) - (1000 * research_progress.toDouble()
+                    .pow(1.6)), 0.0
+            )
+            val bxs = data.getInteger("bxs" + (k + 1) + (kk + 1)) * (1 + components_amount.toDouble().pow(2.5))
+            val component_raw_ore = data.getByte("additional_component_raw_ore")
+            var random = ctrl.getWorld().rand.nextInt(10000)
+            val worldInfo: MineralWorldInfo = ExcavatorHandler.getMineralWorldInfo(
+                world,
+                (chunkCoord(pos.x) + k),
+                (chunkCoord(pos.z) + kk)
+            )
+            if (sfsh < 10000) {
+                if (sfsh > random) {
+                    worldInfo.depletion += bxs.toInt()
+                    data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
+                    ctrl.customDataTag = data
+                }
+            } else {
+                val sl = floor(1.0f * sfsh) / 10000
+                worldInfo.depletion += (bxs * sl).toInt()
+                if ((sfsh - (10000 * sl)) > random) {
+                    worldInfo.depletion += bxs.toInt()
+                }
+                data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
+                ctrl.customDataTag = data
+            }
+            val mineral: MineralMix? = getUsableMix(worldInfo)
+            if (mineral != null) {
+                val iore = mineral.getRandomOre(world.rand)
+                if (component_raw_ore.toInt() == 1) {
+                    val rawore = OreHandler.getRawOre(iore)
+                    if (rawore == null) {
+                        return OreHandler.getOre(iore)
+                    } else {
+                        random = world.rand.nextInt(6)
+                        return rawore.amount(max(random, 1))
+                    }
+                }
+                return OreHandler.getOre(iore)
+            } else {
+                data.setString("kmm" + (k + 1) + (kk + 1), "empty")
+                return stone
+            }
+        }
+
+        private fun getCcrystalOutput(ctrl: TileMultiblockMachineController): IItemStack {
+            val data = ctrl.customDataTag
+            val world = ctrl.getWorld()
+            val research_progress = data.getByte("research_progress")
+            if (research_progress > 0) {
+                val cjc: MutableList<IItemStack> = ReferenceArrayList()
+                cjc.add(itemUtils.getItem("environmentaltech:litherite_crystal", 0))
+                cjc.add(itemUtils.getItem("environmentaltech:erodium_crystal", 0))
+                if (research_progress > 1) {
+                    cjc.add(itemUtils.getItem("environmentaltech:kyronite_crystal", 0))
+                    cjc.add(itemUtils.getItem("environmentaltech:pladium_crystal", 0))
+                    if (research_progress > 2) {
+                        cjc.add(itemUtils.getItem("environmentaltech:ionite_crystal", 0))
+                        if (research_progress > 3) {
+                            cjc.add(itemUtils.getItem("environmentaltech:aethium_crystal", 0))
+                        }
+                    }
+                }
+                val random = world.rand.nextInt(cjc.size)
+                return cjc[random]
+            } else {
+                return stone
+            }
+        }
+
+        private fun getUsableMix(worldInfo: MineralWorldInfo): MineralMix? {
+            return if (worldInfo.mineralOverride != null) {
+                worldInfo.mineralOverride
+            } else {
+                worldInfo.mineral
+            }
+        }
+    }
+
+    private val resourceLocation = ResourceLocation(ModularMachinery.MODID, this.getMachineName())
 
     override fun preInit(machine: DynamicMachine) {
         machine.addMachineEventHandler(
             MachineStructureUpdateEvent::class.java
-        ) { event ->
-            val controller = event!!.getController()
+        ) {
+            val controller = it.getController()
             controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC)
         }
         regUpgrade(machine)
@@ -97,12 +222,15 @@ abstract class Drill : MachineSpecial {
             SINGLE -> 4
         }
 
-    protected fun isDimensional(): Boolean {
+    protected open fun isDimensional(): Boolean {
         return false
     }
 
-    protected val exIngredient: Array<IIngredient?>
-        get() = arrayOfNulls(0)
+    private val emptyIngredient = arrayOf<IIngredient>()
+
+    protected open fun getExIngredient(): Array<IIngredient> {
+        return emptyIngredient
+    }
 
     override fun getRegistryName(): ResourceLocation {
         return resourceLocation
@@ -189,8 +317,8 @@ abstract class Drill : MachineSpecial {
                         data.setInteger("bxs11", bxs)
                         data.setInteger("sfsh", 8000)
                     }
-                if (this.exIngredient.isNotEmpty()) {
-                    r0.addInputs(*this.exIngredient)
+                if (this.getExIngredient().isNotEmpty()) {
+                    r0.addInputs(*this.getExIngredient())
                 }
                 for (i in 0..3) {
                     r0.addOutput(stone)
@@ -293,8 +421,8 @@ abstract class Drill : MachineSpecial {
                         data.setInteger("bxs11", bxs)
                         data.setInteger("sfsh", 9000)
                     }
-                if (this.exIngredient.isNotEmpty()) {
-                    r1.addInputs(*this.exIngredient)
+                if (this.getExIngredient().isNotEmpty()) {
+                    r1.addInputs(*this.getExIngredient())
                 }
                 for (i in 0..3) {
                     r1.addOutput(stone)
@@ -869,10 +997,10 @@ abstract class Drill : MachineSpecial {
     }
 
     override fun onTOPInfo(
-        probeMode: ProbeMode?,
+        probeMode: ProbeMode,
         probeInfo: IProbeInfo,
-        player: EntityPlayer?,
-        ipData: IProbeHitData?,
+        player: EntityPlayer,
+        ipData: IProbeHitData,
         controller: TileMultiblockMachineController
     ) {
         val data = controller.customDataTag
@@ -889,129 +1017,4 @@ abstract class Drill : MachineSpecial {
         RANGE
     }
 
-    companion object {
-        protected val tqsz: IntArray = intArrayOf(-1, 0, 1)
-        protected val tqdzb: Object2IntMap<String> = Object2IntOpenHashMap<String>()
-        val errorStone: IItemStack
-        val stone: IItemStack = itemUtils.getItem("minecraft:stone", 0)
-        val circuit_0: IOreDictEntry = oreDict.get("programmingCircuit")
-        val dust: IOreDictEntry = oreDict.get("itemPulsatingPowder")
-        protected var basicMineralMix: Int
-        protected var MMMineralMix: Int
-
-        init {
-            var j = 0
-            for (i in tqsz) {
-                for (ii in tqsz) {
-                    tqdzb.put("" + (i + 1) + (ii + 1), ++j)
-                }
-            }
-            basicMineralMix = Config.IEConfig.Machines.excavator_depletion
-            MMMineralMix = basicMineralMix * 3
-
-            val item = ItemStack(Blocks.STONE)
-            val nbt = NBTTagCompound()
-            nbt.setByte("error", 1.toByte())
-            item.tagCompound = nbt
-            errorStone = CraftTweakerMC.getIItemStack(item)
-        }
-
-        protected fun chunkCoord(posValue: Int): Int {
-            return posValue shr 4
-        }
-
-        private fun getOreOutput(ctrl: TileMultiblockMachineController, pos: BlockPos, worldid: Int): IItemStack {
-            return getOreOutput(ctrl, pos, worldid, 0, 0)
-        }
-
-        private fun getOreOutput(
-            ctrl: TileMultiblockMachineController,
-            pos: BlockPos,
-            worldid: Int,
-            k: Int,
-            kk: Int
-        ): IItemStack {
-            val world = DimensionManager.getWorld(worldid) ?: return errorStone.mutable().copy()
-            val data = ctrl.customDataTag
-            val research_progress = data.getByte("research_progress")
-            val components_amount = data.getByte("components_amount")
-            val sfsh = max(
-                (if (data.hasKey("sfsh")) data.getInteger("sfsh") else 10000) - (1000 * research_progress.toDouble()
-                    .pow(1.6)), 0.0
-            )
-            val bxs = data.getInteger("bxs" + (k + 1) + (kk + 1)) * (1 + components_amount.toDouble().pow(2.5))
-            val component_raw_ore = data.getByte("additional_component_raw_ore")
-            var random = ctrl.getWorld().rand.nextInt(10000)
-            val worldInfo: MineralWorldInfo = ExcavatorHandler.getMineralWorldInfo(
-                world,
-                (chunkCoord(pos.x) + k),
-                (chunkCoord(pos.z) + kk)
-            )
-            if (sfsh < 10000) {
-                if (sfsh > random) {
-                    worldInfo.depletion += bxs.toInt()
-                    data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
-                    ctrl.customDataTag = data
-                }
-            } else {
-                val sl = floor(1.0f * sfsh) / 10000
-                worldInfo.depletion += (bxs * sl).toInt()
-                if ((sfsh - (10000 * sl)) > random) {
-                    worldInfo.depletion += bxs.toInt()
-                }
-                data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
-                ctrl.customDataTag = data
-            }
-            val mineral: MineralMix? = getUsableMix(worldInfo)
-            if (mineral != null) {
-                val iore = mineral.getRandomOre(world.rand)
-                if (component_raw_ore.toInt() == 1) {
-                    val rawore = OreHandler.getRawOre(iore)
-                    if (rawore == null) {
-                        return OreHandler.getOre(iore)
-                    } else {
-                        random = world.rand.nextInt(6)
-                        return rawore.amount(max(random, 1))
-                    }
-                }
-                return OreHandler.getOre(iore)
-            } else {
-                data.setString("kmm" + (k + 1) + (kk + 1), "empty")
-                return stone
-            }
-        }
-
-        private fun getCcrystalOutput(ctrl: TileMultiblockMachineController): IItemStack {
-            val data = ctrl.customDataTag
-            val world = ctrl.getWorld()
-            val research_progress = data.getByte("research_progress")
-            if (research_progress > 0) {
-                val cjc: MutableList<IItemStack> = ReferenceArrayList()
-                cjc.add(itemUtils.getItem("environmentaltech:litherite_crystal", 0))
-                cjc.add(itemUtils.getItem("environmentaltech:erodium_crystal", 0))
-                if (research_progress > 1) {
-                    cjc.add(itemUtils.getItem("environmentaltech:kyronite_crystal", 0))
-                    cjc.add(itemUtils.getItem("environmentaltech:pladium_crystal", 0))
-                    if (research_progress > 2) {
-                        cjc.add(itemUtils.getItem("environmentaltech:ionite_crystal", 0))
-                        if (research_progress > 3) {
-                            cjc.add(itemUtils.getItem("environmentaltech:aethium_crystal", 0))
-                        }
-                    }
-                }
-                val random = world.rand.nextInt(cjc.size)
-                return cjc[random]
-            } else {
-                return stone
-            }
-        }
-
-        private fun getUsableMix(worldInfo: MineralWorldInfo): MineralMix? {
-            return if (worldInfo.mineralOverride != null) {
-                worldInfo.mineralOverride
-            } else {
-                worldInfo.mineral
-            }
-        }
-    }
 }

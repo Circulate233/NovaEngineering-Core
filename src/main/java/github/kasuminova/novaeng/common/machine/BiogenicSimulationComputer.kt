@@ -6,8 +6,6 @@ import crafttweaker.api.item.IItemStack
 import crafttweaker.api.minecraft.CraftTweakerMC
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
 import github.kasuminova.mmce.common.event.recipe.FactoryRecipeFinishEvent
-import github.kasuminova.mmce.common.event.recipe.FactoryRecipeStartEvent
-import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent
 import github.kasuminova.mmce.common.helper.IMachineController
 import github.kasuminova.novaeng.common.crafttweaker.expansion.RecipePrimerHyperNet.requireComputationPoint
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper
@@ -32,7 +30,7 @@ object BiogenicSimulationComputer : MachineSpecial {
     private val blank = CraftTweakerMC.getIItemStack(ItemStack(DMLRegistry.ITEM_DATA_MODEL_BLANK))
     private const val MACHINEID = "biogenic_simulation_computer"
     val REGISTRY_NAME = ResourceLocation(ModularMachinery.MODID, MACHINEID)
-    private val inscriberModels = arrayOf<String?>(
+    private val inscriberModels = arrayOf(
         "数位演算模块-α",
         "数位演算模块-β",
         "数位演算模块-δ",
@@ -60,19 +58,19 @@ object BiogenicSimulationComputer : MachineSpecial {
                     data.setTag(prepare, item.writeToNBT(NBTTagCompound()))
                     true
                 }
-                .addPreCheckHandler { event ->
-                    val ctrl = event.getController()
+                .addPreCheckHandler {
+                    val ctrl = it.getController()
                     val data = ctrl.customDataTag
                     if (data.hasKey(ysqname)) {
-                        event.setFailed("数据模块注入完成,可以开始演算")
+                        it.setFailed("数据模块注入完成,可以开始演算")
 
                         for (ii in inscriberModels.indices) {
                             data.removeTag("prepare$ii")
                         }
                     }
                 }
-                .addFactoryStartHandler { event: FactoryRecipeStartEvent ->
-                    val ctrl = event.getController()
+                .addFactoryStartHandler {
+                    val ctrl = it.getController()
                     val data = ctrl.customDataTag
                     if (!data.hasKey(ysqname)) {
                         val itemData = data.getTag(prepare) as NBTTagCompound
@@ -99,22 +97,22 @@ object BiogenicSimulationComputer : MachineSpecial {
             RecipeBuilder.newBuilder("moni$i", MACHINEID, 60, 0)
                 .addEnergyPerTickInput(1000000)
                 .addItemInput(clay)
-                .addPreCheckHandler { event: RecipeCheckEvent ->
-                    val ctrl = event.getController()
+                .addPreCheckHandler {
+                    val ctrl = it.getController()
                     val data = ctrl.customDataTag
                     val parallelism = max(data.getInteger("parallelism"), 1)
 
                     if (!data.hasKey(ysqname)) {
-                        event.setFailed("没有数据模型！")
+                        it.setFailed("没有数据模型！")
                         return@addPreCheckHandler
                     }
-                    event.activeRecipe.maxParallelism = parallelism
+                    it.activeRecipe.maxParallelism = parallelism
                 }
-                .addFactoryStartHandler { event: FactoryRecipeStartEvent ->
-                    val ctrl = event.getController()
+                .addFactoryStartHandler {
+                    val ctrl = it.getController()
                     val data = ctrl.customDataTag
                     val ysqddcss = data.getInteger(ysqddcs)
-                    val bl = event.factoryRecipeThread
+                    val bl = it.factoryRecipeThread
                     if (ysqddcss < 32) {
                         bl.addModifier(
                             "duration",
@@ -159,18 +157,18 @@ object BiogenicSimulationComputer : MachineSpecial {
 
             RecipeBuilder.newBuilder("mxdc$i", MACHINEID, 1)
                 .addItemInput(blank)
-                .addPreCheckHandler { event: RecipeCheckEvent ->
-                    val ctrl = event.getController()
+                .addPreCheckHandler {
+                    val ctrl = it.getController()
                     val data = ctrl.customDataTag
                     if (!data.hasKey(ysqname)) {
-                        event.setFailed("没有可以导出的数据")
+                        it.setFailed("没有可以导出的数据")
                     }
                 }
                 .addOutput(CraftTweakerAPI.oreDict.get("dataModel"))
                 .setLore("§6提取出写入的模型")
-                .addItemModifier { ctrl: IMachineController?, Item: IItemStack? ->
+                .addItemModifier { ctrl,item ->
                     outputdata(
-                        ctrl!!,
+                        ctrl,
                         ysqname,
                         ysqddcs
                     )
@@ -186,8 +184,8 @@ object BiogenicSimulationComputer : MachineSpecial {
 
         machine.addMachineEventHandler(
             ControllerGUIRenderEvent::class.java
-        ) { event: ControllerGUIRenderEvent ->
-            val ctrl = event.getController()
+        ) {
+            val ctrl = it.getController()
             val data = ctrl.customDataTag
             val info = ArrayList<String?>()
 
@@ -205,7 +203,7 @@ object BiogenicSimulationComputer : MachineSpecial {
                 info.add("当前迭代次数：$ysqddcs")
             }
             @Suppress("UsePropertyAccessSyntax")
-            event.setExtraInfo(*info.toTypedArray())
+            it.setExtraInfo(*info.toTypedArray())
         }
     }
 

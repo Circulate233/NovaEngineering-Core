@@ -24,4 +24,8 @@ object DifferentWorld : Drill() {
     override fun getBaseEnergy(): Long {
         return 32768
     }
+
+    override fun isDimensional(): Boolean {
+        return true
+    }
 }

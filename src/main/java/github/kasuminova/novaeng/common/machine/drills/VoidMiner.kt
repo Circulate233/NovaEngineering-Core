@@ -20,4 +20,8 @@ object VoidMiner : Drill() {
     override fun getRecipeTimeMultiple(): Float {
         return 1.5f
     }
+
+    override fun isDimensional(): Boolean {
+        return true
+    }
 }
