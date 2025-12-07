@@ -492,6 +492,55 @@ novaeng.molten_casting.thread.temperature=温度控制核心
 novaeng.molten_casting.thread.work=合金熔炼铸造
 novaeng.molten_casting.thread.cooling=冷却模块
 
+novaeng.mm_altar.thread.0=血之合成
+novaeng.mm_altar.thread.1=血液注入
+novaeng.mm_altar.thread.2=灵魂网络链接维持
+novaeng.mm_altar.recipe.0=§4所需基础生命源质%s
+novaeng.mm_altar.recipe.1=§4所需生命源质总量%s
+novaeng.mm_altar.recipe.2=§4配方所要求最低层级：%s
+novaeng.mm_altar.recipe.3=§6实际速度与消耗将取决于速度符文
+novaeng.mm_altar.recipe.4=§6并行状态每次需要消耗的血量会乘并行数
+novaeng.mm_altar.recipe.5=§6不接受速度符文和升级
+novaeng.mm_altar.recipe.6=§4输出生命源质至生命源质输出仓
+novaeng.mm_altar.recipe.7=§4固定每10t输出10000
+novaeng.mm_altar.recipe.8=§4让你的祭坛里的生命源质永远是满的
+novaeng.mm_altar.recipe.9=§4固定每10t输出10000
+novaeng.mm_altar.progress.0=§6合成中,还差§a%s生命源质§6完成合成
+novaeng.mm_altar.progress.1=§6剩余的生命源质不足最低值§a%s
+novaeng.mm_altar.failed.blood=§4缓存的生命源质无法启动配方！
+novaeng.mm_altar.failed.level=§4祭坛等级不足以运行配方！
+novaeng.mm_altar.failed.0=§4内部生命源质不足够进行一次输出！
+novaeng.mm_altar.failed.1=§4没有生命源质输出仓或输出仓内没有宝珠,无法运行
+novaeng.mm_altar.failed.2=§4存储的生命源质已经抵达极限！
+novaeng.mm_altar.upgrade.0=§7柱子可以是任意完整方块
+novaeng.mm_altar.upgrade.1=§6即可提升%s级并行
+novaeng.mm_altar.upgrade1=§6将3级祭坛的柱子方块全部替换为
+novaeng.mm_altar.upgrade2=§6将4级祭坛的所有的大血石砖正下方的柱子方块替换为
+novaeng.mm_altar.upgrade3.0=§6将6级祭坛的所有的晶簇块正下方的柱子方块替换为
+novaeng.mm_altar.upgrade3.1=§6并且额外提升1级祭坛等级
+
+gui.mm_altar.tooltip.0=§4生命源质数量 ：§a%s / $s
+gui.mm_altar.tooltip.1=§9当前祭坛等级§a：%s   §9祭坛升级激活数§a：%s
+gui.mm_altar.tooltip.2=§9苦难之井状态§a：
+gui.mm_altar.tooltip.3=§b仪式：苦难之井的主仪式石允许位于控制器的为中心的长13,宽13,高度为21的长方体内（即半径6,高度上下10)
+gui.mm_altar.tooltip.4=§b激活仪式：苦难之井后,控制器会自动连接苦难之井
+gui.mm_altar.tooltip.5=§b连接后允许使用生命萃取祭坛的苦难之井配方
+mmaltar.well_of_suffering.true=§6已连接
+mmaltar.well_of_suffering.false=§6未连接
+
+novaeng.life_extracts_altar.recipe.0=§a必须绑定过血之祭坛控制器的坐标
+novaeng.life_extracts_altar.recipe.1=§4直接将生命源质产出至模块血之祭坛
+novaeng.life_extracts_altar.recipe.2=§4坐标卡需要绑定模块血之祭坛控制器
+novaeng.life_extracts_altar.recipe.3=§4需要模块血之祭坛苦难之井模式完成连接才会开始工作
+novaeng.life_extracts_altar.recipe.4=§6每次为祭坛添加的生命源质基础值为%s,支持献祭符文
+novaeng.life_extracts_altar.failed.0=坐标未找到血之祭坛,或者在已加载区块之外
+novaeng.life_extracts_altar.failed.1=绑定的方块错误,或血之祭坛未成型
+novaeng.life_extracts_altar.failed.2=苦难之井未建立,无法激活
+
+gui.life_extracts_altar.tooltip.name=§4//////////// 生命萃取祭坛 ////////////
+gui.life_extracts_altar.tooltip.true=§4苦难之井模式：§6开启
+gui.life_extracts_altar.tooltip.false=§4苦难之井模式：§6关闭
+
 novaeng.dyson.thread.name=管理中枢链接器
 novaeng.dyson_ball_management_center.thread.0=戴森球结构链接核心
 novaeng.dyson_ball_management_center.thread.1=太阳帆状态同步器

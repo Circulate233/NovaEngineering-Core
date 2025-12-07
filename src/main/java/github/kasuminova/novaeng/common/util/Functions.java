@@ -40,31 +40,31 @@ public class Functions {
 
     @SafeVarargs
     public static <T> ObjectList<T> asList(T... s) {
-        return ObjectArrayList.wrap(s);
+        return new ObjectArrayList<>(s);
     }
 
     public static IntList asList(int... s) {
-        return IntArrayList.wrap(s);
+        return new IntArrayList(s);
     }
 
     public static LongList asList(long... s) {
-        return LongArrayList.wrap(s);
+        return new LongArrayList(s);
     }
 
     public static ShortList asList(short... s) {
-        return ShortArrayList.wrap(s);
+        return new ShortArrayList(s);
     }
 
     public static FloatList asList(float... s) {
-        return FloatArrayList.wrap(s);
+        return new FloatArrayList(s);
     }
 
     public static DoubleList asList(double... s) {
-        return DoubleArrayList.wrap(s);
+        return new DoubleArrayList(s);
     }
 
     public static CharList asList(char... s) {
-        return CharArrayList.wrap(s);
+        return new CharArrayList(s);
     }
 
     @SafeVarargs

@@ -1,25 +1,19 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class SmallOreDrill extends Drill {
-    public static final SmallOreDrill INSTANCE = new SmallOreDrill();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.a";
+object SmallOreDrill : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.a"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "small_ore_drill";
+    override fun getMachineName(): String {
+        return "small_ore_drill"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.SINGLE;
+    override fun getType(): Type {
+        return Type.SINGLE
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 24576;
+    override fun getBaseEnergy(): Long {
+        return 24576
     }
 }

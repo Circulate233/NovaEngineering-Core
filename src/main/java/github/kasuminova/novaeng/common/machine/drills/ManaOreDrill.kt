@@ -1,25 +1,19 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class ManaOreDrill extends Drill {
-    public static final ManaOreDrill INSTANCE = new ManaOreDrill();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.c";
+object ManaOreDrill : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.c"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "mana_ore_drill";
+    override fun getMachineName(): String {
+        return "mana_ore_drill"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.SINGLE;
+    override fun getType(): Type {
+        return Type.SINGLE
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 24576;
+    override fun getBaseEnergy(): Long {
+        return 24576
     }
 }

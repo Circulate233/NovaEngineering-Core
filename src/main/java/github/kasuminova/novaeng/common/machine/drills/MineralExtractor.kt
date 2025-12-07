@@ -1,30 +1,23 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class MineralExtractor extends Drill {
-    public static final MineralExtractor INSTANCE = new MineralExtractor();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.a";
+object MineralExtractor : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.a"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "mineral_extractor";
+    override fun getMachineName(): String {
+        return "mineral_extractor"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.RANGE;
+    override fun getType(): Type {
+        return Type.RANGE
     }
 
-    @Override
-    protected float getAdvancedRecipeTimeMultiple() {
-        return 1.5f;
+    override fun getAdvancedRecipeTimeMultiple(): Float {
+        return 1.5f
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 32768;
+    override fun getBaseEnergy(): Long {
+        return 32768
     }
 }

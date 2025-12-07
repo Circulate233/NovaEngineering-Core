@@ -1,36 +1,27 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class DifferentWorld extends Drill {
-    public static final DifferentWorld INSTANCE = new DifferentWorld();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.b";
+object DifferentWorld : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.b"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "different_world";
+    override fun getMachineName(): String {
+        return "different_world"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.RANGE;
+    override fun getType(): Type {
+        return Type.RANGE
     }
 
-    @Override
-    protected float getRecipeTimeMultiple() {
-        return 1.5f;
+    override fun getRecipeTimeMultiple(): Float {
+        return 1.5f
     }
 
-    @Override
-    protected float getAdvancedRecipeTimeMultiple() {
-        return 1.5f;
+    override fun getAdvancedRecipeTimeMultiple(): Float {
+        return 1.5f
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 32768;
+    override fun getBaseEnergy(): Long {
+        return 32768
     }
-
 }

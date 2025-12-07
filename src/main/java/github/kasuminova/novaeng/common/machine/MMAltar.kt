@@ -1,231 +1,601 @@
-package github.kasuminova.novaeng.common.machine;
+package github.kasuminova.novaeng.common.machine
 
-import WayofTime.bloodmagic.api.impl.BloodMagicAPI;
-import WayofTime.bloodmagic.api.impl.recipe.RecipeBloodAltar;
-import crafttweaker.annotations.ZenRegister;
-import crafttweaker.api.item.IIngredient;
-import crafttweaker.api.item.IItemStack;
-import crafttweaker.api.minecraft.CraftTweakerMC;
-import crafttweaker.api.oredict.IOreDictEntry;
-import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
-import hellfirepvp.modularmachinery.ModularMachinery;
-import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
-import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
-import hellfirepvp.modularmachinery.common.modifier.MultiBlockModifierReplacement;
-import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
-import hellfirepvp.modularmachinery.common.util.BlockArray;
-import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor;
-import ink.ikx.mmce.common.utils.StackUtils;
-import net.minecraft.block.Block;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import stanhebben.zenscript.annotations.ZenClass;
-import stanhebben.zenscript.annotations.ZenMethod;
+import WayofTime.bloodmagic.altar.BloodAltar
+import WayofTime.bloodmagic.api.impl.BloodMagicAPI
+import WayofTime.bloodmagic.block.BlockLifeEssence
+import WayofTime.bloodmagic.core.RegistrarBloodMagicBlocks
+import WayofTime.bloodmagic.core.data.Binding
+import WayofTime.bloodmagic.ritual.IMasterRitualStone
+import WayofTime.bloodmagic.ritual.types.RitualWellOfSuffering
+import WayofTime.bloodmagic.tile.TileAltar
+import WayofTime.bloodmagic.util.helper.NetworkHelper
+import crafttweaker.CraftTweakerAPI.itemUtils
+import crafttweaker.annotations.ZenRegister
+import crafttweaker.api.item.IIngredient
+import crafttweaker.api.item.IItemStack
+import crafttweaker.api.minecraft.CraftTweakerMC
+import crafttweaker.api.oredict.IOreDictEntry
+import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
+import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent
+import github.kasuminova.mmce.common.event.machine.MachineTickEvent
+import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.common.util.Functions.asList
+import github.kasuminova.novaeng.common.util.Functions.getText
+import hellfirepvp.modularmachinery.ModularMachinery
+import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder
+import hellfirepvp.modularmachinery.common.machine.DynamicMachine
+import hellfirepvp.modularmachinery.common.modifier.MultiBlockModifierReplacement
+import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
+import hellfirepvp.modularmachinery.common.util.BlockArray
+import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor
+import ink.ikx.mmce.common.utils.StackUtils
+import it.unimi.dsi.fastutil.objects.ObjectLists
+import kport.modularmagic.common.tile.TileLifeEssenceProvider
+import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.BlockPos
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
+import stanhebben.zenscript.annotations.ZenClass
+import stanhebben.zenscript.annotations.ZenMethod
+import java.util.WeakHashMap
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-//TODO:处理硬编码
 @ZenRegister
 @ZenClass("novaeng.MMAltar")
-public class MMAltar implements MachineSpecial {
-    public static final String MachineID = "mm_altar";
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, MachineID);
-    public static final MMAltar INSTANCE = new MMAltar();
+object MMAltar : MachineSpecial {
 
-    public static final List<BlockPos> posSet1 = Arrays.asList(
-        new BlockPos(-3, -5, -3), new BlockPos(-3, -5, 3),
-        new BlockPos(3, -5, -3), new BlockPos(3, -5, 3),
-        new BlockPos(-3, -4, -3), new BlockPos(-3, -4, 3),
-        new BlockPos(3, -4, -3), new BlockPos(3, -4, 3)
-    );
+    private val chace: MutableMap<TileMultiblockMachineController, TileAltar> = WeakHashMap()
+    val pdfw1 = intArrayOf(-6, -10, -6)
+    val pdfw2 = intArrayOf(6, 10, 6)
 
-    public static final List<BlockPos> posSet2 = Arrays.asList(
-        new BlockPos(-5, -3, -5), new BlockPos(-5, -3, 5),
-        new BlockPos(5, -3, -5), new BlockPos(5, -3, 5)
-    );
+    const val MACHINEID = "mm_altar"
+    val REGISTRY_NAME = ResourceLocation(ModularMachinery.MODID, MACHINEID)
 
-    public static final List<BlockPos> posSet3 = Arrays.asList(
-        new BlockPos(-11, -2, -11), new BlockPos(-11, -2, 11),
-        new BlockPos(11, -2, -11), new BlockPos(11, -2, 11)
-    );
+    val posSet1: List<BlockPos> = asList(
+        BlockPos(-3, -5, -3), BlockPos(-3, -5, 3),
+        BlockPos(3, -5, -3), BlockPos(3, -5, 3),
+        BlockPos(-3, -4, -3), BlockPos(-3, -4, 3),
+        BlockPos(3, -4, -3), BlockPos(3, -4, 3)
+    )
 
-    public static Block BLOCKSJ1 = getOtherModsBlock("contenttweaker", "crystalmatrixforcefieldcontrolblock");
-    public static Block BLOCKSJ2 = getOtherModsBlock("contenttweaker", "fallenstarforcefieldcontrolblock");
-    public static Block BLOCKSJ3 = getOtherModsBlock("contenttweaker", "universalforcefieldcontrolblock");
+    val posSet2: List<BlockPos> = asList(
+        BlockPos(-5, -3, -5), BlockPos(-5, -3, 5),
+        BlockPos(5, -3, -5), BlockPos(5, -3, 5)
+    )
 
-    protected MMAltar() {
+    val posSet3: List<BlockPos> = asList(
+        BlockPos(-11, -2, -11), BlockPos(-11, -2, 11),
+        BlockPos(11, -2, -11), BlockPos(11, -2, 11)
+    )
+
+    //水晶矩阵
+    var BLOCKSJ1: Block = getOtherModsBlock("contenttweaker", "crystalmatrixforcefieldcontrolblock")
+
+    //落星合金
+    var BLOCKSJ2: Block = getOtherModsBlock("contenttweaker", "fallenstarforcefieldcontrolblock")
+
+    //寰宇
+    var BLOCKSJ3: Block = getOtherModsBlock("contenttweaker", "universalforcefieldcontrolblock")
+
+    private fun getOtherModsBlock(modId: String, blockName: String): Block {
+        return GameRegistry.findRegistry(Block::class.java)
+            .getValue(ResourceLocation(modId, blockName)) ?: Blocks.AIR
     }
 
-    protected static Block getOtherModsBlock(String modId, String blockName) {
-        return GameRegistry.findRegistry(Block.class).getValue(new ResourceLocation(modId, blockName));
+    private fun buildModifierReplacementBlockArray(block: Block, posSet: List<BlockPos>): BlockArray {
+        val blockArray = BlockArray()
+        val descriptor = IBlockStateDescriptor(block)
+        posSet.forEach { pos ->
+            blockArray.addBlock(
+                pos, BlockArray.BlockInformation(
+                    mutableListOf(descriptor)
+                )
+            )
+        }
+        return blockArray
     }
 
-    protected static BlockArray buildModifierReplacementBlockArray(final Block block, final List<BlockPos> posSet) {
-        BlockArray blockArray = new BlockArray();
-        IBlockStateDescriptor descriptor = new IBlockStateDescriptor(block);
-        posSet.forEach(pos -> blockArray.addBlock(pos, new BlockArray.BlockInformation(Collections.singletonList(descriptor))));
-        return blockArray;
+    override fun preInit(machine: DynamicMachine) {
+        machine.addMachineEventHandler(
+            MachineStructureUpdateEvent::class.java
+        ) {
+            val controller = it.getController()
+            controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC)
+        }
+        machine.addMachineEventHandler(MachineStructureUpdateEvent::class.java) {
+            val ctrl = it.controller
+            val nbt = ctrl.customDataTag
+            val altar = ctrl.getAltar()
+
+            var sacrifice: Short = 0
+            for (pos in ctrl.foundPattern.getPattern().keys) {
+                val realPos: BlockPos = ctrl.getPos().add(pos.x, pos.y, pos.z)
+                val state: IBlockState = ctrl.getWorld().getBlockState(realPos)
+                if (state.block == RegistrarBloodMagicBlocks.BLOOD_RUNE) {
+                    if (state.block.getMetaFromState(state) == 3) ++sacrifice
+                }
+            }
+            var level = altar.getLevel().toByte()
+            var upgrade: Byte = 0
+
+            ctrl.foundMachine?.let { it1 ->
+                for (replacement in it1.multiBlockModifiers) {
+                    if (replacement.matches(ctrl)) {
+                        when (replacement.modifierName) {
+                            "upgrade1" -> ++upgrade
+                            "upgrade2" -> ++upgrade
+                            "upgrade3" -> {
+                                upgrade = (2.toByte() + upgrade).toByte()
+                                ++level
+                            }
+                        }
+                    }
+                }
+            }
+
+            nbt.setShort("sacrifice", sacrifice)
+            nbt.setByte("level", level)
+            nbt.setByte("upgrade", upgrade)
+        }
+        machine.addMachineEventHandler(MachineTickEvent::class.java) {
+            val ctrl = it.controller
+
+            if (ctrl.world.totalWorldTime % 100 != 0.toLong()) return@addMachineEventHandler
+
+            val nbt = ctrl.customDataTag
+            val altar = ctrl.getAltar()
+
+            var level = altar.getLevel().toByte()
+            var upgrade: Byte = 0
+
+            ctrl.foundMachine?.let { it1 ->
+                for (replacement in it1.multiBlockModifiers) {
+                    if (replacement.matches(ctrl)) {
+                        when (replacement.modifierName) {
+                            "upgrade1" -> ++upgrade
+                            "upgrade2" -> ++upgrade
+                            "upgrade3" -> {
+                                upgrade = (2.toByte() + upgrade).toByte()
+                                ++level
+                            }
+                        }
+                    }
+                }
+            }
+
+            nbt.setByte("level", level)
+            nbt.setByte("upgrade", upgrade)
+        }
+        machine.multiBlockModifiers.add(
+            MultiBlockModifierReplacement(
+                "upgrade1",
+                buildModifierReplacementBlockArray(BLOCKSJ1, posSet1),
+                ObjectLists.emptyList(),
+                asList(
+                    getText("novaeng.mm_altar.upgrade.0"),
+                    getText("novaeng.mm_altar.upgrade1") + BLOCKSJ1.localizedName,
+                    getText("novaeng.mm_altar.upgrade.1", 1)
+                ),
+                StackUtils.getStackFromBlockState(BLOCKSJ1.defaultState)
+            )
+        )
+        machine.multiBlockModifiers.add(
+            MultiBlockModifierReplacement(
+                "upgrade2",
+                buildModifierReplacementBlockArray(BLOCKSJ2, posSet2),
+                ObjectLists.emptyList(),
+                asList(
+                    getText("novaeng.mm_altar.upgrade.0"),
+                    getText("novaeng.mm_altar.upgrade2") + BLOCKSJ2.localizedName,
+                    getText("novaeng.mm_altar.upgrade.1", 1)
+                ),
+                StackUtils.getStackFromBlockState(BLOCKSJ2.defaultState)
+            )
+        )
+        machine.multiBlockModifiers.add(
+            MultiBlockModifierReplacement(
+                "upgrade3",
+                buildModifierReplacementBlockArray(BLOCKSJ3, posSet3),
+                ObjectLists.emptyList(),
+                asList(
+                    getText("novaeng.mm_altar.upgrade.0"),
+                    getText("novaeng.mm_altar.upgrade3.0") + BLOCKSJ3.localizedName,
+                    getText("novaeng.mm_altar.upgrade.1", 2),
+                    getText("novaeng.mm_altar.upgrade3.1")
+                ),
+                StackUtils.getStackFromBlockState(BLOCKSJ3.defaultState)
+            )
+        )
+        val altarRecipe = BloodMagicAPI.INSTANCE.recipeRegistrar
+        altarRecipe.removeBloodAltar(ItemStack(Items.BUCKET))
+        for (recipe in altarRecipe.altarRecipes) {
+            registerRecipe(
+                recipe.consumeRate,
+                recipe.syphon,
+                recipe.minimumTier.toInt(),
+                CraftTweakerMC.getIIngredient(recipe.input),
+                CraftTweakerMC.getIItemStack(recipe.output)
+            )
+        }
+        RecipeBuilder.newBuilder("czshr", MACHINEID, 10)
+            .addItemInput(itemUtils.getItem("bloodmagic:sacrificial_dagger", 1)).setChance(0.toFloat())
+            .addFactoryFinishHandler { it.controller.getAltar().addBlood(Int.MAX_VALUE) }
+            .addRecipeTooltip("novaeng.mm_altar.recipe.8")
+            .setParallelized(false)
+            .setThreadName("novaeng.mm_altar.thread.1")
+            .build()
+        RecipeBuilder.newBuilder("lhwl", MACHINEID, 10)
+            .addPreCheckHandler {
+                val ctrl = it.controller
+                val altar = ctrl.getAltar()
+                val now = altar.getNowBlood()
+                if (now < 10000) {
+                    it.setFailed("novaeng.mm_altar.failed.0")
+                    return@addPreCheckHandler
+                }
+                val pos = BlockPos.PooledMutableBlockPos.retain(
+                    ctrl.pos.x, ctrl.pos.y - 1, ctrl.pos.z
+                )
+                val t = ctrl.world.getTileEntity(pos)
+                pos.release()
+                if (t is TileLifeEssenceProvider.Output) {
+                    val item = t.inventory.getStackInSlot(0)
+                    if (item.isEmpty) {
+                        it.setFailed("novaeng.mm_altar.failed.1")
+                        return@addPreCheckHandler
+                    }
+                    val soulNetwork = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
+                    if (soulNetwork.currentEssence >= NetworkHelper.getMaximumForTier(
+                            NetworkHelper.getCurrentMaxOrb(
+                                soulNetwork
+                            )
+                        )
+                    ) {
+                        it.setFailed("novaeng.mm_altar.failed.2")
+                    }
+                } else it.setFailed("novaeng.mm_altar.failed.1")
+            }
+            .addFactoryFinishHandler {
+                val ctrl = it.controller
+                val altar = ctrl.getAltar()
+                val pos = BlockPos.PooledMutableBlockPos.retain(
+                    ctrl.pos.x, ctrl.pos.y - 1, ctrl.pos.z
+                )
+                val t = ctrl.world.getTileEntity(pos)
+                pos.release()
+                if (t is TileLifeEssenceProvider.Output) {
+                    val item = t.inventory.getStackInSlot(0)
+                    val Soul = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
+                    Soul.currentEssence += altar.drainBlood(10000)
+                }
+
+            }
+            .addRecipeTooltip(
+                "novaeng.mm_altar.recipe.6",
+                "novaeng.mm_altar.recipe.7"
+            )
+            .setParallelized(false)
+            .setThreadName("novaeng.mm_altar.thread.2")
+            .build()
+        RecipeBuilder.newBuilder("mm_altar_level_infinity_orb", "mm_altar", 2147483647, 9999999, false)
+            .addItemInputs(itemUtils.getItem("contenttweaker:universalforcefieldcontrolblock", 0).amount(4))
+            .addPreCheckHandler {
+                val ctrl = it.controller
+                val data = ctrl.customDataTag
+                val xycc = ctrl.getAltar().getNowBlood()
+                val jtdj = data.getByte("level")
+
+                if (xycc < 2147483647) {
+                    it.setFailed("novaeng.mm_altar.failed.blood")
+                    return@addPreCheckHandler
+                }
+                if (jtdj < 7) {
+                    it.setFailed("novaeng.mm_altar.failed.level")
+                    return@addPreCheckHandler
+                }
+            }
+            .addFactoryStartHandler { event ->
+                val ctrl = event.getController()
+                val data = ctrl.customDataTag
+
+                data.setLong("progress", 0)
+                data.setLong("totalProgress", 214748364700L)
+            }
+            .addFactoryPreTickHandler {
+                val ctrl = it.controller
+                val data = ctrl.customDataTag
+                val altar = ctrl.getAltar()
+                val now = altar.getNowBlood()
+                val progress = data.getLong("progress")
+                val thread = it.factoryRecipeThread
+                val totalTick = thread.activeRecipe.totalTick
+
+                if (progress < 214748364700L) {
+                    it.preventProgressing(
+                        getText(
+                            "novaeng.mm_altar.progress.0",
+                            214748364700L - progress
+                        )
+                    )
+                }
+                if (now == 2147483647) {
+                    if ((progress + 2147483647) <= 214748364700L) {
+                        data.setLong("progress", progress + 2147483647)
+                        altar.setBlood(0)
+                    } else {
+                        data.setLong("progress", 214748364700L)
+                        altar.setBlood(0)
+                        thread.activeRecipe.tick = totalTick
+                    }
+                }
+            }
+            .addOutput(itemUtils.getItem("contenttweaker:level_infinity_orb", 0))
+            .setThreadName("novaeng.mm_altar.thread.0")
+            .addRecipeTooltip(
+                getText("novaeng.mm_altar.recipe.0", 2147483647),
+                getText("novaeng.mm_altar.recipe.1", 214748364700L),
+                getText("novaeng.mm_altar.recipe.2", 7),
+                "novaeng.mm_altar.recipe.5"
+            )
+            .setParallelized(false)
+            .build()
+        if (NovaEngineeringCore.proxy.isClient) clientInit(machine)
+    }
+
+    @SideOnly(Side.CLIENT)
+    private fun clientInit(machine: DynamicMachine) {
+        machine.addMachineEventHandler(ControllerGUIRenderEvent::class.java) {
+            val ctrl = it.controller
+            val altar = ctrl.getAltar()
+            val nbt = ctrl.customDataTag
+
+            val level = nbt.getByte("level")
+            val upgrade = nbt.getByte("upgrade")
+            val now = altar.getNowBlood()
+            val max = altar.getMaxBlood()
+
+            var check = nbt.hasKey("pos")
+            if (check) {
+                val p = nbt.getIntArray("pos")
+                val pos = BlockPos.PooledMutableBlockPos.retain(
+                    p[0], p[1], p[2]
+                )
+                val t = ctrl.world.getTileEntity(pos)
+                pos.release()
+                if (!(t is IMasterRitualStone && t.currentRitual is RitualWellOfSuffering)) {
+                    nbt.removeTag("pos")
+                    check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
+                        nbt.setIntArray("pos", intArrayOf(x, y, z))
+                    }
+                }
+            } else {
+                check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
+                    nbt.setIntArray("pos", intArrayOf(x, y, z))
+                }
+            }
+
+            val info = asList(
+                getText("gui.mm_altar.tooltip.0", now, max),
+                getText("gui.mm_altar.tooltip.1", level, upgrade),
+                getText("gui.mm_altar.tooltip.2") + getText("mmaltar.well_of_suffering.$check")
+            )
+            if (!check) {
+                info.add(getText("gui.mm_altar.tooltip.3"))
+                info.add(getText("gui.mm_altar.tooltip.4"))
+                info.add(getText("gui.mm_altar.tooltip.5"))
+            }
+            @Suppress("UsePropertyAccessSyntax")
+            it.setExtraInfo(*info.toTypedArray())
+        }
+    }
+
+    override fun getRegistryName(): ResourceLocation {
+        return REGISTRY_NAME
     }
 
     /**
      * 合成配方
      *
      * @param need      最低血液需求
-     * @param Maxneed   总血液需求
-     * @param AltarTier 祭坛等级需求
+     * @param maxNeed   总血液需求
+     * @param altarTier 祭坛等级需求
      * @param input     输入物品
      * @param output    输出物品
      */
     @ZenMethod
-    public static void registerRecipe(int need, int Maxneed, int AltarTier, IIngredient input, IItemStack output) {
-        var time = Maxneed / need;
-        String name;
-        if (input instanceof IItemStack item) {
-            name = CraftTweakerMC.getItem(item.getDefinition()).getRegistryName().toString() + item.getMetadata();
-        } else if (input instanceof IOreDictEntry od) {
-            name = od.getName();
-        } else {
-            name = CraftTweakerMC.getItem(output.getDefinition()).getRegistryName().toString() + output.getMetadata();
+    @JvmStatic
+    fun registerRecipe(need: Int, maxNeed: Int, altarTier: Int, input: IIngredient, output: IItemStack) {
+        val time = maxNeed / need
+        val name: String = when (input) {
+            is IItemStack -> CraftTweakerMC.getItem(input.definition).getRegistryName().toString() + input.metadata
+            is IOreDictEntry -> input.name
+            else -> CraftTweakerMC.getItem(output.definition).getRegistryName().toString() + output.metadata
         }
-        RecipeBuilder.newBuilder(name, MachineID, time, 1000)
-                     .addItemInputs(input)
-                     .addPreCheckHandler(event -> {
-                         var ctrl = event.getController();
-                         var data = ctrl.getCustomDataTag();
-                         var xycc = data.getLong("xycc");
-                         var jtdj = data.getInteger("jtdj");
-                         var cpdj = data.getInteger("cpdj");
-                         var ccjx = data.getInteger("ccjx");
-                         var bx = Math.min(Math.pow(4, cpdj), ((double) ccjx / need));
+        RecipeBuilder.newBuilder(name, MACHINEID, time, 1000)
+            .addItemInputs(input)
+            .addPreCheckHandler { event ->
+                val ctrl = event.getController()
+                val nbt = ctrl.customDataTag
+                val altar = ctrl.getAltar()
+                val now = altar.getNowBlood()
+                val max = altar.getMaxBlood()
+                val level = nbt.getByte("level")
+                val upgrade = nbt.getByte("upgrade")
+                val bx = min(4.0.pow(upgrade.toDouble()), (max.toDouble() / need))
 
-                         if (xycc < need) {
-                             event.setFailed("§4缓存的生命源质无法启动配方！");
-                             return;
-                         }
-                         if (jtdj < AltarTier) {
-                             event.setFailed("§4祭坛等级不足以运行配方！");
-                             return;
-                         }
-                         event.getActiveRecipe().setMaxParallelism((int) bx);
-                     })
-                     .addFactoryStartHandler(event -> {
-                         var ctrl = event.getController();
-                         var data = ctrl.getCustomDataTag();
-                         var bx = event.getFactoryRecipeThread().getActiveRecipe().getParallelism();
+                if (now < need) {
+                    event.setFailed("novaeng.mm_altar.failed.blood")
+                    return@addPreCheckHandler
+                }
+                if (level < altarTier) {
+                    event.setFailed("novaeng.mm_altar.failed.level")
+                    return@addPreCheckHandler
+                }
+                event.activeRecipe.maxParallelism = bx.toInt()
+            }
+            .addFactoryStartHandler { event ->
+                val ctrl = event.getController()
+                val data = ctrl.customDataTag
+                val bx = event.factoryRecipeThread.getActiveRecipe().parallelism
 
-                         data.setLong("hcjd", 0);
-                         data.setLong("hcjdmax", (long) bx * Maxneed);
-                     })
-                     .addFactoryPreTickHandler(event -> {
-                         var ctrl = event.getController();
-                         var data = ctrl.getCustomDataTag();
-                         var xycc = data.getLong("xycc");
-                         data.getInteger("jtdj");
-                         var hcjd = data.getInteger("hcjd");
-                         var hcjdmax = data.getInteger("hcjdmax");
-                         var sdfwxg = 0.2 * data.getInteger("sdfw");
-                         var thread = event.getFactoryRecipeThread();
-                         var bx = thread.getActiveRecipe().getParallelism();
-                         var totalTick = thread.getActiveRecipe().getTotalTick();
-                         var sjneed = need * bx;
-
-                         if (xycc > sjneed) {
-                             if (hcjd < hcjdmax) {
-                                 thread.getActiveRecipe().setTick((totalTick / 2));
-                                 event.preventProgressing("§6合成中,还差§a" + (hcjdmax - hcjd) + "生命源质§6完成合成");
-                             }
-                             if (xycc <= (1 + sdfwxg) * sjneed) {
-                                 if (hcjd + xycc <= hcjdmax) {
-                                     data.setLong("hcjd", hcjd + xycc);
-                                     data.setLong("xycc", 0);
-                                 } else {
-                                     data.setLong("hcjd", hcjdmax);
-                                     data.setLong("xycc", xycc - (hcjdmax - hcjd));
-                                     thread.getActiveRecipe().setTick(totalTick);
-                                 }
-                             } else {
-                                 if (hcjd + ((1 + sdfwxg) * sjneed) <= hcjdmax) {
-                                     data.setLong("hcjd", (long) (hcjd + ((1 + sdfwxg) * sjneed)));
-                                     data.setLong("xycc", (long) (xycc - ((1 + sdfwxg) * sjneed)));
-                                 } else {
-                                     data.setLong("hcjd", hcjdmax);
-                                     data.setLong("xycc", xycc - (hcjdmax - hcjd));
-                                     thread.getActiveRecipe().setTick(totalTick);
-                                 }
-                             }
-                         } else {
-                             event.preventProgressing("§6剩余的生命源质不足最低值§a" + (sjneed));
-                         }
-                     })
-                     .addOutput(output)
-                     .setThreadName("血之合成")
-                     .addRecipeTooltip(
-                         "§4所需基础生命源质" + need,
-                         "§4所需生命源质总量" + Maxneed,
-                         "§4配方所要求最低层级：" + AltarTier,
-                         "§6实际速度与消耗将取决于速度符文",
-                         "§6并行状态每次需要消耗的血量会乘并行数"
-                     )
-                     .build();
+                data.setLong("progress", 0)
+                data.setLong("totalProgress", bx.toLong() * maxNeed)
+            }
+            .addFactoryPreTickHandler { event ->
+                val ctrl = event.getController()
+                val data = ctrl.customDataTag
+                val altar = ctrl.getAltar()
+                val nowBlood = altar.getNowBlood()
+                val progress = data.getLong("progress")
+                val totalProgress = data.getLong("totalProgress")
+                val consumption = altar?.consumptionMultiplier ?: 0f
+                val thread = event.factoryRecipeThread
+                val bx = thread.getActiveRecipe().parallelism
+                val totalTick = thread.getActiveRecipe().totalTick
+                val sjneed = need * bx
+                if (nowBlood > sjneed) {
+                    if (progress < totalProgress) {
+                        thread.getActiveRecipe().setTick((totalTick / 2))
+                        event.preventProgressing(
+                            getText(
+                                "novaeng.mm_altar.progress.0",
+                                totalProgress - progress
+                            )
+                        )
+                    }
+                    if (nowBlood <= (consumption + 1.0f) * sjneed) {
+                        if (progress + nowBlood <= totalProgress) {
+                            data.setLong("progress", progress + nowBlood)
+                            altar.setBlood(0)
+                        } else {
+                            data.setLong("progress", totalProgress)
+                            altar.drainBlood((totalProgress - progress).toInt())
+                            thread.getActiveRecipe().tick = totalTick
+                        }
+                    } else {
+                        if (progress + ((1 + consumption) * sjneed) <= totalProgress) {
+                            data.setLong("progress", (progress + ((1 + consumption) * sjneed)).toLong())
+                            altar.drainBlood(((1.0f + consumption) * sjneed).toInt())
+                        } else {
+                            data.setLong("progress", totalProgress)
+                            altar.drainBlood((totalProgress - progress).toInt())
+                            thread.getActiveRecipe().tick = totalTick
+                        }
+                    }
+                } else {
+                    event.preventProgressing(
+                        getText(
+                            "novaeng.mm_altar.progress.1",
+                            sjneed
+                        )
+                    )
+                }
+            }
+            .addOutput(output)
+            .setThreadName("novaeng.mm_altar.thread.0")
+            .addRecipeTooltip(
+                getText("novaeng.mm_altar.recipe.0", need),
+                getText("novaeng.mm_altar.recipe.1", maxNeed),
+                getText("novaeng.mm_altar.recipe.2", altarTier),
+                "novaeng.mm_altar.recipe.3",
+                "novaeng.mm_altar.recipe.4"
+            )
+            .build()
     }
 
-    @Override
-    public void preInit(final DynamicMachine machine) {
-        machine.addMachineEventHandler(MachineStructureUpdateEvent.class, event -> {
-            TileMultiblockMachineController controller = event.getController();
-            controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC);
-        });
-        machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement("xzjtsj1",
-            buildModifierReplacementBlockArray(BLOCKSJ1, posSet1),
-            Collections.emptyList(),
-            Arrays.asList(
-                "§7柱子可以是任意完整方块",
-                "§6将3级祭坛的柱子方块全部替换为" + BLOCKSJ1.getLocalizedName(),
-                "§6即可激活升级数1"
-            ),
-            StackUtils.getStackFromBlockState(BLOCKSJ1.getDefaultState()))
-        );
-        machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement("xzjtsj2",
-            buildModifierReplacementBlockArray(BLOCKSJ2, posSet2),
-            Collections.emptyList(),
-            Arrays.asList(
-                "§7柱子可以是任意完整方块",
-                "§6将4级祭坛的所有的大血石下方的1个柱子方块全部替换为" + BLOCKSJ2.getLocalizedName(),
-                "§6即可激活升级数1"
-            ),
-            StackUtils.getStackFromBlockState(BLOCKSJ2.getDefaultState()))
-        );
-        machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement("xzjtsj3",
-            buildModifierReplacementBlockArray(BLOCKSJ3, posSet3),
-            Collections.emptyList(),
-            Arrays.asList(
-                "§7柱子可以是任意完整方块",
-                "§6将6级祭坛的所有的晶簇下方的1个柱子方块全部替换为" + BLOCKSJ3.getLocalizedName(),
-                "§6即可激活升级数2",
-                "§6并且额外提升1级祭坛位阶"
-            ),
-            StackUtils.getStackFromBlockState(BLOCKSJ3.getDefaultState()))
-        );
-        var altarRecipe = BloodMagicAPI.INSTANCE.getRecipeRegistrar();
-        altarRecipe.removeBloodAltar(new ItemStack(Items.BUCKET));
-        for (RecipeBloodAltar recipe : altarRecipe.getAltarRecipes()) {
-            registerRecipe(
-                recipe.getConsumeRate(),
-                recipe.getSyphon(),
-                recipe.getMinimumTier().toInt(),
-                CraftTweakerMC.getIIngredient(recipe.getInput()),
-                CraftTweakerMC.getIItemStack(recipe.getOutput())
-            );
+    fun TileMultiblockMachineController.getAltar(): TileAltar? {
+        var t = chace[this]
+        if (t == null || t.isInvalid) {
+            t = this.world.getTileEntity(this.pos.offset(EnumFacing.DOWN, 4)) as? TileAltar
+        } else return t
+        if (t != null) {
+            synchronized(MMAltar) {
+                chace.put(this, t)
+            }
         }
+        return t
     }
 
-    @Override
-    public ResourceLocation getRegistryName() {
-        return REGISTRY_NAME;
+    private fun TileAltar?.getLevel(): Int {
+        if (this == null) return 0
+        return this.tier.ordinal + 1
+    }
+
+    private fun TileAltar?.getNowBlood(): Int {
+        return this?.getBloodAltar()?.fluid?.amount ?: 0
+    }
+
+    fun TileAltar?.setBlood(value: Int) {
+        val altar = this?.getBloodAltar() ?: return
+        if (altar.fluid == null) {
+            altar.setMainFluid(FluidStack(BlockLifeEssence.getLifeEssence(), value))
+            return
+        }
+        altar.fluid.amount = value
+    }
+
+    fun TileAltar?.addBlood(value: Int) {
+        val altar = this?.getBloodAltar() ?: return
+        if (altar.fluid == null) {
+            altar.setMainFluid(FluidStack(BlockLifeEssence.getLifeEssence(), value))
+            return
+        }
+        val fluid = altar.fluid
+        val max = altar.capacity
+        val need = max - fluid.amount
+        fluid.amount = if (value >= need) max else fluid.amount + value
+    }
+
+    private fun TileAltar?.drainBlood(value: Int): Int {
+        val altar = this?.getBloodAltar() ?: return 0
+        val fluid = altar.fluid ?: return 0
+        val o = fluid.amount
+        fluid.amount = max(0, fluid.amount - value)
+        return o - fluid.amount
+    }
+
+    private fun TileAltar.getBloodAltar(): BloodAltar? {
+        return this.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null) as? BloodAltar
+    }
+
+    private fun TileAltar?.getMaxBlood(): Int {
+        return this?.capacity ?: 0
+    }
+
+    fun clamp(a: Int, min: Int, max: Int): Int {
+        return min(max(a, max), max)
+    }
+
+    inline fun ergodicPos(
+        ctrl: TileMultiblockMachineController,
+        pos: BlockPos,
+        run: (x: Int, y: Int, z: Int) -> Unit
+    ): Boolean {
+        val p = BlockPos.MutableBlockPos()
+        for (x in (pos.x + pdfw1[0])..(pos.x + pdfw2[0] + 1)) {
+            for (y in clamp((pos.y + pdfw1[1]), 0, 255)..(clamp((pos.y + pdfw2[1]), 0, 255))) {
+                for (z in (pos.z + pdfw1[2])..(pos.z + pdfw2[2] + 1)) {
+                    val tile = ctrl.world.getTileEntity(p.setPos(x, y, z))
+                    if (tile is IMasterRitualStone) {
+                        if (tile.currentRitual is RitualWellOfSuffering) {
+                            run(x, y, z)
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
     }
 }

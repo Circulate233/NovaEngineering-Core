@@ -138,24 +138,24 @@ open class CommonProxy : IGuiHandler {
                 RegistryMachineSpecial.registrySpecialMachine(SingularityCore.INSTANCE)
             }
             if (Mods.BM2.isPresent) {
-                RegistryMachineSpecial.registrySpecialMachine(MMAltar.INSTANCE)
+                RegistryMachineSpecial.registrySpecialMachine(MMAltar)
             }
             RegistryMachineSpecial.registrySpecialMachine(DreamEnergyCore.INSTANCE)
             RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE)
             if (Loader.isModLoaded("deepmoblearning")) {
-                RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(BiogenicSimulationComputer.INSTANCE)
+                RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing)
+                RegistryMachineSpecial.registrySpecialMachine(BiogenicSimulationComputer)
             }
             if (Loader.isModLoaded("avaritia")) {
-                RegistryMachineSpecial.registrySpecialMachine(SpaceGenerator.INSTANCE)
+                RegistryMachineSpecial.registrySpecialMachine(SpaceGenerator)
             }
             if (Loader.isModLoaded("immersiveengineering")) {
-                RegistryMachineSpecial.registrySpecialMachine(MineralExtractor.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(VoidMiner.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(DifferentWorld.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill.INSTANCE)
-                RegistryMachineSpecial.registrySpecialMachine(SmallOreDrill.INSTANCE)
+                RegistryMachineSpecial.registrySpecialMachine(MineralExtractor)
+                RegistryMachineSpecial.registrySpecialMachine(VoidMiner)
+                RegistryMachineSpecial.registrySpecialMachine(DifferentWorld)
+                RegistryMachineSpecial.registrySpecialMachine(ManaOreDrill)
+                RegistryMachineSpecial.registrySpecialMachine(OrichalcosDrill)
+                RegistryMachineSpecial.registrySpecialMachine(SmallOreDrill)
             }
         }
         if (Mods.AE2.isPresent) {

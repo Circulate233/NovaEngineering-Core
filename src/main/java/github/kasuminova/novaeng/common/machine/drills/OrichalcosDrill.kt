@@ -1,30 +1,23 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class OrichalcosDrill extends Drill {
-    public static final OrichalcosDrill INSTANCE = new OrichalcosDrill();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.c";
+object OrichalcosDrill : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.c"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "orichalcos_drill";
+    override fun getMachineName(): String {
+        return "orichalcos_drill"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.RANGE;
+    override fun getType(): Type {
+        return Type.RANGE
     }
 
-    @Override
-    protected float getAdvancedRecipeTimeMultiple() {
-        return 1.5f;
+    override fun getAdvancedRecipeTimeMultiple(): Float {
+        return 1.5f
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 32768;
+    override fun getBaseEnergy(): Long {
+        return 32768
     }
 }

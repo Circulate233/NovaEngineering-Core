@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common.machine;
 
 import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent;
-import github.kasuminova.mmce.common.event.recipe.FactoryRecipeFinishEvent;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
@@ -51,9 +50,9 @@ public class StardustDisintegrator implements MachineSpecial {
 
     @Override
     public void init(final DynamicMachine machine) {
-        machine.addMachineEventHandler(FactoryRecipeFinishEvent.class, event -> {
-
-        });
+//        machine.addMachineEventHandler(FactoryRecipeFinishEvent.class, event -> {
+//
+//        });
     }
 
     @Override

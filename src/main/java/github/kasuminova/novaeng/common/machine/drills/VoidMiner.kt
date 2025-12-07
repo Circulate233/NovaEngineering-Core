@@ -1,30 +1,23 @@
-package github.kasuminova.novaeng.common.machine.drills;
+package github.kasuminova.novaeng.common.machine.drills
 
-public class VoidMiner extends Drill {
-    public static final VoidMiner INSTANCE = new VoidMiner();
-
-    @Override
-    protected String getCoreTheardName() {
-        return "novaeng.drill.thread.b";
+object VoidMiner : Drill() {
+    override fun getCoreTheardName(): String {
+        return "novaeng.drill.thread.b"
     }
 
-    @Override
-    protected String getMachineName() {
-        return "void_miner";
+    override fun getMachineName(): String {
+        return "void_miner"
     }
 
-    @Override
-    protected Type getType() {
-        return Type.SINGLE;
+    override fun getType(): Type {
+        return Type.SINGLE
     }
 
-    @Override
-    protected long getBaseEnergy() {
-        return 24576;
+    override fun getBaseEnergy(): Long {
+        return 24576
     }
 
-    @Override
-    protected float getRecipeTimeMultiple() {
-        return 1.5f;
+    override fun getRecipeTimeMultiple(): Float {
+        return 1.5f
     }
 }
