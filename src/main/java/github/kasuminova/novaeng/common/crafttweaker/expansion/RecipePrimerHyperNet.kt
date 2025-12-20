@@ -7,6 +7,7 @@ import github.kasuminova.novaeng.common.hypernet.old.NetNodeImpl
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchCognitionData
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipePrimer
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.client.resources.I18n
 import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -14,7 +15,6 @@ import stanhebben.zenscript.annotations.Optional
 import stanhebben.zenscript.annotations.ZenExpansion
 import stanhebben.zenscript.annotations.ZenMethod
 import java.util.Arrays
-import java.util.Objects
 import java.util.stream.Collectors
 
 @ZenRegister
@@ -87,14 +87,14 @@ object RecipePrimerHyperNet {
     fun RecipePrimer.requireResearch(
         vararg researchNames: String
     ): RecipePrimer {
-        return this.requireResearch(
-            *Arrays.stream(researchNames)
-                .map {
-                    RegistryHyperNet.getResearchCognitionData(it)
-                }
-                .filter { Objects.nonNull(it) }
-                .toArray { arrayOfNulls<ResearchCognitionData>(0) }
-        )
+        val list = ObjectArrayList<ResearchCognitionData>()
+        researchNames.forEach {
+            val data = RegistryHyperNet.getResearchCognitionData(it)
+            if (data != null) {
+                list.add(data)
+            }
+        }
+        return this.requireResearch(*list.toTypedArray())
     }
 
     @JvmStatic
