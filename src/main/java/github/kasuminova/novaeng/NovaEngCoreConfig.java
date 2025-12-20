@@ -46,6 +46,9 @@ public class NovaEngCoreConfig {
         @Config.RequiresMcRestart
         @Config.Name("爆炸")
         public boolean piece = false;
+
+        @Config.Name("ExtremeCraftingUIModification")
+        public boolean ExtremeCraftingUIModification = true;
     }
 
     public static class Server {

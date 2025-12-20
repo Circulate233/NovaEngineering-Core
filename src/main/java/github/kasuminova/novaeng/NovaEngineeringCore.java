@@ -59,7 +59,7 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PR
         "required-after:lumenized@[1.0.2,);" +
         "after:fluxnetworks@[4.1.0,);",
     acceptedMinecraftVersions = "[1.12, 1.13)",
-    acceptableRemoteVersions = "[1.21.7, 1.23.0)"
+    acceptableRemoteVersions = "[1.21.7, 1.24.0)"
 )
 @SuppressWarnings("MethodMayBeStatic")
 public class NovaEngineeringCore {
