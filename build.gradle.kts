@@ -226,6 +226,7 @@ dependencies {
 
     // Mod Dependencies
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
+    implementation(rfg.deobf("curse.maven:jaopca-266936:3487112"))
     implementation(rfg.deobf("curse.maven:modularui-624243:7102461"))
     compileOnly(rfg.deobf("curse.maven:electroblobs-wizardry-265642:5354477"))
     implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:7306619"))

@@ -328,7 +328,7 @@ class EFabricatorWorker : EFabricatorPart() {
         }
 
         constructor(nbt: NBTTagCompound, stackSet: MutableList<ItemStack>) {
-            remaining = Array<ItemStack>(
+            remaining = Array(
                 nbt.getByte(REMAIN_SIZE_TAG).toInt()
             ) { i -> ItemStack.EMPTY }
             for (remainIdx in remaining.indices) {

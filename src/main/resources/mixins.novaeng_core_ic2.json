@@ -9,6 +9,7 @@
   ],
   "mixins": [
     "AccessorTileEntityInventory",
+    "MixinBasicMachineRecipeManager",
     "MixinNetworkManager",
     "MixinTileEntityMatter",
     "MixinTileEntityReplicator"

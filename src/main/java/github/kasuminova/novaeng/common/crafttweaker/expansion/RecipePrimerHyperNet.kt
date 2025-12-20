@@ -93,7 +93,7 @@ object RecipePrimerHyperNet {
                     RegistryHyperNet.getResearchCognitionData(it)
                 }
                 .filter { Objects.nonNull(it) }
-                .toArray { arrayOf<ResearchCognitionData>() }
+                .toArray { arrayOfNulls<ResearchCognitionData>(0) }
         )
     }
 
