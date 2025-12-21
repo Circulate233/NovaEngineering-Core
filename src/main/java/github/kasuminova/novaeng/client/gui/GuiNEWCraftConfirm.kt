@@ -2,15 +2,15 @@ package github.kasuminova.novaeng.client.gui
 
 import appeng.client.gui.implementations.GuiCraftConfirm
 import appeng.helpers.WirelessTerminalGuiObject
-import com.circulation.random_complement.client.RCGuiCraftConfirm
 import github.kasuminova.novaeng.NovaEngineeringCore
+import github.kasuminova.novaeng.client.util.RCGuiCraftConfirm
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm
 import github.kasuminova.novaeng.mixin.ae2.AccessorGuiCraftConfirm
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.entity.player.InventoryPlayer
 import java.io.IOException
 
-open class GuiNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : GuiCraftConfirm(ip, te) {
+open class GuiNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : GuiCraftConfirm(ip, te),RCGuiCraftConfirm {
 
     var cancel: GuiButton? = null
     var start: GuiButton? = null
@@ -26,7 +26,7 @@ open class GuiNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject
     @Throws(IOException::class)
     override fun actionPerformed(btn: GuiButton) {
         if (btn == cancel) {
-            if (this is RCGuiCraftConfirm && isShiftKeyDown()) {
+            if (isShiftKeyDown()) {
                 `rc$addMissBookmark`()
             }
             NovaEngineeringCore.NET_CHANNEL.sendToServer(PktAutoCraftConfirm())

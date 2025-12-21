@@ -313,7 +313,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
     compileOnly(rfg.deobf("curse.maven:libvulpes-236541:3801015"))
     compileOnly(rfg.deobf("curse.maven:advanced-rocketry-236542:4671856"))
-    implementation(rfg.deobf("curse.maven:random-complement-1198138:7155516"))
+    implementation(rfg.deobf("curse.maven:random-complement-1198138:7340975"))
     implementation(rfg.deobf("curse.maven:modular-routers-250294:2954953"))
     implementation(rfg.deobf("curse.maven:actually-additions-228404:3117927"))
     implementation(rfg.deobf("curse.maven:brandons-core-231382:3408276"))
