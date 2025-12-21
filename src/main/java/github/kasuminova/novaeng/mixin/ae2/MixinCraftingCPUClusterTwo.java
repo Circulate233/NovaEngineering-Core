@@ -27,8 +27,11 @@ import com.circulation.random_complement.client.RCSettings;
 import com.circulation.random_complement.client.buttonsetting.IntelligentBlocking;
 import com.circulation.random_complement.common.interfaces.RCIConfigurableObject;
 import com.glodblock.github.coremod.CoreModHooks;
+import com.glodblock.github.integration.mek.FCGasItems;
 import com.glodblock.github.inventory.FluidConvertingInventoryCrafting;
+import com.glodblock.github.loader.FCItems;
 import com.glodblock.github.util.FluidCraftingPatternDetails;
+import com.glodblock.github.util.ModAndClassUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import github.kasuminova.mmce.common.tile.MEPatternProvider;
@@ -164,10 +167,20 @@ public abstract class MixinCraftingCPUClusterTwo {
                                 if (ic == null) {
                                     IAEItemStack[] input = key.getInputs();
                                     double sum = 0;
-
                                     for (IAEItemStack anInput : input) {
                                         if (anInput != null) {
-                                            sum += (double) CoreModHooks.getFluidSize(anInput);
+                                            if (anInput.getDefinition() != null && !anInput.getDefinition().isEmpty()) {
+                                                if (anInput.getDefinition().getItem() == FCItems.FLUID_DROP) {
+                                                    sum += Math.max((double)anInput.getStackSize() / (double)1000.0F, (double)1.0F);
+                                                    continue;
+                                                }
+
+                                                if (ModAndClassUtil.GAS && anInput.getDefinition().getItem() == FCGasItems.GAS_DROP) {
+                                                    sum += Math.max((double)anInput.getStackSize() / (double)4000.0F, (double)1.0F);
+                                                    continue;
+                                                }
+                                            }
+                                            sum += anInput.getStackSize();
                                         }
                                     }
 

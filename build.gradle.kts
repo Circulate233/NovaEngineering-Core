@@ -248,7 +248,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:FTB-Library-237167:2985811"))
     implementation(rfg.deobf("curse.maven:FTBU-237102:3157548"))
     implementation(rfg.deobf("curse.maven:ae2-extended-life-570458:6302098"))
-    implementation(rfg.deobf("curse.maven:ae2-fluid-crafting-rework-623955:5504001"))
+    implementation(rfg.deobf("curse.maven:ae2fluidcraft-rework-unofficial-1404390:7336029"))
     compileOnly(rfg.deobf("curse.maven:MekanismEnergistics-1027681:5775101"))
     implementation(rfg.deobf("curse.maven:nae2-884359:5380800"))
 //    implementation(rfg.deobf("curse.maven:applied-energistics-2-223794:2747063"))

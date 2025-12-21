@@ -169,11 +169,7 @@ abstract class Drill : MachineSpecial {
         }
 
         private fun getUsableMix(worldInfo: MineralWorldInfo): MineralMix? {
-            return if (worldInfo.mineralOverride != null) {
-                worldInfo.mineralOverride
-            } else {
-                worldInfo.mineral
-            }
+            return worldInfo.mineralOverride ?: worldInfo.mineral
         }
     }
 
@@ -252,7 +248,7 @@ abstract class Drill : MachineSpecial {
                     .addEnergyPerTickInput(this.getBaseEnergy())
                     .addInput(circuit_0).setChance(0f)
                     .addPreCheckHandler { event ->
-                        val ctrl = event!!.getController()
+                        val ctrl = event.getController()
                         val data = ctrl.customDataTag
                         if (!data.hasKey("pos")) {
                             event.setFailed("novaeng.drill.failed.pos")
@@ -284,7 +280,7 @@ abstract class Drill : MachineSpecial {
                         ctrl.customDataTag = data
                     }
                     .addFactoryStartHandler { event ->
-                        val ctrl = event!!.getController()
+                        val ctrl = event.getController()
                         val data = ctrl.customDataTag
                         val kmm = data.getString("kmm11")
                         val x: Int
@@ -356,7 +352,7 @@ abstract class Drill : MachineSpecial {
                     .addEnergyPerTickInput(this.getBaseEnergy() * 2)
                     .addInput(itemUtils.getItem("thermalinnovation:drill", 4)).setChance(0f)
                     .addPreCheckHandler { event ->
-                        val ctrl = event!!.getController()
+                        val ctrl = event.getController()
                         val data = ctrl.customDataTag
                         if (!data.hasKey("pos")) {
                             event.setFailed("novaeng.drill.failed.pos")
@@ -388,7 +384,7 @@ abstract class Drill : MachineSpecial {
                         ctrl.customDataTag = data
                     }
                     .addFactoryStartHandler { event ->
-                        val ctrl = event!!.getController()
+                        val ctrl = event.getController()
                         val data = ctrl.customDataTag
                         val kmm = data.getString("kmm11")
                         val x: Int
@@ -468,7 +464,7 @@ abstract class Drill : MachineSpecial {
                             .setLoadJEI(false)
                             .addEnergyPerTickInput(this.getBaseEnergy())
                             .addPreCheckHandler { event ->
-                                val ctrl = event!!.getController()
+                                val ctrl = event.getController()
                                 val data = ctrl.customDataTag
                                 val kmm = data.getString("kmm$k$kk")
                                 val depletion = data.getInteger("depletion$k$kk")
@@ -483,7 +479,7 @@ abstract class Drill : MachineSpecial {
                                 }
                             }
                             .addFactoryStartHandler { event ->
-                                val ctrl = event!!.getController()
+                                val ctrl = event.getController()
                                 val data = ctrl.customDataTag
                                 data.getString("kmm$k$kk")
                                 val x: Int
@@ -550,7 +546,7 @@ abstract class Drill : MachineSpecial {
                             .setLoadJEI(false)
                             .addEnergyPerTickInput(this.getBaseEnergy() * 2)
                             .addPreCheckHandler { event ->
-                                val ctrl = event!!.getController()
+                                val ctrl = event.getController()
                                 val data = ctrl.customDataTag
                                 val kmm = data.getString("kmm$k$kk")
                                 val depletion = data.getInteger("depletion$k$kk")
@@ -566,7 +562,7 @@ abstract class Drill : MachineSpecial {
                                 event.activeRecipe.maxParallelism = 8
                             }
                             .addFactoryStartHandler { event ->
-                                val ctrl = event!!.getController()
+                                val ctrl = event.getController()
                                 val data = ctrl.customDataTag
                                 data.getString("kmm$k$kk")
                                 val x: Int
@@ -637,7 +633,7 @@ abstract class Drill : MachineSpecial {
                 SINGLE -> machine.addMachineEventHandler(
                     MachineStructureFormedEvent::class.java
                 ) { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     val x = ctrl.getPos().x
                     val z = ctrl.getPos().z
@@ -661,7 +657,7 @@ abstract class Drill : MachineSpecial {
                 RANGE -> machine.addMachineEventHandler(
                     MachineStructureFormedEvent::class.java
                 ) { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     val x = ctrl.getPos().x
                     val z = ctrl.getPos().z
@@ -697,7 +693,7 @@ abstract class Drill : MachineSpecial {
             SINGLE -> machine.addMachineEventHandler(
                 ControllerGUIRenderEvent::class.java
             ) { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 val research_progress = data.getByte("research_progress")
                 val components_amount = data.getByte("components_amount")
@@ -724,7 +720,7 @@ abstract class Drill : MachineSpecial {
             RANGE -> machine.addMachineEventHandler(
                 ControllerGUIRenderEvent::class.java
             ) { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 val research_progress = data.getByte("research_progress")
                 val components_amount = data.getByte("components_amount")
@@ -784,13 +780,13 @@ abstract class Drill : MachineSpecial {
                 }
                 .addOutput(itemUtils.getItem("contenttweaker:zbk", 0))
                 .addPreCheckHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     if (ctrl.isWorking) {
                         event.setFailed("novaeng.machine.failed.work")
                     }
                 }
                 .addFactoryStartHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     val poss = data.getIntArray("poss")
                     val world = DimensionManager.getWorld(poss[3])
@@ -833,6 +829,7 @@ abstract class Drill : MachineSpecial {
                     }
                     data.setIntArray("pos", poss)
                 }
+                .setLoadJEI(false)
                 .setParallelized(false)
                 .setThreadName(upThreadName)
                 .build()
@@ -845,7 +842,7 @@ abstract class Drill : MachineSpecial {
 
             RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + i, name, 10)
                 .addPreCheckHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     data.getByte("research_progress")
                     data.getByte("components_amount")
@@ -855,7 +852,7 @@ abstract class Drill : MachineSpecial {
                     }
                 }
                 .addFactoryFinishHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     val research_progress = data.getByte("research_progress")
 
@@ -880,7 +877,7 @@ abstract class Drill : MachineSpecial {
             RecipeBuilder.newBuilder("additional_component_loading_" + name + "_" + i, name, 100, 1)
                 .addItemInput(itemUtils.getItem("contenttweaker:additional_component_$i", 0))
                 .addPreCheckHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     data.getByte("research_progress")
                     data.getByte("components_amount")
@@ -890,7 +887,7 @@ abstract class Drill : MachineSpecial {
                     }
                 }
                 .addFactoryFinishHandler { event ->
-                    val ctrl = event!!.getController()
+                    val ctrl = event.getController()
                     val data = ctrl.customDataTag
                     val components_amount = data.getByte("components_amount")
 
@@ -927,7 +924,7 @@ abstract class Drill : MachineSpecial {
         RecipeBuilder.newBuilder("additional_component_loading_" + name + "_3", name, 100, 1)
             .addItemInput(itemUtils.getItem("contenttweaker:additional_component_3", 0))
             .addPreCheckHandler { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 data.getByte("research_progress")
                 data.getByte("components_amount")
@@ -937,7 +934,7 @@ abstract class Drill : MachineSpecial {
                 }
             }
             .addFactoryFinishHandler { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 val components_amount = data.getByte("components_amount")
                 val research_progress = data.getByte("research_progress")
@@ -969,7 +966,7 @@ abstract class Drill : MachineSpecial {
         RecipeBuilder.newBuilder("additional_component_loading_" + name + "_raw_ore", name, 100, 1)
             .addItemInput(itemUtils.getItem("contenttweaker:additional_component_raw_ore", 0))
             .addPreCheckHandler { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 data.getByte("research_progress")
                 data.getByte("components_amount")
@@ -979,7 +976,7 @@ abstract class Drill : MachineSpecial {
                 }
             }
             .addFactoryFinishHandler { event ->
-                val ctrl = event!!.getController()
+                val ctrl = event.getController()
                 val data = ctrl.customDataTag
                 data.setBoolean("additional_component_raw_ore", true)
                 ctrl.addPermanentModifier(
