@@ -75,8 +75,8 @@ class AssemblyBlockArray : BlockArray {
             player: InventoryPlayer?
         ): Boolean {
             for ((slot, fluidHandler) in fluidHandlers) {
-                val drained = fluidHandler.drain(required.copy(), false)
-                if (drained != null && drained.containsFluid(required)) {
+                val drained = fluidHandler.drain(required.copy(), false) ?: continue
+                if (drained.containsFluid(required)) {
                     fluidHandler.drain(required.copy(), true)
                     player?.setInventorySlotContents(slot, fluidHandler.container)
                     return true
