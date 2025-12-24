@@ -68,7 +68,7 @@ abstract class Drill : MachineSpecial {
             var j = 0
             for (i in tqsz) {
                 for (ii in tqsz) {
-                    tqdzb.put("" + (i + 1) + (ii + 1), ++j)
+                    tqdzb.put("${i + 1}${ii + 1}", ++j)
                 }
             }
             basicMineralMix = Config.IEConfig.Machines.excavator_depletion
@@ -85,17 +85,15 @@ abstract class Drill : MachineSpecial {
             return posValue shr 4
         }
 
-        private fun getOreOutput(ctrl: TileMultiblockMachineController, pos: BlockPos, worldid: Int): IItemStack {
-            return getOreOutput(ctrl, pos, worldid, 0, 0)
-        }
-
         private fun getOreOutput(
             ctrl: TileMultiblockMachineController,
             pos: BlockPos,
             worldid: Int,
-            k: Int,
-            kk: Int
+            i: Int,
+            ii: Int
         ): IItemStack {
+            val k: Int = i + 1
+            val kk: Int = ii + 1
             val world = DimensionManager.getWorld(worldid) ?: return errorStone.mutable().copy()
             val data = ctrl.customDataTag
             val research_progress = data.getByte("research_progress")
@@ -105,18 +103,18 @@ abstract class Drill : MachineSpecial {
                     .pow(1.6)), 0.0
             )
             val parallelSize =
-                data.getInteger("parallelSize" + (k + 1) + (kk + 1)) * (1 + components_amount.toDouble().pow(2.5))
+                data.getInteger("parallelSize$k$kk") * (1 + components_amount.toDouble().pow(2.5))
             val component_raw_ore = data.getByte("additional_component_raw_ore")
             var random = ctrl.getWorld().rand.nextInt(10000)
             val worldInfo = ExcavatorHandler.getMineralWorldInfo(
                 world,
-                (chunkCoord(pos.x) + k),
-                (chunkCoord(pos.z) + kk)
+                (chunkCoord(pos.x) + i),
+                (chunkCoord(pos.z) + ii)
             )
             if (damage_probability < 10000) {
                 if (damage_probability > random) {
                     worldInfo.depletion += parallelSize.toInt()
-                    data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
+                    data.setInteger("depletion$k$kk", worldInfo.depletion)
                 }
             } else {
                 val sl = floor(1.0f * damage_probability) / 10000
@@ -124,7 +122,7 @@ abstract class Drill : MachineSpecial {
                 if ((damage_probability - (10000 * sl)) > random) {
                     worldInfo.depletion += parallelSize.toInt()
                 }
-                data.setInteger("depletion" + (k + 1) + (kk + 1), worldInfo.depletion)
+                data.setInteger("depletion$k$kk", worldInfo.depletion)
             }
             val mineral: MineralMix? = getUsableMix(worldInfo)
             if (mineral != null) {
@@ -140,7 +138,7 @@ abstract class Drill : MachineSpecial {
                 }
                 return OreHandler.getOre(iore)
             } else {
-                data.setString("veinName" + (k + 1) + (kk + 1), "empty")
+                data.setString("veinName$k$kk", "empty")
                 return stone
             }
         }
@@ -241,22 +239,26 @@ abstract class Drill : MachineSpecial {
         return this
     }
 
-    private fun RecipePrimer.addOutputs(size: Byte): RecipePrimer {
-        for (i in 0..<size) {
+    private fun RecipePrimer.addOutputs(size: Int, i: Int, ii: Int): RecipePrimer {
+        repeat(size) {
             this.addOutput(stone)
-                .addItemModifier { ctrl, item ->
-                    if (this@Drill.isDimensional()) {
-                        val poss = ctrl.controller.customDataTag.getIntArray("pos")
-                        val pos = BlockPos(poss[0], poss[1], poss[2])
-                        return@addItemModifier getOreOutput(ctrl.controller, pos, poss[3])
-                    } else {
-                        return@addItemModifier getOreOutput(
-                            ctrl.controller,
-                            ctrl.controller.getPos(),
-                            ctrl.iWorld.dimension
-                        )
-                    }
+            if (this@Drill.isDimensional()) {
+                this.addItemModifier { ctrl, item ->
+                    val poss = ctrl.controller.customDataTag.getIntArray("pos")
+                    val pos = BlockPos(poss[0], poss[1], poss[2])
+                    return@addItemModifier getOreOutput(ctrl.controller, pos, poss[3], i, ii)
                 }
+            } else {
+                this.addItemModifier { ctrl, item ->
+                    return@addItemModifier getOreOutput(
+                        ctrl.controller,
+                        ctrl.controller.getPos(),
+                        ctrl.iWorld.dimension,
+                        i,
+                        ii
+                    )
+                }
+            }
         }
         return this
     }
@@ -368,7 +370,7 @@ abstract class Drill : MachineSpecial {
                     .addPreCheckHandler { checkMineralMix(it, 1, 1) }
                     .addFactoryStartHandler { startWork(it, 0, 0, 8000) }
                     .addExInput()
-                    .addOutputs(4)
+                    .addOutputs(4, 1, 1)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, item ->
@@ -391,7 +393,7 @@ abstract class Drill : MachineSpecial {
                     .addPreCheckHandler { checkMineralMix(it, 1, 1) }
                     .addFactoryStartHandler { startWork(it, 0, 0, 9000) }
                     .addExInput()
-                    .addOutputs(4)
+                    .addOutputs(4, 1, 1)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, item ->
@@ -422,7 +424,7 @@ abstract class Drill : MachineSpecial {
                             .addPreCheckHandler { checkMineralMix(it, k, kk) }
                             .addFactoryStartHandler { startWork(it, i, ii, 8000) }
                             .addInput(circuit_0).setChance(0f)
-                            .addOutputs(3)
+                            .addOutputs(3, i, ii)
                             .requireComputationPoint(3f)
                             .addOutput(stone)
                             .addItemModifier { ctrl, item ->
@@ -447,7 +449,7 @@ abstract class Drill : MachineSpecial {
                             }
                             .addFactoryStartHandler { startWork(it, i, ii, 6000) }
                             .addInput(dust).setChance(0.05f)
-                            .addOutputs(3)
+                            .addOutputs(3, i, ii)
                             .requireComputationPoint(3f)
                             .addOutput(stone)
                             .addItemModifier { ctrl, item ->
