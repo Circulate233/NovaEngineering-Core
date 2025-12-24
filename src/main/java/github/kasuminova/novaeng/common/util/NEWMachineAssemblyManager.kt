@@ -117,12 +117,12 @@ class NEWMachineAssemblyManager {
             autoAECrafting: Boolean
         ): Miss2ListPair {
             if (player.isCreative) return emptyMiss2ListPair
-            val inventory = player.inventory.mainInventory.stream().map { obj: ItemStack -> obj.copy() }
+            val inventory = player.inventory.mainInventory.stream().map { it.copy() }
                 .collect(Collectors.toCollection { ObjectArrayList() })
             val itemIngredientList = ingredient.itemIngredient()
             val fluidIngredientList = ingredient.fluidIngredient()
             MachineAssembly.searchAndRemoveContainItem(inventory, itemIngredientList)
-            MachineAssembly.searchAndRemoveContainFluid(inventory, fluidIngredientList)
+            AssemblyBlockArray.searchAndRemoveContainFluid(inventory, fluidIngredientList)
             if (itemIngredientList.isEmpty() && fluidIngredientList.isEmpty()) {
                 return emptyMiss2ListPair
             } else {

@@ -18,14 +18,15 @@ import hellfirepvp.modularmachinery.common.util.MiscUtils
 import ink.ikx.mmce.common.assembly.MachineAssembly
 import ink.ikx.mmce.common.utils.FluidUtils
 import ink.ikx.mmce.common.utils.StackUtils
+import ink.ikx.mmce.common.utils.StructureIngredient
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.block.BlockLiquid
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayerMP
+import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Tuple
@@ -38,13 +39,14 @@ import net.minecraftforge.fluids.BlockFluidBase
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.UniversalBucket
 import net.minecraftforge.fluids.capability.IFluidHandlerItem
 import java.util.ArrayDeque
 import java.util.Queue
 import java.util.function.Function
 
 class AssemblyBlockArray : BlockArray {
+
+    private data class FluidInventory(val slot: Int, val fluid: IFluidHandlerItem)
 
     companion object {
         private val material =
@@ -53,22 +55,55 @@ class AssemblyBlockArray : BlockArray {
         /**
          * MachineAssembly#getFluidHandlerItems(List)
          */
-        private fun getFluidHandlerItems(inventory: List<ItemStack>): List<IFluidHandlerItem> {
-            val fluidHandlers = ObjectArrayList<IFluidHandlerItem>()
-            for (invStack in inventory) {
-                val item = invStack.item
-                if (item is UniversalBucket || item === Items.LAVA_BUCKET || item === Items.WATER_BUCKET) {
-                    continue
-                }
+        private fun getFluidHandlerItems(inventory: List<ItemStack>): List<FluidInventory> {
+            val fluidHandlers = ObjectArrayList<FluidInventory>()
+            for ((index, invStack) in inventory.withIndex()) {
                 if (!FluidUtils.isFluidHandler(invStack)) {
                     continue
                 }
                 val fluidHandler = FluidUtil.getFluidHandler(invStack)
                 if (fluidHandler != null) {
-                    fluidHandlers.add(fluidHandler)
+                    fluidHandlers.add(FluidInventory(index, fluidHandler))
                 }
             }
             return fluidHandlers
+        }
+
+        private fun consumeInventoryFluid(
+            required: FluidStack,
+            fluidHandlers: List<FluidInventory>,
+            player: InventoryPlayer?
+        ): Boolean {
+            for ((slot, fluidHandler) in fluidHandlers) {
+                val drained = fluidHandler.drain(required.copy(), false)
+                if (drained != null && drained.containsFluid(required)) {
+                    fluidHandler.drain(required.copy(), true)
+                    player?.setInventorySlotContents(slot, fluidHandler.container)
+                    return true
+                }
+            }
+
+            return false
+        }
+
+        fun searchAndRemoveContainFluid(
+            inventory: MutableList<ItemStack>,
+            fluidIngredients: MutableList<StructureIngredient.FluidIngredient>
+        ) {
+            val fluidHandlers = getFluidHandlerItems(inventory)
+            val fluidIngredientIter: MutableIterator<StructureIngredient.FluidIngredient> = fluidIngredients.iterator()
+
+            while (fluidIngredientIter.hasNext()) {
+                val fluidIngredient = fluidIngredientIter.next()
+
+                for (tuple in fluidIngredient.ingredientList()) {
+                    val required = tuple.getFirst() as FluidStack
+                    if (consumeInventoryFluid(required, fluidHandlers, null)) {
+                        fluidIngredientIter.remove()
+                        break
+                    }
+                }
+            }
         }
     }
 
@@ -197,9 +232,10 @@ class AssemblyBlockArray : BlockArray {
                     return OperatingStatus.SUCCESS
                 }
             } else {
-                if (MachineAssembly.consumeInventoryFluid(
+                if (consumeInventoryFluid(
                         ingredient.fluidStack,
-                        fluidInventory
+                        fluidInventory,
+                        player.inventory
                     )
                 ) {
                     placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
