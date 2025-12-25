@@ -161,7 +161,7 @@ class AssemblyBlockArray : BlockArray {
         }
     }
 
-    fun isFluid(state: IBlockState): Boolean {
+    private fun isFluid(state: IBlockState): Boolean {
         val block = state.getBlock()
         return block is BlockLiquid || block is BlockFluidBase
     }

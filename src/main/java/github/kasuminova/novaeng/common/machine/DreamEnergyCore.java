@@ -195,7 +195,7 @@ public class DreamEnergyCore implements MachineSpecial {
             if (event.phase == Phase.START) {
                 var ctrl = event.getController();
                 var world = ctrl.getWorld();
-                if (world.getWorldTime() % (1200 / MinuteScale) == 0) {
+                if (world.getTotalWorldTime() % (1200 / MinuteScale) == 0) {
                     var data = ctrl.getCustomDataTag();
                     var energyStored = data.getString("energyStored").isEmpty() ? "0" : data.getString("energyStored");
                     getEnergyInfo(world, ctrl.getPos()).addFirst(energyStored);

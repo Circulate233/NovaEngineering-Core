@@ -84,7 +84,7 @@ object MachineAssemblyHandler {
     fun onPlayerTick(event: TickEvent.PlayerTickEvent) {
         val player = event.player
         val world = player.world
-        if (player is EntityPlayerMP && world.worldTime % NovaEngCoreConfig.MACHINE_ASSEMBLY_TOOL.buildSpeed == 0L) {
+        if (player is EntityPlayerMP && world.totalWorldTime % NovaEngCoreConfig.MACHINE_ASSEMBLY_TOOL.buildSpeed == 0L) {
             val ma = NEWMachineAssemblyManager.getMachineAssembly(player) ?: return
             var restart: Boolean
             for (i in 0..<NovaEngCoreConfig.MACHINE_ASSEMBLY_TOOL.buildQuantity) {

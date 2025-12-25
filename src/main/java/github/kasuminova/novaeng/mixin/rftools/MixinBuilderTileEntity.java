@@ -26,7 +26,7 @@ public abstract class MixinBuilderTileEntity extends GenericEnergyReceiverTileEn
     private void commonQuarryBlockI(CallbackInfo ci) {
         if (CommandBuilder.INSTANCE.isTickWork) {
             if (this.getWorld() instanceof WorldServer w) {
-                if (w.getWorldTime() % 200 != 0) return;
+                if (w.getTotalWorldTime() % 200 != 0) return;
                 if (w.getMinecraftServer() != null) {
                     var server = w.getMinecraftServer();
                     var playerList = server.getPlayerList();

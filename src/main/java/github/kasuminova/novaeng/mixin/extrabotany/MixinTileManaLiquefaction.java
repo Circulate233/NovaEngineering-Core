@@ -27,7 +27,7 @@ public abstract class MixinTileManaLiquefaction extends TileMod {
     public void updateMixin(CallbackInfo ci) {
         if (ConfigHandler.DISABLE_MANALIQUEFICATION) {
             var world = this.world;
-            if (world.getWorldTime() % 20 != 0) return;
+            if (world.getTotalWorldTime() % 20 != 0) return;
 
             var uppos = this.pos.up();
 
