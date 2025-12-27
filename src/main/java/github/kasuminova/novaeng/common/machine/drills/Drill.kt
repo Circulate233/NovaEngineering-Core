@@ -245,7 +245,7 @@ abstract class Drill : MachineSpecial {
             this.addOutput(stone)
             if (this@Drill.isDimensional()) {
                 this.addItemModifier { ctrl, _ ->
-                    val poss = ctrl.controller.customDataTag.getIntArray("pos")
+                    val poss = ctrl.controller.customDataTag.getIntArray("pos") ?: return@addItemModifier errorStone.mutable().copy()
                     val pos = BlockPos(poss[0], poss[1], poss[2])
                     return@addItemModifier getOreOutput(ctrl.controller, pos, poss[3], i, ii)
                 }
@@ -371,7 +371,7 @@ abstract class Drill : MachineSpecial {
                     .addPreCheckHandler { checkMineralMix(it, 1, 1) }
                     .addFactoryStartHandler { startWork(it, 0, 0, 8000) }
                     .addExInput()
-                    .addOutputs(4, 1, 1)
+                    .addOutputs(4, 0, 0)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, _ ->
@@ -394,7 +394,7 @@ abstract class Drill : MachineSpecial {
                     .addPreCheckHandler { checkMineralMix(it, 1, 1) }
                     .addFactoryStartHandler { startWork(it, 0, 0, 9000) }
                     .addExInput()
-                    .addOutputs(4, 1, 1)
+                    .addOutputs(4, 0, 0)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, _ ->

@@ -574,7 +574,7 @@ object MMAltar : MachineSpecial {
     }
 
     fun clamp(a: Int, min: Int, max: Int): Int {
-        return min(max(a, max), max)
+        return min(max(a, min), max)
     }
 
     inline fun ergodicPos(
