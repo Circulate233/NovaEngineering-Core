@@ -176,16 +176,16 @@ public class GeocentricDrill implements MachineSpecial {
     }
 
     public Map<String, ItemStack> getRawOres() {
-        return Collections.unmodifiableMap(rawOres);
+        return Collections.unmodifiableMap(this.rawOres);
     }
 
     public MachineRecipe rebuildRecipe(final MachineRecipe original, final Set<String> accelerateOres) {
         MachineRecipe recipe = new MachineRecipe("", RECIPE_REGISTRY_NAME, REGISTRY_NAME, 10, 0, false, true);
         recipe.addRequirement(new RequirementEnergy(IOType.INPUT, ENERGY_PER_TICK));
 
-        float chance = 1F / (rawOres.size() + (accelerateOres.size() * (GeocentricDrill.ACCELERATE_MULTIPLIER - 1)));
+        float chance = 1F / (this.rawOres.size() + (accelerateOres.size() * (GeocentricDrill.ACCELERATE_MULTIPLIER - 1)));
         List<ChancedIngredientStack> output = new ObjectArrayList<>();
-        rawOres.forEach((oreName, ore) -> output.add(new ChancedIngredientStack(
+        this.rawOres.forEach((oreName, ore) -> output.add(new ChancedIngredientStack(
             ore.copy(), accelerateOres.contains(oreName) ? chance * GeocentricDrill.ACCELERATE_MULTIPLIER : chance)
         ));
         recipe.addRequirement(new RequirementIngredientArray(output, IOType.OUTPUT));

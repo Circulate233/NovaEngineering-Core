@@ -125,7 +125,7 @@ object BiogenicSimulationComputer : MachineSpecial {
                     }
                 }
                 .addItemOutput(CraftTweakerAPI.oreDict.get("pristine"))
-                .addItemModifier { ctrl: IMachineController?, Item: IItemStack? ->
+                .addItemModifier { ctrl: IMachineController?, _: IItemStack? ->
                     outputPristineMatter(
                         ctrl!!,
                         ysqname,
@@ -133,7 +133,7 @@ object BiogenicSimulationComputer : MachineSpecial {
                     )
                 }
                 .addItemOutput(CraftTweakerAPI.oreDict.get("livingMatter"))
-                .addItemModifier { ctrl: IMachineController, Item: IItemStack ->
+                .addItemModifier { ctrl: IMachineController, _: IItemStack ->
                     outputLivingMatter(
                         ctrl,
                         ysqname
@@ -166,7 +166,7 @@ object BiogenicSimulationComputer : MachineSpecial {
                 }
                 .addOutput(CraftTweakerAPI.oreDict.get("dataModel"))
                 .setLore("§6提取出写入的模型")
-                .addItemModifier { ctrl,item ->
+                .addItemModifier { ctrl, _ ->
                     outputdata(
                         ctrl,
                         ysqname,

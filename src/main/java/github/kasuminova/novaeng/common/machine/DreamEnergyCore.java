@@ -184,9 +184,9 @@ public class DreamEnergyCore implements MachineSpecial {
 
     @Override
     public void preInit(DynamicMachine machine) {
-        SInit(machine);
+        this.SInit(machine);
         if (isClient) {
-            CInit(machine);
+            this.CInit(machine);
         }
     }
 
@@ -199,7 +199,7 @@ public class DreamEnergyCore implements MachineSpecial {
                     var data = ctrl.getCustomDataTag();
                     var energyStored = data.getString("energyStored").isEmpty() ? "0" : data.getString("energyStored");
                     getEnergyInfo(world, ctrl.getPos()).addFirst(energyStored);
-                    data.setString("chance", change(ctrl, energyStored));
+                    data.setString("chance", this.change(ctrl, energyStored));
                 }
             }
         });
