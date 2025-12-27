@@ -1,139 +1,156 @@
-package github.kasuminova.novaeng.common.util;
+package github.kasuminova.novaeng.common.util
 
-import crafttweaker.annotations.ZenRegister;
-import crafttweaker.api.data.DataMap;
-import crafttweaker.api.data.IData;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
-import stanhebben.zenscript.annotations.Optional;
-import stanhebben.zenscript.annotations.ZenExpansion;
-import stanhebben.zenscript.annotations.ZenMethod;
+import crafttweaker.api.data.DataMap
+import crafttweaker.api.data.IData
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps
+import stanhebben.zenscript.annotations.ZenMethod
 
-import java.util.List;
-import java.util.Map;
+object IDataUtils {
 
-@ZenRegister
-@ZenExpansion("crafttweaker.data.IData")
-public class IDataUtils {
-
-    private static Map<String, IData> getNBTMap(IData data) {
-        if (data instanceof DataMap) {
-            return data.asMap();
+    @JvmStatic
+    private fun IData.getNBTMap(): MutableMap<String?, IData?> {
+        if (this is DataMap) {
+            return this.asMap()
         }
-        return Object2ObjectMaps.emptyMap();
+        return Object2ObjectMaps.emptyMap<String?, IData?>()
     }
 
     @ZenMethod
-    public static IData get(IData data, String path, @Optional IData defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path);
+    @JvmStatic
+    fun IData.get(path: String, defaultValue: IData?): IData? {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static boolean getBool(IData data, String path, @Optional boolean defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asBool();
+    @JvmStatic
+    fun IData.getBool(path: String, defaultValue: Boolean): Boolean {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asBool() ?: false
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static byte getByte(IData data, String path, @Optional byte defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asByte();
+    @JvmStatic
+    fun IData.getByte(path: String, defaultValue: Byte): Byte {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asByte() ?: 0
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static double getDouble(IData data, String path, @Optional double defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asDouble();
+    @JvmStatic
+    fun IData.getDouble(path: String, defaultValue: Double): Double {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asDouble() ?: 0.0
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static float getFloat(IData data, String path, @Optional float defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asFloat();
+    @JvmStatic
+    fun IData.getFloat(path: String, defaultValue: Float): Float {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asFloat() ?: 0.0f
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static int getInt(IData data, String path, @Optional int defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asInt();
+    @JvmStatic
+    fun IData.getInt(path: String, defaultValue: Int): Int {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asInt() ?: 0
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static List<IData> getList(IData data, String path, @Optional List<IData> defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asList();
+    @JvmStatic
+    fun IData.getList(path: String, defaultValue: MutableList<IData?>?): MutableList<IData?>? {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asList()
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static long getLong(IData data, String path, @Optional long defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asLong();
+    @JvmStatic
+    fun IData.getLong(path: String, defaultValue: Long): Long {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asLong() ?: 0
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static Map<String, IData> getMap(IData data, String path, @Optional Map<String, IData> defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asMap();
+    @JvmStatic
+    fun IData.getMap(
+        path: String,
+        defaultValue: MutableMap<String?, IData?>?
+    ): MutableMap<String?, IData?>? {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asMap()
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static short getShort(IData data, String path, @Optional short defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asShort();
+    @JvmStatic
+    fun IData.getShort(path: String, defaultValue: Short): Short {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asShort() ?: 0
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static String getString(IData data, String path, @Optional String defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asString();
+    @JvmStatic
+    fun IData.getString(path: String, defaultValue: String): String {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asString() ?: ""
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static byte[] getByteArray(IData data, String path, @Optional byte[] defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asByteArray();
+    @JvmStatic
+    fun IData.getByteArray(path: String, defaultValue: ByteArray?): ByteArray? {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asByteArray()
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static int[] getIntArray(IData data, String path, @Optional int[] defaultValue) {
-        if (check(data, path)) {
-            return getNBTMap(data).get(path).asIntArray();
+    @JvmStatic
+    fun IData.getIntArray(path: String, defaultValue: IntArray?): IntArray? {
+        if (this.check(path)) {
+            return this.getNBTMap()[path]?.asIntArray()
         }
-        return defaultValue;
+        return defaultValue
     }
 
     @ZenMethod
-    public static boolean check(IData data, String... path) {
-        final var nbt = getNBTMap(data);
-        for (String key : path) {
+    @JvmStatic
+    fun IData.check(path: String?): Boolean {
+        val nbt = this.getNBTMap()
+        return nbt.containsKey(path)
+    }
+
+    @ZenMethod
+    @JvmStatic
+    fun IData.check(vararg path: String?): Boolean {
+        val nbt = this.getNBTMap()
+        for (key in path) {
             if (!nbt.containsKey(key)) {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
 }

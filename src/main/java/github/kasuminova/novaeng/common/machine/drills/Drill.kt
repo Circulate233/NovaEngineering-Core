@@ -23,7 +23,8 @@ import github.kasuminova.novaeng.common.handler.OreHandler
 import github.kasuminova.novaeng.common.machine.MachineSpecial
 import github.kasuminova.novaeng.common.machine.drills.Drill.Type.RANGE
 import github.kasuminova.novaeng.common.machine.drills.Drill.Type.SINGLE
-import github.kasuminova.novaeng.common.util.IDataUtils
+import github.kasuminova.novaeng.common.util.IDataUtils.check
+import github.kasuminova.novaeng.common.util.IDataUtils.getIntArray
 import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeModifierBuilder
@@ -243,13 +244,13 @@ abstract class Drill : MachineSpecial {
         repeat(size) {
             this.addOutput(stone)
             if (this@Drill.isDimensional()) {
-                this.addItemModifier { ctrl, item ->
+                this.addItemModifier { ctrl, _ ->
                     val poss = ctrl.controller.customDataTag.getIntArray("pos")
                     val pos = BlockPos(poss[0], poss[1], poss[2])
                     return@addItemModifier getOreOutput(ctrl.controller, pos, poss[3], i, ii)
                 }
             } else {
-                this.addItemModifier { ctrl, item ->
+                this.addItemModifier { ctrl, _ ->
                     return@addItemModifier getOreOutput(
                         ctrl.controller,
                         ctrl.controller.getPos(),
@@ -373,7 +374,7 @@ abstract class Drill : MachineSpecial {
                     .addOutputs(4, 1, 1)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
-                    .addItemModifier { ctrl, item ->
+                    .addItemModifier { ctrl, _ ->
                         getCcrystalOutput(ctrl.controller)
                     }
                     .setChance(0.1f)
@@ -396,7 +397,7 @@ abstract class Drill : MachineSpecial {
                     .addOutputs(4, 1, 1)
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
-                    .addItemModifier { ctrl, item ->
+                    .addItemModifier { ctrl, _ ->
                         getCcrystalOutput(ctrl.controller)
                     }.setChance(0.1f)
                     .setParallelized(true)
@@ -427,7 +428,7 @@ abstract class Drill : MachineSpecial {
                             .addOutputs(3, i, ii)
                             .requireComputationPoint(3f)
                             .addOutput(stone)
-                            .addItemModifier { ctrl, item ->
+                            .addItemModifier { ctrl, _ ->
                                 getCcrystalOutput(ctrl.controller)
                             }.setChance(0.035f)
                             .setMaxThreads(1)
@@ -452,7 +453,7 @@ abstract class Drill : MachineSpecial {
                             .addOutputs(3, i, ii)
                             .requireComputationPoint(3f)
                             .addOutput(stone)
-                            .addItemModifier { ctrl, item ->
+                            .addItemModifier { ctrl, _ ->
                                 getCcrystalOutput(ctrl.controller)
                             }
                             .setChance(0.04f)
@@ -579,11 +580,11 @@ abstract class Drill : MachineSpecial {
             RecipeBuilder.newBuilder("excavatorzb$name", name, 10)
                 .addInput(itemUtils.getItem("contenttweaker:zbk", 0))
                 .setNBTChecker { ctrl, item ->
-                    val data = ctrl.controller.customDataTag
-                    if (!data.hasKey("binding")) {
+                    if (!item.tag.check("binding")) {
                         return@setNBTChecker false
                     }
-                    val pos = IDataUtils.getIntArray(item.tag, "pos", null) ?: return@setNBTChecker false
+                    val pos = item.tag.getIntArray("pos", null) ?: return@setNBTChecker false
+                    val data = ctrl.controller.customDataTag
                     data.setIntArray("poss", pos)
                     true
                 }
