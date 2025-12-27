@@ -35,7 +35,7 @@ public class MixinGuiPatternTerm extends GuiMEMonitorable {
 
     @Inject(method = "initGui", at = @At("RETURN"))
     private void injectInitGui(final CallbackInfo ci) {
-        novaeng_core$uploadPatternButton = new GuiTabButton(
+        this.novaeng_core$uploadPatternButton = new GuiTabButton(
             this.guiLeft + 173, this.guiTop + this.ySize - 155,
             new ItemStack(BlockEFabricatorController.L4), I18n.format("gui.efabricator.button.upload_pattern"), this.itemRender
         );
@@ -44,7 +44,7 @@ public class MixinGuiPatternTerm extends GuiMEMonitorable {
 
     @Inject(method = "actionPerformed", at = @At("HEAD"), cancellable = true)
     private void injectActionPerformed(final GuiButton btn, final CallbackInfo ci) {
-        if (btn == novaeng_core$uploadPatternButton) {
+        if (btn == this.novaeng_core$uploadPatternButton) {
             NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktPatternTermUploadPattern());
             ci.cancel();
         }
@@ -52,7 +52,7 @@ public class MixinGuiPatternTerm extends GuiMEMonitorable {
 
     @Inject(method = "drawFG", at = @At("HEAD"), remap = false)
     private void injectDrawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY, final CallbackInfo ci) {
-        novaeng_core$uploadPatternButton.visible = this.container.isCraftingMode();
+        this.novaeng_core$uploadPatternButton.visible = this.container.isCraftingMode();
     }
 
 }

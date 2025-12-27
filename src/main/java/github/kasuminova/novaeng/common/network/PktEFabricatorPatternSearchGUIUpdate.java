@@ -40,14 +40,14 @@ public class PktEFabricatorPatternSearchGUIUpdate implements IMessage, IMessageH
 
     @Override
     public void fromBytes(final ByteBuf buf) {
-        type = UpdateType.values()[buf.readByte()];
-        data = EFabricatorPatternData.readFrom(buf);
+        this.type = UpdateType.values()[buf.readByte()];
+        this.data = EFabricatorPatternData.readFrom(buf);
     }
 
     @Override
     public void toBytes(final ByteBuf buf) {
-        buf.writeByte(type.ordinal());
-        data.writeTo(buf);
+        buf.writeByte(this.type.ordinal());
+        this.data.writeTo(buf);
     }
 
     @Override

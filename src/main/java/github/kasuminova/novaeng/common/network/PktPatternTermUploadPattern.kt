@@ -7,7 +7,7 @@ import appeng.api.storage.data.IAEItemStack
 import appeng.container.implementations.ContainerPatternEncoder
 import appeng.items.misc.ItemEncodedPattern
 import appeng.me.GridAccessException
-import com.glodblock.github.util.FluidPatternDetails
+import com.glodblock.github.util.FluidCraftingPatternDetails
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel
 import github.kasuminova.novaeng.mixin.ae2.AccessorContainerPatternEncoder
 import hellfirepvp.modularmachinery.ModularMachinery
@@ -44,7 +44,7 @@ class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUplo
             val channelNodes = if (part != null) {
                 try {
                     part.proxy.grid.getMachines(EFabricatorMEChannel::class.java)
-                } catch (ignored: GridAccessException) {
+                } catch (_: GridAccessException) {
                     return@addSyncTask
                 }
             } else if (itemObject is IActionHost) {
@@ -58,7 +58,7 @@ class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUplo
             val item = patternStack.item
             val out: IAEItemStack? = if (item is ItemEncodedPattern) {
                 val pattern: ICraftingPatternDetails = item.getPatternForItem(patternStack, player.world)
-                if (pattern.isCraftable || pattern is FluidPatternDetails) {
+                if (pattern.isCraftable || pattern is FluidCraftingPatternDetails) {
                     pattern.condensedOutputs[0]
                 } else return@addSyncTask
             } else return@addSyncTask
