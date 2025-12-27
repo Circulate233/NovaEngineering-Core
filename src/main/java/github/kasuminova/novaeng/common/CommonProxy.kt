@@ -40,6 +40,7 @@ import github.kasuminova.novaeng.common.machine.BiogenicSimulationComputer
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore
 import github.kasuminova.novaeng.common.machine.GeocentricDrill
 import github.kasuminova.novaeng.common.machine.IllumPool
+import github.kasuminova.novaeng.common.machine.LifeExtractsAltar
 import github.kasuminova.novaeng.common.machine.MMAltar
 import github.kasuminova.novaeng.common.machine.MaterialSequenceProcessing
 import github.kasuminova.novaeng.common.machine.SingularityCore
@@ -139,6 +140,7 @@ open class CommonProxy : IGuiHandler {
             }
             if (Mods.BM2.isPresent) {
                 RegistryMachineSpecial.registrySpecialMachine(MMAltar)
+                RegistryMachineSpecial.registrySpecialMachine(LifeExtractsAltar)
             }
             RegistryMachineSpecial.registrySpecialMachine(DreamEnergyCore.INSTANCE)
             RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE)
@@ -204,7 +206,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.EFABRICATOR_CONTROLLER -> {
                 val efController = present as? EFabricatorController
-                return if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -214,7 +216,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.EFABRICATOR_PATTERN_SEARCH -> {
                 val efController = present as? EFabricatorController
-                return if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -225,7 +227,7 @@ open class CommonProxy : IGuiHandler {
             GuiType.EFABRICATOR_PATTERN_BUS -> {
                 val efPatternBus = present as? EFabricatorPatternBus
                 val efController = efPatternBus?.controller
-                return if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -240,7 +242,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.ECALCULATOR_CONTROLLER -> {
                 val ecController = present as ECalculatorController?
-                return if (ecController != null && ecController.channel != null && ModIntegrationAE2.securityCheck(
+                if (ecController != null && ecController.channel != null && ModIntegrationAE2.securityCheck(
                         player, ecController.channel.getProxy()
                     )
                 ) {
@@ -255,7 +257,7 @@ open class CommonProxy : IGuiHandler {
                 MEHandler.getTerminalGuiObject(stack, player, x, y)?.let {
                     return ContainerNEWCraftConfirm(player.inventory, it)
                 }
-                return null
+                null
             }
 
             GuiType.MACHINE_ASSEMBLY_TOOL -> null

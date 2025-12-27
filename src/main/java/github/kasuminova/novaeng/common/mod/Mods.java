@@ -8,18 +8,18 @@ public enum Mods {
     AE2EL("appliedenergistics2") {
         @Override
         public boolean loaded() {
-            if (initialized) {
-                return loaded;
+            if (this.initialized) {
+                return this.loaded;
             }
-            initialized = true;
+            this.initialized = true;
             if (!super.loaded()) {
-                return loaded = false;
+                return this.loaded = false;
             }
             try {
                 Class.forName("appeng.core.AE2ELCore");
-                return loaded = true;
+                return this.loaded = true;
             } catch (Exception e) {
-                return loaded = false;
+                return this.loaded = false;
             }
         }
     },
@@ -31,16 +31,16 @@ public enum Mods {
             if (!MEK.loaded()) {
                 return false;
             }
-            if (initialized) {
-                return loaded;
+            if (this.initialized) {
+                return this.loaded;
             }
 
             try {
                 Class.forName("mekanism.common.config.MEKCEConfig");
-                initialized = true;
-                return loaded = true;
+                this.initialized = true;
+                return this.loaded = true;
             } catch (Throwable e) {
-                return loaded = false;
+                return this.loaded = false;
             }
         }
     };
@@ -54,11 +54,11 @@ public enum Mods {
     }
 
     public boolean loaded() {
-        if (!initialized) {
-            loaded = Loader.isModLoaded(modID);
-            initialized = true;
+        if (!this.initialized) {
+            this.loaded = Loader.isModLoaded(this.modID);
+            this.initialized = true;
         }
-        return loaded;
+        return this.loaded;
     }
 
 }
