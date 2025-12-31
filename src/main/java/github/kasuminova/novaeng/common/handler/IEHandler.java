@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.handler;
 
 import blusunrize.immersiveengineering.api.tool.ExcavatorHandler;
-import blusunrize.immersiveengineering.common.blocks.metal.BlockMetalDevice1;
+import blusunrize.immersiveengineering.common.IEContent;
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDevice1;
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntitySampleDrill;
 import codechicken.lib.util.ItemUtils;
@@ -40,7 +40,7 @@ public class IEHandler {
     };
 
     private static void giveCoresample(PlayerInteractEvent.RightClickItem event, World world, BlockPos eventpos, EntityPlayer player, ItemStack item) {
-        world.setBlockState(eventpos, BlockMetalDevice1.getStateById(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
+        world.setBlockState(eventpos,  IEContent.blockMetalDevice1.getStateFromMeta(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
         val drill = (TileEntitySampleDrill) world.getTileEntity(eventpos);
         val worldInfo = ExcavatorHandler.getMineralWorldInfo(
             world,
@@ -87,6 +87,7 @@ public class IEHandler {
         val eventpos = new BlockPos(event.getPos().getX(), 250, event.getPos().getZ());
         if (tky.equals(item.getItem().getRegistryName())) {
             giveCoresample(event, world, eventpos, player, item);
+            item.shrink(1);
         } else if (scanner.equals(item.getItem().getRegistryName())) {
             var nbt = item.getTagCompound();
             var mode = nbt.getByte("mode");
