@@ -622,7 +622,6 @@ abstract class Drill : MachineSpecial {
             upThread.addRecipe("research_mineral_utilization_" + name + "_" + i)
             upThread.addRecipe("additional_component_loading_" + name + "_" + i)
 
-
             RecipeBuilder.newBuilder("research_mineral_utilization_" + name + "_" + i, name, 10)
                 .addPreCheckHandler { event ->
                     val ctrl = event.getController()
@@ -696,7 +695,7 @@ abstract class Drill : MachineSpecial {
                     )
 
                     data.setBoolean("additional_component_$i", true)
-                    data.setByte("additional_component_$i", (components_amount + 1).toByte())
+                    data.setByte("components_amount", (components_amount + 1).toByte())
                 }.requireResearch("additional_component_loading_$i")
                 .setThreadName(upThreadName)
                 .setParallelized(false)

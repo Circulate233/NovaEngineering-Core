@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.machine
 
-import WayofTime.bloodmagic.ritual.IMasterRitualStone
-import WayofTime.bloodmagic.ritual.types.RitualWellOfSuffering
 import crafttweaker.CraftTweakerAPI.itemUtils
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.machine.MMAltar.addBlood
-import github.kasuminova.novaeng.common.machine.MMAltar.ergodicPos
+import github.kasuminova.novaeng.common.machine.MMAltar.checkAlter
 import github.kasuminova.novaeng.common.machine.MMAltar.getAltar
 import github.kasuminova.novaeng.common.util.Functions
 import github.kasuminova.novaeng.common.util.RecipePrimerEx.setLore
@@ -72,27 +70,7 @@ object LifeExtractsAltar : MachineSpecial {
                             return@addPreCheckHandler
                         }
 
-                        var check = nbt.hasKey("pos")
-                        if (check) {
-                            val p = nbt.getIntArray("pos")
-                            val pos = BlockPos.PooledMutableBlockPos.retain(
-                                p[0], p[1], p[2]
-                            )
-                            val t = ctrl.world.getTileEntity(pos)
-                            pos.release()
-                            if (!(t is IMasterRitualStone && t.currentRitual is RitualWellOfSuffering)) {
-                                nbt.removeTag("pos")
-                                check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
-                                    nbt.setIntArray("pos", intArrayOf(x, y, z))
-                                }
-                            }
-                        } else {
-                            check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
-                                nbt.setIntArray("pos", intArrayOf(x, y, z))
-                            }
-                        }
-
-                        if (!check) {
+                        if (!checkAlter(nbt, ctrl)) {
                             it.setFailed("novaeng.life_extracts_altar.failed.2")
                         }
                     }

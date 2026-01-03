@@ -36,6 +36,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
@@ -126,27 +127,8 @@ object MMAltar : MachineSpecial {
                     if (state.block.getMetaFromState(state) == 3) ++sacrifice
                 }
             }
-            var level = altar.getLevel().toByte()
-            var upgrade: Byte = 0
-
-            ctrl.foundMachine?.let { it1 ->
-                for (replacement in it1.multiBlockModifiers) {
-                    if (replacement.matches(ctrl)) {
-                        when (replacement.modifierName) {
-                            "upgrade1" -> ++upgrade
-                            "upgrade2" -> ++upgrade
-                            "upgrade3" -> {
-                                upgrade = (2.toByte() + upgrade).toByte()
-                                ++level
-                            }
-                        }
-                    }
-                }
-            }
-
             nbt.setShort("sacrifice", sacrifice)
-            nbt.setByte("level", level)
-            nbt.setByte("upgrade", upgrade)
+            finishCheck(altar, ctrl, nbt)
         }
         machine.addMachineEventHandler(MachineTickEvent::class.java) {
             val ctrl = it.controller
@@ -156,26 +138,7 @@ object MMAltar : MachineSpecial {
             val nbt = ctrl.customDataTag
             val altar = ctrl.getAltar()
 
-            var level = altar.getLevel().toByte()
-            var upgrade: Byte = 0
-
-            ctrl.foundMachine?.let { it1 ->
-                for (replacement in it1.multiBlockModifiers) {
-                    if (replacement.matches(ctrl)) {
-                        when (replacement.modifierName) {
-                            "upgrade1" -> ++upgrade
-                            "upgrade2" -> ++upgrade
-                            "upgrade3" -> {
-                                upgrade = (2.toByte() + upgrade).toByte()
-                                ++level
-                            }
-                        }
-                    }
-                }
-            }
-
-            nbt.setByte("level", level)
-            nbt.setByte("upgrade", upgrade)
+            finishCheck(altar, ctrl, nbt)
         }
         machine.multiBlockModifiers.add(
             MultiBlockModifierReplacement(
@@ -353,6 +316,33 @@ object MMAltar : MachineSpecial {
         if (NovaEngineeringCore.proxy.isClient) clientInit(machine)
     }
 
+    private fun finishCheck(
+        altar: TileAltar?,
+        ctrl: TileMultiblockMachineController,
+        nbt: NBTTagCompound
+    ) {
+        var level = altar.getLevel().toByte()
+        var upgrade: Byte = 0
+
+        ctrl.foundMachine?.let { it1 ->
+            for (replacement in it1.multiBlockModifiers) {
+                if (replacement.matches(ctrl)) {
+                    when (replacement.modifierName) {
+                        "upgrade1" -> ++upgrade
+                        "upgrade2" -> ++upgrade
+                        "upgrade3" -> {
+                            upgrade = (2.toByte() + upgrade).toByte()
+                            ++level
+                        }
+                    }
+                }
+            }
+        }
+
+        nbt.setByte("level", level)
+        nbt.setByte("upgrade", upgrade)
+    }
+
     @SideOnly(Side.CLIENT)
     private fun clientInit(machine: DynamicMachine) {
         machine.addMachineEventHandler(ControllerGUIRenderEvent::class.java) {
@@ -365,25 +355,7 @@ object MMAltar : MachineSpecial {
             val now = altar.getNowBlood()
             val max = altar.getMaxBlood()
 
-            var check = nbt.hasKey("pos")
-            if (check) {
-                val p = nbt.getIntArray("pos")
-                val pos = BlockPos.PooledMutableBlockPos.retain(
-                    p[0], p[1], p[2]
-                )
-                val t = ctrl.world.getTileEntity(pos)
-                pos.release()
-                if (!(t is IMasterRitualStone && t.currentRitual is RitualWellOfSuffering)) {
-                    nbt.removeTag("pos")
-                    check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
-                        nbt.setIntArray("pos", intArrayOf(x, y, z))
-                    }
-                }
-            } else {
-                check = ergodicPos(ctrl, ctrl.pos) { x, y, z ->
-                    nbt.setIntArray("pos", intArrayOf(x, y, z))
-                }
-            }
+            val check = checkAlter(nbt, ctrl)
 
             val info = asList(
                 getText("gui.mm_altar.tooltip.0", now, max),
@@ -398,6 +370,31 @@ object MMAltar : MachineSpecial {
             @Suppress("UsePropertyAccessSyntax")
             it.setExtraInfo(*info.toTypedArray())
         }
+    }
+
+    fun checkAlter(
+        nbt: NBTTagCompound,
+        ctrl: TileMultiblockMachineController
+    ): Boolean {
+        if (nbt.hasKey("pos")) {
+            val p = nbt.getIntArray("pos")
+            val pos = BlockPos.PooledMutableBlockPos.retain(
+                p[0], p[1], p[2]
+            )
+            val t = ctrl.world.getTileEntity(pos)
+            pos.release()
+            if (!(t is IMasterRitualStone && t.currentRitual is RitualWellOfSuffering)) {
+                nbt.removeTag("pos")
+                return ergodicPos(ctrl, ctrl.pos) { x, y, z ->
+                    nbt.setIntArray("pos", intArrayOf(x, y, z))
+                }
+            }
+        } else {
+            return ergodicPos(ctrl, ctrl.pos) { x, y, z ->
+                nbt.setIntArray("pos", intArrayOf(x, y, z))
+            }
+        }
+        return false
     }
 
     override fun getRegistryName(): ResourceLocation {
@@ -577,7 +574,7 @@ object MMAltar : MachineSpecial {
         return min(max(a, min), max)
     }
 
-    inline fun ergodicPos(
+    private inline fun ergodicPos(
         ctrl: TileMultiblockMachineController,
         pos: BlockPos,
         run: (x: Int, y: Int, z: Int) -> Unit
