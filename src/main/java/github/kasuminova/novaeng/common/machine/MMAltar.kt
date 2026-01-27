@@ -355,7 +355,7 @@ object MMAltar : MachineSpecial {
             val now = altar.getNowBlood()
             val max = altar.getMaxBlood()
 
-            val check = checkAlter(nbt, ctrl)
+            val check = checkRitualWellOfSuffering(nbt, ctrl)
 
             val info = asList(
                 getText("gui.mm_altar.tooltip.0", now, max),
@@ -372,7 +372,7 @@ object MMAltar : MachineSpecial {
         }
     }
 
-    fun checkAlter(
+    fun checkRitualWellOfSuffering(
         nbt: NBTTagCompound,
         ctrl: TileMultiblockMachineController
     ): Boolean {

@@ -114,6 +114,28 @@ public abstract class MixinCraftingCPUClusterTwo {
     @Shadow
     public abstract IAEItemStack injectItems(IAEItemStack input, Actionable type, IActionSource src);
 
+    @Unique
+    private static double n$getSum(IAEItemStack[] input) {
+        double sum = 0;
+        for (IAEItemStack anInput : input) {
+            if (anInput != null) {
+                if (anInput.getDefinition() != null && !anInput.getDefinition().isEmpty()) {
+                    if (anInput.getItem() == FCItems.FLUID_DROP) {
+                        sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
+                        continue;
+                    }
+
+                    if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
+                        sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
+                        continue;
+                    }
+                }
+                sum += anInput.getStackSize();
+            }
+        }
+        return sum;
+    }
+
     /**
      * @author circulation
      * @reason 完全覆写样板发配方法
@@ -163,27 +185,10 @@ public abstract class MixinCraftingCPUClusterTwo {
                         while (!this.visitedMediums.get(key).isEmpty()) {
                             ICraftingMedium m = this.visitedMediums.get(key).poll();
                             if (value.getValue() > 0L && m != null && !m.isBusy()) {
-                                MediumType mediumType = r$specialMediumTreatment(m, key);
+                                MediumType mediumType = this.r$specialMediumTreatment(m, key);
                                 if (ic == null) {
                                     IAEItemStack[] input = key.getInputs();
-                                    double sum = 0;
-                                    for (IAEItemStack anInput : input) {
-                                        if (anInput != null) {
-                                            if (anInput.getDefinition() != null && !anInput.getDefinition().isEmpty()) {
-                                                if (anInput.getDefinition().getItem() == FCItems.FLUID_DROP) {
-                                                    sum += Math.max((double)anInput.getStackSize() / (double)1000.0F, (double)1.0F);
-                                                    continue;
-                                                }
-
-                                                if (ModAndClassUtil.GAS && anInput.getDefinition().getItem() == FCGasItems.GAS_DROP) {
-                                                    sum += Math.max((double)anInput.getStackSize() / (double)4000.0F, (double)1.0F);
-                                                    continue;
-                                                }
-                                            }
-                                            sum += anInput.getStackSize();
-                                        }
-                                    }
-
+                                    final var sum = n$getSum(input);
                                     double energy;
                                     long s = 1;
                                     if (mediumType != MediumType.NULL) {
@@ -232,7 +237,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                     fuzz = fuzz.copy();
                                                     fuzz.setStackSize(input[x].getStackSize());
                                                     if (key.isValidItemForSlot(x, fuzz.createItemStack(), this.getWorld())) {
-                                                        IAEItemStack ais = r$extractItemsR(this.inventory, fuzz, Actionable.MODULATE, this.machineSrc, mediumType);
+                                                        IAEItemStack ais = this.r$extractItemsR(this.inventory, fuzz, Actionable.MODULATE, this.machineSrc, mediumType);
                                                         ItemStack is = ais == null ? ItemStack.EMPTY : ais.createItemStack();
                                                         if (!is.isEmpty()) {
                                                             IAEItemStack receiver = AEItemStack.fromItemStack(is);
@@ -247,7 +252,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                     }
                                                 }
                                             } else {
-                                                IAEItemStack ais = r$extractItemsR(this.inventory, input[x].copy(), Actionable.MODULATE, this.machineSrc, mediumType);
+                                                IAEItemStack ais = this.r$extractItemsR(this.inventory, input[x].copy(), Actionable.MODULATE, this.machineSrc, mediumType);
                                                 ItemStack is = ais == null ? ItemStack.EMPTY : ais.createItemStack();
                                                 if (!is.isEmpty()) {
                                                     IAEItemStack receiver = input[x];
@@ -314,7 +319,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                         val iaeStack = out.copy();
                                         if (mediumType != MediumType.NULL)
                                             iaeStack.setStackSize(iaeStack.getStackSize() * this.r$craftingFrequency);
-                                        r$postProcessing(iaeStack);
+                                        this.r$postProcessing(iaeStack);
                                     }
 
                                     if (key.isCraftable()) {
@@ -324,7 +329,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                 IAEItemStack cItem = AEItemStack.fromItemStack(output);
                                                 if (mediumType == MediumType.EF)
                                                     cItem.setStackSize(cItem.getStackSize() * this.r$craftingFrequency);
-                                                r$postProcessing(cItem);
+                                                this.r$postProcessing(cItem);
                                             }
                                         }
                                     }

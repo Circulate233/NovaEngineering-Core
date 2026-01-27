@@ -31,17 +31,17 @@ public class NetNodeImpl extends NetNode {
     @Override
     public void onMachineTick() {
         super.onMachineTick();
-        if (isWorking()) {
-            if (owner.getTicksExisted() % 10 == 0) {
+        if (this.isWorking()) {
+            if (this.owner.getTicksExisted() % 10 == 0) {
                 double total = 0;
-                for (final double value : recipeConsumers.values()) {
+                for (final double value : this.recipeConsumers.values()) {
                     total += value;
                 }
-                computationPointConsumption = total;
-                recipeConsumers.clear();
+                this.computationPointConsumption = total;
+                this.recipeConsumers.clear();
             }
         } else {
-            computationPointConsumption = 0;
+            this.computationPointConsumption = 0;
         }
     }
 
@@ -49,12 +49,12 @@ public class NetNodeImpl extends NetNode {
     public void checkComputationPoint(final RecipeCheckEvent event,
                                       final double pointRequired,
                                       final ResearchCognitionData... researchRequired) {
-        if (centerPos == null || center == null) {
+        if (this.centerPos == null || this.center == null) {
             event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
-        double generation = center.getComputationPointGeneration() - center.getComputationPointConsumption();
+        double generation = this.center.getComputationPointGeneration() - this.center.getComputationPointConsumption();
         if (generation < pointRequired) {
             event.setFailed("算力不足！预期："
                 + NovaEngUtils.formatFLOPS(pointRequired) + "，当前："
@@ -72,12 +72,12 @@ public class NetNodeImpl extends NetNode {
     @ZenMethod
     public void checkResearch(final RecipeCheckEvent event,
                               final ResearchCognitionData... researchRequired) {
-        if (centerPos == null || center == null) {
+        if (this.centerPos == null || this.center == null) {
             event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
-        Collection<Database> nodes = center.getNode(Database.class);
+        Collection<Database> nodes = this.center.getNode(Database.class);
         if (nodes.isEmpty()) {
             event.setFailed("计算网络中未找到数据库！");
             return;
@@ -92,26 +92,26 @@ public class NetNodeImpl extends NetNode {
     }
 
     public void onRecipeStart(final RecipeStartEvent event, final double computation) {
-        recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
+        this.recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
     }
 
     public void onRecipeStart(final FactoryRecipeStartEvent event, final double computation) {
-        recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
+        this.recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
     }
 
     public void onRecipePreTick(final RecipeTickEvent event, final double computation, final boolean triggerFailure) {
-        if (centerPos == null) {
+        if (this.centerPos == null) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
-        if (center == null) {
+        if (this.center == null) {
             event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();
-        recipeConsumers.put(event.getRecipeThread(), required);
+        this.recipeConsumers.put(event.getRecipeThread(), required);
 
-        if (!center.consumeComputationPoint(required)) {
+        if (!this.center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
                 NovaEngUtils.formatFLOPS(required);
 
@@ -124,18 +124,18 @@ public class NetNodeImpl extends NetNode {
     }
 
     public void onRecipePreTick(final FactoryRecipeTickEvent event, final double computation, final boolean triggerFailure) {
-        if (centerPos == null) {
+        if (this.centerPos == null) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return;
         }
-        if (center == null) {
+        if (this.center == null) {
             event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();
-        recipeConsumers.put(event.getRecipeThread(), required);
+        this.recipeConsumers.put(event.getRecipeThread(), required);
 
-        if (!center.consumeComputationPoint(required)) {
+        if (!this.center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
                 NovaEngUtils.formatFLOPS(required);
 
@@ -148,7 +148,7 @@ public class NetNodeImpl extends NetNode {
     }
 
     public void onRecipeFinished(final RecipeThread thread) {
-        recipeConsumers.removeDouble(thread);
+        this.recipeConsumers.removeDouble(thread);
     }
 
     @Override
@@ -160,12 +160,12 @@ public class NetNodeImpl extends NetNode {
     @Override
     public void writeNBT() {
         super.writeNBT();
-        NBTTagCompound tag = owner.getCustomDataTag();
-        tag.setDouble("c", computationPointConsumption);
+        NBTTagCompound tag = this.owner.getCustomDataTag();
+        tag.setDouble("c", this.computationPointConsumption);
     }
 
     @Override
     public double getComputationPointConsumption() {
-        return computationPointConsumption;
+        return this.computationPointConsumption;
     }
 }

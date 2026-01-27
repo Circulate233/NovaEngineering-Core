@@ -2,9 +2,10 @@ package github.kasuminova.novaeng.common.machine
 
 import crafttweaker.CraftTweakerAPI.itemUtils
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
+import github.kasuminova.mmce.common.event.recipe.RecipeEvent
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.machine.MMAltar.addBlood
-import github.kasuminova.novaeng.common.machine.MMAltar.checkAlter
+import github.kasuminova.novaeng.common.machine.MMAltar.checkRitualWellOfSuffering
 import github.kasuminova.novaeng.common.machine.MMAltar.getAltar
 import github.kasuminova.novaeng.common.util.Functions
 import github.kasuminova.novaeng.common.util.RecipePrimerEx.setLore
@@ -45,53 +46,51 @@ object LifeExtractsAltar : MachineSpecial {
                     return@setNBTChecker true
                 } else return@setNBTChecker false
             }
-            .addPreCheckHandler {
-                val ctrl = it.controller
-                val data = ctrl.customDataTag
-                val world = ctrl.world
-                val mmpos = BlockPos.PooledMutableBlockPos.retain(
-                    data.getInteger("x"),
-                    data.getInteger("y"),
-                    data.getInteger("z")
-                )
-                val mm_altarctrl =
-                    world.getTileEntity(mmpos) as? TileMultiblockMachineController
-                mmpos.release()
-                if (!world.isRemote) {
-                    if (mm_altarctrl == null) {
-                        it.setFailed("novaeng.life_extracts_altar.failed.0")
-                        return@addPreCheckHandler
-                    } else {
-                        val altar = mm_altarctrl.getAltar()
-                        val nbt = mm_altarctrl.customDataTag
+            .addPostCheckHandler {
+                val mm_altarctrl = getAltarCtrl(it)
+                if (mm_altarctrl == null) {
+                    it.setFailed("novaeng.life_extracts_altar.failed.0")
+                    return@addPostCheckHandler
+                } else if (!mm_altarctrl.world.isRemote) {
+                    val altar = mm_altarctrl.getAltar()
+                    val nbt = mm_altarctrl.customDataTag
 
-                        if (altar == null) {
-                            it.setFailed("novaeng.life_extracts_altar.failed.1")
-                            return@addPreCheckHandler
-                        }
+                    if (altar == null) {
+                        it.setFailed("novaeng.life_extracts_altar.failed.1")
+                        return@addPostCheckHandler
+                    }
 
-                        if (!checkAlter(nbt, ctrl)) {
-                            it.setFailed("novaeng.life_extracts_altar.failed.2")
-                        }
+                    if (!checkRitualWellOfSuffering(nbt, mm_altarctrl)) {
+                        it.setFailed("novaeng.life_extracts_altar.failed.2")
                     }
                 }
             }
             .addStartHandler {
                 it.controller.customDataTag.setBoolean("mode", true)
             }
+            .addPreTickHandler {
+                if (it.activeRecipe.tick != 0) return@addPreTickHandler
+
+                val mm_altarctrl = getAltarCtrl(it)
+                if (mm_altarctrl == null) {
+                    it.setFailed(true, "novaeng.life_extracts_altar.failed.0")
+                    return@addPreTickHandler
+                } else if (!mm_altarctrl.world.isRemote) {
+                    val altar = mm_altarctrl.getAltar()
+                    val nbt = mm_altarctrl.customDataTag
+
+                    if (altar == null) {
+                        it.setFailed(true, "novaeng.life_extracts_altar.failed.1")
+                        return@addPreTickHandler
+                    }
+
+                    if (!checkRitualWellOfSuffering(nbt, mm_altarctrl)) {
+                        it.setFailed(true, "novaeng.life_extracts_altar.failed.2")
+                    }
+                }
+            }
             .addFinishHandler {
-                val ctrl = it.controller
-                val data = ctrl.customDataTag
-                val world = ctrl.world
-                val mmpos = BlockPos.PooledMutableBlockPos.retain(
-                    data.getInteger("x"),
-                    data.getInteger("y"),
-                    data.getInteger("z")
-                )
-                val mm_altarctrl =
-                    world.getTileEntity(mmpos) as? TileMultiblockMachineController
-                mmpos.release()
-                mm_altarctrl?.let { mmctrl ->
+                getAltarCtrl(it)?.let { mmctrl ->
                     mmctrl.getAltar()
                         .addBlood(SINGLE_VALUE + (SINGLE_VALUE / 10) * mmctrl.customDataTag.getShort("sacrifice"))
                 }
@@ -105,6 +104,21 @@ object LifeExtractsAltar : MachineSpecial {
             .setParallelized(false)
             .build()
         if (NovaEngineeringCore.proxy.isClient) clientInit(machine)
+    }
+
+    private fun getAltarCtrl(event: RecipeEvent): TileMultiblockMachineController? {
+        val ctrl = event.controller
+        val data = ctrl.customDataTag
+        val world = ctrl.world
+        val mmpos = BlockPos.PooledMutableBlockPos.retain(
+            data.getInteger("x"),
+            data.getInteger("y"),
+            data.getInteger("z")
+        )
+        val mm_altarctrl =
+            world.getTileEntity(mmpos) as? TileMultiblockMachineController
+        mmpos.release()
+        return mm_altarctrl
     }
 
     @SideOnly(Side.CLIENT)

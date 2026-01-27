@@ -144,7 +144,7 @@ abstract class Drill : MachineSpecial {
             }
         }
 
-        private fun getCcrystalOutput(ctrl: TileMultiblockMachineController): IItemStack {
+        private fun getCrystalOutput(ctrl: TileMultiblockMachineController): IItemStack {
             val data = ctrl.customDataTag
             val world = ctrl.getWorld()
             val research_progress = data.getByte("research_progress")
@@ -375,7 +375,7 @@ abstract class Drill : MachineSpecial {
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, _ ->
-                        getCcrystalOutput(ctrl.controller)
+                        getCrystalOutput(ctrl.controller)
                     }
                     .setChance(0.1f)
                     .setParallelized(false)
@@ -398,7 +398,7 @@ abstract class Drill : MachineSpecial {
                     .requireComputationPoint(1.5f)
                     .addOutput(stone)
                     .addItemModifier { ctrl, _ ->
-                        getCcrystalOutput(ctrl.controller)
+                        getCrystalOutput(ctrl.controller)
                     }.setChance(0.1f)
                     .setParallelized(true)
                     .setThreadName(threadName)
@@ -429,7 +429,7 @@ abstract class Drill : MachineSpecial {
                             .requireComputationPoint(3f)
                             .addOutput(stone)
                             .addItemModifier { ctrl, _ ->
-                                getCcrystalOutput(ctrl.controller)
+                                getCrystalOutput(ctrl.controller)
                             }.setChance(0.035f)
                             .setMaxThreads(1)
                             .setParallelized(false)
@@ -454,7 +454,7 @@ abstract class Drill : MachineSpecial {
                             .requireComputationPoint(3f)
                             .addOutput(stone)
                             .addItemModifier { ctrl, _ ->
-                                getCcrystalOutput(ctrl.controller)
+                                getCrystalOutput(ctrl.controller)
                             }
                             .setChance(0.04f)
                             .setMaxThreads(1)
