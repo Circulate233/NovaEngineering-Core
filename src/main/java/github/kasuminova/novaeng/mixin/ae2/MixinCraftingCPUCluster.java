@@ -90,7 +90,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
         }
         // Ensure inventory is empty
         if (this.inventory.getItemList().isEmpty()) {
-            destroy();
+            this.destroy();
         }
     }
 
@@ -108,7 +108,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
         if (this.isComplete) {
             // Ensure inventory is empty
             if (this.inventory.getItemList().isEmpty()) {
-                destroy();
+                this.destroy();
                 ci.cancel();
             }
         }
@@ -117,7 +117,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Inject(method = "updateCraftingLogic", at = @At("TAIL"))
     private void injectUpdateCraftingLogicTail(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cgc, final CallbackInfo ci) {
         int currentParallelism = this.usedOps[0];
-        novaeng_ec$parallelismRecorder.addUsedTime(currentParallelism);
+        this.novaeng_ec$parallelismRecorder.addUsedTime(currentParallelism);
     }
 
     @WrapOperation(
@@ -133,7 +133,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
             return controller != null && controller.getChannel() != null && controller.getChannel().getProxy().isActive();
         }
         if (this.novaeng_ec$virtualCPUOwner != null) {
-            ECalculatorController controller = novaeng_ec$virtualCPUOwner;
+            ECalculatorController controller = this.novaeng_ec$virtualCPUOwner;
             return controller.getChannel() != null && controller.getChannel().getProxy().isActive();
         }
         return original.call(instance);
@@ -161,7 +161,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
             cir.setReturnValue(controller != null && controller.getChannel() != null && controller.getChannel().getProxy().isActive());
         }
         if (this.novaeng_ec$virtualCPUOwner != null) {
-            ECalculatorController controller = novaeng_ec$virtualCPUOwner;
+            ECalculatorController controller = this.novaeng_ec$virtualCPUOwner;
             cir.setReturnValue(controller.getChannel() != null && controller.getChannel().getProxy().isActive());
         }
     }
@@ -181,7 +181,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
             cir.setReturnValue(node == null ? null : node.getGrid());
         }
         if (this.novaeng_ec$virtualCPUOwner != null) {
-            final ECalculatorMEChannel channel = novaeng_ec$virtualCPUOwner.getChannel();
+            final ECalculatorMEChannel channel = this.novaeng_ec$virtualCPUOwner.getChannel();
             if (channel == null) {
                 return;
             }
@@ -203,7 +203,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
             cir.setReturnValue(this.novaeng_ec$core.getWorld());
         }
         if (this.novaeng_ec$virtualCPUOwner != null) {
-            cir.setReturnValue(novaeng_ec$virtualCPUOwner.getWorld());
+            cir.setReturnValue(this.novaeng_ec$virtualCPUOwner.getWorld());
         }
     }
 
@@ -234,7 +234,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Unique
     @Override
     public ECalculatorThreadCore novaeng_ec$getController() {
-        return novaeng_ec$core;
+        return this.novaeng_ec$core;
     }
 
     @Unique
@@ -293,7 +293,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Unique
     @Override
     public long novaeng_ec$getUsedExtraStorage() {
-        return novaeng_ec$usedExtraStorage;
+        return this.novaeng_ec$usedExtraStorage;
     }
 
     @Unique
@@ -306,13 +306,13 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Unique
     @Override
     public TimeRecorder novaeng_ec$getTimeRecorder() {
-        return novaeng_ec$timeRecorder;
+        return this.novaeng_ec$timeRecorder;
     }
 
     @Unique
     @Override
     public TimeRecorder novaeng_ec$getParallelismRecorder() {
-        return novaeng_ec$parallelismRecorder;
+        return this.novaeng_ec$parallelismRecorder;
     }
 
 }

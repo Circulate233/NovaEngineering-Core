@@ -62,16 +62,16 @@ public class ClientEventHandler {
         if (event.phase != TickEvent.Phase.START) {
             return;
         }
-        clientTick++;
+        this.clientTick++;
 
-        if (clientTick % 5 == 0) {
+        if (this.clientTick % 5 == 0) {
             if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
                 TitleUtils.checkTitleState();
             }
-            debugMessageUpdateRequired = true;
+            this.debugMessageUpdateRequired = true;
         }
 
-        if (clientTick % 20 == 0) {
+        if (this.clientTick % 20 == 0) {
             checkParticleEffects();
         }
     }
@@ -82,27 +82,27 @@ public class ClientEventHandler {
             return;
         }
 
-        if (debugMessageUpdateRequired) {
+        if (this.debugMessageUpdateRequired) {
             final ParticleManager effectRenderer = Minecraft.getMinecraft().effectRenderer;
             if (effectRenderer == null) {
                 NovaEngineeringCore.log.warn("Particle effect renderer is null.");
             }
 
-            debugMessageUpdateRequired = false;
-            debugMessageCache.clear();
-            debugMessageCache.add("");
-            debugMessageCache.add(TextFormatting.BLUE + "[NovaEngineering-Core] Ver: " + NovaEngineeringCore.VERSION);
+            this.debugMessageUpdateRequired = false;
+            this.debugMessageCache.clear();
+            this.debugMessageCache.add("");
+            this.debugMessageCache.add(TextFormatting.BLUE + "[NovaEngineering-Core] Ver: " + NovaEngineeringCore.VERSION);
 
             if (effectRenderer != null) {
-                debugMessageCache.add(TextFormatting.GREEN + "Particles: " + TextFormatting.DARK_GREEN + getTotalParticles((AccessorParticleManager) effectRenderer));
+                this.debugMessageCache.add(TextFormatting.GREEN + "Particles: " + TextFormatting.DARK_GREEN + getTotalParticles((AccessorParticleManager) effectRenderer));
             }
 
-            debugMessageCache.addAll(CPacketProfiler.getProfilerMessages(debugPacketProfilerMessageLimit));
-            debugMessageCache.addAll(TEUpdatePacketProfiler.getProfilerMessages(debugTEPacketProfilerMessageLimit));
+            this.debugMessageCache.addAll(CPacketProfiler.getProfilerMessages(debugPacketProfilerMessageLimit));
+            this.debugMessageCache.addAll(TEUpdatePacketProfiler.getProfilerMessages(debugTEPacketProfilerMessageLimit));
         }
 
         List<String> right = event.getRight();
-        right.addAll(debugMessageCache);
+        right.addAll(this.debugMessageCache);
     }
 
     @SubscribeEvent

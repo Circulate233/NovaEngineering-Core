@@ -30,7 +30,7 @@ public class MixinPacketInventoryAction {
         if (!(sender.openContainer instanceof AEBaseContainer)) {
             return;
         }
-        if (action == InventoryAction.MOVE_REGION && AEPktInvActionSpamHandler.receivePacketAndCheckSpam(sender)) {
+        if (this.action == InventoryAction.MOVE_REGION && AEPktInvActionSpamHandler.receivePacketAndCheckSpam(sender)) {
             sender.connection.disconnect(new TextComponentString("[NovaEng-Core]" + TextFormatting.RED + " Disconnected by AE2 Packet Spam."));
             ci.cancel();
         }

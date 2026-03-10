@@ -160,11 +160,6 @@ public abstract class MixinCraftingCPUClusterTwo {
                     if (size > max) max = size;
                 }
 
-                this.r$craftingFrequency = e.getValue().getValue();
-                if (max * this.r$craftingFrequency > Integer.MAX_VALUE) {
-                    this.r$craftingFrequency = Integer.MAX_VALUE / max;
-                }
-
                 if (this.canCraft(key, key.getCondensedInputs())) {
                     if (key instanceof VirtualPatternDetails) {
                         this.completeJob();
@@ -175,6 +170,11 @@ public abstract class MixinCraftingCPUClusterTwo {
                     boolean didPatternCraft;
                     doWhileCraftingLoop:
                     do {
+                        this.r$craftingFrequency = e.getValue().getValue();
+                        if (max * this.r$craftingFrequency > Integer.MAX_VALUE) {
+                            this.r$craftingFrequency = Integer.MAX_VALUE / max;
+                        }
+
                         InventoryCrafting ic = null;
                         didPatternCraft = false;
 
@@ -190,9 +190,9 @@ public abstract class MixinCraftingCPUClusterTwo {
                                     IAEItemStack[] input = key.getInputs();
                                     final var sum = n$getSum(input);
                                     double energy;
-                                    long s = 1;
+                                    long s = this.r$craftingFrequency;
                                     if (mediumType != MediumType.NULL) {
-                                        double sum1 = sum * this.r$craftingFrequency;
+                                        double sum1 = sum * s;
                                         double o = eg.extractAEPower(sum1, Actionable.SIMULATE, PowerMultiplier.CONFIG);
                                         if (o < sum1 - 0.01) {
                                             this.r$craftingFrequency = (long) (o / sum1 * this.r$craftingFrequency);
@@ -238,12 +238,9 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                     fuzz.setStackSize(input[x].getStackSize());
                                                     if (key.isValidItemForSlot(x, fuzz.createItemStack(), this.getWorld())) {
                                                         IAEItemStack ais = this.r$extractItemsR(this.inventory, fuzz, Actionable.MODULATE, this.machineSrc, mediumType);
-                                                        ItemStack is = ais == null ? ItemStack.EMPTY : ais.createItemStack();
+                                                        ItemStack is = ais == null ? ItemStack.EMPTY : ais.getDefinition();
                                                         if (!is.isEmpty()) {
-                                                            IAEItemStack receiver = AEItemStack.fromItemStack(is);
-                                                            if (mediumType == MediumType.EF)
-                                                                receiver = receiver.copy().setStackSize(receiver.getStackSize() * this.r$craftingFrequency);
-
+                                                            IAEItemStack receiver = ais.copy();
                                                             this.postChange(receiver, this.machineSrc);
                                                             ic.setInventorySlotContents(x, is);
                                                             found = true;
