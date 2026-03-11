@@ -119,16 +119,14 @@ public abstract class MixinCraftingCPUClusterTwo {
         double sum = 0;
         for (IAEItemStack anInput : input) {
             if (anInput != null) {
-                if (anInput.getDefinition() != null && !anInput.getDefinition().isEmpty()) {
-                    if (anInput.getItem() == FCItems.FLUID_DROP) {
-                        sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
-                        continue;
-                    }
+                if (anInput.getItem() == FCItems.FLUID_DROP) {
+                    sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
+                    continue;
+                }
 
-                    if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
-                        sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
-                        continue;
-                    }
+                if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
+                    sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
+                    continue;
                 }
                 sum += anInput.getStackSize();
             }
@@ -226,7 +224,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                     IAEItemStack item = this.inventory.getItemList().findPrecise(input[x]);
                                                     if (item != null) {
                                                         itemList = ObjectLists.singleton(item);
-                                                    } else if (input[x].getDefinition().getItem().isDamageable()) {
+                                                    } else if (input[x].getItem().isDamageable()) {
                                                         itemList = this.inventory.getItemList().findFuzzy(input[x], FuzzyMode.IGNORE_ALL);
                                                     } else {
                                                         itemList = ObjectLists.emptyList();
@@ -238,7 +236,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                                                     fuzz.setStackSize(input[x].getStackSize());
                                                     if (key.isValidItemForSlot(x, fuzz.createItemStack(), this.getWorld())) {
                                                         IAEItemStack ais = this.r$extractItemsR(this.inventory, fuzz, Actionable.MODULATE, this.machineSrc, mediumType);
-                                                        ItemStack is = ais == null ? ItemStack.EMPTY : ais.getDefinition();
+                                                        ItemStack is = ais == null ? ItemStack.EMPTY : ais.createItemStack();
                                                         if (!is.isEmpty()) {
                                                             IAEItemStack receiver = ais.copy();
                                                             this.postChange(receiver, this.machineSrc);
