@@ -14,6 +14,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -31,6 +32,10 @@ public class BlockDreamEnergyPort extends BaseNodeBlock {
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "dream_energy_port");
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setNodeTileClass(TileDreamEnergyPort.class);
+    }
+
+    public @NotNull String getTranslationKey() {
+        return "tile.novaeng_core.dream_energy_port";
     }
 
     @Override
