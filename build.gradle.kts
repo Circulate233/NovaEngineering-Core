@@ -12,7 +12,7 @@ plugins {
 
 // Project properties
 group = "github.kasuminova.novaeng"
-version = "1.23.1"
+version = "1.23.2"
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -101,6 +101,18 @@ tasks.compileTestKotlin.configure {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_1_8)
     }
+}
+
+tasks.matching { it.name == "compilePatchedMcKotlin" }.configureEach {
+    dependsOn(tasks.named("decompressDecompiledSources"))
+}
+
+tasks.matching { it.name == "compileInjectedTagsKotlin" }.configureEach {
+    dependsOn(tasks.named("injectTags"))
+}
+
+tasks.matching { it.name == "compileMcLauncherKotlin" }.configureEach {
+    dependsOn(tasks.named("createMcLauncherFiles"))
 }
 
 tasks.javadoc.configure {
