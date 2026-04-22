@@ -259,7 +259,7 @@ public class DreamEnergyCore implements MachineSpecial {
                          var ctrl = event.getController();
                          var data = ctrl.getCustomDataTag();
                          if (data.getBoolean("wireless")) {
-                             event.setFailed("当前处于通量模式");
+                             event.setFailed("当前处于环流模式");
                              return;
                          }
                          var speed = Math.max(1.0f, data.getFloat("speed"));
@@ -289,7 +289,7 @@ public class DreamEnergyCore implements MachineSpecial {
                          var ctrl = event.getController();
                          var data = ctrl.getCustomDataTag();
                          if (data.getBoolean("wireless")) {
-                             event.setFailed("当前处于通量模式");
+                             event.setFailed("当前处于环流模式");
                          }
                          var speed = Math.max(1.0f, data.getFloat("speed"));
                          ctrl.addPermanentModifier("receive", RecipeModifierBuilder.create("modularmachinery:energy", "input", speed, 1, false).build());

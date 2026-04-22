@@ -947,8 +947,8 @@ hypernet.item.ram.4=§5内存§9模块§6（等级 4）
 hypernet.item.ram.5=§5内存§9模块§c（等级 5）
 hypernet.item.ram.core=§5内存§9模块§d「核心」
 
-text.dream_energy_port.0=替换梦之能量核心的智能数据接口以启用通量模式
-text.dream_energy_port.1=通量模式下,梦之能量核心将直接作为通量网络缓存
+text.dream_energy_port.0=替换梦之能量核心的智能数据接口以启用环流模式
+text.dream_energy_port.1=环流模式下,梦之能量核心将可以直接通过环流网络传输能量
 
 enchantment.magic_breaking=破魔
 enchantment.novaeng_core.magic_breaking.desc=对于剩余血量大于10的生物,你的每一次伤害都将是真实的(无视免伤和护甲),但你无法一次击杀它们
