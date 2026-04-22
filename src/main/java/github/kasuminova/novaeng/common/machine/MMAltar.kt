@@ -388,13 +388,10 @@ object MMAltar : MachineSpecial {
                 return ergodicPos(ctrl, ctrl.pos) { x, y, z ->
                     nbt.setIntArray("pos", intArrayOf(x, y, z))
                 }
-            }
-        } else {
-            return ergodicPos(ctrl, ctrl.pos) { x, y, z ->
-                nbt.setIntArray("pos", intArrayOf(x, y, z))
-            }
+            } else return true
+        } else return ergodicPos(ctrl, ctrl.pos) { x, y, z ->
+            nbt.setIntArray("pos", intArrayOf(x, y, z))
         }
-        return false
     }
 
     override fun getRegistryName(): ResourceLocation {
