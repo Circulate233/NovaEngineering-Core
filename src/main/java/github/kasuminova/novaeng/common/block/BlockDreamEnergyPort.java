@@ -27,7 +27,7 @@ public class BlockDreamEnergyPort extends BaseNodeBlock {
     }
 
     private BlockDreamEnergyPort() {
-        super("DreamEnergyPort");
+        super(NovaEngineeringCore.MOD_ID, "DreamEnergyPort");
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "dream_energy_port");
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setNodeTileClass(TileDreamEnergyPort.class);
