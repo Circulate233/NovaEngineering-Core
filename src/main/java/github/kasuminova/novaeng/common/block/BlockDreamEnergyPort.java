@@ -1,55 +1,44 @@
 package github.kasuminova.novaeng.common.block;
 
+import com.circulation.circulation_networks.api.API;
+import com.circulation.circulation_networks.api.node.NodeType;
+import com.circulation.circulation_networks.blocks.nodes.BaseNodeBlock;
+import com.circulation.circulation_networks.tooltip.LocalizedComponent;
+import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.NotNull;
-import sonar.fluxnetworks.common.block.BlockFluxStorage;
-import sonar.fluxnetworks.common.registry.RegistryBlocks;
-import sonar.fluxnetworks.common.registry.RegistryItems;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockDreamEnergyPort extends BlockFluxStorage {
+public class BlockDreamEnergyPort extends BaseNodeBlock {
     public static final BlockDreamEnergyPort INSTANCE = new BlockDreamEnergyPort();
+    public static final NodeType<TileDreamEnergyPort.DreamNode> TYPE = new DreamNodeType("dream_core", TileDreamEnergyPort.DreamNode.class, false);
+
+    static {
+        API.registerNodeType(TYPE, TileDreamEnergyPort.DreamNode::new, TileDreamEnergyPort.DreamNode::new);
+    }
 
     private BlockDreamEnergyPort() {
         super("DreamEnergyPort");
         this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "dream_energy_port");
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
-        RegistryBlocks.BLOCKS.remove(this);
-        RegistryItems.ITEMS.remove(RegistryItems.ITEMS.size() - 1);
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
-        return new TileDreamEnergyPort();
+        this.setNodeTileClass(TileDreamEnergyPort.class);
     }
 
     @Override
-    public int getMaxStorage() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(@NotNull ItemStack stack, @Nullable World player, @NotNull List<String> tooltip, @NotNull ITooltipFlag advanced) {
-        super.addInformation(stack, player, tooltip, advanced);
-        tooltip.add(I18n.format("text.dream_energy_port.0"));
-        tooltip.add(I18n.format("text.dream_energy_port.1"));
+    protected List<LocalizedComponent> buildTooltips(ItemStack stack) {
+        var tooltip = super.buildTooltips(stack);
+        tooltip.add(LocalizedComponent.of("text.dream_energy_port.0"));
+        tooltip.add(LocalizedComponent.of("text.dream_energy_port.1"));
+        return tooltip;
     }
 
     @Nonnull
@@ -63,5 +52,11 @@ public class BlockDreamEnergyPort extends BlockFluxStorage {
     @Override
     public EnumBlockRenderType getRenderType(@Nonnull IBlockState state) {
         return EnumBlockRenderType.MODEL;
+    }
+
+    @Desugar
+    private record DreamNodeType(String id, Class<TileDreamEnergyPort.DreamNode> nodeClass,
+                                 boolean allowsPocketNode) implements NodeType<TileDreamEnergyPort.DreamNode> {
+
     }
 }

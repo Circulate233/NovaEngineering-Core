@@ -2,6 +2,6 @@
   "parent": "modularmachinery:block/blockmodel_overlay_all",
   "textures": {
     "bg_all": "contenttweaker:blocks/extrememachineblock",
-    "ov_all": "fluxnetworks:items/fluxcore"
+    "ov_all": "circulation_networks:item/endercore_crystal"
   }
 }

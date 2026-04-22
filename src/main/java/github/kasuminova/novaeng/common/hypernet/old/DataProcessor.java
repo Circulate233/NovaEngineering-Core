@@ -60,34 +60,34 @@ public class DataProcessor extends NetNode {
 
     @ZenMethod
     public void onRecipeCheck(RecipeCheckEvent event) {
-        if (centerPos == null || center == null) {
+        if (this.centerPos == null || this.center == null) {
             event.setFailed("novaeng.hypernet.prrocessor.link.false");
             return;
         }
 
-        if (overheat) {
+        if (this.overheat) {
             event.setFailed("novaeng.hypernet.prrocessor.overheat");
             return;
         }
 
-        if (moduleCPUS.isEmpty() && moduleRAMS.isEmpty()) {
+        if (this.moduleCPUS.isEmpty() && this.moduleRAMS.isEmpty()) {
             event.setFailed("novaeng.hypernet.prrocessor.no_module");
             return;
         }
 
-        if (moduleCPUS.isEmpty()) {
+        if (this.moduleCPUS.isEmpty()) {
             event.setFailed("novaeng.hypernet.prrocessor.no_cpu");
             return;
         }
 
-        if (moduleRAMS.isEmpty()) {
+        if (this.moduleRAMS.isEmpty()) {
             event.setFailed("novaeng.hypernet.prrocessor.no_ram");
         }
     }
 
     @ZenMethod
     public void heatDistributionRecipeCheck(RecipeCheckEvent event, int heatDistribution) {
-        if (storedHU - heatDistribution < 0) {
+        if (this.storedHU - heatDistribution < 0) {
             event.setFailed("novaeng.hypernet.craftcheck.heat_distribution.failed");
         }
     }
@@ -95,27 +95,27 @@ public class DataProcessor extends NetNode {
     @ZenMethod
     public void onWorkingTick(FactoryRecipeTickEvent event) {
         event.getActiveRecipe().setTick(0);
-        if (workingCheck(event)) {
+        if (this.workingCheck(event)) {
             return;
         }
 
-        long baseEnergyUsage = type.getEnergyUsage();
+        long baseEnergyUsage = this.type.getEnergyUsage();
         long energyUsage = 0;
 
         Long usage;
-        while ((usage = recentEnergyUsage.poll()) != null) {
+        while ((usage = this.recentEnergyUsage.poll()) != null) {
             energyUsage += usage;
         }
 
-        float heatPercent = getOverHeatPercent();
+        float heatPercent = this.getOverHeatPercent();
         if (heatPercent <= 0.1F) {
-            energyUsage += (baseEnergyUsage / 10) * dynamicPatternSize > 0 ? dynamicPatternSize : 1;
+            energyUsage += (baseEnergyUsage / 10) * this.dynamicPatternSize > 0 ? this.dynamicPatternSize : 1;
         } else if (heatPercent <= 0.5F) {
-            energyUsage += (baseEnergyUsage / 5) * dynamicPatternSize > 0 ? dynamicPatternSize : 1;
+            energyUsage += (baseEnergyUsage / 5) * this.dynamicPatternSize > 0 ? this.dynamicPatternSize : 1;
         } else if (heatPercent <= 0.75F) {
-            energyUsage += (baseEnergyUsage / 2) * dynamicPatternSize > 0 ? dynamicPatternSize : 1;
+            energyUsage += (baseEnergyUsage / 2) * this.dynamicPatternSize > 0 ? this.dynamicPatternSize : 1;
         } else {
-            energyUsage += baseEnergyUsage * dynamicPatternSize > 0 ? dynamicPatternSize : 1;
+            energyUsage += baseEnergyUsage * this.dynamicPatternSize > 0 ? this.dynamicPatternSize : 1;
         }
 
         float mul = (float) ((double) (energyUsage + baseEnergyUsage) / baseEnergyUsage);
@@ -126,27 +126,27 @@ public class DataProcessor extends NetNode {
     }
 
     protected boolean workingCheck(final FactoryRecipeTickEvent event) {
-        if (centerPos == null) {
+        if (this.centerPos == null) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.link.false");
             return true;
         }
-        if (center == null) {
+        if (this.center == null) {
             event.preventProgressing("novaeng.hypernet.prrocessor.link.false");
             return true;
         }
-        if (overheat) {
+        if (this.overheat) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.overheat");
             return true;
         }
-        if (moduleCPUS.isEmpty() && moduleRAMS.isEmpty()) {
+        if (this.moduleCPUS.isEmpty() && this.moduleRAMS.isEmpty()) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.no_module");
             return true;
         }
-        if (moduleCPUS.isEmpty()) {
+        if (this.moduleCPUS.isEmpty()) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.no_cpu");
             return true;
         }
-        if (moduleRAMS.isEmpty()) {
+        if (this.moduleRAMS.isEmpty()) {
             event.setFailed(true, "novaeng.hypernet.prrocessor.no_ram");
             return true;
         }
@@ -157,69 +157,69 @@ public class DataProcessor extends NetNode {
     public void onMachineTick() {
         super.onMachineTick();
 
-        if (!isWorking()) {
-            generated.set(0D);
-            computationalLoad = 0F;
-            computationalLoadHistoryCache = 0F;
-            computationalLoadHistory.clear();
+        if (!this.isWorking()) {
+            this.generated.set(0D);
+            this.computationalLoad = 0F;
+            this.computationalLoadHistoryCache = 0F;
+            this.computationalLoadHistory.clear();
         } else {
             double totalCalculation = 0F;
             Double calculation;
-            while ((calculation = recentCalculation.poll()) != null) {
+            while ((calculation = this.recentCalculation.poll()) != null) {
                 totalCalculation += calculation;
             }
 
-            computationalLoadHistory.addFirst(totalCalculation);
-            computationalLoadHistoryCache += totalCalculation;
-            if (computationalLoadHistory.size() > 100) {
-                computationalLoadHistoryCache -= computationalLoadHistory.pollLast();
+            this.computationalLoadHistory.addFirst(totalCalculation);
+            this.computationalLoadHistoryCache += totalCalculation;
+            if (this.computationalLoadHistory.size() > 100) {
+                this.computationalLoadHistoryCache -= this.computationalLoadHistory.pollLast();
             }
 
-            computationalLoad = computationalLoadHistoryCache / computationalLoadHistory.size();
-            HyperNetEventHandler.addTickStartAction(() -> generated.set(maxGeneration));
+            this.computationalLoad = this.computationalLoadHistoryCache / this.computationalLoadHistory.size();
+            HyperNetEventHandler.addTickStartAction(() -> this.generated.set(this.maxGeneration));
         }
 
-        if (owner.getTicksExisted() % 20 == 0) {
-            maxGeneration = getComputationPointProvision(0xFFFFFF);
-            IDynamicPatternInfo dynamicPattern = owner.getDynamicPattern(type.getDynamicPatternName());
+        if (this.owner.getTicksExisted() % 20 == 0) {
+            this.maxGeneration = this.getComputationPointProvision(0xFFFFFF);
+            IDynamicPatternInfo dynamicPattern = this.owner.getDynamicPattern(this.type.getDynamicPatternName());
             if (dynamicPattern != null) {
-                dynamicPatternSize = dynamicPattern.getSize();
+                this.dynamicPatternSize = dynamicPattern.getSize();
             } else {
-                dynamicPatternSize = 0;
+                this.dynamicPatternSize = 0;
             }
-            writeNBT();
+            this.writeNBT();
         }
 
-        if (storedHU > 0) {
-            int heatDist = calculateHeatDist();
+        if (this.storedHU > 0) {
+            int heatDist = this.calculateHeatDist();
 
-            storedHU -= Math.min(heatDist, storedHU);
-            if (storedHU <= 0) {
-                overheat = false;
+            this.storedHU -= Math.min(heatDist, this.storedHU);
+            if (this.storedHU <= 0) {
+                this.overheat = false;
             }
-            maxGeneration = getComputationPointProvision(0xFFFFFF);
-            writeNBT();
+            this.maxGeneration = this.getComputationPointProvision(0xFFFFFF);
+            this.writeNBT();
         }
     }
 
     @ZenMethod
     public void onStructureUpdate() {
         try {
-            lock.lock();
-            moduleCPUS.clear();
-            moduleRAMS.clear();
-            moduleCPUS.addAll(ProcessorModuleCPU.filter(owner.getFoundUpgrades().values()));
-            moduleRAMS.addAll(ProcessorModuleRAM.filter(owner.getFoundUpgrades().values()));
+            this.lock.lock();
+            this.moduleCPUS.clear();
+            this.moduleRAMS.clear();
+            this.moduleCPUS.addAll(ProcessorModuleCPU.filter(this.owner.getFoundUpgrades().values()));
+            this.moduleRAMS.addAll(ProcessorModuleRAM.filter(this.owner.getFoundUpgrades().values()));
         } finally {
-            lock.unlock();
+            this.lock.unlock();
         }
     }
 
     private int calculateHeatDist() {
-        float heatPercent = getOverHeatPercent();
-        float heatDist = type.getHeatDistribution();
-        if (dynamicPatternSize > 1) {
-            heatDist *= dynamicPatternSize;
+        float heatPercent = this.getOverHeatPercent();
+        float heatDist = this.type.getHeatDistribution();
+        if (this.dynamicPatternSize > 1) {
+            heatDist *= this.dynamicPatternSize;
         }
 
         if (heatPercent <= 0.25F) {
@@ -235,7 +235,7 @@ public class DataProcessor extends NetNode {
 
     @Override
     public double requireComputationPoint(final double maxGeneration, final boolean doCalculate) {
-        if (!isConnected() || center == null || !isWorking()) {
+        if (!this.isConnected() || this.center == null || !this.isWorking()) {
             return 0F;
         }
 
@@ -255,10 +255,10 @@ public class DataProcessor extends NetNode {
         }
 
         double maxCanGenerated = polledCounter[0];
-        double generated = calculateComputationPointProvision(maxCanGenerated, doCalculate) * getEfficiency();
+        double generated = this.calculateComputationPointProvision(maxCanGenerated, doCalculate) * this.getEfficiency();
 
         if (doCalculate) {
-            doHeatGeneration(generated);
+            this.doHeatGeneration(generated);
             this.generated.updateAndGet(counter -> counter + (maxCanGenerated - generated));
         }
 
@@ -267,51 +267,51 @@ public class DataProcessor extends NetNode {
 
     @Override
     public boolean isWorking() {
-        if (!(owner instanceof final TileFactoryController factory)) {
+        if (!(this.owner instanceof final TileFactoryController factory)) {
             return false;
         }
 
         FactoryRecipeThread thread = factory.getCoreRecipeThreads().get(DataProcessorType.PROCESSOR_WORKING_THREAD_NAME);
 
-        return owner.isWorking() && thread != null && thread.isWorking();
+        return this.owner.isWorking() && thread != null && thread.isWorking();
     }
 
     @ZenGetter("maxGeneration")
     public double getMaxGeneration() {
-        return maxGeneration;
+        return this.maxGeneration;
     }
 
     public float getEfficiency() {
-        float overHeatPercent = getOverHeatPercent();
+        float overHeatPercent = this.getOverHeatPercent();
         return overHeatPercent >= 0.85F ? (1.0F - overHeatPercent) / 0.15F : 1F;
     }
 
     @ZenGetter("overHeatPercent")
     public float getOverHeatPercent() {
-        return overheat ? 1F : (float) storedHU / type.getOverheatThreshold();
+        return this.overheat ? 1F : (float) this.storedHU / this.type.getOverheatThreshold();
     }
 
     public void doHeatGeneration(double computationPointGeneration) {
-        storedHU += (int) (computationPointGeneration * 2);
-        if (storedHU >= type.getOverheatThreshold()) {
-            overheat = true;
+        this.storedHU += (int) (computationPointGeneration * 2);
+        if (this.storedHU >= this.type.getOverheatThreshold()) {
+            this.overheat = true;
         }
     }
 
     public double calculateComputationPointProvision(double maxGeneration, boolean doCalculate) {
-        if (overheat || !isWorking()) {
+        if (this.overheat || !this.isWorking()) {
             return 0;
         }
 
-        if (owner.getFoundUpgrades().isEmpty()) {
+        if (this.owner.getFoundUpgrades().isEmpty()) {
             return 0;
         }
 
-        if (moduleCPUS.isEmpty()) {
+        if (this.moduleCPUS.isEmpty()) {
             return 0;
         }
 
-        if (moduleRAMS.isEmpty()) {
+        if (this.moduleRAMS.isEmpty()) {
             return 0;
         }
 
@@ -320,14 +320,14 @@ public class DataProcessor extends NetNode {
         double generationLimit = 0F;
         double totalGenerated = 0F;
 
-        for (ProcessorModuleRAM ram : moduleRAMS) {
+        for (ProcessorModuleRAM ram : this.moduleRAMS) {
             double generated = ram.calculate(doCalculate, maxGeneration - generationLimit);
             generationLimit += generated;
             if (doCalculate) {
                 totalEnergyConsumption += (long) ((generated / ram.getComputationPointGenerationLimit()) * ram.getEnergyConsumption());
             }
         }
-        for (final ProcessorModuleCPU cpu : moduleCPUS) {
+        for (final ProcessorModuleCPU cpu : this.moduleCPUS) {
             double generated = cpu.calculate(doCalculate, generationLimit - totalGenerated);
             totalGenerated += generated;
             if (doCalculate) {
@@ -340,8 +340,8 @@ public class DataProcessor extends NetNode {
         }
 
         if (doCalculate) {
-            recentCalculation.offer(totalGenerated);
-            recentEnergyUsage.offer(totalEnergyConsumption);
+            this.recentCalculation.offer(totalGenerated);
+            this.recentEnergyUsage.offer(totalEnergyConsumption);
         }
 
         return totalGenerated;
@@ -362,41 +362,41 @@ public class DataProcessor extends NetNode {
     @Override
     public void writeNBT() {
         super.writeNBT();
-        NBTTagCompound tag = owner.getCustomDataTag();
-        tag.setInteger("storedHU", storedHU);
-        tag.setBoolean("overheat", overheat);
-        tag.setDouble("computationalLoad", computationalLoad);
-        tag.setDouble("maxGeneration", maxGeneration);
+        NBTTagCompound tag = this.owner.getCustomDataTag();
+        tag.setInteger("storedHU", this.storedHU);
+        tag.setBoolean("overheat", this.overheat);
+        tag.setDouble("computationalLoad", this.computationalLoad);
+        tag.setDouble("maxGeneration", this.maxGeneration);
     }
 
     @Override
     public double getComputationPointProvision(final double maxGeneration) {
-        return calculateComputationPointProvision(maxGeneration, false) * getEfficiency();
+        return this.calculateComputationPointProvision(maxGeneration, false) * this.getEfficiency();
     }
 
     @ZenGetter("computationalLoad")
     public double getComputationalLoad() {
-        return computationalLoad;
+        return this.computationalLoad;
     }
 
     @ZenGetter("type")
     public DataProcessorType getType() {
-        return type;
+        return this.type;
     }
 
     @ZenGetter("storedHU")
     public int getStoredHU() {
-        return storedHU;
+        return this.storedHU;
     }
 
     @ZenSetter("storedHU")
     public void setStoredHU(final int storedHU) {
         this.storedHU = storedHU;
-        writeNBT();
+        this.writeNBT();
     }
 
     @ZenGetter("overheat")
     public boolean isOverheat() {
-        return overheat;
+        return this.overheat;
     }
 }

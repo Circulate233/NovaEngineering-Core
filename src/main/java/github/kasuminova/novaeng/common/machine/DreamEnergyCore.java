@@ -111,6 +111,18 @@ public class DreamEnergyCore implements MachineSpecial {
         }
     }
 
+    public static void receiveEnergy(IMachineController ctrl, BigInteger value) {
+        var nbt = ctrl.getController().getCustomDataTag();
+        synchronized (nbt) {
+            var energyStored = getEnergyStored(nbt);
+            nbt.setString("energyStored", energyStored.add(value).toString());
+        }
+
+        if (ENERGY_STORED_CACHE.size() > 3000) {
+            ENERGY_STORED_CACHE.clear();
+        }
+    }
+
     /**
      * 提取控制器内部能量至能量输出仓。
      */
@@ -126,6 +138,18 @@ public class DreamEnergyCore implements MachineSpecial {
         }
     }
 
+    public static void extractEnergy(IMachineController ctrl, BigInteger value) {
+        var nbt = ctrl.getController().getCustomDataTag();
+        synchronized (nbt) {
+            var energyStored = getEnergyStored(nbt);
+            nbt.setString("energyStored", energyStored.subtract(value).max(BigInteger.ZERO).toString());
+        }
+
+        if (ENERGY_STORED_CACHE.size() > 3000) {
+            ENERGY_STORED_CACHE.clear();
+        }
+    }
+
     public static BigInteger getEnergyStored(NBTTagCompound nbt) {
         return nbt.hasKey("energyStored") ? getBigInt(nbt.getString("energyStored")) : BigInteger.ZERO;
     }
@@ -133,6 +157,11 @@ public class DreamEnergyCore implements MachineSpecial {
     @ZenMethod
     public static BigInteger getEnergyStored(IMachineController ctrl) {
         return getEnergyStored(ctrl.getController().getCustomDataTag());
+    }
+
+    @ZenMethod
+    public static String getEnergyStoredString(IMachineController ctrl) {
+        return ctrl.getController().getCustomDataTag().getString("energyStored");
     }
 
     /**

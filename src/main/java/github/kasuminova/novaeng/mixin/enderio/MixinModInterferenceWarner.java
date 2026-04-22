@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@Mixin(value = ModInterferenceWarner.class,remap = false)
+@Mixin(value = ModInterferenceWarner.class, remap = false)
 public class MixinModInterferenceWarner {
 
     /**

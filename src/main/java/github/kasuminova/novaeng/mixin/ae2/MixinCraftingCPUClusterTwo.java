@@ -90,6 +90,26 @@ public abstract class MixinCraftingCPUClusterTwo {
     @Unique
     private boolean r$nae2$ghostInjecting;
 
+    @Unique
+    private static double n$getSum(IAEItemStack[] input) {
+        double sum = 0;
+        for (IAEItemStack anInput : input) {
+            if (anInput != null) {
+                if (anInput.getItem() == FCItems.FLUID_DROP) {
+                    sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
+                    continue;
+                }
+
+                if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
+                    sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
+                    continue;
+                }
+                sum += anInput.getStackSize();
+            }
+        }
+        return sum;
+    }
+
     @Shadow
     protected abstract void postChange(IAEItemStack diff, IActionSource src);
 
@@ -113,26 +133,6 @@ public abstract class MixinCraftingCPUClusterTwo {
 
     @Shadow
     public abstract IAEItemStack injectItems(IAEItemStack input, Actionable type, IActionSource src);
-
-    @Unique
-    private static double n$getSum(IAEItemStack[] input) {
-        double sum = 0;
-        for (IAEItemStack anInput : input) {
-            if (anInput != null) {
-                if (anInput.getItem() == FCItems.FLUID_DROP) {
-                    sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
-                    continue;
-                }
-
-                if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
-                    sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
-                    continue;
-                }
-                sum += anInput.getStackSize();
-            }
-        }
-        return sum;
-    }
 
     /**
      * @author circulation

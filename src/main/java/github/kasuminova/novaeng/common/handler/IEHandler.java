@@ -40,7 +40,7 @@ public class IEHandler {
     };
 
     private static void giveCoresample(PlayerInteractEvent.RightClickItem event, World world, BlockPos eventpos, EntityPlayer player, ItemStack item) {
-        world.setBlockState(eventpos,  IEContent.blockMetalDevice1.getStateFromMeta(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
+        world.setBlockState(eventpos, IEContent.blockMetalDevice1.getStateFromMeta(BlockTypes_MetalDevice1.SAMPLE_DRILL.getMeta()));
         val drill = (TileEntitySampleDrill) world.getTileEntity(eventpos);
         val worldInfo = ExcavatorHandler.getMineralWorldInfo(
             world,

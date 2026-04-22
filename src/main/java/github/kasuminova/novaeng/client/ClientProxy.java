@@ -248,20 +248,6 @@ public class ClientProxy extends CommonProxy {
         TitleUtils.setRandomTitle("*PostInit*");
     }
 
-    @Desugar
-    private record IColor(int color) implements IBlockColor, IItemColor {
-
-        @Override
-        public int colorMultiplier(@NotNull IBlockState state, @org.jetbrains.annotations.Nullable IBlockAccess worldIn, @org.jetbrains.annotations.Nullable BlockPos pos, int tintIndex) {
-            return this.color;
-        }
-
-        @Override
-        public int colorMultiplier(@NotNull ItemStack stack, int tintIndex) {
-            return this.color;
-        }
-    }
-
     @Override
     public void loadComplete() {
         super.loadComplete();
@@ -312,6 +298,20 @@ public class ClientProxy extends CommonProxy {
             }
             case MACHINE_ASSEMBLY_TOOL -> new GuiMachineAssemblyTool(player);
         };
+    }
+
+    @Desugar
+    private record IColor(int color) implements IBlockColor, IItemColor {
+
+        @Override
+        public int colorMultiplier(@NotNull IBlockState state, @org.jetbrains.annotations.Nullable IBlockAccess worldIn, @org.jetbrains.annotations.Nullable BlockPos pos, int tintIndex) {
+            return this.color;
+        }
+
+        @Override
+        public int colorMultiplier(@NotNull ItemStack stack, int tintIndex) {
+            return this.color;
+        }
     }
 
 }

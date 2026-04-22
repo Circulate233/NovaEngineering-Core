@@ -6,7 +6,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
     id("eclipse")
-    id("com.gtnewhorizons.retrofuturagradle") version "1.4.1"
+    id("com.gtnewhorizons.retrofuturagradle") version "2.0.2"
     kotlin("jvm")
 }
 
@@ -231,6 +231,7 @@ dependencies {
     implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:7306619"))
     implementation(rfg.deobf("kasuminova:MMCE-ComponentModelHider:1.1:dev"))
     implementation(rfg.deobf("lumien231:resourceloader:1.5.3:main"))
+    implementation("circulation:circulation_networks-1.12.2:1.0.0:dev")
 //    implementation(rfg.deobf("curse.maven:modularmachinery-community-edition-817377:5255734"))
     implementation(rfg.deobf("curse.maven:extended-crafting-terminals-for-applied-1157825:6503414"))
     implementation(rfg.deobf("curse.maven:lumenized-1234162:6378222"))
@@ -307,7 +308,6 @@ dependencies {
     implementation(rfg.deobf("curse.maven:legendary-tooltips-532127:5734973"))
     implementation(rfg.deobf("curse.maven:betterer-p2p-943734:4928154"))
     implementation(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:6605808"))
-    implementation(rfg.deobf("curse.maven:flux-networks-248020:3178199"))
     implementation(rfg.deobf("curse.maven:loot-overhaul-299389:2711740"))
     implementation(rfg.deobf("curse.maven:BloodMagic-224791:2822288"))
     implementation(rfg.deobf("curse.maven:dme-737252:5985530"))
