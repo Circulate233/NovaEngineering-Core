@@ -42,15 +42,27 @@ import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.IFluidHandlerItem
 import java.util.ArrayDeque
 import java.util.Queue
-import java.util.function.Function
 
 class AssemblyBlockArray : BlockArray {
+
+    enum class PlacementStage {
+        SOLID,
+        FLUID
+    }
+
+    data class QueuedPlacement(
+        val pos: BlockPos,
+        val info: BlockInformation,
+        val stage: PlacementStage
+    )
 
     private data class FluidInventory(val slot: Int, val fluid: IFluidHandlerItem)
 
     companion object {
         private val material =
             Object2ReferenceOpenHashMap<BlockInformation, ObjectArrayList<Tuple<Ingredient, IBlockState>>>()
+        private val placementStages =
+            Object2ReferenceOpenHashMap<BlockInformation, PlacementStage>()
 
         /**
          * MachineAssembly#getFluidHandlerItems(List)
@@ -105,12 +117,59 @@ class AssemblyBlockArray : BlockArray {
                 }
             }
         }
+
+        private fun buildMaterialList(info: BlockInformation): ObjectArrayList<Tuple<Ingredient, IBlockState>> {
+            val resolved = ObjectArrayList<Tuple<Ingredient, IBlockState>>()
+            var fluidOnly = true
+
+            for (stateDescriptor in info.matchingStates) {
+                for (state in stateDescriptor.applicable) {
+                    val block = state.block
+                    val ingredient = if (block is BlockFluidBase) {
+                        Ingredient(FluidStack(block.fluid, 1000))
+                    } else if (block is BlockLiquid) {
+                        val material = state.material
+                        if (material === Material.LAVA) {
+                            Ingredient(FluidStack(FluidRegistry.LAVA, 1000))
+                        } else {
+                            Ingredient(FluidStack(FluidRegistry.WATER, 1000))
+                        }
+                    } else {
+                        fluidOnly = false
+                        Ingredient(StackUtils.getStackFromBlockState(state))
+                    }
+                    if (ingredient.isItem) {
+                        fluidOnly = false
+                    }
+                    resolved.add(Tuple(ingredient, state))
+                }
+            }
+
+            material[info] = resolved
+            placementStages[info] = if (resolved.isNotEmpty() && fluidOnly) {
+                PlacementStage.FLUID
+            } else {
+                PlacementStage.SOLID
+            }
+            return resolved
+        }
+
+        fun getMaterialList(info: BlockInformation): ObjectArrayList<Tuple<Ingredient, IBlockState>> {
+            return material[info] ?: buildMaterialList(info)
+        }
+
+        fun getPlacementStage(info: BlockInformation): PlacementStage {
+            return placementStages[info] ?: run {
+                buildMaterialList(info)
+                placementStages[info] ?: PlacementStage.SOLID
+            }
+        }
     }
 
     var usingAE = false
     var ignoreFluids = false
     var missing = 0
-    private var queue: Queue<BlockPos>? = null
+    private var queue: Queue<QueuedPlacement>? = null
 
     constructor() : super()
 
@@ -134,29 +193,36 @@ class AssemblyBlockArray : BlockArray {
     }
 
     fun start(usingAE: Boolean = true, ignoreFluids: Boolean = true) {
-        queue = ArrayDeque()
-        val l = Function { b: BlockInformation -> ObjectArrayList<Tuple<Ingredient, IBlockState>>() }
-        for (entry in this.pattern.entries) {
-            queue!!.add(entry.key)
-            val info = entry.value
-            if (material.containsKey(info)) continue
-            for (stateDescriptor in info.matchingStates) {
-                for (state in stateDescriptor.applicable) {
-                    val block = state.getBlock()
-                    val ingredient = if (block is BlockFluidBase) {
-                        Ingredient(
-                            FluidStack(block.fluid, 1000)
-                        )
-                    } else if (block is BlockLiquid) {
-                        val material1 = state.getMaterial()
-                        if (material1 === Material.LAVA) {
-                            Ingredient(FluidStack(FluidRegistry.LAVA, 1000))
-                        } else Ingredient(FluidStack(FluidRegistry.WATER, 1000))
-                    } else {
-                        Ingredient(StackUtils.getStackFromBlockState(state))
-                    }
-                    material.computeIfAbsent(info, l).add(Tuple(ingredient, state))
-                }
+        this.usingAE = usingAE
+        this.ignoreFluids = ignoreFluids
+
+        val solidQueue = ArrayDeque<QueuedPlacement>()
+        val fluidQueue = ArrayDeque<QueuedPlacement>()
+        for ((pos, info) in this.pattern.entries) {
+            getMaterialList(info)
+            val stage = getPlacementStage(info)
+            if (ignoreFluids && stage == PlacementStage.FLUID) {
+                continue
+            }
+            val placement = QueuedPlacement(pos, info, stage)
+            if (stage == PlacementStage.FLUID) {
+                fluidQueue.add(placement)
+            } else {
+                solidQueue.add(placement)
+            }
+        }
+
+        queue = ArrayDeque<QueuedPlacement>(solidQueue.size + fluidQueue.size).also {
+            it.addAll(solidQueue)
+            it.addAll(fluidQueue)
+        }
+    }
+
+    private fun pollPlacement(): QueuedPlacement? {
+        while (true) {
+            val next = queue?.poll() ?: return null
+            if (synchronized(pattern) { this.pattern.remove(next.pos) } != null) {
+                return next
             }
         }
     }
@@ -167,10 +233,9 @@ class AssemblyBlockArray : BlockArray {
     }
 
     fun assemblyBlock(world: World, player: EntityPlayerMP): OperatingStatus {
-        val pos = queue!!.poll() ?: return OperatingStatus.COMPLETE
-        val info: BlockInformation = synchronized(pattern) {
-            this.pattern.remove(pos) ?: return OperatingStatus.ALREADY_EXISTS
-        }
+        val placement = pollPlacement() ?: return OperatingStatus.COMPLETE
+        val pos = placement.pos
+        val info = placement.info
 
         if (player.isCreative) {
             placeBlock(player, world, pos, info.sampleState)
@@ -195,7 +260,7 @@ class AssemblyBlockArray : BlockArray {
             }
         }
 
-        val list = material[info] ?: throw RuntimeException("Unknown BlockInformation")
+        val list = getMaterialList(info)
 
         var hasAE = false
         var wobj: WirelessTerminalGuiObject? = null

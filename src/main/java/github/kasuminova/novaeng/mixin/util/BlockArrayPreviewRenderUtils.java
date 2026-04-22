@@ -33,4 +33,8 @@ public interface BlockArrayPreviewRenderUtils {
     EnumFacing getFacing();
 
     void setFacing(EnumFacing facing);
+
+    boolean isForceDetachedPreview();
+
+    void setForceDetachedPreview(boolean forceDetachedPreview);
 }

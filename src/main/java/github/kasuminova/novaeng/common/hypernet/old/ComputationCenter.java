@@ -2,9 +2,9 @@ package github.kasuminova.novaeng.common.hypernet.old;
 
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
+import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.mmce.common.helper.IMachineController;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
-import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
 import github.kasuminova.novaeng.common.hypernet.old.misc.ConnectResult;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import github.kasuminova.novaeng.common.util.RandomUtils;
@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.ComputationCenter")
@@ -40,10 +39,10 @@ public class ComputationCenter {
     private final TileMultiblockMachineController owner;
     private final Map<Class<?>, Map<BlockPos, NetNode>> nodes = new ConcurrentHashMap<>();
 
-    private final ComputationCenterType type;
+    private static final boolean DEBUG_LOG_BUDGET = false;
 
-    // 计算点计数器，计算当前 Tick 总共消耗了多少算力。
-    private final AtomicReference<Double> computationPointCounter = new AtomicReference<>(0D);
+    private final ComputationCenterType type;
+    private TickComputationBudget tickBudget = TickComputationBudget.empty(-1L);
 
     @Getter
     private UUID networkOwner = null;
@@ -96,7 +95,6 @@ public class ComputationCenter {
     public void onWorkingTick() {
         checkNodeConnection();
         consumeCircuitDurability();
-        HyperNetEventHandler.addTickStartAction(this::resetComputationPointCounter);
     }
 
     @ZenMethod
@@ -158,6 +156,7 @@ public class ComputationCenter {
                         TileEntity te = world.getTileEntity(pos);
                         if (!(te instanceof TileMultiblockMachineController)) {
                             nodes.remove(pos);
+                            logBudgetDebug("stale node cleanup", pos);
                         }
                     });
                 }
@@ -204,87 +203,24 @@ public class ComputationCenter {
      * 现：直接返回是否成功
      */
     public boolean consumeComputationPoint(final double required) {
-        if (!isWorking() || type.getMaxComputationPointCarrying() < required || computationPointCounter.get() < required) {
+        double consumed = consumeBudget(required);
+        if (consumed + 0.1D < required) {
+            logBudgetDebug("center consume fail", required, consumed);
             return false;
         }
-
-        final boolean[] successful = {false};
-        computationPointCounter.updateAndGet(counter -> {
-            if (counter < required) {
-                return counter;
-            }
-            successful[0] = true;
-            return counter - required;
-        });
-        if (successful[0]) {
-            double totalGenerated = 0F;
-            calculate:
-            for (Map<BlockPos, NetNode> nodes : nodes.values()) {
-                for (NetNode node : nodes.values()) {
-                    double generated = node.requireComputationPoint(required - totalGenerated, true);
-                    totalGenerated += generated;
-                    if (totalGenerated >= required) {
-                        break calculate;
-                    }
-                }
-            }
-
-            boolean su = totalGenerated + 0.1D >= required;
-            if (su) {
-                double finalTotalGenerated = totalGenerated;
-                computationPointCounter.updateAndGet(counter -> counter + required - finalTotalGenerated);
-            } else {
-                computationPointCounter.updateAndGet(counter -> counter + required);
-            }
-            return su;
-        }
-        return false;
+        logBudgetDebug("center consume success", required, consumed);
+        return true;
     }
 
     /**
      * 计算研究站的额外点数消耗
      */
     public double researchConsumeComputationPoint(final double required) {
-        if (!isWorking() || type.getMaxComputationPointCarrying() < required || computationPointCounter.get() < required) {
-            return 0;
+        double consumed = consumeBudget(required);
+        if (required > consumed && consumed + 0.1D > required) {
+            consumed = required;
         }
-
-        final boolean[] successful = {false};
-        computationPointCounter.updateAndGet(counter -> {
-            if (counter < required) {
-                return counter;
-            }
-            successful[0] = true;
-            return counter - required;
-        });
-
-        final double[] finalTotalGenerated = new double[1];
-        if (successful[0]) {
-            computationPointCounter.updateAndGet(counter -> {
-                double totalGenerated = 0F;
-                for (Map<BlockPos, NetNode> nodes : nodes.values()) {
-                    for (NetNode node : nodes.values()) {
-                        double generated = node.requireComputationPoint(required - totalGenerated, true);
-                        totalGenerated += generated;
-                        if (totalGenerated >= required) {
-                            break;
-                        }
-                    }
-                }
-                return counter + required - (finalTotalGenerated[0] = totalGenerated);
-            });
-        } else {
-            return 0;
-        }
-
-        if (required > finalTotalGenerated[0]) {
-            // 修复精度有概率不准确的问题
-            if (finalTotalGenerated[0] + 0.1D > required) {
-                return required;
-            }
-        }
-
-        return finalTotalGenerated[0];
+        return consumed;
     }
 
     public boolean isWorking() {
@@ -296,7 +232,7 @@ public class ComputationCenter {
     }
 
     public void resetComputationPointCounter() {
-        computationPointCounter.set(type.getMaxComputationPointCarrying());
+        this.tickBudget = TickComputationBudget.empty(getCurrentTick());
     }
 
     @ZenMethod
@@ -356,16 +292,7 @@ public class ComputationCenter {
 
     @ZenGetter("computationPointGeneration")
     public double getComputationPointGeneration() {
-        double maxCarry = type.getMaxComputationPointCarrying();
-        double totalGeneration = 0F;
-        for (Map<BlockPos, NetNode> nodes : nodes.values()) {
-            for (NetNode node : nodes.values()) {
-                double generation = node.getComputationPointProvision(maxCarry);
-                maxCarry -= generation;
-                totalGeneration += generation;
-            }
-        }
-        return totalGeneration;
+        return ensureBudgetForCurrentTick().theoreticalGeneration();
     }
 
     @ZenGetter("computationPointConsumption")
@@ -377,6 +304,161 @@ public class ComputationCenter {
             }
         }
         return sum;
+    }
+
+    @ZenGetter("availableComputationPoint")
+    public double getAvailableComputationPoint() {
+        return ensureBudgetForCurrentTick().available();
+    }
+
+    @ZenGetter("budgetComputationPoint")
+    public double getBudgetComputationPoint() {
+        return ensureBudgetForCurrentTick().budget();
+    }
+
+    protected TickComputationBudget ensureBudgetForCurrentTick() {
+        long tickId = getCurrentTick();
+        TickComputationBudget current = this.tickBudget;
+        if (current.tickId() == tickId) {
+            return current;
+        }
+
+        double theoreticalGeneration = calculateTheoreticalGeneration();
+        double budget = Math.min(type.getMaxComputationPointCarrying(), theoreticalGeneration);
+        TickComputationBudget refreshed = new TickComputationBudget(
+            tickId,
+            theoreticalGeneration,
+            budget,
+            0D,
+            budget
+        );
+        this.tickBudget = refreshed;
+        logBudgetDebug("budget init", tickId, budget, theoreticalGeneration);
+        return refreshed;
+    }
+
+    private double consumeBudget(final double required) {
+        if (!isWorking() || required <= 0D || type.getMaxComputationPointCarrying() < required) {
+            return 0D;
+        }
+
+        TickComputationBudget current = ensureBudgetForCurrentTick();
+        if (current.available() + 0.1D < required) {
+            return 0D;
+        }
+
+        double generated = pullGeneratedComputation(required);
+        if (generated <= 0D) {
+            return 0D;
+        }
+
+        double consumed = Math.min(required, generated);
+        double available = Math.max(0D, current.available() - consumed);
+        this.tickBudget = current.consume(consumed, available);
+        if (generated > consumed) {
+            logBudgetDebug("refund", required, generated - consumed);
+        }
+        return consumed;
+    }
+
+    private double pullGeneratedComputation(final double required) {
+        double totalGenerated = 0D;
+        calculate:
+        for (Map<BlockPos, NetNode> nodeMap : nodes.values()) {
+            for (NetNode node : nodeMap.values()) {
+                double generated = node.requireComputationPoint(required - totalGenerated, true);
+                totalGenerated += generated;
+                if (totalGenerated + 0.1D >= required) {
+                    break calculate;
+                }
+            }
+        }
+        return totalGenerated;
+    }
+
+    private double calculateTheoreticalGeneration() {
+        double maxCarry = type.getMaxComputationPointCarrying();
+        double totalGeneration = 0D;
+        for (Map<BlockPos, NetNode> nodeMap : nodes.values()) {
+            for (NetNode node : nodeMap.values()) {
+                double generation = node.getComputationPointProvision(maxCarry);
+                if (generation <= 0D) {
+                    continue;
+                }
+                maxCarry -= generation;
+                totalGeneration += generation;
+                if (maxCarry <= 0D) {
+                    return totalGeneration;
+                }
+            }
+        }
+        return totalGeneration;
+    }
+
+    private long getCurrentTick() {
+        return owner.getWorld().getTotalWorldTime();
+    }
+
+    private void logBudgetDebug(final String action, final Object... values) {
+        if (!DEBUG_LOG_BUDGET) {
+            return;
+        }
+        StringBuilder builder = new StringBuilder("[HyperNet] ").append(action).append(" @ ").append(owner.getPos());
+        for (Object value : values) {
+            builder.append(' ').append(value);
+        }
+        builder.append(" active=").append(getConnectedMachineryCount());
+        NovaEngineeringCore.log.info(builder.toString());
+    }
+
+    public static final class TickComputationBudget {
+        private final long tickId;
+        private final double theoreticalGeneration;
+        private final double budget;
+        private final double consumed;
+        private final double available;
+
+        private TickComputationBudget(final long tickId,
+                                      final double theoreticalGeneration,
+                                      final double budget,
+                                      final double consumed,
+                                      final double available) {
+            this.tickId = tickId;
+            this.theoreticalGeneration = theoreticalGeneration;
+            this.budget = budget;
+            this.consumed = consumed;
+            this.available = available;
+        }
+
+        private static TickComputationBudget empty(final long tickId) {
+            return new TickComputationBudget(tickId, 0D, 0D, 0D, 0D);
+        }
+
+        private long tickId() {
+            return tickId;
+        }
+
+        private double theoreticalGeneration() {
+            return theoreticalGeneration;
+        }
+
+        private double budget() {
+            return budget;
+        }
+
+        private double available() {
+            return available;
+        }
+
+        private TickComputationBudget consume(final double amount, final double available) {
+            return new TickComputationBudget(
+                tickId,
+                theoreticalGeneration,
+                budget,
+                consumed + amount,
+                available
+            );
+        }
     }
 
 }

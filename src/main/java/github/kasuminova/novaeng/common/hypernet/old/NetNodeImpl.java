@@ -10,19 +10,19 @@ import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchCognitionData;
 import hellfirepvp.modularmachinery.common.machine.RecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraft.nbt.NBTTagCompound;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.NetNodeImpl")
 public class NetNodeImpl extends NetNode {
-    protected final Object2DoubleMap<RecipeThread> recipeConsumers = new Object2DoubleOpenHashMap<>();
-    protected double computationPointConsumption = 0;
+    protected final Map<RecipeThread, Double> recipeConsumers = new ConcurrentHashMap<>();
+    protected volatile double computationPointConsumption = 0;
 
     public NetNodeImpl(final TileMultiblockMachineController owner) {
         super(owner);
@@ -31,17 +31,8 @@ public class NetNodeImpl extends NetNode {
     @Override
     public void onMachineTick() {
         super.onMachineTick();
-        if (this.isWorking()) {
-            if (this.owner.getTicksExisted() % 10 == 0) {
-                double total = 0;
-                for (final double value : this.recipeConsumers.values()) {
-                    total += value;
-                }
-                this.computationPointConsumption = total;
-                this.recipeConsumers.clear();
-            }
-        } else {
-            this.computationPointConsumption = 0;
+        if (!this.isWorking()) {
+            clearRecipeConsumers();
         }
     }
 
@@ -54,17 +45,17 @@ public class NetNodeImpl extends NetNode {
             return;
         }
 
-        double generation = this.center.getComputationPointGeneration() - this.center.getComputationPointConsumption();
-        if (generation < pointRequired) {
+        double available = this.center.getAvailableComputationPoint();
+        if (available < pointRequired) {
             event.setFailed("算力不足！预期："
                 + NovaEngUtils.formatFLOPS(pointRequired) + "，当前："
-                + NovaEngUtils.formatFLOPS(generation));
+                + NovaEngUtils.formatFLOPS(available));
             return;
         }
 
         int currentParallelism = event.getActiveRecipe().getMaxParallelism();
         if (currentParallelism > 1) {
-            int max = (int) Math.min(currentParallelism, generation / pointRequired);
+            int max = (int) Math.min(currentParallelism, available / pointRequired);
             event.getActiveRecipe().setMaxParallelism(max);
         }
     }
@@ -92,11 +83,11 @@ public class NetNodeImpl extends NetNode {
     }
 
     public void onRecipeStart(final RecipeStartEvent event, final double computation) {
-        this.recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
+        updateRecipeConsumer(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
     }
 
     public void onRecipeStart(final FactoryRecipeStartEvent event, final double computation) {
-        this.recipeConsumers.put(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
+        updateRecipeConsumer(event.getRecipeThread(), computation * event.getActiveRecipe().getParallelism());
     }
 
     public void onRecipePreTick(final RecipeTickEvent event, final double computation, final boolean triggerFailure) {
@@ -109,7 +100,7 @@ public class NetNodeImpl extends NetNode {
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();
-        this.recipeConsumers.put(event.getRecipeThread(), required);
+        updateRecipeConsumer(event.getRecipeThread(), required);
 
         if (!this.center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
@@ -133,7 +124,7 @@ public class NetNodeImpl extends NetNode {
             return;
         }
         double required = computation * event.getActiveRecipe().getParallelism();
-        this.recipeConsumers.put(event.getRecipeThread(), required);
+        updateRecipeConsumer(event.getRecipeThread(), required);
 
         if (!this.center.consumeComputationPoint(required)) {
             String failureMessage = "算力不足！预期需求：" +
@@ -148,7 +139,7 @@ public class NetNodeImpl extends NetNode {
     }
 
     public void onRecipeFinished(final RecipeThread thread) {
-        this.recipeConsumers.removeDouble(thread);
+        removeRecipeConsumer(thread);
     }
 
     @Override
@@ -167,5 +158,25 @@ public class NetNodeImpl extends NetNode {
     @Override
     public double getComputationPointConsumption() {
         return this.computationPointConsumption;
+    }
+
+    protected synchronized void updateRecipeConsumer(final RecipeThread thread, final double required) {
+        Double previous = this.recipeConsumers.put(thread, required);
+        if (previous != null) {
+            this.computationPointConsumption -= previous;
+        }
+        this.computationPointConsumption += required;
+    }
+
+    protected synchronized void removeRecipeConsumer(final RecipeThread thread) {
+        Double removed = this.recipeConsumers.remove(thread);
+        if (removed != null) {
+            this.computationPointConsumption -= removed;
+        }
+    }
+
+    protected synchronized void clearRecipeConsumers() {
+        this.recipeConsumers.clear();
+        this.computationPointConsumption = 0D;
     }
 }

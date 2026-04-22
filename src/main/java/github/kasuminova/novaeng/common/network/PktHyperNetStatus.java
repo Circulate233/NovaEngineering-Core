@@ -33,6 +33,8 @@ public class PktHyperNetStatus implements IMessage, IMessageHandler<PktHyperNetS
         statusTag.setString("centerType", center.getType().getTypeName());
         statusTag.setInteger("totalConnected", center.getConnectedMachineryCount());
         statusTag.setDouble("computationPointGeneration", center.getComputationPointGeneration());
+        statusTag.setDouble("budgetComputationPoint", center.getBudgetComputationPoint());
+        statusTag.setDouble("availableComputationPoint", center.getAvailableComputationPoint());
         statusTag.setDouble("computationPointConsumption", center.getComputationPointConsumption());
 
         ByteBufUtils.writeTag(buf, statusTag);
@@ -48,6 +50,8 @@ public class PktHyperNetStatus implements IMessage, IMessageHandler<PktHyperNetS
         if (!statusTag.hasKey("centerType")
             || !statusTag.hasKey("totalConnected")
             || !statusTag.hasKey("computationPointGeneration")
+            || !statusTag.hasKey("budgetComputationPoint")
+            || !statusTag.hasKey("availableComputationPoint")
             || !statusTag.hasKey("computationPointConsumption")) {
             return null;
         }
@@ -55,6 +59,8 @@ public class PktHyperNetStatus implements IMessage, IMessageHandler<PktHyperNetS
         ComputationCenterCache.setType(RegistryHyperNet.getComputationCenterType(statusTag.getString("centerType")));
         ComputationCenterCache.setTotalConnected(statusTag.getInteger("totalConnected"));
         ComputationCenterCache.setComputationPointGeneration(statusTag.getDouble("computationPointGeneration"));
+        ComputationCenterCache.setBudgetComputationPoint(statusTag.getDouble("budgetComputationPoint"));
+        ComputationCenterCache.setAvailableComputationPoint(statusTag.getDouble("availableComputationPoint"));
         ComputationCenterCache.setComputationPointConsumption(statusTag.getDouble("computationPointConsumption"));
         return null;
     }

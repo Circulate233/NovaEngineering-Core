@@ -69,8 +69,9 @@ public class ResearchStation extends NetNode {
         }
 
         double required = Math.min(getComputationLeft(), currentResearching.getMinComputationPointPerTick());
-        if (center.getComputationPointGeneration() < required) {
-            event.setFailed("算力不足！预期：" + NovaEngUtils.formatFLOPS(required) + "，当前：" + NovaEngUtils.formatFLOPS(center.getComputationPointGeneration()));
+        double available = center.getAvailableComputationPoint();
+        if (available < required) {
+            event.setFailed("算力不足！预期：" + NovaEngUtils.formatFLOPS(required) + "，当前：" + NovaEngUtils.formatFLOPS(available));
             return;
         }
 
@@ -106,9 +107,11 @@ public class ResearchStation extends NetNode {
             return;
         }
 
+        consumption = 0D;
         double required = Math.min(getComputationLeft(), currentResearching.getMinComputationPointPerTick());
         double consumed = center.researchConsumeComputationPoint(required);
         if (consumed < required) {
+            consumption = consumed;
             event.preventProgressing("算力不足！预期："
                 + NovaEngUtils.formatFLOPS(required) + "，当前："
                 + NovaEngUtils.formatFLOPS(consumed));
@@ -142,7 +145,7 @@ public class ResearchStation extends NetNode {
 
         completedPoints += consumed;
         double baseConsumption = currentResearching.getMinComputationPointPerTick();
-        consumption = Math.min(baseConsumption, getComputationLeft());
+        consumption = consumed;
 
         final short overclockingValue = (short) Math.max(0, event.getController().getCustomDataTag().getShort("overclocking") - 1);
 
@@ -152,7 +155,7 @@ public class ResearchStation extends NetNode {
         event.getRecipeThread().setStatus(CraftingStatus.SUCCESS).setStatusInfo("研究中...");
 
         HyperNetEventHandler.addTickEndAction(() -> doExtraResearch(Math.min(
-            center.getComputationPointGeneration() - center.getComputationPointConsumption(),
+            center.getAvailableComputationPoint(),
             Math.min(baseConsumption * overclockingValue, getComputationLeft())))
         );
     }
@@ -249,12 +252,13 @@ public class ResearchStation extends NetNode {
         if (data == null) {
             this.completedPoints = 0;
             this.taskProvider = null;
+            this.consumption = 0D;
             writeNBT();
             return;
         }
 
         this.taskProvider = taskProvider.getUniqueID();
-        this.consumption = data.getMinComputationPointPerTick();
+        this.consumption = 0D;
         double progress = center.getNode(Database.class)
                                 .stream()
                                 .map(database -> database.getResearchingData(data))

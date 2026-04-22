@@ -2,7 +2,6 @@ package github.kasuminova.novaeng.mixin.mmce;
 
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
 import github.kasuminova.novaeng.mixin.util.BlockArrayPreviewRenderUtils;
-import github.kasuminova.novaeng.mixin.util.BlockArrayRenderUtils;
 import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper;
 import hellfirepvp.modularmachinery.client.util.BlockArrayRenderHelper;
 import hellfirepvp.modularmachinery.common.block.BlockController;
@@ -14,6 +13,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,42 +50,28 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
     private Vec3i renderHelperOffset;
     @Unique
     private EnumFacing n$facing;
+    @Unique
+    private boolean n$forceDetachedPreview;
 
     @Shadow
     abstract void renderTranslucentBlocks();
 
-    @Shadow
-    protected abstract void updateLayers();
-
-    @Redirect(method = {"hashBlocks", "hasLowerLayer", "updateLayers"}, at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;"))
+    @Redirect(method = {"hashBlocks", "hasLowerLayer", "updateLayers"}, at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;", opcode = Opcodes.GETFIELD))
     public BlockPos isRenderingComplete(BlockArrayPreviewRenderHelper instance) {
         if (this.renderHelper == null) return this.attachedPosition;
-        if ((Object) this instanceof NEWBlockArrayPreviewRenderHelper) {
-            var maxY = ((BlockArrayRenderUtils) this.renderHelper).n$getBlocks().getMax().getY();
-            if (renderedLayer > maxY) {
-                return null;
-            }
+        if ((Object) this == NEWBlockArrayPreviewRenderHelper.INSTANCE && n$forceDetachedPreview) {
+            return null;
         }
         return this.attachedPosition;
     }
 
-    @Redirect(method = "batchBlocks", at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;", ordinal = 1))
+    @Redirect(method = "batchBlocks", at = @At(value = "FIELD", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;attachedPosition:Lnet/minecraft/util/math/BlockPos;", ordinal = 1, opcode = Opcodes.GETFIELD))
     public BlockPos isRenderingCompleteB(BlockArrayPreviewRenderHelper instance) {
         if (this.renderHelper == null) return this.attachedPosition;
-        if ((Object) this instanceof NEWBlockArrayPreviewRenderHelper) {
-            var maxY = ((BlockArrayRenderUtils) this.renderHelper).n$getBlocks().getMax().getY();
-            if (renderedLayer > maxY) {
-                return null;
-            }
+        if ((Object) this == NEWBlockArrayPreviewRenderHelper.INSTANCE && n$forceDetachedPreview) {
+            return null;
         }
         return this.attachedPosition;
-    }
-
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lhellfirepvp/modularmachinery/client/util/BlockArrayPreviewRenderHelper;updateLayers()V"))
-    private void updateLayers(BlockArrayPreviewRenderHelper instance) {
-        if (!((Object) this == NEWBlockArrayPreviewRenderHelper.INSTANCE)) {
-            this.updateLayers();
-        }
     }
 
     @Unique
@@ -98,6 +84,7 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
         if ((Object) this == NEWBlockArrayPreviewRenderHelper.INSTANCE) {
             NEWBlockArrayPreviewRenderHelper.INSTANCE.clear();
             n$facing = null;
+            n$forceDetachedPreview = false;
         }
     }
 
@@ -122,5 +109,15 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
     @Intrinsic
     public void setFacing(EnumFacing facing) {
         n$facing = facing;
+    }
+
+    @Intrinsic
+    public boolean isForceDetachedPreview() {
+        return n$forceDetachedPreview;
+    }
+
+    @Intrinsic
+    public void setForceDetachedPreview(boolean forceDetachedPreview) {
+        n$forceDetachedPreview = forceDetachedPreview;
     }
 }

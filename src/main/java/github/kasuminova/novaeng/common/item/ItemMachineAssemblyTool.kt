@@ -165,10 +165,8 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool"), IConfigurab
                     || !isNeedAllIngredient(stack)
                 ) {
                     array = NEWMachineAssemblyManager.addAssemblyMachine(player, array)
-                    array.usingAE = usingAE
-                    array.ignoreFluids = isIgnoreFluids(stack)
                     array.missing = missing.miss
-                    array.start()
+                    array.start(usingAE, isIgnoreFluids(stack))
                     player.sendMessage(
                         TextComponentTranslation(
                             "message.assembly.tip.already_assembly.start"

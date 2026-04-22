@@ -66,6 +66,11 @@ class NEWMachineAssemblyManager {
             Miss2ListPair(0, ObjectLists.emptyList())
         }
 
+        private data class IngredientStages(
+            val itemIngredients: MutableList<StructureIngredient.ItemIngredient>,
+            val fluidIngredients: MutableList<StructureIngredient.FluidIngredient>
+        )
+
         fun getAllDynamicMachines(): Collection<DynamicMachine> {
             val i = ObjectArrayList<DynamicMachine>()
             for (map in ADDITIONAL_CONSTRUCTORS.values) {
@@ -119,8 +124,9 @@ class NEWMachineAssemblyManager {
             if (player.isCreative) return emptyMiss2ListPair
             val inventory = player.inventory.mainInventory.stream().map { it.copy() }
                 .collect(Collectors.toCollection { ObjectArrayList() })
-            val itemIngredientList = ingredient.itemIngredient()
-            val fluidIngredientList = ingredient.fluidIngredient()
+            val stages = splitIngredientStages(ingredient)
+            val itemIngredientList = stages.itemIngredients
+            val fluidIngredientList = stages.fluidIngredients
             MachineAssembly.searchAndRemoveContainItem(inventory, itemIngredientList)
             AssemblyBlockArray.searchAndRemoveContainFluid(inventory, fluidIngredientList)
             if (itemIngredientList.isEmpty() && fluidIngredientList.isEmpty()) {
@@ -221,6 +227,13 @@ class NEWMachineAssemblyManager {
         }
 
         class Miss2ListPair(val miss: Int, val list: List<List<ItemStack>>)
+
+        private fun splitIngredientStages(ingredient: StructureIngredient): IngredientStages {
+            return IngredientStages(
+                ingredient.itemIngredient(),
+                ingredient.fluidIngredient()
+            )
+        }
 
         private fun getFluidStackIngList(fluidIngredientList: List<StructureIngredient.FluidIngredient>): MutableList<MutableList<FluidStack>> {
             val fluidStackIngList: MutableList<MutableList<FluidStack>> = ObjectArrayList()

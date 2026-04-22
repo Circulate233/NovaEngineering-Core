@@ -253,15 +253,15 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
 
         ResearchCognitionData data = current.data();
         ResearchStationType stationType = PktTerminalGuiData.getResearchStationType();
-        double consumption = ComputationCenterCache.getComputationPointConsumption();
         double generation = ComputationCenterCache.getComputationPointGeneration();
+        double available = ComputationCenterCache.getAvailableComputationPoint();
 
         if (stationType == null || stationType.getMaxTechLevel() < data.getTechLevel()) {
             errorTip.add(I18n.format("gui.terminal_controller.screen.info.start.error.tech_level"));
         }
         if (generation < data.getMinComputationPointPerTick()) {
             errorTip.add(I18n.format("gui.terminal_controller.screen.info.start.error.computation"));
-        } else if ((generation - consumption) < data.getMinComputationPointPerTick()) {
+        } else if (available < data.getMinComputationPointPerTick()) {
             warnTip.add(I18n.format("gui.terminal_controller.screen.info.start.warn.computation"));
         }
         List<ResearchCognitionData> missingDependencies = getMissingResearches(data);
@@ -458,6 +458,17 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         fontRenderer.drawStringWithShadow(
             I18n.format("gui.terminal_controller.status.network.computation_point.info",
                 NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointGeneration())),
+            statusRenderX, statusRenderY, 0xFFFFFF);
+        statusRenderY += 10;
+
+        fontRenderer.drawStringWithShadow(
+            I18n.format("gui.terminal_controller.status.network.computation_point_available"),
+            statusRenderX, statusRenderY, 0xFFFFFF);
+        statusRenderY += 10;
+
+        fontRenderer.drawStringWithShadow(
+            I18n.format("gui.terminal_controller.status.network.computation_point.info",
+                NovaEngUtils.formatFLOPS(ComputationCenterCache.getAvailableComputationPoint())),
             statusRenderX, statusRenderY, 0xFFFFFF);
         statusRenderY += 15;
 
@@ -774,10 +785,9 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
             return false;
         }
 
-//        float consumption = ComputationCenterCache.getComputationPointConsumption();
-//        if ((generation - consumption) < data.getMinComputationPointPerTick()) {
-//            return false;
-//        }
+        if (ComputationCenterCache.getAvailableComputationPoint() < data.getMinComputationPointPerTick()) {
+            return false;
+        }
 
         if (!unlockedData.containsAll(data.getDependencies())) {
             return false;

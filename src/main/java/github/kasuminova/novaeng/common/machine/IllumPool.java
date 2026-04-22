@@ -329,15 +329,21 @@ public class IllumPool implements MachineSpecial {
 
             String catalyst = null;
             Map<String, List<RecipeModifier>> foundModifiers = controller.getFoundModifiers();
-            if (foundModifiers.containsKey(ALCHEMY_CATALYST) && foundModifiers.containsKey(NORMAL_CATALYST)) {
+            boolean hasAlchemy = foundModifiers.containsKey(ALCHEMY_CATALYST);
+            boolean hasConjuration = foundModifiers.containsKey(CONJURATION_CATALYST);
+            boolean hasDimension = foundModifiers.containsKey(DIMENSION_CATALYST);
+            boolean hasStarlight = foundModifiers.containsKey(STARLIGHT_CATALYST);
+            boolean hasNormal = foundModifiers.containsKey(NORMAL_CATALYST);
+
+            if (hasAlchemy && hasNormal && !hasStarlight) {
                 catalyst = ALCHEMY_CATALYST;
-            } else if (foundModifiers.containsKey(CONJURATION_CATALYST) && foundModifiers.containsKey(NORMAL_CATALYST)) {
+            } else if (hasConjuration && hasNormal && !hasStarlight) {
                 catalyst = CONJURATION_CATALYST;
-            } else if (foundModifiers.containsKey(DIMENSION_CATALYST) && foundModifiers.containsKey(NORMAL_CATALYST)) {
+            } else if (hasDimension && hasNormal && !hasStarlight) {
                 catalyst = DIMENSION_CATALYST;
-            } else if (foundModifiers.containsKey(STARLIGHT_CATALYST) && !foundModifiers.containsKey(NORMAL_CATALYST)) {
+            } else if (hasStarlight && !hasNormal && !hasAlchemy && !hasConjuration && !hasDimension) {
                 catalyst = STARLIGHT_CATALYST;
-            } else if (foundModifiers.containsKey(NORMAL_CATALYST) && !foundModifiers.containsKey(STARLIGHT_CATALYST)) {
+            } else if (hasNormal && !hasStarlight) {
                 catalyst = NORMAL_CATALYST;
             }
             if (catalyst != null) {

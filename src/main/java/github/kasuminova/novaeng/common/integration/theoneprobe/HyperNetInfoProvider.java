@@ -219,9 +219,12 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
         double consumption = center.getComputationPointConsumption();
         double generation = center.getComputationPointGeneration();
+        double available = center.getAvailableComputationPoint();
         leftInfo.text("{*top.hypernet.computation_point.total*}");
         rightInfo.text(TextFormatting.AQUA +
             NovaEngUtils.formatFLOPS(consumption) + " / " + NovaEngUtils.formatFLOPS(generation));
+        leftInfo.text("{*top.hypernet.computation_point.available*}");
+        rightInfo.text(TextFormatting.AQUA + NovaEngUtils.formatFLOPS(available));
     }
 
     @Override

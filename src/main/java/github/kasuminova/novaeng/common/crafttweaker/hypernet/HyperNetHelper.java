@@ -79,6 +79,7 @@ public class HyperNetHelper {
                 tips.add(I18n.format(
                     "gui.hypernet.controller.computation_point_consumption.total",
                     NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointConsumption()),
+                    NovaEngUtils.formatFLOPS(ComputationCenterCache.getAvailableComputationPoint()),
                     NovaEngUtils.formatFLOPS(ComputationCenterCache.getComputationPointGeneration()))
                 );
                 if (node.isWorking()) {

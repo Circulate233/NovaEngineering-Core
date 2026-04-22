@@ -5,7 +5,6 @@ import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
 import github.kasuminova.mmce.common.helper.IDynamicPatternInfo;
 import github.kasuminova.mmce.common.util.concurrent.Queues;
-import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
 import github.kasuminova.novaeng.common.hypernet.old.upgrade.ProcessorModuleCPU;
 import github.kasuminova.novaeng.common.hypernet.old.upgrade.ProcessorModuleRAM;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -21,12 +20,12 @@ import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
 import stanhebben.zenscript.annotations.ZenSetter;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,13 +38,15 @@ public class DataProcessor extends NetNode {
     private final Queue<Double> recentCalculation = Queues.createConcurrentQueue();
 
     private final DataProcessorType type;
-    private final LinkedList<Double> computationalLoadHistory = new LinkedList<>();
+    private final Deque<Double> computationalLoadHistory = new ArrayDeque<>();
 
     private final List<ProcessorModuleCPU> moduleCPUS = new CopyOnWriteArrayList<>();
     private final List<ProcessorModuleRAM> moduleRAMS = new CopyOnWriteArrayList<>();
-    private final AtomicReference<Double> generated = new AtomicReference<>(0D);
     private volatile int dynamicPatternSize = 0;
     private volatile double maxGeneration = 0;
+    private volatile long lastProvisionTick = Long.MIN_VALUE;
+    private volatile double availableGeneratedThisTick = 0D;
+    private volatile double generatedThisTick = 0D;
     private int storedHU = 0;
     private boolean overheat = false;
     private double computationalLoadHistoryCache = 0;
@@ -158,7 +159,9 @@ public class DataProcessor extends NetNode {
         super.onMachineTick();
 
         if (!this.isWorking()) {
-            this.generated.set(0D);
+            this.availableGeneratedThisTick = 0D;
+            this.generatedThisTick = 0D;
+            this.lastProvisionTick = Long.MIN_VALUE;
             this.computationalLoad = 0F;
             this.computationalLoadHistoryCache = 0F;
             this.computationalLoadHistory.clear();
@@ -176,7 +179,6 @@ public class DataProcessor extends NetNode {
             }
 
             this.computationalLoad = this.computationalLoadHistoryCache / this.computationalLoadHistory.size();
-            HyperNetEventHandler.addTickStartAction(() -> this.generated.set(this.maxGeneration));
         }
 
         if (this.owner.getTicksExisted() % 20 == 0) {
@@ -239,27 +241,19 @@ public class DataProcessor extends NetNode {
             return 0F;
         }
 
-        double[] polledCounter = {0};
-        this.generated.updateAndGet(generated -> {
-            if (generated < maxGeneration) {
-                polledCounter[0] = generated;
-                return 0D;
-            }
-
-            polledCounter[0] = maxGeneration;
-            return generated - maxGeneration;
-        });
-
-        if (polledCounter[0] <= 0) {
+        ensureProvisionForCurrentTick();
+        double polledCounter = Math.min(this.availableGeneratedThisTick, maxGeneration);
+        if (polledCounter <= 0D) {
             return 0F;
         }
+        this.availableGeneratedThisTick -= polledCounter;
 
-        double maxCanGenerated = polledCounter[0];
-        double generated = this.calculateComputationPointProvision(maxCanGenerated, doCalculate) * this.getEfficiency();
+        double generated = this.calculateComputationPointProvision(polledCounter, doCalculate) * this.getEfficiency();
 
         if (doCalculate) {
             this.doHeatGeneration(generated);
-            this.generated.updateAndGet(counter -> counter + (maxCanGenerated - generated));
+            this.generatedThisTick += generated;
+            this.availableGeneratedThisTick += (polledCounter - generated);
         }
 
         return generated;
@@ -345,6 +339,16 @@ public class DataProcessor extends NetNode {
         }
 
         return totalGenerated;
+    }
+
+    private void ensureProvisionForCurrentTick() {
+        long tickId = this.owner.getWorld().getTotalWorldTime();
+        if (this.lastProvisionTick == tickId) {
+            return;
+        }
+        this.lastProvisionTick = tickId;
+        this.availableGeneratedThisTick = this.maxGeneration;
+        this.generatedThisTick = 0D;
     }
 
     @Override

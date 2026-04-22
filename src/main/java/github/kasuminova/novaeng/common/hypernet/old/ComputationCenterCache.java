@@ -10,6 +10,8 @@ public class ComputationCenterCache {
     private static volatile ComputationCenterType type = null;
     private static volatile int totalConnected = 0;
     private static volatile double computationPointGeneration = 0;
+    private static volatile double budgetComputationPoint = 0;
+    private static volatile double availableComputationPoint = 0;
     private static volatile double computationPointConsumption = 0;
 
     @ZenMethod
@@ -37,6 +39,24 @@ public class ComputationCenterCache {
 
     public static void setComputationPointGeneration(final double computationPointGeneration) {
         ComputationCenterCache.computationPointGeneration = computationPointGeneration;
+    }
+
+    @ZenMethod
+    public static double getBudgetComputationPoint() {
+        return budgetComputationPoint;
+    }
+
+    public static void setBudgetComputationPoint(final double budgetComputationPoint) {
+        ComputationCenterCache.budgetComputationPoint = budgetComputationPoint;
+    }
+
+    @ZenMethod
+    public static double getAvailableComputationPoint() {
+        return availableComputationPoint;
+    }
+
+    public static void setAvailableComputationPoint(final double availableComputationPoint) {
+        ComputationCenterCache.availableComputationPoint = availableComputationPoint;
     }
 
     @ZenMethod
