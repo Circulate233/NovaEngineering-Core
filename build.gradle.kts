@@ -215,7 +215,7 @@ dependencies {
 
     // Mixins
 //    implementation("zone.rong:mixinbooter:7.1")
-    val mixin: String = modUtils.enableMixins("zone.rong:mixinbooter:9.3", "mixins.novaeng_core.refmap.json").toString()
+    val mixin: String = modUtils.enableMixins("zone.rong:mixinbooter:10.7", "mixins.novaeng_core.refmap.json").toString()
     api(mixin) {
         isTransitive = false
     }
@@ -268,7 +268,7 @@ dependencies {
 //    implementation(rfg.deobf("curse.maven:tx-loader-706505:4515357"))
     implementation(rfg.deobf("curse.maven:CodeChickenLib-242818:2779848"))
     implementation(rfg.deobf("curse.maven:wanionlib-253043:4623135"))
-    implementation(rfg.deobf("curse.maven:avaritia-1-1x-unofficial-1165010:6207893"))
+    implementation(rfg.deobf("curse.maven:avaritia-1-1x-unofficial-1165010:7939693"))
     implementation(rfg.deobf("curse.maven:eternal-singularity-253077:2922583"))
     compileOnly(rfg.deobf("curse.maven:optifine-check-626981:3806565"))
     compileOnly(rfg.deobf("curse.maven:nuclearcraft-overhauled-336895:3862197"))

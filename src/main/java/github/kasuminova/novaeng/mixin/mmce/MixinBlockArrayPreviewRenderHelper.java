@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
 import github.kasuminova.novaeng.mixin.util.BlockArrayPreviewRenderUtils;
 import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper;
@@ -8,8 +11,6 @@ import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -88,17 +89,22 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
         }
     }
 
-    @Redirect(method = "batchBlocks", at = @At(value = "CONSTANT", args = "classValue=hellfirepvp/modularmachinery/common/block/BlockController"))
-    public boolean isFacing(Object instance, Class<?> type) {
-        return n$facing != null || instance instanceof BlockController;
+    @Definition(id = "BlockController", type = BlockController.class)
+    @Expression("? instanceof BlockController")
+    @ModifyExpressionValue(method = "batchBlocks", at = @At("MIXINEXTRAS:EXPRESSION"), remap = false)
+    private boolean n$matchControllerPreview(final boolean original) {
+        return n$facing != null || original;
     }
 
-    @Redirect(method = "batchBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;", remap = true))
-    public <T extends Comparable<T>> T setBlockFacing(IBlockState instance, IProperty<T> tiProperty) {
-        if (n$facing != null && tiProperty == BlockController.FACING) {
+    @Definition(id = "getValue", method = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;")
+    @Definition(id = "FACING", field = "Lhellfirepvp/modularmachinery/common/block/BlockController;FACING:Lnet/minecraft/block/properties/PropertyEnum;", remap = false)
+    @Expression("?.getValue(FACING)")
+    @ModifyExpressionValue(method = "batchBlocks", at = @At("MIXINEXTRAS:EXPRESSION"), remap = false)
+    private <T extends Comparable<T>> T n$setPreviewFacing(final T original) {
+        if (n$facing != null) {
             return (T) n$facing;
         }
-        return instance.getValue(tiProperty);
+        return original;
     }
 
     @Intrinsic

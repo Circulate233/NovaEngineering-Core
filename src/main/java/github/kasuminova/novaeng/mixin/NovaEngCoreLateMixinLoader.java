@@ -42,7 +42,6 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_techguns.json", "techguns");
         addModdedMixinCFG("mixins.novaeng_core_codechickenlib.json", "codechickenlib");
         addModdedMixinCFG("mixins.novaeng_core_legendarytooltips.json", "legendarytooltips");
-        addModdedMixinCFG("mixins.novaeng_core_avaritia.json", "avaritia");
         addModdedMixinCFG("mixins.novaeng_core_betterp2p.json", "betterp2p");
         addModdedMixinCFG("mixins.novaeng_core_nco.json", "nuclearcraft");
         addModdedMixinCFG("mixins.novaeng_core_lootoverhaul.json", "lootoverhaul");
@@ -50,7 +49,6 @@ public class NovaEngCoreLateMixinLoader implements ILateMixinLoader {
         addModdedMixinCFG("mixins.novaeng_core_packagedauto.json", "packagedauto");
         addModdedMixinCFG("mixins.novaeng_core_rftools.json", "rftools");
         addModdedMixinCFG("mixins.novaeng_core_advancedrocketry.json", "advancedrocketry");
-        addModdedMixinCFG("mixins.novaeng_core_aroma1997core.json", "aroma1997core");
         addModdedMixinCFG("mixins.novaeng_core_enderio.json", "enderio");
 
         addMixinCFG("mixins.novaeng_core_botania_r.json", () -> {

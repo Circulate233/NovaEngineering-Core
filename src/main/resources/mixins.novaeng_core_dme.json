@@ -3,6 +3,9 @@
     "refmap": "mixins.novaeng_core.refmap.json",
     "target": "@env(DEFAULT)",
     "minVersion": "0.8",
+    "mixinextras": {
+        "minVersion": "0.5.0"
+    },
     "compatibilityLevel": "JAVA_8",
     "mixins": [
         "MixinMetadataManager"
