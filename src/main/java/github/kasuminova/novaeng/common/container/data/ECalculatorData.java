@@ -5,7 +5,6 @@ import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.me.GridAccessException;
 import appeng.util.item.AEItemStack;
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Desugar
 public record ECalculatorData(long totalStorage, long usedExtraStorage, int accelerators,
                               List<ThreadCoreData> threadCores, List<ECPUData> ecpuList, int cpuUsagePerSecond) {
 
@@ -125,12 +123,10 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         buf.writeInt(cpuUsagePerSecond);
     }
 
-    @Desugar
     public record ECPUData(IAEItemStack crafting, long usedMemory, long usedExtraMemory, int parallelismPreSecond,
                            int cpuUsagePerSecond) {
     }
 
-    @Desugar
     public record ThreadCoreData(Levels type, int threads, int hyperThreads, int maxThreads, int maxHyperThreads) {
     }
 

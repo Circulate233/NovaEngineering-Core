@@ -30,6 +30,10 @@ open class ContainerModularServerAssembler(owner: TileModularServerAssembler, pr
         this.owner!!.addContainer(this)
     }
 
+    override fun canInteractWith(playerIn: EntityPlayer): Boolean {
+        return true
+    }
+
     override fun onContainerClosed(@Nonnull playerIn: EntityPlayer) {
         super.onContainerClosed(playerIn)
         this.owner!!.removeContainer(this)

@@ -10,6 +10,14 @@ class GuiMachineAssemblyTool(player: EntityPlayer) : GuiConfigureTool(
     GuiToolConfig(player), player, player.getHeldItem(EnumHand.MAIN_HAND),
     PlayerSlot(player.inventory.currentItem, PlayerSlot.EnumInvCategory.MAIN)
 ) {
+    override fun setEntryValue(id: Int, value: Boolean) {
+    }
+
+    override fun setEntryValue(id: Int, value: Float) {
+    }
+
+    override fun setEntryValue(id: Int, value: String) {
+    }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {

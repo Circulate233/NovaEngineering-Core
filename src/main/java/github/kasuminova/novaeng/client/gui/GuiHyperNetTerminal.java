@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.client.gui;
 
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.misc.TechLevelText;
 import github.kasuminova.novaeng.client.gui.widget.GuiScrollbarThin;
@@ -874,7 +873,6 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    @Desugar
     public record ResearchDataContext(ResearchCognitionData data, boolean locked, boolean available, double progress) {
         @Override
         public int hashCode() {

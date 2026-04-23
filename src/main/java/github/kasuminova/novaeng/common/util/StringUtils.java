@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.util;
 
-import com.github.bsideup.jabel.Desugar;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -136,7 +135,6 @@ public class StringUtils {
         return new String(buffer, 0, index);
     }
 
-    @Desugar
     public record MatchResult(String str, int matchRate) implements Comparable<MatchResult> {
 
         @Override

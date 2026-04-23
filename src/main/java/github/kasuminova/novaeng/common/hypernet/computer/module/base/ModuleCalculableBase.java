@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module.base;
 
-import com.github.bsideup.jabel.Desugar;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.hypernet.calculation.Calculable;
@@ -55,7 +54,6 @@ public abstract class ModuleCalculableBase<T extends ServerModule & Calculable> 
         return tooltip;
     }
 
-    @Desugar
     record EfficiencyTip(double efficiency, String tip) implements Comparable<EfficiencyTip> {
         @Override
         public int compareTo(final EfficiencyTip efficiencyTip) {

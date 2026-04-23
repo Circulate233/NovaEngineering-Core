@@ -220,7 +220,7 @@ object SpaceGenerator : MachineSpecial {
                             orename,
                             ctrl,
                             item,
-                            singularitys[singularityname]!!
+                            singularitys.getLong(singularityname)
                         )
                     }
             }

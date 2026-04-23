@@ -10,6 +10,10 @@ open class ContainerSingularityCore(owner: SingularityCore?, opening: EntityPlay
 
     protected var tickExisted: Int = 0
 
+    override fun canInteractWith(playerIn: EntityPlayer): Boolean {
+        return true
+    }
+
     override fun addPlayerSlots(opening: EntityPlayer) {
         for (i in 0..2) {
             for (j in 0..8) {

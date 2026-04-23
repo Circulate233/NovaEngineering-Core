@@ -4,7 +4,6 @@ import com.circulation.circulation_networks.api.API;
 import com.circulation.circulation_networks.api.node.NodeType;
 import com.circulation.circulation_networks.blocks.nodes.BaseNodeBlock;
 import com.circulation.circulation_networks.tooltip.LocalizedComponent;
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
@@ -59,7 +58,6 @@ public class BlockDreamEnergyPort extends BaseNodeBlock {
         return EnumBlockRenderType.MODEL;
     }
 
-    @Desugar
     private record DreamNodeType(String id, Class<TileDreamEnergyPort.DreamNode> nodeClass,
                                  boolean allowsPocketNode) implements NodeType<TileDreamEnergyPort.DreamNode> {
 

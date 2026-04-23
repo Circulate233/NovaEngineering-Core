@@ -1,25 +1,43 @@
-name: Build mod
+name: Build
 
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  push:
+    branches: [ '**' ]
+    tags-ignore: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   build:
-    name: Build mod
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '8'
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew -Pnet.minecraftforge.gradle.disableUpdateChecker=true build
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: NovaEngineering-Core
-        path: build/libs
+      - uses: actions/checkout@v6
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build
+
+      - name: Read mod version
+        id: props
+        run: |
+          version=$(grep -E '^mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          echo "mod_version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ github.event.repository.name }}-${{ steps.props.outputs.mod_version }}
+          path: build/libs/*.jar
+          if-no-files-found: error

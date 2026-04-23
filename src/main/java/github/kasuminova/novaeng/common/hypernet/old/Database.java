@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.hypernet.old;
 
-import com.github.bsideup.jabel.Desugar;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.event.recipe.FactoryRecipeTickEvent;
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchCognitionData;
@@ -213,7 +212,6 @@ public class Database extends NetNode {
         return new Status(type, storedResearchCognition.size(), researchingCognition.size());
     }
 
-    @Desugar
     public record Status(DatabaseType type, int storedCognition, int researchingCognition) {
 
         public static Status readFromNBT(final NBTTagCompound tag) {

@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.util;
 
-import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -61,7 +60,6 @@ public class MachineCoolants {
         return coolants.get(fluid);
     }
 
-    @Desugar
     public record Coolant(FluidStack input, @Nullable FluidStack output, int coolantUnit) {
 
         public int maxCanConsume(final IFluidHandler inputHandler, final IFluidHandler outputHandler) {

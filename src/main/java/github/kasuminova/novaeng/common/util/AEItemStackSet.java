@@ -2,7 +2,6 @@ package github.kasuminova.novaeng.common.util;
 
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.item.AEItemStack;
-import com.github.bsideup.jabel.Desugar;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -52,7 +51,6 @@ public class AEItemStackSet {
         }
     }
 
-    @Desugar
     private record Entry(IAEItemStack stack, int id) {
 
         @Override

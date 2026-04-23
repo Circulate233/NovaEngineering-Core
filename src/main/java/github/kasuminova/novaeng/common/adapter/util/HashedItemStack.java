@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.adapter.util;
 
-import com.github.bsideup.jabel.Desugar;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,7 +9,6 @@ import javax.annotation.Nonnull;
 import java.util.Base64;
 import java.util.Objects;
 
-@Desugar
 public record HashedItemStack(ItemStack stack, int stackHashCode, boolean hasTag) {
 
     public static HashedItemStack ofTag(final ItemStack stack) {

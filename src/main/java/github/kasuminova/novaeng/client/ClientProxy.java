@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.client;
 import appeng.api.features.IWirelessTermHandler;
 import appeng.helpers.WirelessTerminalGuiObject;
 import baubles.api.BaublesApi;
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
@@ -300,7 +299,6 @@ public class ClientProxy extends CommonProxy {
         };
     }
 
-    @Desugar
     private record IColor(int color) implements IBlockColor, IItemColor {
 
         @Override

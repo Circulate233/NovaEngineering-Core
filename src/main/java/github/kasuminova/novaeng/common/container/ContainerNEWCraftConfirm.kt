@@ -12,6 +12,9 @@ import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.entity.player.InventoryPlayer
 
 class ContainerNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : ContainerCraftConfirm(ip, te) {
+    override fun canInteractWith(playerIn: net.minecraft.entity.player.EntityPlayer): Boolean {
+        return true
+    }
 
     override fun startJob() {
         @Suppress("USELESS_IS_CHECK")

@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.container.data;
 
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.Levels;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@Desugar
 public record EFabricatorData(int length, boolean overclocked, boolean activeCooling,
                               int maxParallelism,
                               int coolant, int maxCoolant, int hotCoolant, int maxHotCoolant,
@@ -55,7 +53,6 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
         });
     }
 
-    @Desugar
     public record WorkerStatus(ItemStack crafting, int queueLength) {
     }
 

@@ -7,6 +7,10 @@ import net.minecraft.inventory.Slot
 
 open class ContainerEFabricatorPatternSearch(owner: EFabricatorController?, opening: EntityPlayer?) :
     ContainerBase<EFabricatorController?>(owner, opening) {
+    override fun canInteractWith(playerIn: EntityPlayer): Boolean {
+        return true
+    }
+
     override fun addPlayerSlots(opening: EntityPlayer) {
         for (i in 0..2) {
             for (j in 0..8) {

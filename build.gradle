@@ -1,0 +1,336 @@
+import org.jetbrains.gradle.ext.Gradle
+
+buildscript {
+    ext.kotlin_version = '2.3.21'
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.wagyourtail.xyz/releases' }
+        maven { url = 'https://maven.wagyourtail.xyz/snapshots' }
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.outlands.top/releases' }
+        gradlePluginPortal()
+    }
+    configurations.classpath.resolutionStrategy {
+        // unimined 1.4.16-kappa's tiny-remapper requires KmFunction.getContextParameters()
+        // from kotlin-metadata-jvm 2.3.20 (POM-declared version). The Kotlin compiler plugin
+        // (2.1.20) otherwise pulls in an older metadata lib on the same classpath and wins
+        // conflict resolution. Load unimined via the classic buildscript so force applies.
+        force 'org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.20'
+    }
+    dependencies {
+        classpath 'xyz.wagyourtail.unimined:unimined:1.4.16-kappa'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
+    id 'com.gradleup.shadow' version '9.4.0'
+    id 'com.diffplug.spotless' version '8.4.0'
+}
+
+apply plugin: 'xyz.wagyourtail.unimined'
+apply plugin: 'kotlin'
+
+apply from: 'gradle/scripts/helpers.gradle'
+
+assertProperty 'mod_version'
+assertProperty 'root_package'
+assertProperty 'mod_id'
+assertProperty 'mod_name'
+
+assertSubProperties 'use_lombok_ap', 'lombok_version'
+assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
+assertSubProperties 'use_access_transformer', 'access_transformer_locations'
+assertSubProperties 'use_asset_mover', 'asset_mover_version'
+
+setDefaultProperty 'generate_sources_jar', true, true
+setDefaultProperty 'generate_javadocs_jar', true, false
+setDefaultProperty 'minecraft_username', true, 'Kasumi_Nova'
+setDefaultProperty 'extra_jvm_args', false, ''
+setDefaultProperty 'enable_junit_testing', false, false
+setDefaultProperty 'show_testing_output', false, false
+setDefaultProperty 'enable_shadow', false, false
+setDefaultProperty 'enable_lwjglx', false, true
+setDefaultProperty 'enable_foundation_debug', false, false
+
+version = propertyString('mod_version')
+group = propertyString('root_package')
+
+base {
+    archivesName = 'NovaEngineering-Core'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    if (propertyBool('generate_sources_jar')) {
+        withSourcesJar()
+    }
+    if (propertyBool('generate_javadocs_jar')) {
+        withJavadocJar()
+    }
+}
+
+configurations {
+    contain
+    implementation.extendsFrom(contain)
+    modCompileOnly
+    compileOnly.extendsFrom(modCompileOnly)
+}
+
+def generatedTagsDir = layout.buildDirectory.dir('generated/sources/tags/main/java')
+
+def generateTags = tasks.register('generateTags') {
+    outputs.dir(generatedTagsDir)
+    inputs.property('packageName', propertyString('root_package'))
+    inputs.property('modVersion', version.toString())
+    doLast {
+        def packageName = propertyString('root_package')
+        def outputFile = generatedTagsDir.get().file("${packageName.replace('.', '/')}/Tags.java").asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.text = """package ${packageName};
+
+public final class Tags {
+    public static final String VERSION = "${version}";
+
+    private Tags() {
+    }
+}
+"""
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java', 'src/api/java']
+        java.srcDir generateTags
+        resources.srcDirs = ['src/main/resources']
+    }
+}
+
+def mixinConfigFiles = fileTree('src/main/resources') {
+    include 'mixins.novaeng_core*.json'
+}.files.collect { it.name }.sort()
+
+String remapTaskName = propertyBool('enable_shadow') ? 'remapShadowJar' : 'remapJar'
+
+unimined.minecraft {
+    version '1.12.2'
+
+    mappings {
+        mcp('stable', '39-1.12')
+    }
+
+    cleanroom {
+        if (propertyBool('use_access_transformer')) {
+            accessTransformer "${rootProject.projectDir}/src/main/resources/${propertyString('access_transformer_locations')}"
+        }
+        loader '0.5.6-alpha'
+        runs.auth.username = minecraft_username
+        runs.all {
+            systemProperty('crl.dev.mixin', mixinConfigFiles.join(','))
+            def extraArgs = propertyString('extra_jvm_args')
+            if (extraArgs != null && !extraArgs.trim().isEmpty()) {
+                jvmArgs += extraArgs.split(/\s+/).toList()
+            }
+            if (propertyBool('enable_foundation_debug')) {
+                systemProperty('foundation.dump', 'true')
+                systemProperty('foundation.verbose', 'true')
+            }
+            if (propertyBool('is_coremod')) {
+                systemProperty('fml.coreMods.load', propertyString('coremod_plugin_class_name'))
+            }
+        }
+    }
+
+    defaultRemapJar = false
+
+    String jarTaskName = propertyBool('enable_shadow') ? 'shadowJar' : 'jar'
+
+    remap(tasks.named(jarTaskName).get()) {
+        mixinRemap {
+            enableBaseMixin()
+            enableMixinExtra()
+            disableRefmap()
+        }
+    }
+
+    mods {
+        remap(configurations.modCompileOnly)
+    }
+}
+
+dependencies {
+    if (propertyBool('use_lombok_ap')) {
+        compileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
+        annotationProcessor "org.projectlombok:lombok:${propertyString('lombok_version')}"
+        testCompileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
+        testAnnotationProcessor "org.projectlombok:lombok:${propertyString('lombok_version')}"
+    }
+    if (propertyBool('use_asset_mover')) {
+        implementation "com.cleanroommc:assetmover:${propertyString('asset_mover_version')}"
+    }
+    if (propertyBool('enable_junit_testing')) {
+        testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+
+apply from: 'gradle/scripts/dependencies.gradle'
+
+processResources {
+    inputs.property('version', version.toString())
+    inputs.property('mcversion', '1.12.2')
+    filesMatching('mcmod.info') {
+        expand(
+                version: version.toString(),
+                mcversion: '1.12.2'
+        )
+    }
+    if (propertyBool('use_access_transformer')) {
+        rename '(.+_at.cfg)', 'META-INF/$1'
+    }
+}
+
+if (!propertyBool('enable_shadow')) {
+    shadowJar.enabled = false
+}
+
+compileJava {
+    dependsOn generateTags
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
+    options.release = 25
+}
+
+compileTestJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
+    options.release = 25
+}
+
+tasks.withType(JavaCompile).configureEach {
+    dependsOn generateTags
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('compileKotlin') {
+    dependsOn generateTags
+}
+
+javadoc {
+    enabled = false
+}
+
+jar {
+    archiveClassifier = 'dev'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    if (configurations.contain.size() > 0) {
+        into('/') {
+            from configurations.contain
+        }
+    }
+    doFirst {
+        manifest {
+            def attributeMap = [
+                    'ModType'     : 'CRL',
+                    'MixinConfigs': mixinConfigFiles.join(',')
+            ]
+            if (configurations.contain.size() > 0) {
+                attributeMap['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
+                attributeMap['NonModDeps'] = true
+            }
+            if (propertyBool('is_coremod')) {
+                attributeMap['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
+                if (propertyBool('coremod_includes_mod')) {
+                    attributeMap['FMLCorePluginContainsFMLMod'] = true
+                }
+            }
+            if (propertyBool('use_access_transformer')) {
+                attributeMap['FMLAT'] = propertyString('access_transformer_locations')
+            }
+            attributes(attributeMap)
+        }
+    }
+    finalizedBy(tasks.named(remapTaskName).get())
+}
+
+tasks.named('sourcesJar') {
+    dependsOn generateTags
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    archiveClassifier = 'shadow'
+}
+
+tasks.named(remapTaskName).configure {
+    doFirst {
+        logging.captureStandardOutput LogLevel.INFO
+    }
+    doLast {
+        logging.captureStandardOutput LogLevel.QUIET
+    }
+}
+
+idea {
+    module {
+        inheritOutputDirs = true
+        excludeDirs += file('run')
+        excludeDirs += file('lib')
+        excludeDirs += file('logs')
+    }
+    project {
+        settings {
+            runConfigurations {
+                '0. Apply Spotless'(Gradle) {
+                    taskNames = ['spotlessApply']
+                }
+                '1. Run Client'(Gradle) {
+                    taskNames = ['runClient']
+                }
+                '2. Run Server'(Gradle) {
+                    taskNames = ['runServer']
+                }
+                '3. Build Mod'(Gradle) {
+                    taskNames = ['build']
+                }
+            }
+            compiler.javac {
+                afterEvaluate {
+                    javacAdditionalOptions = '-encoding utf8'
+                    moduleJavacAdditionalOptions = [
+                            (project.name + '.main'): tasks.compileJava.options.compilerArgs.collect { '"' + it + '"' }.join(' ')
+                    ]
+                }
+            }
+        }
+    }
+}
+
+test {
+    enabled = propertyBool('enable_junit_testing')
+    if (propertyBool('enable_junit_testing')) {
+        useJUnitPlatform()
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(25)
+        })
+        if (propertyBool('show_testing_output')) {
+            testLogging {
+                showStandardStreams = true
+            }
+        }
+    }
+}
+
+apply from: 'gradle/scripts/publishing.gradle'
+apply from: 'gradle/scripts/extra.gradle'
+repositories {
+    mavenCentral()
+}

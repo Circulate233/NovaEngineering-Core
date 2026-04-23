@@ -1,13 +1,11 @@
 package github.kasuminova.novaeng.common.util;
 
-import com.github.bsideup.jabel.Desugar;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.Objects;
 
-@Desugar
 public record WorldPos(World world, BlockPos pos, int hash) {
 
     public static WorldPos of(final World world, final BlockPos pos) {

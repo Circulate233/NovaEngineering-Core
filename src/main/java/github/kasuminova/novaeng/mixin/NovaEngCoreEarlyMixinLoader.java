@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.mixin;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import zone.rong.mixinbooter.IEarlyMixinLoader;
 
 import javax.annotation.Nullable;
 import javax.swing.JOptionPane;
@@ -15,14 +13,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("unused")
-public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMixinLoader {
+public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin {
     public static final Logger LOG = LogManager.getLogger("NOVAENG_CORE_PRE");
     public static final String LOG_PREFIX = "[NOVAENG_CORE_PRE]" + ' ';
     private static final String RESOURCE_BUNDLE = "messages";
@@ -48,7 +44,6 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         }
 
         boolean detected = false;
-        List<String> lines = new ObjectArrayList<>();
         try {
             String queryCmd = "tasklist.exe" + " /FO csv /FI \"STATUS eq RUNNING\" | findstr /R /C:\"Plain Craft Launcher 2\"";
             String cmd = "cmd";
@@ -168,14 +163,6 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin, IEarlyMix
         } catch (ClassNotFoundException e) {
             return false;
         }
-    }
-
-    @Override
-    public List<String> getMixinConfigs() {
-        return Arrays.asList(
-            "mixins.novaeng_core_vanilla.json",
-            "mixins.novaeng_core.json"
-        );
     }
 
     // Noop

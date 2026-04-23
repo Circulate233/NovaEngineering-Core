@@ -5,4 +5,8 @@ import hellfirepvp.modularmachinery.common.container.ContainerBase
 import net.minecraft.entity.player.EntityPlayer
 
 class ContainerModularServerFrame(owner: TileModularServerFrame?, opening: EntityPlayer?) :
-    ContainerBase<TileModularServerFrame?>(owner, opening)
+    ContainerBase<TileModularServerFrame?>(owner, opening) {
+    override fun canInteractWith(playerIn: EntityPlayer): Boolean {
+        return true
+    }
+}

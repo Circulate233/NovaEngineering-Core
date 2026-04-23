@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.util;
 
-import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMaps;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-@Desugar
 public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
 
     public static final SimpleItem empty = new SimpleItem(ItemStack.EMPTY);

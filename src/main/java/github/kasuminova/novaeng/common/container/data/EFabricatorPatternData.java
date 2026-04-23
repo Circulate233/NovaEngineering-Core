@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common.container.data;
 
 import appeng.tile.inventory.AppEngInternalInventory;
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.util.BlockPos2ValueMap;
@@ -15,7 +14,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-@Desugar
 public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
 
     public static EFabricatorPatternData ofFull(final EFabricatorController efController) {
@@ -67,7 +65,6 @@ public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
         });
     }
 
-    @Desugar
     public record PatternData(BlockPos pos, int slot, ItemStack pattern) {
     }
 

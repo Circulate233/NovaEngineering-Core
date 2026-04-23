@@ -4,7 +4,6 @@ import appeng.api.storage.ICellInventory;
 import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.tile.inventory.AppEngCellInventory;
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageType;
 import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
@@ -13,7 +12,6 @@ import github.kasuminova.novaeng.common.item.estorage.EStorageCell;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import net.minecraft.item.ItemStack;
 
-@Desugar
 public record EStorageCellData(DriveStorageType type, DriveStorageLevel level, int usedTypes, long usedBytes) {
 
     public static EStorageCellData from(final EStorageCellDrive drive) {

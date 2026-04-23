@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.hypernet.calculation;
 
-import com.github.bsideup.jabel.Desugar;
 import github.kasuminova.novaeng.common.hypernet.calculation.modifier.ModifierManager;
 import net.minecraft.tileentity.TileEntity;
 
 import java.util.Map;
 
-@Desugar
 public record CalculateRequest(
     double maxRequired,
     boolean simulate,

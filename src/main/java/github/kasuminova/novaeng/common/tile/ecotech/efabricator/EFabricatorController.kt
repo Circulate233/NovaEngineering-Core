@@ -190,8 +190,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
         // Nova写了一坨大的！
         for (inputHandler in coolantInputHandlers) {
-            for (property in inputHandler.getTankProperties()) {
-                val contents = property.getContents()
+            for (property in inputHandler.tankProperties) {
+                val contents = property.contents
                 if (contents == null || contents.amount == 0) {
                     continue
                 }
@@ -459,8 +459,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     fun getCoolantInputCap(): Int {
         var total = 0
         for (handler in coolantInputHandlers) {
-            for (property in handler.getTankProperties()) {
-                total += min(property.getCapacity(), Int.MAX_VALUE - total)
+            for (property in handler.tankProperties) {
+                total += min(property.capacity, Int.MAX_VALUE - total)
                 if (total == Int.MAX_VALUE) {
                     return Int.MAX_VALUE
                 }
@@ -472,8 +472,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     fun getCoolantInputFluids(): Int {
         var total = 0
         for (handler in coolantInputHandlers) {
-            for (property in handler.getTankProperties()) {
-                val contents = property.getContents()
+            for (property in handler.tankProperties) {
+                val contents = property.contents
                 if (contents == null || contents.amount == 0) {
                     continue
                 }
@@ -491,8 +491,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     fun getCoolantOutputCap(): Int {
         var total = 0
         for (handler in coolantOutputHandlers) {
-            for (property in handler.getTankProperties()) {
-                total += min(property.getCapacity(), Int.MAX_VALUE - total)
+            for (property in handler.tankProperties) {
+                total += min(property.capacity, Int.MAX_VALUE - total)
                 if (total == Int.MAX_VALUE) {
                     return Int.MAX_VALUE
                 }
@@ -504,8 +504,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     fun getCoolantOutputFluids(): Int {
         var total = 0
         for (handler in coolantOutputHandlers) {
-            for (property in handler.getTankProperties()) {
-                val contents = property.getContents()
+            for (property in handler.tankProperties) {
+                val contents = property.contents
                 if (contents == null || contents.amount == 0) {
                     continue
                 }
@@ -523,7 +523,7 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     }
 
     override fun validate() {
-        if (!FMLCommonHandler.instance().getEffectiveSide().isClient) {
+        if (!FMLCommonHandler.instance().effectiveSide.isClient) {
             return
         }
 
@@ -535,14 +535,14 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
     override fun invalidate() {
         super.invalidate()
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient) {
+        if (FMLCommonHandler.instance().effectiveSide.isClient) {
             BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
         }
     }
 
     override fun onLoad() {
         super.onLoad()
-        if (!FMLCommonHandler.instance().getEffectiveSide().isClient) {
+        if (!FMLCommonHandler.instance().effectiveSide.isClient) {
             return
         }
         ClientProxy.clientScheduler.addRunnable({
@@ -574,7 +574,7 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
         loaded = prevLoaded
 
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient) {
+        if (FMLCommonHandler.instance().effectiveSide.isClient) {
             ClientProxy.clientScheduler.addRunnable({
                 BlockModelHider.hideOrShowBlocks(HIDE_POS_LIST, this)
                 notifyStructureFormedState(isStructureFormed)

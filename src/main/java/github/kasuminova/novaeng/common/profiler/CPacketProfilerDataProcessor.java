@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.profiler;
 
-import com.github.bsideup.jabel.Desugar;
 import com.mojang.authlib.GameProfile;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.handler.HyperNetEventHandler;
@@ -226,7 +225,6 @@ public class CPacketProfilerDataProcessor {
         NovaEngineeringCore.log.info("Received profiler data from {}", player.getName());
     }
 
-    @Desugar
     private record ProcessedData(double totalBandwidthPerSecond, GameProfile maxPlayer, double maxBandwidthPerSecond,
                                  Map<String, CPacketProfilerData.PacketData> mergedPackets,
                                  Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {

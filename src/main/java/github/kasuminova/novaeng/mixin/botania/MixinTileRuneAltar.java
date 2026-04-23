@@ -95,4 +95,3 @@ public abstract class MixinTileRuneAltar extends TileSimpleInventory {
         }
     }
 }
-

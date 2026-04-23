@@ -142,7 +142,7 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
                 // 如有重复进度，取最大值。
                 Double value = researchingData.computeIfPresent(researchName, (_k, v) -> v > progress ? v : progress);
                 if (value == null) {
-                    researchingData.put(researchName, progress.doubleValue());
+                    researchingData.put(researchName, progress);
                 }
             });
         });
