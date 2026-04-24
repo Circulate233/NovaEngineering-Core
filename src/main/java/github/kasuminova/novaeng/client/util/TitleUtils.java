@@ -7,7 +7,6 @@ import github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader;
 import org.lwjgl.opengl.Display;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.CompletableFuture;
 
 public class TitleUtils {
     /**
@@ -16,9 +15,9 @@ public class TitleUtils {
     public static final String DEFAULT_TITLE = "Nova Engineering: World 1.20.0 by Hikari_Nova | Core Ver: " + NovaEngineeringCore.VERSION;
     public static final String VANILLA_TITLE = "Minecraft 1.12.2";
 
-    public static String currentTitle = null;
-    public static String lastCurrentTitle = null;
-    public static boolean unsupportedPlatform = false;
+    public static volatile String currentTitle = null;
+    public static volatile String lastCurrentTitle = null;
+    public static volatile boolean unsupportedPlatform = false;
 
     /**
      * 设置一言随机标题，必须在客户端主线程使用。
@@ -37,7 +36,7 @@ public class TitleUtils {
             currentTitle = buildTitle(state, hitokotoCache);
             setTitle();
         } else {
-            CompletableFuture.runAsync(HitokotoAPI::getRandomHitokoto);
+            Thread.ofVirtual().name("NovaEng Title Hitokoto Loader").start(HitokotoAPI::getRandomHitokoto);
             currentTitle = buildTitle(state, null);
             setTitle();
         }
@@ -84,12 +83,12 @@ public class TitleUtils {
 
     public static String buildTitle(final String state, final String hitokoto) {
         if (state == null) {
-            if (hitokoto == null) {
-                currentTitle = String.format("%s", DEFAULT_TITLE);
+            if (hitokoto == null || hitokoto.isEmpty()) {
+                return DEFAULT_TITLE;
             }
             return String.format("%s | %s", DEFAULT_TITLE, hitokoto);
         }
-        if (hitokoto == null) {
+        if (hitokoto == null || hitokoto.isEmpty()) {
             return String.format("%s | %s", DEFAULT_TITLE, state);
         }
 

@@ -36,7 +36,7 @@ public final class CalculateTypes {
         return Collections.unmodifiableMap(AVAILABLE_TYPES);
     }
 
-    public static class CalculateTypeIntricate extends CalculateType {
+    public static final class CalculateTypeIntricate extends BuiltInCalculateType {
 
         CalculateTypeIntricate() {
             super("intricate");
@@ -63,7 +63,7 @@ public final class CalculateTypes {
         }
     }
 
-    public static class CalculateTypeLogic extends CalculateType {
+    public static final class CalculateTypeLogic extends BuiltInCalculateType {
         CalculateTypeLogic() {
             super("logic");
         }
@@ -75,7 +75,7 @@ public final class CalculateTypes {
         }
     }
 
-    public static class CalculateTypeNeuron extends CalculateType {
+    public static final class CalculateTypeNeuron extends BuiltInCalculateType {
         CalculateTypeNeuron() {
             super("neuron");
         }
@@ -87,7 +87,7 @@ public final class CalculateTypes {
         }
     }
 
-    public static class CalculateTypeQbit extends CalculateType {
+    public static final class CalculateTypeQbit extends BuiltInCalculateType {
         CalculateTypeQbit() {
             super("qbit");
         }

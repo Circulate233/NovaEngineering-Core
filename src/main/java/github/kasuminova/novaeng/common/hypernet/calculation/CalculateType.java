@@ -4,7 +4,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class CalculateType {
+public abstract sealed class CalculateType permits BuiltInCalculateType, CustomCalculateType {
     protected final String typeName;
 
     public CalculateType(String typeName) {

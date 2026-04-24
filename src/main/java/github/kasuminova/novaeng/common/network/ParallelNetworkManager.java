@@ -73,30 +73,23 @@ public class ParallelNetworkManager {
     }
 
     public void offerAction(final Object group, final Action action, final int priority) {
-        Queue<ActionExecutor> queue = groupQueues.get(group);
-        if (queue == null) {
-            synchronized (groupQueues) {
-                queue = groupQueues.computeIfAbsent(group, k -> new PriorityQueue<>());
-            }
-        }
+        Queue<ActionExecutor> queue = groupQueues.computeIfAbsent(group, k -> new PriorityQueue<>());
         synchronized (queue) {
             queue.offer(new ActionExecutor(action, priority));
         }
     }
 
     public void execute() {
-        synchronized (groupQueues) {
-            ModularMachinery.EXECUTE_MANAGER.addTask(() -> {
-                for (final Queue<ActionExecutor> queue : groupQueues.values()) {
-                    synchronized (queue) {
-                        ActionExecutor action;
-                        while ((action = queue.poll()) != null) {
-                            action.run();
-                        }
+        ModularMachinery.EXECUTE_MANAGER.addTask(() -> {
+            for (final Queue<ActionExecutor> queue : groupQueues.values()) {
+                synchronized (queue) {
+                    ActionExecutor action;
+                    while ((action = queue.poll()) != null) {
+                        action.run();
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     public boolean isBlacklistChannel(final Object channel) {

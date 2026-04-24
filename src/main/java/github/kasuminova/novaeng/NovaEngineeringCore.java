@@ -79,15 +79,13 @@ public class NovaEngineeringCore {
 
     static {
         if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
-            Thread thread = new Thread(() -> {
+            Thread.ofVirtual().name("NovaEng Core Hitokoto Initializer").start(() -> {
                 String hitokoto = HitokotoAPI.getRandomHitokoto();
                 if (hitokoto == null || hitokoto.isEmpty()) {
                     return;
                 }
                 LOG.info(LOG_PREFIX + "{}", hitokoto);
             });
-            thread.setName("NovaEng Core Hitokoto Initializer");
-            thread.start();
         }
     }
 

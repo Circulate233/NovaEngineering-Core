@@ -2,7 +2,6 @@ package github.kasuminova.novaeng.client.hitokoto;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import lombok.Getter;
 import net.minecraft.util.JsonUtils;
 
 import java.io.BufferedReader;
@@ -12,56 +11,68 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HitokotoAPI {
     public static final String API_URL = "https://v1.hitokoto.cn/";
     private static final Gson DESERIALIZER = new GsonBuilder()
         .registerTypeHierarchyAdapter(HitokotoResult.class, new HitokotoDeserializer())
         .create();
-    @Getter
-    public static String hitokotoCache = null;
+    private static final AtomicBoolean loading = new AtomicBoolean(false);
+    private static volatile String hitokotoCache = null;
+
+    public static String getHitokotoCache() {
+        return hitokotoCache;
+    }
 
     public static String getRandomHitokoto() {
         if (hitokotoCache != null) {
             return hitokotoCache;
         }
+        if (!loading.compareAndSet(false, true)) {
+            return "";
+        }
 
-        String jsonStr;
         try {
-            jsonStr = getStringFromURL(API_URL);
-        } catch (IOException e) {
-            return "";
-        }
+            String jsonStr;
+            try {
+                jsonStr = getStringFromURL(API_URL);
+            } catch (IOException e) {
+                return "";
+            }
 
-        if (jsonStr == null || jsonStr.isEmpty()) {
-            return "";
-        }
+            if (jsonStr == null || jsonStr.isEmpty()) {
+                return "";
+            }
 
-        HitokotoResult hitokoto;
-        try {
-            hitokoto = JsonUtils.fromJson(DESERIALIZER, jsonStr, HitokotoResult.class, true);
-        } catch (Exception e) {
-            return "";
-        }
+            HitokotoResult hitokoto;
+            try {
+                hitokoto = JsonUtils.fromJson(DESERIALIZER, jsonStr, HitokotoResult.class, true);
+            } catch (Exception e) {
+                return "";
+            }
 
-        if (hitokoto == null) {
-            return "";
-        }
+            if (hitokoto == null) {
+                return "";
+            }
 
-        String assembled = assembleHitokoto(hitokoto);
-        if (!assembled.isEmpty()) {
-            hitokotoCache = assembled;
+            String assembled = assembleHitokoto(hitokoto);
+            if (!assembled.isEmpty()) {
+                hitokotoCache = assembled;
+            }
+            return assembled;
+        } finally {
+            loading.set(false);
         }
-        return assembled;
     }
 
     public static String assembleHitokoto(HitokotoResult result) {
-        String hitokoto = result.getHitokoto();
-        String fromWho = result.getFromWho();
+        String hitokoto = result.hitokoto();
+        String fromWho = result.fromWho();
         if (fromWho.isEmpty()) {
-            fromWho = result.getFrom();
+            fromWho = result.from();
             if (fromWho.isEmpty()) {
-                fromWho = result.getCreator();
+                fromWho = result.creator();
             }
         }
 
@@ -73,24 +84,29 @@ public class HitokotoAPI {
     }
 
     public static String getStringFromURL(String urlStr) throws IOException {
+        HttpURLConnection connection = null;
         try {
             URL url = new URL(urlStr);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5_000);
+            connection.setReadTimeout(5_000);
             connection.connect();
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
-            String line;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                return stringBuilder.toString();
             }
-
-            reader.close();
-            connection.disconnect();
-            return stringBuilder.toString();
         } catch (MalformedURLException e) {
             return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
 
@@ -27,26 +28,22 @@ public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
             return Integer.MIN_VALUE;
         }
     };
-    private static final Reference2ObjectMap<Item, Int2ObjectOpenHashMapS> chane = Reference2ObjectMaps.synchronize(new Reference2ObjectOpenHashMap<>());
-    private static final Function<Item, Int2ObjectOpenHashMapS> intMap = item -> new Int2ObjectOpenHashMapS();
+    private static final Reference2ObjectMap<Item, Int2ObjectOpenHashMap<Map<NBTTagCompound, SimpleItem>>> chane = Reference2ObjectMaps.synchronize(new Reference2ObjectOpenHashMap<>());
 
     private SimpleItem(ItemStack stack) {
-        this(stack.getItem(), stack.getItemDamage(), stack.getTagCompound());
+        this(stack.getItem(), stack.getItemDamage(), copyTag(stack.getTagCompound()));
     }
 
     public static SimpleItem getInstance(final ItemStack stack) {
         if (stack.isEmpty()) return empty;
-        var nbt = stack.getTagCompound();
-        return chane.computeIfAbsent(stack.getItem(), intMap)
-                    .computeIfAbsent(stack.getItemDamage())
-                    .computeIfAbsent(nbt == null ? NullNbt : nbt, n -> new SimpleItem(stack));
+        var nbt = copyTag(stack.getTagCompound());
+        return chane.computeIfAbsent(stack.getItem(), (Function<Item, Int2ObjectOpenHashMap<Map<NBTTagCompound, SimpleItem>>>) _ -> new Int2ObjectOpenHashMap<>())
+                    .computeIfAbsent(stack.getItemDamage(), (IntFunction<Map<NBTTagCompound, SimpleItem>>) _ -> new ConcurrentHashMap<>())
+                    .computeIfAbsent(nbt == null ? NullNbt : nbt, _ -> new SimpleItem(stack.getItem(), stack.getItemDamage(), nbt));
     }
 
-    public static SimpleItem getNoNBTInstance(final ItemStack stack) {
-        if (stack.isEmpty()) return empty;
-        return chane.computeIfAbsent(stack.getItem(), intMap)
-                    .computeIfAbsent(stack.getItemDamage())
-                    .computeIfAbsent(NullNbt, n -> new SimpleItem(stack));
+    private static NBTTagCompound copyTag(final NBTTagCompound nbt) {
+        return nbt == null ? null : nbt.copy();
     }
 
     public boolean isEmpty() {
@@ -66,24 +63,5 @@ public record SimpleItem(Item item, int meta, NBTTagCompound nbt) {
         result = 31 * result + meta;
         result = 31 * result + (nbt != null ? nbt.hashCode() : 0);
         return result;
-    }
-
-    private static class Int2ObjectOpenHashMapS extends Int2ObjectOpenHashMap<Map<NBTTagCompound, SimpleItem>> {
-
-        public Map<NBTTagCompound, SimpleItem> computeIfAbsent(int key) {
-            Map<NBTTagCompound, SimpleItem> v;
-
-            if ((v = get(key)) == null) {
-                synchronized (this) {
-                    if ((v = get(key)) == null) {
-                        v = new ConcurrentHashMap<>();
-                        put(key, v);
-                    }
-                }
-            }
-
-            return v;
-        }
-
     }
 }

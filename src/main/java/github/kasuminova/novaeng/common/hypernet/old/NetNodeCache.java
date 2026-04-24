@@ -57,13 +57,12 @@ public class NetNodeCache {
         }
 
         synchronized (ctrl) {
-            if (node != null) {
-                CACHED_NODES.remove(ctrl);
-            }
-
             node = CACHED_NODES.get(ctrl);
             if (type.isInstance(node)) {
                 return type.cast(node);
+            }
+            if (node != null) {
+                CACHED_NODES.remove(ctrl, node);
             }
 
             try {

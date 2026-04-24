@@ -21,9 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 public class CPacketProfilerDataProcessor {
 
@@ -35,19 +33,17 @@ public class CPacketProfilerDataProcessor {
     private UUID currentEvent = null;
     private GameProfile target = null;
 
-    private int limit = 0;
     private long startTime = 0;
 
     private int players = 0;
     private int receivedPlayers = 0;
 
-    private Future<Void> task = null;
-
     private CPacketProfilerDataProcessor() {
     }
 
-    private static void generateDefaultMessage(final List<ITextComponent> messages, final long maxBandwidthPerSecond, final GameProfile maxPlayer, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
-        messages.add(new TextComponentString(TextFormatting.GREEN + "最大带宽使用: ~" + TextFormatting.AQUA + MiscUtils.formatNumber(maxBandwidthPerSecond) + "B/s" + TextFormatting.GREEN + "，来自: " + TextFormatting.YELLOW + maxPlayer.getName()));
+    private static void generateDefaultMessage(final List<ITextComponent> messages, final long maxBandwidthPerSecond, @Nullable final GameProfile maxPlayer, final Map<String, CPacketProfilerData.PacketData> mergedPackets, final Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
+        String maxPlayerName = maxPlayer == null ? "N/A" : maxPlayer.getName();
+        messages.add(new TextComponentString(TextFormatting.GREEN + "最大带宽使用: ~" + TextFormatting.AQUA + MiscUtils.formatNumber(maxBandwidthPerSecond) + "B/s" + TextFormatting.GREEN + "，来自: " + TextFormatting.YELLOW + maxPlayerName));
         messages.add(new TextComponentString(TextFormatting.GREEN + "合并后数据: "));
         messages.add(new TextComponentString(TextFormatting.GREEN + "普通数据包: "));
         generatePktMessage(messages, mergedPackets);
@@ -91,7 +87,6 @@ public class CPacketProfilerDataProcessor {
         this.sender = sender;
         this.currentEvent = UUID.randomUUID();
         this.target = target;
-        this.limit = limit;
         this.startTime = System.currentTimeMillis();
         requestPlayers(players, limit);
         createTask();
@@ -104,21 +99,27 @@ public class CPacketProfilerDataProcessor {
         players.forEach(player -> NovaEngineeringCore.NET_CHANNEL.sendTo(new PktCProfilerRequest(currentEvent, limit), player));
     }
 
-    @SuppressWarnings("BusyWait")
     private void createTask() {
-        task = CompletableFuture.runAsync(() -> {
-            while (receivedPlayers < players && System.currentTimeMillis() - startTime < 5000) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {
+        Thread.ofVirtual().name("NovaEng CPacket Profiler Collector").start(() -> {
+            ProcessedData result;
+            synchronized (receivedData) {
+                long remaining = 5000L - (System.currentTimeMillis() - startTime);
+                while (receivedPlayers < players && remaining > 0L) {
+                    try {
+                        receivedData.wait(remaining);
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                    remaining = 5000L - (System.currentTimeMillis() - startTime);
                 }
+                result = getProcessedData(System.currentTimeMillis() - startTime, receivedPlayers, players);
             }
-            if (receivedPlayers < players) {
-                NovaEngineeringCore.log.warn("Profiler collect task timeout ({}ms), received players: {}, players: {}", System.currentTimeMillis() - startTime, receivedPlayers, players);
+            if (result.receivedPlayers() < result.players()) {
+                NovaEngineeringCore.log.warn("Profiler collect task timeout ({}ms), received players: {}, players: {}", result.elapsedTime(), result.receivedPlayers(), result.players());
             } else {
-                NovaEngineeringCore.log.info("Profiler collect task completed ({}ms), received players: {}, players: {}", System.currentTimeMillis() - startTime, receivedPlayers, players);
+                NovaEngineeringCore.log.info("Profiler collect task completed ({}ms), received players: {}, players: {}", result.elapsedTime(), result.receivedPlayers(), result.players());
             }
-            ProcessedData result = getProcessedData();
             HyperNetEventHandler.addTickEndAction(() -> finish(result));
         });
     }
@@ -137,7 +138,7 @@ public class CPacketProfilerDataProcessor {
         List<ITextComponent> messages = new ObjectArrayList<>();
 
         messages.add(new TextComponentString(TextFormatting.GREEN + "收集任务完成，事件 ID: " + TextFormatting.YELLOW + currentEvent));
-        messages.add(new TextComponentString(TextFormatting.GREEN + "已收集数据: " + TextFormatting.YELLOW + receivedPlayers + "/" + players));
+        messages.add(new TextComponentString(TextFormatting.GREEN + "已收集数据: " + TextFormatting.YELLOW + result.receivedPlayers() + "/" + result.players()));
         messages.add(new TextComponentString(TextFormatting.GREEN + "总带宽使用: ~" + TextFormatting.AQUA + MiscUtils.formatNumber((long) result.totalBandwidthPerSecond()) + "B/s"));
         if (target == null) {
             generateDefaultMessage(messages, (long) result.maxBandwidthPerSecond(), result.maxPlayer(), mergedPackets, mergedTileEntityPackets);
@@ -156,16 +157,14 @@ public class CPacketProfilerDataProcessor {
         currentEvent = null;
         target = null;
 
-        limit = 0;
         startTime = 0;
 
         receivedPlayers = 0;
         players = 0;
-        task = null;
     }
 
     @Nonnull
-    private ProcessedData getProcessedData() {
+    private ProcessedData getProcessedData(final long elapsedTime, final int receivedPlayers, final int players) {
         Map<GameProfile, CPacketProfilerData> sorted = receivedData.entrySet().stream()
                                                                    .sorted(Map.Entry.comparingByValue())
                                                                    .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
@@ -178,7 +177,6 @@ public class CPacketProfilerDataProcessor {
                                       .max(Comparator.comparingDouble(entry -> entry.getValue().getNetworkBandwidthPerSecond()))
                                       .map(Map.Entry::getKey)
                                       .orElse(null);
-        assert maxPlayer != null;
         double maxBandwidthPerSecond = sorted.values().stream()
                                              .mapToDouble(CPacketProfilerData::getNetworkBandwidthPerSecond)
                                              .max()
@@ -207,7 +205,7 @@ public class CPacketProfilerDataProcessor {
                 }
             });
         }
-        return new ProcessedData(totalBandwidthPerSecond, maxPlayer, maxBandwidthPerSecond, mergedPackets, mergedTileEntityPackets);
+        return new ProcessedData(elapsedTime, receivedPlayers, players, totalBandwidthPerSecond, maxPlayer, maxBandwidthPerSecond, mergedPackets, mergedTileEntityPackets);
     }
 
     public void receive(final UUID eventId, final GameProfile player, final CPacketProfilerData data) {
@@ -221,11 +219,17 @@ public class CPacketProfilerDataProcessor {
         synchronized (receivedData) {
             receivedPlayers++;
             receivedData.put(player, data);
+            receivedData.notifyAll();
         }
         NovaEngineeringCore.log.info("Received profiler data from {}", player.getName());
     }
 
-    private record ProcessedData(double totalBandwidthPerSecond, GameProfile maxPlayer, double maxBandwidthPerSecond,
+    private record ProcessedData(long elapsedTime,
+                                 int receivedPlayers,
+                                 int players,
+                                 double totalBandwidthPerSecond,
+                                 GameProfile maxPlayer,
+                                 double maxBandwidthPerSecond,
                                  Map<String, CPacketProfilerData.PacketData> mergedPackets,
                                  Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets) {
     }
