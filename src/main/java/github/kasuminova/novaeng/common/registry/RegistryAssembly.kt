@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "IMPOSSIBLE_IS_CHECK_WARNING")
 
 package github.kasuminova.novaeng.common.registry
 
@@ -133,7 +133,7 @@ object RegistryAssembly {
     private fun regMEK() {
         val reactorMachine = NEWDynamicMachine("")
         if (reactorMachine is AccessorAbstractMachine) {
-            reactorMachine.setRL(ResourceLocation("mek", "reactor"))
+            reactorMachine.setRegistryName(ResourceLocation("mek", "reactor"))
         }
         val reactor = NEWMachineAssemblyManager.BlockPair(GeneratorsBlocks.Reactor, 0)
         val mekReactor = reactorMachine.pattern
@@ -255,7 +255,7 @@ object RegistryAssembly {
 
         val thermalEvaporationMachine = NEWDynamicMachine("")
         if (thermalEvaporationMachine is AccessorAbstractMachine) {
-            thermalEvaporationMachine.setRL(ResourceLocation("mek", "thermalEvaporation".camelToSnake()))
+            thermalEvaporationMachine.setRegistryName(ResourceLocation("mek", "thermalEvaporation".camelToSnake()))
         }
         val thermalEvaporationArray = thermalEvaporationMachine.pattern
         val thermalEvaporation = NEWMachineAssemblyManager.BlockPair(MekanismBlocks.BasicBlock, 14)
@@ -337,7 +337,7 @@ object RegistryAssembly {
     private fun regBot() {
         val terraPlateMachine = NEWDynamicMachine("")
         if (terraPlateMachine is AccessorAbstractMachine) {
-            terraPlateMachine.setRL(ResourceLocation("botania", "terra_plate"))
+            terraPlateMachine.setRegistryName(ResourceLocation("botania", "terra_plate"))
         }
         val terraplateArray = terraPlateMachine.pattern
         val stone = packBlock(ModBlocks.livingrock.defaultState)
@@ -362,7 +362,7 @@ object RegistryAssembly {
 
         val alfheimportalMachine = NEWDynamicMachine("")
         if (alfheimportalMachine is AccessorAbstractMachine) {
-            alfheimportalMachine.setRL(ResourceLocation("botania", "alfheimportal"))
+            alfheimportalMachine.setRegistryName(ResourceLocation("botania", "alfheimportal"))
         }
         val alfheimportalArray = alfheimportalMachine.pattern
         val wood = packBlock(ModBlocks.livingwood.defaultState)
@@ -437,7 +437,7 @@ object RegistryAssembly {
     ): NEWDynamicMachine {
         val machine = NEWDynamicMachine("")
         if (machine is AccessorAbstractMachine) {
-            machine.setRL(ResourceLocation("astralsorcery", name))
+            machine.setRegistryName(ResourceLocation("astralsorcery", name))
         }
         val newBlcokArray = machine.pattern
         for (entry in array.pattern) {
@@ -454,7 +454,7 @@ object RegistryAssembly {
     ): NEWDynamicMachine {
         val machine = NEWDynamicMachine("")
         if (machine is AccessorAbstractMachine) {
-            machine.setRL(ResourceLocation("packagedastral", name))
+            machine.setRegistryName(ResourceLocation("packagedastral", name))
         }
         val newBlcokArray = machine.pattern
         for (entry in array.pattern) {
@@ -469,10 +469,6 @@ object RegistryAssembly {
         return this
     }
 
-    /**
-     * @param this 驼峰结构的字符串
-     * @return 蛇形结构的字符串
-     */
     private fun String.camelToSnake(): String {
         val len = this.length
         val buffer = CharArray(len * 2)

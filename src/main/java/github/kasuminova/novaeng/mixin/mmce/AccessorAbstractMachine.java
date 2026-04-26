@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(value = AbstractMachine.class, remap = false)
 public interface AccessorAbstractMachine {
 
-    @Accessor("registryName")
+    @Accessor
     @Mutable
-    void setRL(ResourceLocation newRl);
+    void setRegistryName(ResourceLocation newRl);
 }

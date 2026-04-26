@@ -126,6 +126,4 @@ dependencies {
     modImplementation 'curse.maven:draconic-evolution-223565:3431261'
     modImplementation 'curse.maven:packagedauto-308380:6932932'
     modImplementation 'curse.maven:packagedastral-811828:7063119'
-    modCompileOnly 'curse.maven:Aroma1997Core-223735:2914062'
-    modCompileOnly 'curse.maven:tatw-263980:2585616'
 }
