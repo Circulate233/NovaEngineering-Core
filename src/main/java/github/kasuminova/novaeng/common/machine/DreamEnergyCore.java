@@ -161,7 +161,11 @@ public class DreamEnergyCore implements MachineSpecial {
 
     @ZenMethod
     public static String getEnergyStoredString(IMachineController ctrl) {
-        return ctrl.getController().getCustomDataTag().getString("energyStored");
+        var s = ctrl.getController().getCustomDataTag().getString("energyStored");
+        if (s.isEmpty()) {
+            return "0";
+        }
+        return s;
     }
 
     /**

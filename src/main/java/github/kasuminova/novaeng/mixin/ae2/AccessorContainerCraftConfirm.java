@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public interface AccessorContainerCraftConfirm {
 
     @Accessor("result")
-    ICraftingJob n$getResult();
+    ICraftingJob getResult();
 
     @Accessor("cpus")
-    ArrayList<CraftingCPURecord> n$getCpus();
+    ArrayList<CraftingCPURecord> getCpus();
 }

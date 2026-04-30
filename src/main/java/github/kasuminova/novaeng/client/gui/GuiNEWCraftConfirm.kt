@@ -19,8 +19,8 @@ open class GuiNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject
     @Suppress("CAST_NEVER_SUCCEEDS")
     override fun initGui() {
         super.initGui()
-        cancel = utils.`n$getCancel`()
-        start = utils.`n$getStart`()
+        cancel = utils.getCancel()
+        start = utils.getStart()
     }
 
     @Throws(IOException::class)

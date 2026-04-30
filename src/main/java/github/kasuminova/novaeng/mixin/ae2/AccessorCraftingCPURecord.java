@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorCraftingCPURecord {
 
     @Accessor("cpu")
-    ICraftingCPU n$getCpu();
+    ICraftingCPU getCpu();
 }

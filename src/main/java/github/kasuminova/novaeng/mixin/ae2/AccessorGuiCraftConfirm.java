@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorGuiCraftConfirm {
 
     @Accessor("cancel")
-    GuiButton n$getCancel();
+    GuiButton getCancel();
 
     @Accessor("start")
-    GuiButton n$getStart();
+    GuiButton getStart();
 }

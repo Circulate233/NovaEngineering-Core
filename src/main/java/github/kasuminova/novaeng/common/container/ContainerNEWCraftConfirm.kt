@@ -17,20 +17,20 @@ class ContainerNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObjec
     }
 
     override fun startJob() {
-        @Suppress("USELESS_IS_CHECK")
+        @Suppress("USELESS_IS_CHECK", "IMPOSSIBLE_IS_CHECK_WARNING")
         if (this is AccessorContainerCraftConfirm) {
             val h = this.target as? IActionHost
             h?.actionableNode?.grid?.let { grid ->
-                if (this.`n$getResult`() != null && !this.isSimulation) {
+                if (this.getResult() != null && !this.isSimulation) {
                     val cc = grid.getCache<ICraftingGrid>(ICraftingGrid::class.java)
                     cc.submitJob(
-                        this.`n$getResult`(),
+                        this.getResult(),
                         null,
                         if (this.getSelectedCpu() == -1) null
                         else {
-                            val c = this.`n$getCpus`()[this.getSelectedCpu()]
+                            val c = this.getCpus()[this.getSelectedCpu()]
                             if (c is AccessorCraftingCPURecord) {
-                                c.`n$getCpu`()
+                                c.getCpu()
                             } else null
                         },
                         true,
