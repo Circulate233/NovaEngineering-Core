@@ -10,6 +10,7 @@ import WayofTime.bloodmagic.ritual.types.RitualWellOfSuffering
 import WayofTime.bloodmagic.tile.TileAltar
 import WayofTime.bloodmagic.util.helper.NetworkHelper
 import crafttweaker.CraftTweakerAPI.itemUtils
+import crafttweaker.annotations.ModOnly
 import crafttweaker.annotations.ZenRegister
 import crafttweaker.api.item.IIngredient
 import crafttweaker.api.item.IItemStack
@@ -53,6 +54,7 @@ import kotlin.math.min
 import kotlin.math.pow
 
 @ZenRegister
+@ModOnly("bloodmagic")
 @ZenClass("novaeng.MMAltar")
 object MMAltar : MachineSpecial {
 
@@ -239,8 +241,8 @@ object MMAltar : MachineSpecial {
                 pos.release()
                 if (t is TileLifeEssenceProvider.Output) {
                     val item = t.inventory.getStackInSlot(0)
-                    val Soul = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
-                    Soul.currentEssence += altar.drainBlood(10000)
+                    val soul = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
+                    soul.currentEssence += altar.drainBlood(10000)
                 }
 
             }
@@ -412,9 +414,9 @@ object MMAltar : MachineSpecial {
     fun registerRecipe(need: Int, maxNeed: Int, altarTier: Int, input: IIngredient, output: IItemStack) {
         val time = maxNeed / need
         val name: String = when (input) {
-            is IItemStack -> CraftTweakerMC.getItem(input.definition).getRegistryName().toString() + input.metadata
+            is IItemStack -> CraftTweakerMC.getItem(input.definition).registryName.toString() + input.metadata
             is IOreDictEntry -> input.name
-            else -> CraftTweakerMC.getItem(output.definition).getRegistryName().toString() + output.metadata
+            else -> CraftTweakerMC.getItem(output.definition).registryName.toString() + output.metadata
         }
         RecipeBuilder.newBuilder(name, MACHINEID, time, 1000)
             .addItemInputs(input)

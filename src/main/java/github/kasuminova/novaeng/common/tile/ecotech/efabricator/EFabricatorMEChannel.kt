@@ -26,7 +26,6 @@ import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricat
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker.CraftWork
 import hellfirepvp.modularmachinery.ModularMachinery
 import net.minecraft.inventory.InventoryCrafting
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fluids.FluidStack
@@ -47,10 +46,10 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
                         ci = ItemStack.EMPTY
                     }
 
-                    ci.setCount(stackInSlot.count)
+                    ci.count = stackInSlot.count
                     return ci
                 } else if (!stackInSlot.isEmpty) {
-                    stackInSlot.setCount(0)
+                    stackInSlot.count = 0
                     return stackInSlot
                 } else return ItemStack.EMPTY
             }
@@ -70,11 +69,8 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
     val visualItemStack: ItemStack
         get() {
             val controller: EFabricatorController? = getController()
-            return ItemStack(
-                Item.getItemFromBlock(if (controller == null) BlockEFabricatorMEChannel.INSTANCE else controller.parentController!!),
-                1,
-                0
-            )
+            return if (controller == null) ItemStack(BlockEFabricatorMEChannel.INSTANCE)
+            else ItemStack(controller.parentController)
         }
 
     @MENetworkEventSubscribe
@@ -142,7 +138,7 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
             }
         }
 
-        output.setCount(output.count * size)
+        output.count *= size
 
         return partController.offerWork(CraftWork(remaining, output, size))
     }
@@ -173,7 +169,7 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
             }
         }
 
-        output.setCount(output.count * size)
+        output.count *= size
 
         return partController.offerWork(CraftWork(remaining, output, size))
     }
