@@ -54,13 +54,13 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
         new BlockPos(-1, -1, 1)
     );
 
-    public static final List<BlockPos> TAIL_HIDE_POS_LIST = Arrays.asList(
+    public static final BlockPos[] TAIL_HIDE_POS_LIST = new BlockPos[]{
         new BlockPos(0, -1, 1),
         new BlockPos(0, -1, 0),
         new BlockPos(0, 0, 1),
         new BlockPos(0, 1, 1),
         new BlockPos(0, 1, 0)
-    );
+    };
 
     protected BlockECalculatorController parentController = null;
 
@@ -121,7 +121,6 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
         this.channel = null;
     }
 
-    @SuppressWarnings("DataFlowIssue")
     protected void recalculateParallelism() {
         this.parallelism = getParallelProcs().stream()
                                              .mapToInt(ECalculatorParallelProc::getParallelism).sum();
@@ -163,9 +162,10 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
         return parts.getParts(ECalculatorParallelProc.class);
     }
 
-    @SuppressWarnings("DataFlowIssue")
     public void onVirtualCPUSubmitJob(final long usedBytes) {
         List<ECalculatorThreadCore> threadCores = getThreadCores();
+        createVirtualCPU();
+        if (virtualCPU == null) return;
         for (final ECalculatorThreadCore threadCore : threadCores) {
             if (threadCore.addCPU(virtualCPU, false)) {
                 ECPUCluster ecpuCluster = ECPUCluster.from(this.virtualCPU);
