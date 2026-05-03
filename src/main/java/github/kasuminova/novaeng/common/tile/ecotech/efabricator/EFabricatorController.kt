@@ -20,7 +20,6 @@ import github.kasuminova.novaeng.common.tile.ecotech.EPartController
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker.CraftWork
 import github.kasuminova.novaeng.common.util.Functions
 import github.kasuminova.novaeng.common.util.MachineCoolants
-import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.client.ClientProxy
 import hellfirepvp.modularmachinery.common.machine.IOType
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry
@@ -83,7 +82,10 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
     var outputBuffer: IItemList<IAEItemStack> = ItemList()
 
-    var parentController: BlockEFabricatorController? = null
+    val parentController: BlockEFabricatorController?
+        get() {
+            return this.getBlockType() as? BlockEFabricatorController
+        }
     var energyConsumePerTick: Double = 64.0
 
     var channel: EFabricatorMEChannel? = null
@@ -131,10 +133,6 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
     constructor(machineRegistryName: ResourceLocation) : this() {
         this.parentMachine = MachineRegistry.getRegistry().getMachine(machineRegistryName)
-        this.parentController = BlockEFabricatorController.REGISTRY[ResourceLocation(
-            NovaEngineeringCore.MOD_ID,
-            machineRegistryName.getPath()
-        )]
     }
 
     init {
@@ -600,17 +598,5 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
 
     override fun readMachineNBT(compound: NBTTagCompound) {
         super.readMachineNBT(compound)
-        if (compound.hasKey("parentMachine")) {
-            val rl = ResourceLocation(compound.getString("parentMachine"))
-            parentMachine = MachineRegistry.getRegistry().getMachine(rl)
-            if (parentMachine != null) {
-                this.parentController = BlockEFabricatorController.REGISTRY[ResourceLocation(
-                    NovaEngineeringCore.MOD_ID,
-                    parentMachine.getRegistryName().getPath()
-                )]
-            } else {
-                ModularMachinery.log.info("Couldn't find machine named $rl for controller at ${getPos()}")
-            }
-        }
     }
 }

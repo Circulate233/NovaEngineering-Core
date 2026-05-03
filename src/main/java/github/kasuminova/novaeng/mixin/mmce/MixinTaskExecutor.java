@@ -2,7 +2,7 @@ package github.kasuminova.novaeng.mixin.mmce;
 
 import com.google.common.collect.Sets;
 import github.kasuminova.mmce.common.concurrent.TaskExecutor;
-import github.kasuminova.novaeng.mixin.util.ITaskExecutor;
+import github.kasuminova.novaeng.common.util.ITaskExecutor;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

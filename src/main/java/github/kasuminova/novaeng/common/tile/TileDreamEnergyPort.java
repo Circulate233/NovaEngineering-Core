@@ -35,7 +35,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
     }
 
     @Override
-    protected @NotNull NodeType<DreamNode> getNodeType() {
+    public @NotNull NodeType<DreamNode> getNodeType() {
         return BlockDreamEnergyPort.TYPE;
     }
 
@@ -108,6 +108,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
         }
     }
 
+    @SuppressWarnings("ReturnOfInnerClass")
     public final class DreamenergyHandler implements IEnergyHandler {
 
         private static final BigInteger max = BigDecimal.valueOf(1.0E256d).toBigInteger();

@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.mixin.util;
+package github.kasuminova.novaeng.common.util;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.Item;

@@ -4,7 +4,6 @@ import appeng.api.features.IWirelessTermHandler;
 import appeng.helpers.WirelessTerminalGuiObject;
 import baubles.api.BaublesApi;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
@@ -39,8 +38,8 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatt
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
-import github.kasuminova.novaeng.mixin.util.NovaBlockColors;
-import github.kasuminova.novaeng.mixin.util.NovaItemColors;
+import github.kasuminova.novaeng.common.util.NovaBlockColors;
+import github.kasuminova.novaeng.common.util.NovaItemColors;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -85,9 +84,6 @@ import javax.annotation.Nullable;
 import java.awt.Color;
 import java.util.List;
 
-import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.checkJavaVersion;
-import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.isCleanroomLoader;
-
 @SuppressWarnings("MethodMayBeStatic")
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
@@ -111,7 +107,7 @@ public class ClientProxy extends CommonProxy {
         if (color < 0) {
             var od = OreDictionary.getOres(odName);
             if (!od.isEmpty()) {
-                var stack = od.get(0);
+                var stack = od.getFirst();
                 color = getColorForItemStack(stack).getRGB();
             } else {
                 color = Color.WHITE.getRGB();
@@ -130,9 +126,9 @@ public class ClientProxy extends CommonProxy {
                     new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, stack.getMetadata(), mc.player);
                 List<BakedQuad> quads = mc.getBlockRendererDispatcher().getModelForState(state).getQuads(state, EnumFacing.NORTH, 0);
                 if (quads.isEmpty()) return Color.WHITE;
-                sprite = quads.get(0).getSprite();
+                sprite = quads.getFirst().getSprite();
             } else sprite = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null)
-                                     .getQuads(null, null, 0).get(0).getSprite();
+                                     .getQuads(null, null, 0).getFirst().getSprite();
             IntList colours = new IntArrayList();
             for (int[] rows : sprite.getFrameTextureData(0))
                 for (int colour : rows) if ((colour & 0xFF) > 0) colours.add(colour);
@@ -168,15 +164,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void construction() {
         super.construction();
-
         ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
-
-        if (NovaEngCoreConfig.javaCheck) {
-            if (!isCleanroomLoader()) {
-                checkJavaVersion();
-            }
-        }
-
         TitleUtils.setRandomTitle("*Construction*");
     }
 

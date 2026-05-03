@@ -10,10 +10,6 @@ buildscript {
         gradlePluginPortal()
     }
     configurations.classpath.resolutionStrategy {
-        // unimined 1.4.16-kappa's tiny-remapper requires KmFunction.getContextParameters()
-        // from kotlin-metadata-jvm 2.3.20 (POM-declared version). The Kotlin compiler plugin
-        // (2.1.20) otherwise pulls in an older metadata lib on the same classpath and wins
-        // conflict resolution. Load unimined via the classic buildscript so force applies.
         force 'org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.20'
     }
     dependencies {
@@ -104,15 +100,21 @@ public final class Tags {
 }
 
 sourceSets {
+    api {
+        java.srcDirs = ['src/api/java']
+        resources.srcDirs = []
+    }
     main {
-        java.srcDirs = ['src/main/java', 'src/api/java']
+        java.srcDirs = ['src/main/java']
         java.srcDir generateTags
         resources.srcDirs = ['src/main/resources']
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
     }
 }
 
 def mixinConfigFiles = fileTree('src/main/resources') {
-    include 'mixins.novaeng_core*.json'
+    include 'mixins.novaeng_core.json'
 }.files.collect { it.name }.sort()
 
 String remapTaskName = propertyBool('enable_shadow') ? 'remapShadowJar' : 'remapJar'
@@ -202,6 +204,7 @@ if (!propertyBool('enable_shadow')) {
 }
 
 compileJava {
+    dependsOn tasks.named('compileApiJava')
     dependsOn generateTags
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
     options.release = 25

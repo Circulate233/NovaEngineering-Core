@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.mixin.util;
+package github.kasuminova.novaeng.common.util;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.entity.EntityLivingBase;

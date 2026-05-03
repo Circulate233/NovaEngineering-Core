@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.mets;
 
-import github.kasuminova.novaeng.mixin.util.EntityLivingBaseValues;
+import github.kasuminova.novaeng.common.util.EntityLivingBaseValues;
 import net.lrsoft.mets.entity.EntityTachyonBullet;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.datasync.DataParameter;

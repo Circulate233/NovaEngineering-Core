@@ -4,7 +4,6 @@ package github.kasuminova.novaeng.common.util
 
 import crafttweaker.annotations.ZenRegister
 import crafttweaker.api.minecraft.CraftTweakerMC.getIData
-import github.kasuminova.novaeng.mixin.util.NovaRAB
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentSelectorTag
 import hellfirepvp.modularmachinery.common.crafting.requirement.RequirementItem
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipePrimer

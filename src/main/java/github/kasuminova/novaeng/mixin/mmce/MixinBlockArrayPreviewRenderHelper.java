@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
-import github.kasuminova.novaeng.mixin.util.BlockArrayPreviewRenderUtils;
+import github.kasuminova.novaeng.common.util.BlockArrayPreviewRenderUtils;
 import hellfirepvp.modularmachinery.client.util.BlockArrayPreviewRenderHelper;
 import hellfirepvp.modularmachinery.client.util.BlockArrayRenderHelper;
 import hellfirepvp.modularmachinery.common.block.BlockController;

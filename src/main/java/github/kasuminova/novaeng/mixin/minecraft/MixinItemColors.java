@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
-import github.kasuminova.novaeng.mixin.util.NovaItemColors;
+import github.kasuminova.novaeng.common.util.NovaItemColors;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;

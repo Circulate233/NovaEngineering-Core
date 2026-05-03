@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
-import github.kasuminova.novaeng.mixin.util.NovaBlockColors;
+import github.kasuminova.novaeng.common.util.NovaBlockColors;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.color.BlockColors;

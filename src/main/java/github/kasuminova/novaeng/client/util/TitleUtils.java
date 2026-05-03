@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.client.util;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
-import github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader;
 import org.lwjgl.opengl.Display;
 
 import java.lang.reflect.Method;
@@ -116,7 +115,7 @@ public class TitleUtils {
         if (!NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
             return;
         }
-        if (NovaEngCoreEarlyMixinLoader.isCleanroomLoader() && !unsupportedPlatform) {
+        if (!unsupportedPlatform) {
             try {
                 Class<?> Display = Class.forName("org.lwjgl.opengl.Display");
                 Method getWindow = Display.getDeclaredMethod("getWindow");
