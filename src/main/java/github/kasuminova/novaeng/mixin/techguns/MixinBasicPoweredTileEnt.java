@@ -1,11 +1,10 @@
-package github.kasuminova.novaeng.mixin.packagedauto;
+package github.kasuminova.novaeng.mixin.techguns;
 
 import github.kasuminova.novaeng.common.util.OnlyWriteEnergyContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,25 +12,20 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thelm.packagedauto.energy.EnergyStorage;
-import thelm.packagedauto.inventory.InventoryTileBase;
-import thelm.packagedauto.tile.TileBase;
+import techguns.tileentities.BasicPoweredTileEnt;
+import techguns.tileentities.EnergyStoragePlus;
 
-@Mixin(value = TileBase.class, remap = false)
-public abstract class MixinTileBase extends TileEntity {
-
-    @Shadow
-    protected InventoryTileBase inventory;
+@Mixin(value = BasicPoweredTileEnt.class, remap = false)
+public class MixinBasicPoweredTileEnt extends TileEntity {
 
     @Shadow
-    protected EnergyStorage energyStorage;
-
+    protected EnergyStoragePlus energy;
     @Unique
     private OnlyWriteEnergyContainer n$energy;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        n$energy = new OnlyWriteEnergyContainer(energyStorage);
+        n$energy = new OnlyWriteEnergyContainer(energy);
     }
 
     /**
@@ -40,11 +34,6 @@ public abstract class MixinTileBase extends TileEntity {
      */
     @Overwrite
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory.getWrapperForDirection(facing));
-        } else {
-            return (capability == CapabilityEnergy.ENERGY && this.energyStorage.getMaxEnergyStored() > 0 ? CapabilityEnergy.ENERGY.cast(this.n$energy.setStorage(energyStorage)) : super.getCapability(capability, facing));
-        }
+        return capability == CapabilityEnergy.ENERGY ? CapabilityEnergy.ENERGY.cast(this.n$energy.setStorage(energy)) : super.getCapability(capability, facing);
     }
-
 }

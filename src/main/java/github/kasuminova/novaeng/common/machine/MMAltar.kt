@@ -220,7 +220,12 @@ object MMAltar : MachineSpecial {
                         it.setFailed("novaeng.mm_altar.failed.1")
                         return@addPreCheckHandler
                     }
-                    val soulNetwork = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
+                    val b = Binding.fromStack(item)
+                    if (b == null) {
+                        it.setFailed("novaeng.mm_altar.failed.1")
+                        return@addPreCheckHandler
+                    }
+                    val soulNetwork = NetworkHelper.getSoulNetwork(b)
                     if (soulNetwork.currentEssence >= NetworkHelper.getMaximumForTier(
                             NetworkHelper.getCurrentMaxOrb(
                                 soulNetwork
@@ -241,7 +246,8 @@ object MMAltar : MachineSpecial {
                 pos.release()
                 if (t is TileLifeEssenceProvider.Output) {
                     val item = t.inventory.getStackInSlot(0)
-                    val soul = NetworkHelper.getSoulNetwork(Binding.fromStack(item))
+                    val b = Binding.fromStack(item) ?: return@addFactoryFinishHandler
+                    val soul = NetworkHelper.getSoulNetwork(b)
                     soul.currentEssence += altar.drainBlood(10000)
                 }
 

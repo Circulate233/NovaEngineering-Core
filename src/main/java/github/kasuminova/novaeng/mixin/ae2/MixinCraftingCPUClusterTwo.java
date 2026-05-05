@@ -96,12 +96,12 @@ public abstract class MixinCraftingCPUClusterTwo {
         for (IAEItemStack anInput : input) {
             if (anInput != null) {
                 if (anInput.getItem() == FCItems.FLUID_DROP) {
-                    sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, (double) 1.0F);
+                    sum += Math.max((double) anInput.getStackSize() / (double) 1000.0F, 1.0F);
                     continue;
                 }
 
                 if (ModAndClassUtil.GAS && anInput.getItem() == FCGasItems.GAS_DROP) {
-                    sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, (double) 1.0F);
+                    sum += Math.max((double) anInput.getStackSize() / (double) 4000.0F, 1.0F);
                     continue;
                 }
                 sum += anInput.getStackSize();
@@ -145,7 +145,7 @@ public abstract class MixinCraftingCPUClusterTwo {
 
         while (i.hasNext()) {
             Map.Entry<ICraftingPatternDetails, AccessorTaskProgress> e = i.next();
-            val value = ((AccessorTaskProgress) e.getValue());
+            val value = e.getValue();
             if (value.getValue() <= 0L) {
                 i.remove();
             } else {

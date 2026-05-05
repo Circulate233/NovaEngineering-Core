@@ -5,13 +5,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import vazkii.psi.api.spell.*;
+import vazkii.psi.api.spell.Spell;
+import vazkii.psi.api.spell.SpellCompilationException;
+import vazkii.psi.api.spell.SpellContext;
+import vazkii.psi.api.spell.SpellMetadata;
+import vazkii.psi.api.spell.SpellParam;
 import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.spell.trick.PieceTrickExplode;
 
-@Mixin(value = PieceTrickExplode.class,remap = false)
+@Mixin(value = PieceTrickExplode.class, remap = false)
 public abstract class MixinPieceTrickExplode extends PieceTrick {
 
+    @Unique
+    private static final Double novaEngineering_Core$MAXPOWER = 5.0D;
     @Shadow
     SpellParam position;
     @Shadow
@@ -21,12 +27,10 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
         super(spell);
     }
 
-    @Shadow public abstract void addToMetadata(SpellMetadata meta) throws SpellCompilationException;
+    @Shadow
+    public abstract void addToMetadata(SpellMetadata meta) throws SpellCompilationException;
 
-    @Unique
-    private static final Double novaEngineering_Core$MAXPOWER = 5.0D;
-
-    @Redirect(method = "addToMetadata",at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamEvaluation(Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;"))
+    @Redirect(method = "addToMetadata", at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamEvaluation(Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;"))
     public Object addToMetadataMixin(PieceTrickExplode instance, SpellParam spellParam) throws SpellCompilationException {
         Double powerVal = this.getParamEvaluation(this.power);
         if (powerVal != null && powerVal > novaEngineering_Core$MAXPOWER) {
@@ -35,10 +39,10 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
         return powerVal;
     }
 
-    @Redirect(method = "execute",at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamValue(Lvazkii/psi/api/spell/SpellContext;Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;",ordinal = 1))
+    @Redirect(method = "execute", at = @At(value = "INVOKE", target = "Lvazkii/psi/common/spell/trick/PieceTrickExplode;getParamValue(Lvazkii/psi/api/spell/SpellContext;Lvazkii/psi/api/spell/SpellParam;)Ljava/lang/Object;", ordinal = 1))
     public Object executeRed(PieceTrickExplode instance, SpellContext spellContext, SpellParam spellParam) {
         Double powerVal = this.getParamValue(spellContext, this.power);
-        if (spellContext != null && powerVal != null && powerVal > novaEngineering_Core$MAXPOWER){
+        if (spellContext != null && powerVal != null && powerVal > novaEngineering_Core$MAXPOWER) {
             return novaEngineering_Core$MAXPOWER;
         }
         return powerVal;

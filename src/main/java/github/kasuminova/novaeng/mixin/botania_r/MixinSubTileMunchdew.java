@@ -61,7 +61,7 @@ public class MixinSubTileMunchdew extends SubTileGenerating {
 
                     if (!coords.isEmpty()) {
                         Collections.shuffle(coords);
-                        BlockPos breakCoords = (BlockPos) coords.get(0);
+                        BlockPos breakCoords = coords.getFirst();
                         IBlockState state = this.supertile.getWorld().getBlockState(breakCoords);
                         this.supertile.getWorld().setBlockToAir(breakCoords);
                         this.ticksWithoutEating = 0;

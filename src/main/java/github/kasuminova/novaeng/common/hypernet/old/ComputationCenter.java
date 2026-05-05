@@ -2,8 +2,8 @@ package github.kasuminova.novaeng.common.hypernet.old;
 
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.event.recipe.RecipeCheckEvent;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.mmce.common.helper.IMachineController;
+import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.hypernet.HyperNetHelper;
 import github.kasuminova.novaeng.common.hypernet.old.misc.ConnectResult;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -34,13 +34,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @ZenClass("novaeng.hypernet.ComputationCenter")
 public class ComputationCenter {
     private static final Map<TileMultiblockMachineController, ComputationCenter> CACHED_COMPUTATION_CENTER = new WeakHashMap<>();
-
+    private static final boolean DEBUG_LOG_BUDGET = false;
     @Getter
     private final TileMultiblockMachineController owner;
     private final Map<Class<?>, Map<BlockPos, NetNode>> nodes = new ConcurrentHashMap<>();
-
-    private static final boolean DEBUG_LOG_BUDGET = false;
-
     private final ComputationCenterType type;
     private TickComputationBudget tickBudget = TickComputationBudget.empty(-1L);
 

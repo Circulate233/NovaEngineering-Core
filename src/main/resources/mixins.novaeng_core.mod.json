@@ -49,6 +49,8 @@
     "ae2.MixinTileChestFilter",
     "ae2.MixinTileDriveFilter",
     "ar.MixinDimensionProperties",
+    "ar.MixinTileForgePowerInput",
+    "ar.MixinTileForgePowerOutput",
     "astralsorcery.MixinBlockCustomOre",
     "astralsorcery.MixinPlayerAttributeMap",
     "athenaeum.MixinEnchantmentHelper",
@@ -70,6 +72,7 @@
     "ic2.AccessorTileEntityInventory",
     "ic2.MixinBasicMachineRecipeManager",
     "ic2.MixinNetworkManager",
+    "ic2.MixinTileEntityBlock",
     "ic2.MixinTileEntityMatter",
     "ic2.MixinTileEntityReplicator",
     "libvulpes.MixinTileFluidHatch",
@@ -90,12 +93,13 @@
     "mmce.MixinWorldSceneRendererWidget",
     "nae2.MixinJEICellCategory",
     "nco.MixinFluidTileWrapper",
-    "threng.MixinL9AspectInventory",
-    "threng.MixinL9AspectSlot",
     "packagedauto.MixinPacketEjectTracker",
     "packagedauto.MixinTileBase",
     "psi.MixinPieceTrickExplode",
     "rftools.MixinBuilderTileEntity",
-    "techguns.MixinItemRenderHack"
+    "techguns.MixinBasicPoweredTileEnt",
+    "techguns.MixinItemRenderHack",
+    "threng.MixinL9AspectInventory",
+    "threng.MixinL9AspectSlot"
   ]
 }

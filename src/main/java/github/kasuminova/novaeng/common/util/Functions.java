@@ -34,6 +34,7 @@ import net.minecraft.util.text.translation.I18n;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+@SuppressWarnings("deprecation")
 @ZenRegister
 @ZenClass("novaeng.Function")
 public class Functions {
@@ -106,9 +107,6 @@ public class Functions {
 
     @ZenMethod
     public static String getText(String key, Object... objs) {
-        if (NovaEngineeringCore.proxy.isClient()) {
-            return I18n.translateToLocalFormatted(key, objs);
-        }
-        return key;
+        return I18n.translateToLocalFormatted(key, objs);
     }
 }

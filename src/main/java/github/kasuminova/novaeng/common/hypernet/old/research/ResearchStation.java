@@ -16,6 +16,7 @@ import hellfirepvp.modularmachinery.common.crafting.helper.CraftingStatus;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.TileFactoryController;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -81,9 +82,7 @@ public class ResearchStation extends NetNode {
             return;
         }
 
-        if (nodes.stream()
-                 .map(Database.class::cast)
-                 .noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
+        if (nodes.stream().noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
             event.setFailed("网络中所有的数据库存储已满！");
         }
     }
@@ -179,7 +178,7 @@ public class ResearchStation extends NetNode {
 
         Collection<Database> databases = center.getNode(Database.class).stream()
                                                .filter(Database::isWorking)
-                                               .collect(Collectors.toList());
+                                               .collect(Collectors.toCollection(ObjectArrayList::new));
         if (databases.isEmpty()) {
             return;
         }
