@@ -100,39 +100,39 @@ public class GeocentricDrill implements MachineSpecial {
     private static void addOres(final Map<String, ItemStack> rawOres) {
         List<ItemStack> dustDraconium = OreDictionary.getOres("dustDraconium", false);
         if (!dustDraconium.isEmpty()) {
-            rawOres.put("dustDraconium", ItemUtils.copyStackWithSize(dustDraconium.get(0), ORE_COUNT));
+            rawOres.put("dustDraconium", ItemUtils.copyStackWithSize(dustDraconium.getFirst(), ORE_COUNT));
         }
         List<ItemStack> blockSkyStone = OreDictionary.getOres("blockSkyStone", false);
         if (!blockSkyStone.isEmpty()) {
-            rawOres.put("blockSkyStone", ItemUtils.copyStackWithSize(blockSkyStone.get(0), 8));
+            rawOres.put("blockSkyStone", ItemUtils.copyStackWithSize(blockSkyStone.getFirst(), 8));
         }
         List<ItemStack> crystalLitherite = OreDictionary.getOres("crystalLitherite", false);
         if (!crystalLitherite.isEmpty()) {
-            rawOres.put("crystalLitherite", ItemUtils.copyStackWithSize(crystalLitherite.get(0), 8));
+            rawOres.put("crystalLitherite", ItemUtils.copyStackWithSize(crystalLitherite.getFirst(), 8));
         }
         List<ItemStack> crystalErodium = OreDictionary.getOres("crystalErodium", false);
         if (!crystalErodium.isEmpty()) {
-            rawOres.put("crystalErodium", ItemUtils.copyStackWithSize(crystalErodium.get(0), 6));
+            rawOres.put("crystalErodium", ItemUtils.copyStackWithSize(crystalErodium.getFirst(), 6));
         }
         List<ItemStack> crystalLonsdaleite = OreDictionary.getOres("crystalLonsdaleite", false);
         if (!crystalLonsdaleite.isEmpty()) {
-            rawOres.put("crystalLonsdaleite", ItemUtils.copyStackWithSize(crystalLonsdaleite.get(0), 4));
+            rawOres.put("crystalLonsdaleite", ItemUtils.copyStackWithSize(crystalLonsdaleite.getFirst(), 4));
         }
         List<ItemStack> crystalKyronite = OreDictionary.getOres("crystalKyronite", false);
         if (!crystalKyronite.isEmpty()) {
-            rawOres.put("crystalKyronite", ItemUtils.copyStackWithSize(crystalKyronite.get(0), 4));
+            rawOres.put("crystalKyronite", ItemUtils.copyStackWithSize(crystalKyronite.getFirst(), 4));
         }
         List<ItemStack> crystalPladium = OreDictionary.getOres("crystalPladium", false);
         if (!crystalPladium.isEmpty()) {
-            rawOres.put("crystalPladium", ItemUtils.copyStackWithSize(crystalPladium.get(0), 4));
+            rawOres.put("crystalPladium", ItemUtils.copyStackWithSize(crystalPladium.getFirst(), 4));
         }
         List<ItemStack> crystalIonite = OreDictionary.getOres("crystalIonite", false);
         if (!crystalIonite.isEmpty()) {
-            rawOres.put("crystalIonite", ItemUtils.copyStackWithSize(crystalIonite.get(0), 4));
+            rawOres.put("crystalIonite", ItemUtils.copyStackWithSize(crystalIonite.getFirst(), 4));
         }
         List<ItemStack> crystalAethium = OreDictionary.getOres("crystalAethium", false);
         if (!crystalAethium.isEmpty()) {
-            rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.get(0), 2));
+            rawOres.put("crystalAethium", ItemUtils.copyStackWithSize(crystalAethium.getFirst(), 2));
         }
         rawOres.put("glowstone_dust", new ItemStack(Items.GLOWSTONE_DUST, 24));
     }
@@ -148,7 +148,7 @@ public class GeocentricDrill implements MachineSpecial {
               .forEach(oreName -> {
                   NonNullList<ItemStack> ores = OreDictionary.getOres(oreName);
                   if (!ores.isEmpty() && !oreName.equals("rawOreAluminium")) {
-                      ItemStack stack = ores.get(0).copy();
+                      ItemStack stack = ores.getFirst().copy();
                       stack.setCount(ORE_COUNT);
                       rawOres.put(oreName, stack);
                   }

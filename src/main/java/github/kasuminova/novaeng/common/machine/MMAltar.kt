@@ -522,9 +522,7 @@ object MMAltar : MachineSpecial {
             t = this.world.getTileEntity(this.pos.offset(EnumFacing.DOWN, 4)) as? TileAltar
         } else return t
         if (t != null) {
-            synchronized(MMAltar) {
-                chace.put(this, t)
-            }
+            chace[this] = t
         }
         return t
     }

@@ -111,18 +111,16 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
     @SuppressWarnings("ReturnOfInnerClass")
     public final class DreamenergyHandler implements IEnergyHandler {
 
-        private static final BigInteger max = BigDecimal.valueOf(1.0E256d).toBigInteger();
+        private static final BigInteger max = BigDecimal.valueOf(Double.MAX_VALUE).toBigInteger();
+        private static final byte SUCCEEDED = 1;
+        private static final byte FAILED = 2;
         private final EnergyAmount receive = EnergyAmount.obtain(0);
         private final EnergyAmount send = EnergyAmount.obtain(0);
         private final EnergyAmount canSend = EnergyAmount.obtain(0);
-        private boolean init = false;
+        private byte init = 0;
 
         @Override
         public IEnergyHandler init(TileEntity tileEntity, HubNode.HubMetadata hubMetadata) {
-            if (getCtrlStructureFormed()) {
-                canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
-                init = true;
-            } else init = false;
             return this;
         }
 
@@ -133,15 +131,15 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public void clear() {
-            if (init) {
+            if (init == SUCCEEDED) {
                 var ctrl = getCtrl();
                 DreamEnergyCore.extractEnergy(ctrl, send.asBigInteger());
                 DreamEnergyCore.receiveEnergy(ctrl, receive.asBigInteger());
-                canSend.setZero();
-                receive.setZero();
-                send.setZero();
-                init = false;
             }
+            canSend.setZero();
+            receive.setZero();
+            send.setZero();
+            init = 0;
         }
 
         @Override
@@ -169,7 +167,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public boolean canExtract(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            if (!init) {
+            if (init != SUCCEEDED) {
                 return false;
             }
             return canSend.compareTo(0) > 0;
@@ -177,7 +175,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public boolean canReceive(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            return init;
+            return init == SUCCEEDED;
         }
 
         @Override
@@ -187,7 +185,13 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public EnergyType getType(HubNode.HubMetadata hubMetadata) {
-            if (init) {
+            if (init == 0) {
+                if (getCtrlStructureFormed()) {
+                    canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
+                    init = SUCCEEDED;
+                } else init = FAILED;
+            }
+            if (init == SUCCEEDED) {
                 return EnergyType.STORAGE;
             }
             return EnergyType.INVALID;
