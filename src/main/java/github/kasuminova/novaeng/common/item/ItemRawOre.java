@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ReferenceCollection;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
 import static github.kasuminova.novaeng.common.registry.RegistryItems.ITEMS_TO_REGISTER;
@@ -43,6 +45,7 @@ public final class ItemRawOre extends Item {
     };
     private static final Object2ReferenceMap<String, BlockRawOre> allItemRawBlock = new Object2ReferenceOpenHashMap<>();
     private static final Object2ReferenceMap<String, BlockRawOre.ItemBLockRawOre> allItemRawBlockItem = new Object2ReferenceOpenHashMap<>();
+    public static List<Runnable> regOres = new ObjectArrayList<>();
 
     @Getter
     private final String rawOD;
@@ -68,7 +71,7 @@ public final class ItemRawOre extends Item {
         this.partOD = type.name().toLowerCase() + name;
         allItemRawOre.put(this.name, this);
         allItemRawBlock.put(this.name, new BlockRawOre(name));
-        OreDictionary.registerOre(this.getRawOD(), this);
+        regOres.add(() -> OreDictionary.registerOre(this.getRawOD(), this));
     }
 
     public static ItemRawOre getRawOre(String name) {

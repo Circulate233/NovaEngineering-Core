@@ -112,9 +112,17 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
     public final class DreamenergyHandler implements IEnergyHandler {
 
         private static final BigInteger max = BigDecimal.valueOf(1.0E256d).toBigInteger();
+        private final EnergyAmount receive = EnergyAmount.obtain(0);
+        private final EnergyAmount send = EnergyAmount.obtain(0);
+        private final EnergyAmount canSend = EnergyAmount.obtain(0);
+        private boolean init = false;
 
         @Override
         public IEnergyHandler init(TileEntity tileEntity, HubNode.HubMetadata hubMetadata) {
+            if (getCtrlStructureFormed()) {
+                canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
+                init = true;
+            } else init = false;
             return this;
         }
 
@@ -125,25 +133,33 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public void clear() {
-
+            if (init) {
+                var ctrl = getCtrl();
+                DreamEnergyCore.extractEnergy(ctrl, send.asBigInteger());
+                DreamEnergyCore.receiveEnergy(ctrl, receive.asBigInteger());
+                canSend.setZero();
+                receive.setZero();
+                send.setZero();
+                init = false;
+            }
         }
 
         @Override
         public EnergyAmount receiveEnergy(EnergyAmount energyAmount, HubNode.HubMetadata hubMetadata) {
-            DreamEnergyCore.receiveEnergy(getCtrl(), energyAmount.asBigInteger());
+            receive.add(energyAmount);
             return energyAmount;
         }
 
         @Override
         public EnergyAmount extractEnergy(EnergyAmount energyAmount, HubNode.HubMetadata hubMetadata) {
-            var ctrl = getCtrl();
-            DreamEnergyCore.extractEnergy(ctrl, energyAmount.asBigInteger());
-            return EnergyAmount.obtain(DreamEnergyCore.getEnergyStoredString(ctrl)).min(energyAmount);
+            canSend.subtract(energyAmount);
+            send.add(energyAmount);
+            return EnergyAmount.obtain(energyAmount);
         }
 
         @Override
         public EnergyAmount canExtractValue(HubNode.HubMetadata hubMetadata) {
-            return EnergyAmount.obtain(DreamEnergyCore.getEnergyStoredString(getCtrl()));
+            return EnergyAmount.obtain(canSend);
         }
 
         @Override
@@ -153,28 +169,28 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public boolean canExtract(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            if (!getCtrlStructureFormed()) {
+            if (!init) {
                 return false;
             }
-            return DreamEnergyCore.getEnergyStored(getCtrl()).compareTo(BigInteger.ZERO) > 0;
+            return canSend.compareTo(0) > 0;
         }
 
         @Override
         public boolean canReceive(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            return getCtrlStructureFormed();
+            return init;
         }
 
         @Override
         public void recycle() {
-
+            clear();
         }
 
         @Override
         public EnergyType getType(HubNode.HubMetadata hubMetadata) {
-            if (!getCtrlStructureFormed()) {
-                return EnergyType.INVALID;
+            if (init) {
+                return EnergyType.STORAGE;
             }
-            return EnergyType.STORAGE;
+            return EnergyType.INVALID;
         }
     }
 }

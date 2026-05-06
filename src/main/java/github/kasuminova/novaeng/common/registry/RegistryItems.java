@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.client.renderer.EStorageEnergyCellItemRenderer;
 import github.kasuminova.novaeng.common.item.ItemBasic;
 import github.kasuminova.novaeng.common.item.ItemHorologiumCompass;
 import github.kasuminova.novaeng.common.item.ItemMachineAssemblyTool;
+import github.kasuminova.novaeng.common.item.ItemRawOre;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellFluid;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellGas;
@@ -149,5 +150,9 @@ public class RegistryItems {
         registerItems();
 
         GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
+        for (var regOre : ItemRawOre.regOres) {
+            regOre.run();
+        }
+        ItemRawOre.regOres = null;
     }
 }
