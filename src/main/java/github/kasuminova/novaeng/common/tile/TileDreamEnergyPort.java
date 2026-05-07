@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.tile;
 
 import com.circulation.circulation_networks.api.EnergyAmount;
+import com.circulation.circulation_networks.api.EnergyAmounts;
 import com.circulation.circulation_networks.api.IEnergyHandler;
 import com.circulation.circulation_networks.api.IMachineNodeBlockEntity;
 import com.circulation.circulation_networks.api.node.IMachineNode;
@@ -67,7 +68,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
             return null;
         }
         if (this.world.getTileEntity(ctrlPos) instanceof TileMultiblockMachineController ctrl) {
-            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().equals(DreamEnergyCore.REGISTRY_NAME)) {
+            if (ctrl.getFoundMachine() != null && ctrl.getFoundMachine().getRegistryName().getPath().equals(DreamEnergyCore.REGISTRY_NAME.getPath())) {
                 return ctrl;
             }
         }
@@ -121,6 +122,10 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public IEnergyHandler init(TileEntity tileEntity, HubNode.HubMetadata hubMetadata) {
+            if (getCtrlStructureFormed()) {
+                canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
+                init = SUCCEEDED;
+            } else init = FAILED;
             return this;
         }
 
@@ -157,12 +162,14 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public EnergyAmount canExtractValue(HubNode.HubMetadata hubMetadata) {
-            return EnergyAmount.obtain(canSend);
+            if (init == SUCCEEDED) return EnergyAmount.obtain(canSend);
+            return EnergyAmounts.ZERO;
         }
 
         @Override
         public EnergyAmount canReceiveValue(HubNode.HubMetadata hubMetadata) {
-            return EnergyAmount.obtain(max);
+            if (init == SUCCEEDED) return EnergyAmount.obtain(max);
+            return EnergyAmounts.ZERO;
         }
 
         @Override
@@ -185,12 +192,6 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public EnergyType getType(HubNode.HubMetadata hubMetadata) {
-            if (init == 0) {
-                if (getCtrlStructureFormed()) {
-                    canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
-                    init = SUCCEEDED;
-                } else init = FAILED;
-            }
             if (init == SUCCEEDED) {
                 return EnergyType.STORAGE;
             }
