@@ -78,6 +78,7 @@
     "libvulpes.MixinTileFluidHatch",
     "lootoverhaul.MixinConfigIdFileGenerator",
     "mets.MixinEntityTachyonBullet",
+    "minecraft.MixinWorld",
     "mmce.AccessorAbstractMachine",
     "mmce.MixinBlockArrayCache",
     "mmce.MixinBlockArrayPreviewRenderHelper",
