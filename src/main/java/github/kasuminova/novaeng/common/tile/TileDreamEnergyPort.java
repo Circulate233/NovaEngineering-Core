@@ -150,7 +150,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
         @Override
         public EnergyAmount receiveEnergy(EnergyAmount energyAmount, HubNode.HubMetadata hubMetadata) {
             receive.add(energyAmount);
-            return energyAmount;
+            return EnergyAmount.obtain(energyAmount);
         }
 
         @Override
@@ -174,10 +174,7 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
         @Override
         public boolean canExtract(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            if (init != SUCCEEDED) {
-                return false;
-            }
-            return canSend.compareTo(0) > 0;
+            return init == SUCCEEDED && canSend.compareTo(0) > 0;
         }
 
         @Override
