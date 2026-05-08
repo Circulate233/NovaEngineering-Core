@@ -45,10 +45,10 @@ dependencies {
 
     modImplementation 'curse.maven:modularui-624243:7929464'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:5354477'
-    modImplementation 'curse.maven:modularmachinery-community-edition-817377:7306619'
     modImplementation name: 'MMCE-ComponentModelHider', version: '1.1', classifier: 'dev'
     modImplementation name: 'resourceloader', version: '1.5.3', classifier: 'main'
     modImplementation name: 'circulation_networks-1.12.2', version: '1.0.3', classifier: 'dev'
+    modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
     modImplementation 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
     modImplementation 'curse.maven:lumenized-1234162:6378222'
     modImplementation 'curse.maven:mantle-74924:2713386'

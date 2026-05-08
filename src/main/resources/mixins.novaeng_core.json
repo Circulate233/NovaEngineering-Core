@@ -19,6 +19,7 @@
     "minecraft.forge.MixinForgeHooksClient"
   ],
   "mixins": [
+    "minecraft.MixinWorld",
     "minecraft.MixinNettyPacketDecoder",
     "minecraft.MixinRecipeBookServer",
     "minecraft.forge.MixinFMLProxyPacket",

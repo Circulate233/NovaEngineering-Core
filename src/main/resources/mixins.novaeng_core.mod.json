@@ -34,6 +34,7 @@
     "immersiveengineering.MixinTileEntityExcavator"
   ],
   "mixins": [
+    "actuallyadditions.MixinTileEntityPhantomface",
     "ae2.AccessorAbstractCellInventory",
     "ae2.AccessorCellRegistry",
     "ae2.AccessorContainerCraftConfirm",
@@ -78,7 +79,6 @@
     "libvulpes.MixinTileFluidHatch",
     "lootoverhaul.MixinConfigIdFileGenerator",
     "mets.MixinEntityTachyonBullet",
-    "minecraft.MixinWorld",
     "mmce.AccessorAbstractMachine",
     "mmce.MixinBlockArrayCache",
     "mmce.MixinBlockArrayPreviewRenderHelper",

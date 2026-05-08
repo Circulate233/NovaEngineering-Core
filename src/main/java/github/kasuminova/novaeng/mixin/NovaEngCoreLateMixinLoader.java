@@ -43,6 +43,7 @@ public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
             case "botania_r" -> Loader.isModLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
             case "ae2" -> Loader.isModLoaded("appliedenergistics2");
             case "ar" -> Loader.isModLoaded("advancedrocketry");
+            case "actuallyadditions" -> Loader.isModLoaded("actuallyadditions");
             case "astralsorcery" -> Loader.isModLoaded("astralsorcery");
             case "athenaeum" -> Loader.isModLoaded("athenaeum");
             case "betterp2p" -> Loader.isModLoaded("betterp2p");
