@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.util;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jspecify.annotations.NonNull;
 
 import java.util.AbstractList;
@@ -13,36 +13,36 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.Set;
+import java.util.function.Function;
 
-public class SetList<T, S extends Set<?>> extends AbstractList<T> implements RandomAccess {
+public class SetList<T, S extends Set<R>, R> extends AbstractList<T> implements RandomAccess {
 
     private final List<T> list = new ObjectArrayList<>();
     private final S set;
-    private final SetAdd<T, S> add;
-    private final SetRemove<T, S> remove;
-    private final Map<T, WriteRecord> writeRecords;
+    private final Map<R, WriteRecord> writeRecords;
+    private final Function<T, R> getKey;
 
-    public SetList(S set, SetAdd<T, S> add, SetRemove<T, S> remove) {
-        this(set, add, remove, new Reference2ObjectOpenHashMap<>());
+    public SetList(S set, Function<T, R> getKey) {
+        this(set, new Object2ObjectOpenHashMap<>(), getKey);
     }
 
     @SuppressWarnings("ClassEscapesDefinedScope")
-    public SetList(S set, SetAdd<T, S> add, SetRemove<T, S> remove, Map<T, WriteRecord> writeRecords) {
+    public SetList(S set, Map<R, WriteRecord> writeRecords, Function<T, R> getKey) {
         this.set = set;
-        this.add = add;
-        this.remove = remove;
         this.writeRecords = writeRecords;
+        this.getKey = getKey;
     }
 
     @Override
     public boolean add(T element) {
         WriteRecord currentRecord = captureWriteRecord(element);
-        if (!add.added(set, element)) {
-            warnDuplicate(element, currentRecord, writeRecords.get(element));
+        var key = getKey.apply(element);
+        if (!set.add(key)) {
+            warnDuplicate(element, currentRecord, writeRecords.get(key));
             return false;
         }
         list.add(element);
-        writeRecords.put(element, currentRecord);
+        writeRecords.put(key, currentRecord);
         modCount++;
         return true;
     }
@@ -50,12 +50,13 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
     @Override
     public void add(int index, T element) {
         WriteRecord currentRecord = captureWriteRecord(element);
-        if (!add.added(set, element)) {
-            warnDuplicate(element, currentRecord, writeRecords.get(element));
+        var key = getKey.apply(element);
+        if (!set.add(key)) {
+            warnDuplicate(element, currentRecord, writeRecords.get(key));
             return;
         }
         list.add(index, element);
-        writeRecords.put(element, currentRecord);
+        writeRecords.put(key, currentRecord);
         modCount++;
     }
 
@@ -80,13 +81,14 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
         boolean changed = false;
         for (T element : collection) {
             WriteRecord currentRecord = captureWriteRecord(element);
-            if (add.added(set, element)) {
+            var key = getKey.apply(element);
+            if (set.add(key)) {
                 list.add(insertIndex, element);
-                writeRecords.put(element, currentRecord);
+                writeRecords.put(key, currentRecord);
                 insertIndex++;
                 changed = true;
             } else {
-                warnDuplicate(element, currentRecord, writeRecords.get(element));
+                warnDuplicate(element, currentRecord, writeRecords.get(key));
             }
         }
         if (changed) {
@@ -102,27 +104,30 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
             return oldValue;
         }
 
+        var key = getKey.apply(element);
         WriteRecord currentRecord = captureWriteRecord(element);
         int existingIndex = list.indexOf(element);
         if (existingIndex >= 0) {
-            warnDuplicate(element, currentRecord, writeRecords.get(element));
+            warnDuplicate(element, currentRecord, writeRecords.get(key));
             list.remove(existingIndex);
             if (existingIndex < index) {
                 index--;
             }
             list.set(index, element);
-            remove.removed(set, oldValue);
-            writeRecords.remove(oldValue);
-            writeRecords.put(element, currentRecord);
+            var oldkey = getKey.apply(oldValue);
+            set.remove(oldkey);
+            writeRecords.remove(oldkey);
+            writeRecords.put(oldkey, currentRecord);
             modCount++;
             return oldValue;
         }
 
         list.set(index, element);
-        remove.removed(set, oldValue);
-        add.added(set, element);
-        writeRecords.remove(oldValue);
-        writeRecords.put(element, currentRecord);
+        var oldkey = getKey.apply(oldValue);
+        set.remove(oldkey);
+        set.add(key);
+        writeRecords.remove(oldkey);
+        writeRecords.put(oldkey, currentRecord);
         modCount++;
         return oldValue;
     }
@@ -135,24 +140,11 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
     @Override
     public T remove(int index) {
         T removed = list.remove(index);
-        remove.removed(set, removed);
-        writeRecords.remove(removed);
+        var key = getKey.apply(removed);
+        set.remove(key);
+        writeRecords.remove(key);
         modCount++;
         return removed;
-    }
-
-    @FunctionalInterface
-    public interface SetAdd<T, S extends Set<?>> {
-
-        boolean added(S set, T t);
-
-    }
-
-    @FunctionalInterface
-    public interface SetRemove<T, S extends Set<?>> {
-
-        void removed(S set, T t);
-
     }
 
     @Override
