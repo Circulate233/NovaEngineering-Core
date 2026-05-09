@@ -71,7 +71,7 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
 
     @Override
     public boolean contains(Object o) {
-        return set.contains(o);
+        return list.contains(o);
     }
 
     @Override
