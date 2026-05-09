@@ -2,11 +2,14 @@ package github.kasuminova.novaeng.common.util;
 
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jspecify.annotations.NonNull;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.Set;
@@ -17,31 +20,42 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
     private final S set;
     private final SetAdd<T, S> add;
     private final SetRemove<T, S> remove;
+    private final Map<T, WriteRecord> writeRecords;
 
     public SetList(S set, SetAdd<T, S> add, SetRemove<T, S> remove) {
+        this(set, add, remove, new Reference2ObjectOpenHashMap<>());
+    }
+
+    @SuppressWarnings("ClassEscapesDefinedScope")
+    public SetList(S set, SetAdd<T, S> add, SetRemove<T, S> remove, Map<T, WriteRecord> writeRecords) {
         this.set = set;
         this.add = add;
         this.remove = remove;
+        this.writeRecords = writeRecords;
     }
 
     @Override
     public boolean add(T element) {
+        WriteRecord currentRecord = captureWriteRecord(element);
         if (!add.added(set, element)) {
-            warnDuplicate(element);
+            warnDuplicate(element, currentRecord, writeRecords.get(element));
             return false;
         }
         list.add(element);
+        writeRecords.put(element, currentRecord);
         modCount++;
         return true;
     }
 
     @Override
     public void add(int index, T element) {
+        WriteRecord currentRecord = captureWriteRecord(element);
         if (!add.added(set, element)) {
-            warnDuplicate(element);
+            warnDuplicate(element, currentRecord, writeRecords.get(element));
             return;
         }
         list.add(index, element);
+        writeRecords.put(element, currentRecord);
         modCount++;
     }
 
@@ -65,12 +79,14 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
         int insertIndex = index;
         boolean changed = false;
         for (T element : collection) {
+            WriteRecord currentRecord = captureWriteRecord(element);
             if (add.added(set, element)) {
                 list.add(insertIndex, element);
+                writeRecords.put(element, currentRecord);
                 insertIndex++;
                 changed = true;
             } else {
-                warnDuplicate(element);
+                warnDuplicate(element, currentRecord, writeRecords.get(element));
             }
         }
         if (changed) {
@@ -86,15 +102,18 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
             return oldValue;
         }
 
+        WriteRecord currentRecord = captureWriteRecord(element);
         int existingIndex = list.indexOf(element);
         if (existingIndex >= 0) {
-            warnDuplicate(element);
+            warnDuplicate(element, currentRecord, writeRecords.get(element));
             list.remove(existingIndex);
             if (existingIndex < index) {
                 index--;
             }
             list.set(index, element);
             remove.removed(set, oldValue);
+            writeRecords.remove(oldValue);
+            writeRecords.put(element, currentRecord);
             modCount++;
             return oldValue;
         }
@@ -102,6 +121,8 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
         list.set(index, element);
         remove.removed(set, oldValue);
         add.added(set, element);
+        writeRecords.remove(oldValue);
+        writeRecords.put(element, currentRecord);
         modCount++;
         return oldValue;
     }
@@ -115,6 +136,7 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
     public T remove(int index) {
         T removed = list.remove(index);
         remove.removed(set, removed);
+        writeRecords.remove(removed);
         modCount++;
         return removed;
     }
@@ -135,7 +157,7 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
 
     @Override
     public boolean remove(Object o) {
-        int index = list.indexOf(o);
+        int index = indexOf(o);
         if (index < 0) {
             return false;
         }
@@ -150,6 +172,7 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
         }
         list.clear();
         set.clear();
+        writeRecords.clear();
         modCount++;
     }
 
@@ -163,7 +186,65 @@ public class SetList<T, S extends Set<?>> extends AbstractList<T> implements Ran
         return list.lastIndexOf(o);
     }
 
-    private void warnDuplicate(T element) {
-        NovaEngineeringCore.log.warn("[{}]SetList detected duplicate element: {}", Thread.currentThread().getName(), element);
+    private WriteRecord captureWriteRecord(T element) {
+        return new WriteRecord(
+            Thread.currentThread().getName(),
+            String.valueOf(element),
+            formatStackTrace(captureStackTrace())
+        );
+    }
+
+    private StackTraceElement[] captureStackTrace() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int startIndex = 0;
+        while (startIndex < stackTrace.length && isInternalFrame(stackTrace[startIndex])) {
+            startIndex++;
+        }
+        return Arrays.copyOfRange(stackTrace, startIndex, stackTrace.length);
+    }
+
+    private boolean isInternalFrame(StackTraceElement element) {
+        String className = element.getClassName();
+        return Thread.class.getName().equals(className) || SetList.class.getName().equals(className);
+    }
+
+    private String formatStackTrace(StackTraceElement[] stackTrace) {
+        if (stackTrace.length == 0) {
+            return "<empty>";
+        }
+        StringBuilder builder = new StringBuilder();
+        String lineSeparator = System.lineSeparator();
+        for (StackTraceElement element : stackTrace) {
+            builder.append("\tat ").append(element).append(lineSeparator);
+        }
+        builder.setLength(builder.length() - lineSeparator.length());
+        return builder.toString();
+    }
+
+    private void warnDuplicate(T element, WriteRecord currentRecord, WriteRecord previousRecord) {
+        if (previousRecord == null) {
+            NovaEngineeringCore.log.warn(
+                "SetList detected duplicate element: {}\ncurrent write:\n{}\nprevious write:\n<missing>",
+                element,
+                formatWriteRecord(currentRecord)
+            );
+            return;
+        }
+        NovaEngineeringCore.log.warn(
+            "SetList detected duplicate element: {}\ncurrent write:\n{}\nprevious write:\n{}",
+            element,
+            formatWriteRecord(currentRecord),
+            formatWriteRecord(previousRecord)
+        );
+    }
+
+    private String formatWriteRecord(WriteRecord record) {
+        return "thread: " + record.threadName() + System.lineSeparator()
+            + "element: " + record.elementText() + System.lineSeparator()
+            + "stack:" + System.lineSeparator()
+            + record.stackTraceText();
+    }
+
+    private record WriteRecord(String threadName, String elementText, String stackTraceText) {
     }
 }
