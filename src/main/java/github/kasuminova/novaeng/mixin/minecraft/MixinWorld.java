@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import github.kasuminova.novaeng.common.util.SetList;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import org.objectweb.asm.Opcodes;
@@ -33,11 +34,13 @@ public class MixinWorld {
     @Mutable
     private List<TileEntity> tileEntitiesToBeRemoved;
 
-    @Redirect(method = "<init>",at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;addedTileEntityList:Ljava/util/List;", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;addedTileEntityList:Ljava/util/List;", opcode = Opcodes.PUTFIELD))
     public void onInit(World instance, List<TileEntity> value) {
-        this.loadedTileEntityList = new SetList<>();
-        this.tickableTileEntities = new SetList<>();
-        this.addedTileEntityList = new SetList<>();
-        this.tileEntitiesToBeRemoved = new SetList<>();
+        SetList.SetAdd<TileEntity, LongOpenHashSet> add = (s, t) -> s.add(t.getPos().toLong());
+        SetList.SetRemove<TileEntity, LongOpenHashSet> remove = (s, t) -> s.remove(t.getPos().toLong());
+        this.loadedTileEntityList = new SetList<>(new LongOpenHashSet(), add, remove);
+        this.tickableTileEntities = new SetList<>(new LongOpenHashSet(), add, remove);
+        this.addedTileEntityList = new SetList<>(new LongOpenHashSet(), add, remove);
+        this.tileEntitiesToBeRemoved = new SetList<>(new LongOpenHashSet(), add, remove);
     }
 }
