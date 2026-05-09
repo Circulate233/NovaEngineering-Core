@@ -8,6 +8,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -228,6 +229,11 @@ public class SetList<T, S extends Set<R>, R> extends AbstractList<T> implements 
             formatWriteRecord(currentRecord),
             formatWriteRecord(previousRecord)
         );
+    }
+
+    @Override
+    public @NonNull Iterator<T> iterator() {
+        return list.iterator();
     }
 
     private String formatWriteRecord(WriteRecord record) {
