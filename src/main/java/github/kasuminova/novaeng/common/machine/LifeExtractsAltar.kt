@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.common.machine
 
 import crafttweaker.CraftTweakerAPI.itemUtils
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
+import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent
 import github.kasuminova.mmce.common.event.recipe.RecipeEvent
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.machine.MMAltar.addBlood
@@ -31,6 +32,12 @@ object LifeExtractsAltar : MachineSpecial {
 
     override fun preInit(machine: DynamicMachine) {
         super.init(machine)
+        machine.addMachineEventHandler(
+            MachineStructureUpdateEvent::class.java
+        ) {
+            val controller = it.getController()
+            controller.setWorkMode(TileMultiblockMachineController.WorkMode.SEMI_SYNC)
+        }
         RecipeBuilder.newBuilder("knzj", MACHINEID, 20)
             .addItemInput(itemUtils.getItem("deepmoblearningbm:digital_agonizer", 0)).setChance(0.0f)
             .addItemInput(itemUtils.getItem("contenttweaker:zbk", 0)).setChance(0.0f)
@@ -115,10 +122,15 @@ object LifeExtractsAltar : MachineSpecial {
             data.getInteger("y"),
             data.getInteger("z")
         )
-        val mm_altarctrl =
-            world.getTileEntity(mmpos) as? TileMultiblockMachineController
-        mmpos.release()
-        return mm_altarctrl
+        try {
+            if (world.isBlockLoaded(mmpos)) {
+                val mmAltarctrl =
+                    world.getTileEntity(mmpos) as? TileMultiblockMachineController
+                return mmAltarctrl
+            } else return null
+        } finally {
+            mmpos.release()
+        }
     }
 
     @SideOnly(Side.CLIENT)
