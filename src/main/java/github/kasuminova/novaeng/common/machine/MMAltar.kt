@@ -16,6 +16,7 @@ import crafttweaker.api.item.IIngredient
 import crafttweaker.api.item.IItemStack
 import crafttweaker.api.minecraft.CraftTweakerMC
 import crafttweaker.api.oredict.IOreDictEntry
+import github.kasuminova.mmce.common.concurrent.Sync
 import github.kasuminova.mmce.common.event.client.ControllerGUIRenderEvent
 import github.kasuminova.mmce.common.event.machine.MachineStructureUpdateEvent
 import github.kasuminova.mmce.common.event.machine.MachineTickEvent
@@ -33,7 +34,6 @@ import ink.ikx.mmce.common.utils.StackUtils
 import it.unimi.dsi.fastutil.objects.ObjectLists
 import kport.modularmagic.common.tile.TileLifeEssenceProvider
 import net.minecraft.block.Block
-import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -122,15 +122,19 @@ object MMAltar : MachineSpecial {
             val altar = ctrl.getAltar()
 
             var sacrifice: Short = 0
-            for (pos in ctrl.foundPattern.getPattern().keys) {
-                val realPos: BlockPos = ctrl.getPos().add(pos.x, pos.y, pos.z)
-                val state: IBlockState = ctrl.getWorld().getBlockState(realPos)
-                if (state.block == RegistrarBloodMagicBlocks.BLOOD_RUNE) {
-                    if (state.block.getMetaFromState(state) == 3) ++sacrifice
+            val mpos = BlockPos.MutableBlockPos()
+            val ctrlPos = ctrl.getPos()
+            Sync.addSyncTask {
+                for (pos in ctrl.foundPattern.getPattern().keys) {
+                    mpos.setPos(ctrlPos.x + pos.x, ctrlPos.y + pos.y, ctrlPos.z + pos.z)
+                    val state = ctrl.getWorld().getBlockState(mpos)
+                    if (state.block == RegistrarBloodMagicBlocks.BLOOD_RUNE) {
+                        if (state.block.getMetaFromState(state) == 3) ++sacrifice
+                    }
                 }
+                nbt.setShort("sacrifice", sacrifice)
+                finishCheck(altar, ctrl, nbt)
             }
-            nbt.setShort("sacrifice", sacrifice)
-            finishCheck(altar, ctrl, nbt)
         }
         machine.addMachineEventHandler(MachineTickEvent::class.java) {
             val ctrl = it.controller

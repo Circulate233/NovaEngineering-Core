@@ -38,7 +38,7 @@ import javax.annotation.Nonnull
 class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
     companion object {
-        val PATTERN_SLOTS = 12 * 6
+        const val PATTERN_SLOTS = 12 * 6
     }
 
     val aePatterns = ObjectOpenHashSet<IAEItemStack>()
@@ -178,7 +178,7 @@ class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
     override fun validate() {
         super.validate()
-        if (FMLCommonHandler.instance().getEffectiveSide().isServer) {
+        if (FMLCommonHandler.instance().effectiveSide.isServer) {
             ModularMachinery.EXECUTE_MANAGER.addSyncTask { this.refreshPatterns() }
         }
     }
