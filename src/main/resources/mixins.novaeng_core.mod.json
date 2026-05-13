@@ -73,7 +73,6 @@
     "ic2.AccessorTileEntityInventory",
     "ic2.MixinBasicMachineRecipeManager",
     "ic2.MixinNetworkManager",
-    "ic2.MixinTile",
     "ic2.MixinTileEntityBlock",
     "ic2.MixinTileEntityMatter",
     "ic2.MixinTileEntityReplicator",
