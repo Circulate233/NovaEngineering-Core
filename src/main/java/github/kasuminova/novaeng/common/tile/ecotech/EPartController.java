@@ -141,7 +141,7 @@ public abstract class EPartController<P extends EPart<?>> extends TileCustomCont
         if (getControllerBlock().isInstance(state.getBlock())) {
             controllerRotation = state.getValue(FacingProp.HORIZONTALS);
         } else {
-            NovaEngineeringCore.log.warn("Invalid EPartController block at " + getPos() + " !");
+            NovaEngineeringCore.log.warn("Invalid EPartController block at {} !", getPos());
             controllerRotation = EnumFacing.NORTH;
         }
     }
@@ -168,6 +168,7 @@ public abstract class EPartController<P extends EPart<?>> extends TileCustomCont
 
     @Override
     public void onLoad() {
+        lastStructureCheckTick = -1;
         loaded = true;
     }
 
