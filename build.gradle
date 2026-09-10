@@ -1,22 +1,5 @@
 import org.jetbrains.gradle.ext.Gradle
 
-buildscript {
-    ext.kotlin_version = '2.4.20'
-    repositories {
-        mavenCentral()
-        maven { url = 'https://maven.wagyourtail.xyz/releases' }
-        maven { url = 'https://maven.wagyourtail.xyz/snapshots' }
-        maven { url = 'https://maven.fabricmc.net/' }
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://maven.outlands.top/releases' }
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-lombok:$kotlin_version"
-    }
-}
-
 plugins {
     id 'java'
     id 'java-library'
@@ -25,6 +8,9 @@ plugins {
     id 'com.gradleup.shadow' version '9.4.0'
     id 'xyz.wagyourtail.unimined' version '1.4.37-kappa'
     id 'com.diffplug.spotless' version '8.4.0'
+    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.plugin.lombok" version '2.4.20'
+    id "org.jetbrains.kotlin.kapt" version '2.4.20'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
@@ -245,11 +231,17 @@ tasks.matching { it.name == 'sourcesJar' }.configureEach {
     dependsOn(generateTagsSource)
 }
 
+tasks.matching { it.name.toLowerCase().contains('kotlin') }.configureEach {
+    dependsOn(generateTagsSource)
+}
+
 jar {
     archiveClassifier = 'dev'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    into('/') {
-        from configurations.contain
+    if (configurations.contain.size() > 0) {
+        into('/') {
+            from configurations.contain
+        }
     }
     doFirst {
         manifest {
@@ -345,10 +337,9 @@ tasks.withType(JavaCompile).configureEach {
 
 apply from: 'gradle/scripts/publishing.gradle'
 apply from: 'gradle/scripts/extra.gradle'
-
-apply plugin: 'kotlin'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'org.jetbrains.kotlin.plugin.lombok'
+repositories {
+    mavenCentral()
+}
 kapt {
     keepJavacAnnotationProcessors = true
 }
