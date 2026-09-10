@@ -2,7 +2,8 @@
 // This file is automatically applied after build.gradle + dependencies.gradle is ran
 
 def minecraftVersion = '1.12.2'
-def cleanroomVersion = '0.5.14-alpha'
+// 与 runtime-test 工作流的 CLEANROOM_VERSION 保持一致（安装器参数也随版本变化）。
+def cleanroomVersion = '0.6.10-alpha'
 
 def cleanroomInstaller = configurations.maybeCreate('cleanroomInstaller')
 cleanroomInstaller.canBeConsumed = false
