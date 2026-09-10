@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>novaeng.unimined</groupId>
-  <artifactId>KotlinMetadataRemapShim</artifactId>
-  <version>1.0</version>
+  <artifactId>UniminedPatch</artifactId>
+  <version>1.1</version>
   <packaging>jar</packaging>
-  <description>Neutralizes unimined's Kotlin metadata remapping for mod deobfuscation.</description>
+  <description>Neutralizes unimined's Kotlin metadata remapping and provides the on-demand mod deobfuscation used by the runtime test staging.</description>
   <dependencies>
     <dependency>
       <groupId>xyz.wagyourtail.unimined</groupId>

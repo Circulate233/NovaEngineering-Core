@@ -127,23 +127,9 @@ unimined.minecraft {
             enableMixinExtra()
         }
     }
-
     mods {
-        modImplementation {
-            remapper {
-                threads(2)
-            }
-        }
-        remap(configurations.modCompileOnly) {
-            remapper {
-                threads(2)
-            }
-        }
-        remap(configurations.modRuntimeOnly) {
-            remapper {
-                threads(2)
-            }
-        }
+        remap(configurations.modCompileOnly)
+        remap(configurations.modRuntimeOnly)
     }
 }
 

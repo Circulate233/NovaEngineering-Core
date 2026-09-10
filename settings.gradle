@@ -29,7 +29,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == 'xyz.wagyourtail.unimined') {
-                useModule('novaeng.unimined:KotlinMetadataRemapShim:1.0')
+                useModule('novaeng.unimined:UniminedPatch:1.1')
             }
         }
     }

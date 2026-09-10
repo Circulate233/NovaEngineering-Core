@@ -56,6 +56,9 @@ def runtimeTestMinecraftDir = providers.gradleProperty('runtimeTestMinecraftDir'
 def runtimeTestSupportDir = layout.buildDirectory.dir('runtime-test/support')
 def runtimeTestClientModsDir = layout.buildDirectory.dir('runtime-test/client-mods')
 def runtimeRemappedDir = layout.buildDirectory.dir('runtime-test/remapped-mods')
+def runtimeFallbackClasspathDir = layout.buildDirectory.dir(
+    'runtime-test/fallback-classpath'
+)
 def runtimeMcpRemapMarker = layout.buildDirectory.file(
     'runtime-test/runtime-mcp-remap.marker'
 )
@@ -112,9 +115,13 @@ def runtimeTestTasksRequested = gradle.startParameter.taskNames.any {
 }
 
 def runtimeFallbackTasks = []
-def runtimeFallbackInputDir = layout.buildDirectory.dir(
-    'runtime-test/inputs'
-)
+
+// tiny-remapper 只在插件类加载器里可见，构建脚本看不到，所以从补丁 jar 里取工具类。
+def fallbackRemapClass = {
+    minecraftConfig.class.classLoader.loadClass(
+        'github.kasuminova.gradle.remap.FallbackModRemap'
+    )
+}
 
 if (runtimeTestTasksRequested) {
     runtimeTestProductionMods.incoming.artifactView {}.artifacts.each { artifact ->
@@ -139,37 +146,41 @@ if (runtimeTestTasksRequested) {
         }
     }
 
-    runtimeFallbackArtifacts.eachWithIndex { artifact, index ->
-        def inputTask = tasks.register("runtimeTestInput${index}", Jar) {
-            archiveFileName = "runtime-test-input-${index}.jar"
-            destinationDirectory = runtimeFallbackInputDir
-            from { zipTree(artifact.file) }
-        }
-        def remapTask = minecraftConfig.remap(
-            inputTask.get(),
-            "runtimeTestRemap${index}"
-        ) {
-            devNamespace 'mcp'
-            prodNamespace productionNamespace.name
-            mixinRemap {
-                enableMixinExtra()
-                disableRefmap()
-            }
-        }
-        remapTask.configure {
-            archiveFileName = artifact.file.name.replaceFirst(
-                '-dev(?=\\.jar$)', ''
-            )
-            destinationDirectory = runtimeRemappedDir
-            doFirst {
-                logger.lifecycle(
-                    "[RuntimeTest] Remapping ${artifact.file.name} from mcp " +
-                        "to ${productionNamespace.name}"
+    if (!runtimeFallbackArtifacts.isEmpty()) {
+        def fallbackJobs = new LinkedHashMap()
+        runtimeFallbackArtifacts.each { artifact ->
+            fallbackJobs.put(
+                artifact.file,
+                new File(
+                    runtimeRemappedDir.get().asFile,
+                    artifact.file.name.replaceFirst('-dev(?=\\.jar$)', '')
                 )
+            )
+        }
+        def remapTask = tasks.register('runtimeTestRemapFallbackMods') {
+            group = 'unimined'
+            description = '把只有 dev 形态的 mod 依赖反混淆到生产命名空间：类路径索引只建一次。'
+            inputs.files(fallbackJobs.keySet())
+            inputs.property(
+                'namespaces',
+                "${minecraftConfig.mappings.checkedNs('mcp').name}->" +
+                    "${productionNamespace.name}"
+            )
+            outputs.files(fallbackJobs.values())
+            doFirst {
+                fallbackJobs.keySet().each { inputJar ->
+                    logger.lifecycle(
+                        "[RuntimeTest] Remapping ${inputJar.name} from mcp to " +
+                            "${productionNamespace.name}"
+                    )
+                }
             }
             doLast {
-                logger.lifecycle(
-                    "[RuntimeTest] Finished remapping ${artifact.file.name}"
+                fallbackRemapClass().remapAll(
+                    minecraftConfig,
+                    logger,
+                    fallbackJobs,
+                    runtimeFallbackClasspathDir.get().asFile
                 )
             }
         }
@@ -180,14 +191,14 @@ if (runtimeTestTasksRequested) {
 def runtimeMcpRemapTask = tasks.register('runtimeTestRemapMcp') {
     dependsOn(runtimeFallbackTasks)
     inputs.files(runtimeFallbackTasks.collect { remapTask ->
-        remapTask.flatMap { it.archiveFile }
+        remapTask.map { it.outputs.files.files }
     })
     inputs.files(runtimeProductionFiles)
     inputs.property('runtimeRemapSchema', 'runtime-production-variants-v2')
     outputs.file(runtimeMcpRemapMarker)
     doLast {
-        def remappedFiles = runtimeFallbackTasks.collect { remapTask ->
-            remapTask.get().archiveFile.get().asFile
+        def remappedFiles = runtimeFallbackTasks.collectMany { remapTask ->
+            remapTask.get().outputs.files.files
         }
         runtimeMcpRemapMarker.get().asFile.text = (
             runtimeProductionFiles.collect { it.name } +
@@ -211,7 +222,7 @@ tasks.register('stageRuntimeTestMods', Sync) {
     from(productionJarTask.flatMap { it.archiveFile })
     from(runtimeProductionFiles)
     runtimeFallbackTasks.each { remapTask ->
-        from(remapTask.flatMap { it.archiveFile })
+        from(remapTask.map { it.outputs.files.files })
     }
     into(runtimeTestModsDir)
     include '*.jar'
