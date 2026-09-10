@@ -1,5 +1,8 @@
 pluginManagement {
     repositories {
+        maven {
+            url = uri('gradle/unimined-patch/repo')
+        }
         gradlePluginPortal() {
             content {
                 excludeGroup('org.apache.logging.log4j')
@@ -21,6 +24,13 @@ pluginManagement {
 
         maven {
             url = 'https://maven.wagyourtail.xyz/snapshots'
+        }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'xyz.wagyourtail.unimined') {
+                useModule('novaeng.unimined:KotlinMetadataRemapShim:1.0')
+            }
         }
     }
     plugins {

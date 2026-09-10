@@ -2,7 +2,7 @@
 // This file is automatically applied after build.gradle + dependencies.gradle is ran
 
 def minecraftVersion = '1.12.2'
-def cleanroomVersion = '0.5.14-alpha'
+def cleanroomVersion = '0.6.12-alpha'
 
 def cleanroomInstaller = configurations.maybeCreate('cleanroomInstaller')
 cleanroomInstaller.canBeConsumed = false
@@ -107,67 +107,74 @@ def resolveProductionArtifact = { artifact ->
     candidates.iterator().next().file
 }
 
-runtimeTestProductionMods.incoming.artifactView {}.artifacts.each { artifact ->
-    if (!artifact.file.name.endsWith('.jar')
-        || artifact.file.name.endsWith('-sources.jar')) {
-        return
-    }
-
-    def artifactNamespace = artifact.variant.attributes.getAttribute(namespaceAttribute)
-    def isMcpArtifact = artifactNamespace == 'mcp'
-    def isDevArtifact = artifact.file.name.endsWith('-dev.jar')
-    if (!isMcpArtifact && !isDevArtifact) {
-        runtimeProductionFiles.add(artifact.file)
-        return
-    }
-
-    def productionFile = resolveProductionArtifact(artifact)
-    if (productionFile == null) {
-        runtimeFallbackArtifacts.add(artifact)
-    } else {
-        runtimeProductionFiles.add(productionFile)
-    }
+def runtimeTestTasksRequested = gradle.startParameter.taskNames.any {
+    it.toLowerCase().contains('runtimetest')
 }
 
 def runtimeFallbackTasks = []
 def runtimeFallbackInputDir = layout.buildDirectory.dir(
     'runtime-test/inputs'
 )
-runtimeFallbackArtifacts.eachWithIndex { artifact, index ->
-    def inputTask = tasks.register("runtimeTestInput${index}", Jar) {
-        archiveFileName = "runtime-test-input-${index}.jar"
-        destinationDirectory = runtimeFallbackInputDir
-        from { zipTree(artifact.file) }
-    }
-    def remapTask = minecraftConfig.remap(
-        inputTask.get(),
-        "runtimeTestRemap${index}"
-    ) {
-        devNamespace 'mcp'
-        prodNamespace productionNamespace.name
-        mixinRemap {
-            enableMixinExtra()
-            disableRefmap()
+
+if (runtimeTestTasksRequested) {
+    runtimeTestProductionMods.incoming.artifactView {}.artifacts.each { artifact ->
+        if (!artifact.file.name.endsWith('.jar')
+            || artifact.file.name.endsWith('-sources.jar')) {
+            return
+        }
+
+        def artifactNamespace = artifact.variant.attributes.getAttribute(namespaceAttribute)
+        def isMcpArtifact = artifactNamespace == 'mcp'
+        def isDevArtifact = artifact.file.name.endsWith('-dev.jar')
+        if (!isMcpArtifact && !isDevArtifact) {
+            runtimeProductionFiles.add(artifact.file)
+            return
+        }
+
+        def productionFile = resolveProductionArtifact(artifact)
+        if (productionFile == null) {
+            runtimeFallbackArtifacts.add(artifact)
+        } else {
+            runtimeProductionFiles.add(productionFile)
         }
     }
-    remapTask.configure {
-        archiveFileName = artifact.file.name.replaceFirst(
-            '-dev(?=\\.jar$)', ''
-        )
-        destinationDirectory = runtimeRemappedDir
-        doFirst {
-            logger.lifecycle(
-                "[RuntimeTest] Remapping ${artifact.file.name} from mcp " +
-                    "to ${productionNamespace.name}"
+
+    runtimeFallbackArtifacts.eachWithIndex { artifact, index ->
+        def inputTask = tasks.register("runtimeTestInput${index}", Jar) {
+            archiveFileName = "runtime-test-input-${index}.jar"
+            destinationDirectory = runtimeFallbackInputDir
+            from { zipTree(artifact.file) }
+        }
+        def remapTask = minecraftConfig.remap(
+            inputTask.get(),
+            "runtimeTestRemap${index}"
+        ) {
+            devNamespace 'mcp'
+            prodNamespace productionNamespace.name
+            mixinRemap {
+                enableMixinExtra()
+                disableRefmap()
+            }
+        }
+        remapTask.configure {
+            archiveFileName = artifact.file.name.replaceFirst(
+                '-dev(?=\\.jar$)', ''
             )
+            destinationDirectory = runtimeRemappedDir
+            doFirst {
+                logger.lifecycle(
+                    "[RuntimeTest] Remapping ${artifact.file.name} from mcp " +
+                        "to ${productionNamespace.name}"
+                )
+            }
+            doLast {
+                logger.lifecycle(
+                    "[RuntimeTest] Finished remapping ${artifact.file.name}"
+                )
+            }
         }
-        doLast {
-            logger.lifecycle(
-                "[RuntimeTest] Finished remapping ${artifact.file.name}"
-            )
-        }
+        runtimeFallbackTasks.add(remapTask)
     }
-    runtimeFallbackTasks.add(remapTask)
 }
 
 def runtimeMcpRemapTask = tasks.register('runtimeTestRemapMcp') {
