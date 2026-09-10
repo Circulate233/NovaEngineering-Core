@@ -118,6 +118,8 @@ dependencies {
     modImplementation 'curse.maven:loot-overhaul-299389:2711740'
     modImplementation 'curse.maven:BloodMagic-224791:2822288'
     modImplementation 'curse.maven:dme-737252:5985530'
+    modRuntimeOnly 'curse.maven:guide-api-228832:2645992'
+    modRuntimeOnly 'curse.maven:patchouli-306770:3162874'
     modCompileOnly 'curse.maven:libvulpes-236541:3801015'
     modCompileOnly 'curse.maven:advanced-rocketry-236542:4671856'
     modImplementation 'curse.maven:random-complement-1198138:7340975'
