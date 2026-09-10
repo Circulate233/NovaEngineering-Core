@@ -3,14 +3,11 @@ apply from: 'gradle/scripts/helpers.gradle'
 repositories {
     flatDir {
         dirs('lib')
-    }
-    maven {
-        url = 'https://maven.cleanroommc.com'
-    }
+    }/*
     maven {
         name = 'CurseMaven'
         url = 'https://cursemaven.com'
-    }
+    }*/
     maven {
         name = 'CleanroomCurseMaven'
         url = 'https://curse.cleanroommc.com'
@@ -40,14 +37,14 @@ dependencies {
         compileOnly 'com.cleanroommc:lwjglx:1.0.0'
     }
 
-    implementation 'io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0'
-    implementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.711'
+    modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.711'
 
+    modImplementation 'curse.maven:fugue-1005815:8230893'
     modImplementation 'curse.maven:modularui-624243:7929464'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:5354477'
     modImplementation name: 'MMCE-ComponentModelHider', version: '1.1', classifier: 'dev'
     modImplementation name: 'resourceloader', version: '1.5.3', classifier: 'main'
-    modImplementation name: 'circulation_networks-1.12.2', version: '1.1.0', classifier: 'dev'
+    modImplementation("curse.maven:circulation-flow-networks-1519385:8699343")
     modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
     modImplementation 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
     modImplementation 'curse.maven:lumenized-1234162:6378222'
@@ -75,7 +72,7 @@ dependencies {
     modImplementation 'curse.maven:industrialcraft-2-242638:3078604'
     modImplementation 'curse.maven:mekanism-ce-unofficial-840735:5946841'
     modImplementation 'curse.maven:RedstoneFlux-270789:2920436'
-    modImplementation 'software.bernie.geckolib:geckolib-forge-1.12.2:3.0.31'
+    modImplementation 'curse.maven:geckolib-388172:4020277'
     modImplementation 'curse.maven:botania-225643:3330934'
     modImplementation 'curse.maven:astral-sorcery-241721:3044416'
     modImplementation 'curse.maven:baubles-227083:2518667'
@@ -123,4 +120,6 @@ dependencies {
     modImplementation 'curse.maven:draconic-evolution-223565:3431261'
     modImplementation 'curse.maven:packagedauto-308380:6932932'
     modImplementation 'curse.maven:packagedastral-811828:7063119'
+    modImplementation 'io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0'
+    implementation fg.deobf("curse.maven:obscure-tooltips-715660:8522661")("curse.maven:obscure-tooltips-715660:8522661")
 }

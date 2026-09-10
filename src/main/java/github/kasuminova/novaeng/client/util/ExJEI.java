@@ -4,7 +4,6 @@ import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.util.Functions;
-import github.kasuminova.novaeng.common.util.SimpleItem;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.ItemName;
 import ic2.core.ref.TeBlock;
@@ -13,11 +12,13 @@ import ic2.core.uu.UuGraph;
 import ink.ikx.rt.api.mods.jei.IJeiUtils;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiPanel;
 import ink.ikx.rt.impl.mods.jei.impl.core.MCJeiRecipe;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class ExJEI {
 
@@ -49,14 +50,28 @@ public class ExJEI {
     }
 
     public static void jeiRecipeRegister() {
-        Map<SimpleItem, ItemStack> uniqueKeys = new Object2ObjectOpenHashMap<>();
+        Set<ItemStack> uniqueKeys = new ObjectOpenCustomHashSet<>(new Hash.Strategy<>() {
+            @Override
+            public int hashCode(ItemStack o) {
+                return Objects.hash(o.getItem(), o.getMetadata(), o.getTagCompound());
+            }
+
+            @Override
+            public boolean equals(ItemStack a, ItemStack b) {
+                if (a == b) {
+                    return true;
+                }
+                if (a == null || b == null) {
+                    return false;
+                }
+                return ItemStack.areItemStacksEqual(a, b);
+            }
+        });
 
         UuGraph.iterator().forEachRemaining(item -> {
             ItemStack stack = item.getKey();
 
-            ItemStack canonicalKey = uniqueKeys.computeIfAbsent(SimpleItem.getInstance(stack), k -> stack);
-
-            if (stack == canonicalKey) {
+            if (stack != null && uniqueKeys.add(stack)) {
                 if (item.getValue() != Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
                     double bValue = item.getValue() / 100000;
                     new MCJeiRecipe("replicator_jei")

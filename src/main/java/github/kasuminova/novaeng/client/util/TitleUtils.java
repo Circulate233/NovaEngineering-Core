@@ -121,7 +121,7 @@ public class TitleUtils {
                 Method getWindow = Display.getDeclaredMethod("getWindow");
                 long result = (long) getWindow.invoke(null);
                 if (result != 0) {
-                    Class<?> GLFW = Class.forName("org.lwjgl3.glfw.GLFW");
+                    Class<?> GLFW = Class.forName("org.lwjgl.glfw.GLFW");
                     Method glfwSetWindowTitle = GLFW.getDeclaredMethod("glfwSetWindowTitle", long.class, CharSequence.class);
                     glfwSetWindowTitle.invoke(null, result, currentTitle);
                 }

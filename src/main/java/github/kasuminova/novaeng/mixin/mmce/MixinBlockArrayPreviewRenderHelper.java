@@ -96,7 +96,7 @@ public abstract class MixinBlockArrayPreviewRenderHelper implements BlockArrayPr
         return n$facing != null || original;
     }
 
-    @Definition(id = "getValue", method = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;")
+    @Definition(id = "getValue", method = "Lnet/minecraft/block/state/IBlockState;getValue(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;", remap = true)
     @Definition(id = "FACING", field = "Lhellfirepvp/modularmachinery/common/block/BlockController;FACING:Lnet/minecraft/block/properties/PropertyEnum;", remap = false)
     @Expression("?.getValue(FACING)")
     @ModifyExpressionValue(method = "batchBlocks", at = @At("MIXINEXTRAS:EXPRESSION"), remap = false)

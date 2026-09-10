@@ -11,13 +11,12 @@ import github.kasuminova.novaeng.mixin.ae2.AccessorCraftingCPURecord
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.entity.player.InventoryPlayer
 
-class ContainerNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : ContainerCraftConfirm(ip, te) {
+open class ContainerNEWCraftConfirm(ip: InventoryPlayer, te: WirelessTerminalGuiObject) : ContainerCraftConfirm(ip, te) {
     override fun canInteractWith(playerIn: net.minecraft.entity.player.EntityPlayer): Boolean {
         return true
     }
 
     override fun startJob() {
-        @Suppress("USELESS_IS_CHECK", "IMPOSSIBLE_IS_CHECK_WARNING")
         if (this is AccessorContainerCraftConfirm) {
             val h = this.target as? IActionHost
             h?.actionableNode?.grid?.let { grid ->

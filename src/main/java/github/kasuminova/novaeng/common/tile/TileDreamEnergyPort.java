@@ -2,11 +2,14 @@ package github.kasuminova.novaeng.common.tile;
 
 import com.circulation.circulation_networks.api.EnergyAmount;
 import com.circulation.circulation_networks.api.EnergyAmounts;
+import com.circulation.circulation_networks.api.HandlerTickResult;
 import com.circulation.circulation_networks.api.IEnergyHandler;
 import com.circulation.circulation_networks.api.IMachineNodeBlockEntity;
 import com.circulation.circulation_networks.api.node.IMachineNode;
 import com.circulation.circulation_networks.api.node.NodeContext;
 import com.circulation.circulation_networks.api.node.NodeType;
+import com.circulation.circulation_networks.manager.HandlerBindingPolicy;
+import com.circulation.circulation_networks.manager.HandlerInvalidationSink;
 import com.circulation.circulation_networks.network.nodes.HubNode;
 import com.circulation.circulation_networks.network.nodes.Node;
 import com.circulation.circulation_networks.tiles.nodes.BaseNodeTileEntity;
@@ -20,9 +23,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implements IMachineNodeBlockEntity {
 
@@ -30,10 +35,6 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
     @Setter
     @Getter
     private BlockPos ctrlPos;
-
-    public TileDreamEnergyPort() {
-
-    }
 
     @Override
     public @NotNull NodeType<DreamNode> getNodeType() {
@@ -111,81 +112,172 @@ public class TileDreamEnergyPort extends BaseNodeTileEntity<IMachineNode> implem
 
     public final class DreamenergyHandler implements IEnergyHandler {
 
-        private static final BigInteger max = BigDecimal.valueOf(Double.MAX_VALUE).toBigInteger();
-        private static final byte SUCCEEDED = 1;
-        private static final byte FAILED = 2;
-        private final EnergyAmount receive = EnergyAmount.obtain(0);
-        private final EnergyAmount send = EnergyAmount.obtain(0);
-        private final EnergyAmount canSend = EnergyAmount.obtain(0);
-        private byte init = 0;
+        private static final BigInteger MAX_RECEIVE = BigDecimal.valueOf(Double.MAX_VALUE).toBigInteger();
+
+        private static final HandlerBindingPolicy BINDING_POLICY = HandlerBindingPolicy.of(
+            HandlerBindingPolicy.TickLifecycle.BEGIN_END_TICK,
+            HandlerBindingPolicy.RoleScope.RUNTIME_DYNAMIC,
+            HandlerBindingPolicy.MappingScope.NONE,
+            HandlerBindingPolicy.PairMatching.NONE
+        );
+
+        private final EnergyAmount received = EnergyAmount.obtain(0L);
+        private final EnergyAmount extracted = EnergyAmount.obtain(0L);
+        private final EnergyAmount available = EnergyAmount.obtain(0L);
+
+        private boolean blockEntityBound;
+        private boolean transferActive;
+        private boolean advertisedTransferActive;
+        private long activeEpoch = Long.MIN_VALUE;
 
         @Override
-        public void init(TileEntity tileEntity, HubNode.HubMetadata hubMetadata) {
-            if (getCtrlStructureFormed()) {
-                canSend.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
-                init = SUCCEEDED;
-            } else init = FAILED;
+        public HandlerBindingPolicy bindingPolicy() {
+            return BINDING_POLICY;
         }
 
         @Override
-        public void init(ItemStack itemStack, HubNode.HubMetadata hubMetadata) {
-
-        }
-
-        @Override
-        public void clear() {
-            if (init == SUCCEEDED) {
-                var ctrl = getCtrl();
-                DreamEnergyCore.extractEnergy(ctrl, send.asBigInteger());
-                DreamEnergyCore.receiveEnergy(ctrl, receive.asBigInteger());
+        public void bindBlockEntity(TileEntity tileEntity, HandlerInvalidationSink invalidationSink) {
+            if (blockEntityBound) {
+                throw new IllegalStateException("Dreamenergy handler is already bound");
             }
-            canSend.setZero();
-            receive.setZero();
-            send.setZero();
-            init = 0;
+
+            Objects.requireNonNull(tileEntity, "tileEntity");
+            Objects.requireNonNull(invalidationSink, "invalidationSink");
+            blockEntityBound = true;
+            transferActive = false;
+            advertisedTransferActive = false;
         }
 
         @Override
-        public EnergyAmount receiveEnergy(EnergyAmount energyAmount, HubNode.HubMetadata hubMetadata) {
-            receive.add(energyAmount);
-            return EnergyAmount.obtain(energyAmount);
-        }
-
-        @Override
-        public EnergyAmount extractEnergy(EnergyAmount energyAmount, HubNode.HubMetadata hubMetadata) {
-            canSend.subtract(energyAmount);
-            send.add(energyAmount);
-            return EnergyAmount.obtain(energyAmount);
-        }
-
-        @Override
-        public EnergyAmount canExtractValue(HubNode.HubMetadata hubMetadata) {
-            if (init == SUCCEEDED) return EnergyAmount.obtain(canSend);
-            return EnergyAmounts.ZERO;
-        }
-
-        @Override
-        public EnergyAmount canReceiveValue(HubNode.HubMetadata hubMetadata) {
-            if (init == SUCCEEDED) return EnergyAmount.obtain(max);
-            return EnergyAmounts.ZERO;
-        }
-
-        @Override
-        public boolean canExtract(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            return init == SUCCEEDED && canSend.compareTo(0) > 0;
-        }
-
-        @Override
-        public boolean canReceive(IEnergyHandler iEnergyHandler, HubNode.HubMetadata hubMetadata) {
-            return init == SUCCEEDED;
-        }
-
-        @Override
-        public EnergyType getType(HubNode.HubMetadata hubMetadata) {
-            if (init == SUCCEEDED) {
-                return EnergyType.STORAGE;
+        public HandlerTickResult beginServerTick(long epoch) {
+            if (!blockEntityBound) {
+                throw new IllegalStateException("Dreamenergy handler is not bound");
             }
-            return EnergyType.INVALID;
+            if (activeEpoch != Long.MIN_VALUE) {
+                throw new IllegalStateException(
+                    "Dreamenergy handler tick is already active for epoch " + activeEpoch
+                );
+            }
+
+            activeEpoch = epoch;
+            received.setZero();
+            extracted.setZero();
+            available.setZero();
+
+            transferActive = getCtrlStructureFormed();
+            if (transferActive) {
+                available.init(DreamEnergyCore.getEnergyStoredString(getCtrl()));
+            }
+
+            if (advertisedTransferActive != transferActive) {
+                advertisedTransferActive = transferActive;
+                return HandlerTickResult.STATE_CHANGED;
+            }
+            return HandlerTickResult.UNCHANGED;
+        }
+
+        @Override
+        public void endServerTick(long epoch) {
+            if (activeEpoch != epoch) {
+                throw new IllegalStateException(
+                    "Dreamenergy handler tick epoch mismatch: expected " + activeEpoch + ", got " + epoch
+                );
+            }
+
+            try {
+                if (!transferActive) {
+                    return;
+                }
+
+                var controller = getCtrl();
+                if (extracted.isPositive()) {
+                    DreamEnergyCore.extractEnergy(controller, extracted.asBigInteger());
+                }
+                if (received.isPositive()) {
+                    DreamEnergyCore.receiveEnergy(controller, received.asBigInteger());
+                }
+            } finally {
+                received.setZero();
+                extracted.setZero();
+                available.setZero();
+                transferActive = false;
+                activeEpoch = Long.MIN_VALUE;
+            }
+        }
+
+        @Override
+        public void unbindBlockEntity() {
+            received.setZero();
+            extracted.setZero();
+            available.setZero();
+            transferActive = false;
+            advertisedTransferActive = false;
+            activeEpoch = Long.MIN_VALUE;
+            blockEntityBound = false;
+        }
+
+        @Override
+        public void bindItem(ItemStack itemStack, @Nullable HubNode.HubMetadata hubMetadata) {
+            throw new UnsupportedOperationException("Dreamenergy does not support item energy bindings");
+        }
+
+        @Override
+        public void unbindItem() {
+            // This handler never acquires item-binding state.
+        }
+
+        @Override
+        public EnergyAmount receiveEnergy(EnergyAmount maxReceive, @Nullable HubNode.HubMetadata hubMetadata) {
+            if (!transferActive || !maxReceive.isPositive()) {
+                return EnergyAmounts.ZERO;
+            }
+
+            received.add(maxReceive);
+            return EnergyAmount.obtain(maxReceive);
+        }
+
+        @Override
+        public EnergyAmount extractEnergy(EnergyAmount maxExtract, @Nullable HubNode.HubMetadata hubMetadata) {
+            if (!transferActive || !maxExtract.isPositive() || !available.isPositive()) {
+                return EnergyAmounts.ZERO;
+            }
+
+            EnergyAmount transferred;
+            if (maxExtract.compareTo(available) >= 0) {
+                transferred = EnergyAmount.obtain(available);
+                available.setZero();
+            } else {
+                transferred = EnergyAmount.obtain(maxExtract);
+                available.subtract(transferred);
+            }
+
+            extracted.add(transferred);
+            return transferred;
+        }
+
+        @Override
+        public EnergyAmount canExtractValue(@Nullable HubNode.HubMetadata hubMetadata) {
+            return transferActive ? EnergyAmount.obtain(available) : EnergyAmounts.ZERO;
+        }
+
+        @Override
+        public EnergyAmount canReceiveValue(@Nullable HubNode.HubMetadata hubMetadata) {
+            return transferActive ? EnergyAmount.obtain(MAX_RECEIVE) : EnergyAmounts.ZERO;
+        }
+
+        @Override
+        public boolean canExtract(IEnergyHandler receiveHandler, @Nullable HubNode.HubMetadata hubMetadata) {
+            return transferActive && available.isPositive();
+        }
+
+        @Override
+        public boolean canReceive(IEnergyHandler sendHandler, @Nullable HubNode.HubMetadata hubMetadata) {
+            return transferActive;
+        }
+
+        @Override
+        public EnergyType getType(@Nullable HubNode.HubMetadata hubMetadata) {
+            return transferActive ? EnergyType.STORAGE : EnergyType.INVALID;
         }
     }
 }

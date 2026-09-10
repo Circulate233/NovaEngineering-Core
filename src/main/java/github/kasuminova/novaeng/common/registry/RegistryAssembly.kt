@@ -440,9 +440,9 @@ object RegistryAssembly {
             machine.setRegistryName(ResourceLocation("astralsorcery", name))
         }
         val newBlcokArray = machine.pattern
-        for (entry in array.pattern) {
-            val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(entry.value.state)))
-            newBlcokArray.addBlock(entry.key, info)
+        for ((key, value) in array.pattern) {
+            val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(value.state)))
+            newBlcokArray.addBlock(key, info)
         }
         return machine
     }
@@ -457,9 +457,9 @@ object RegistryAssembly {
             machine.setRegistryName(ResourceLocation("packagedastral", name))
         }
         val newBlcokArray = machine.pattern
-        for (entry in array.pattern) {
-            val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(entry.value.state)))
-            newBlcokArray.addBlock(entry.key, info)
+        for ((key, value) in array.pattern) {
+            val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(value.state)))
+            newBlcokArray.addBlock(key, info)
         }
         return machine
     }
