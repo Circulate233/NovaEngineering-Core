@@ -211,15 +211,15 @@ public class IllumPool implements MachineSpecial {
     }
 
     protected static float calculateCrystalCollectiveCapabilityRatio(final float collectiveCapability) {
-        return Math.max(Math.min(collectiveCapability / 35, 1F), .75F);
+        return Math.clamp(collectiveCapability / 35, .75F, 1F);
     }
 
     protected static float calculateCrystalPurityRatio(final float purity) {
-        return Math.max(Math.min(purity / 80, 1F), .5F);
+        return Math.clamp(purity / 80, .5F, 1F);
     }
 
     protected static float calculateCrystalSizeRatio(final float size) {
-        return Math.max(Math.min(size / 700, 1F), .2F);
+        return Math.clamp(size / 700, .2F, 1F);
     }
 
     public static float calculateCrystalPurityEfficiency(final float purity) {

@@ -17,10 +17,10 @@ public class MixinNettyCompressionDecoder {
             value = "INVOKE",
             target = "Lnet/minecraft/network/PacketBuffer;readBytes(I)Lio/netty/buffer/ByteBuf;")
     )
-    private ByteBuf onDecodeLen(final PacketBuffer packetBuffer, final int len) {
+    private ByteBuf onDecodeLen(final PacketBuffer packetBuffer, final int p_readBytes_1_) {
         final int prevIndex = packetBuffer.readerIndex();
 
-        ByteBuf decoded = packetBuffer.readBytes(len);
+        ByteBuf decoded = packetBuffer.readBytes(p_readBytes_1_);
 
         CPacketProfiler.onPacketDecoded(packetBuffer.readerIndex() - prevIndex);
         return decoded;
@@ -31,10 +31,10 @@ public class MixinNettyCompressionDecoder {
             value = "INVOKE",
             target = "Lnet/minecraft/network/PacketBuffer;readBytes([B)Lio/netty/buffer/ByteBuf;")
     )
-    private ByteBuf onDecodeByteArray(final PacketBuffer packetBuffer, final byte[] data) {
+    private ByteBuf onDecodeByteArray(final PacketBuffer packetBuffer, final byte[] p_readBytes_1_) {
         final int prevIndex = packetBuffer.readerIndex();
 
-        ByteBuf decoded = packetBuffer.readBytes(data);
+        ByteBuf decoded = packetBuffer.readBytes(p_readBytes_1_);
 
         CPacketProfiler.onPacketDecoded(packetBuffer.readerIndex() - prevIndex);
         return decoded;

@@ -31,7 +31,7 @@ public class MixinNetworkManager {
         ),
         remap = false
     )
-    private DeflaterOutputStream redirectSendLargePacketNewDeflaterInst(final OutputStream outputStream) {
+    private DeflaterOutputStream redirectSendLargePacketNewDeflaterInst(final OutputStream out) {
         return STELLAR_CORE$UNUSED;
     }
 

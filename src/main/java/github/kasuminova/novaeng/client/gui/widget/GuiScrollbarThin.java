@@ -84,7 +84,7 @@ public class GuiScrollbarThin {
     }
 
     private void applyRange() {
-        this.currentScroll = Math.max(Math.min(this.currentScroll, this.maxScroll), this.minScroll);
+        this.currentScroll = Math.clamp(this.currentScroll, this.minScroll, this.maxScroll);
     }
 
     public int getCurrentScroll() {
@@ -116,7 +116,7 @@ public class GuiScrollbarThin {
     }
 
     public void wheel(int delta) {
-        delta = Math.max(Math.min(-delta, 1), -1);
+        delta = Math.clamp(-delta, -1, 1);
         this.currentScroll += delta * this.pageSize;
         this.applyRange();
     }

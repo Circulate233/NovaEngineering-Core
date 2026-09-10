@@ -37,12 +37,12 @@ public class IC2MachineRecipeConverter {
             if (inputs.isEmpty() || !inputFilter.test(inputs)) {
                 continue;
             }
-            MachineRecipe recipe = recipeSupplier.apply(inputs.get(0));
+            MachineRecipe recipe = recipeSupplier.apply(inputs.getFirst());
 
             if (inputs.size() == 1) {
                 int inAmount = Math.round(RecipeModifier.applyModifiers(modifiers, RequirementTypesMM.REQUIREMENT_ITEM, IOType.INPUT, icRecipe.getInput().getAmount(), false));
                 if (inAmount > 0) {
-                    recipe.addRequirement(new RequirementItem(IOType.INPUT, ItemUtils.copyStackWithSize(inputs.get(0), inAmount)));
+                    recipe.addRequirement(new RequirementItem(IOType.INPUT, ItemUtils.copyStackWithSize(inputs.getFirst(), inAmount)));
                 }
             } else {
                 List<ChancedIngredientStack> ingredientStackList = new LinkedList<>();

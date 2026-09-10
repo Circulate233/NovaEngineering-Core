@@ -455,8 +455,8 @@ public abstract class MixinCraftingCPUClusterTwo {
             target = "Lappeng/crafting/CraftingLink;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;)Lappeng/api/storage/data/IAEItemStack;"
         )
     )
-    protected IAEItemStack wrapInjectItems(CraftingLink link, IAEItemStack item, Actionable actionable, Operation<IAEItemStack> operation) {
-        return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable);
+    protected IAEItemStack wrapInjectItems(CraftingLink link, IAEItemStack input, Actionable mode, Operation<IAEItemStack> operation) {
+        return this.r$nae2$ghostInjecting ? null : operation.call(link, input, mode);
     }
 
     @WrapOperation(
@@ -466,8 +466,8 @@ public abstract class MixinCraftingCPUClusterTwo {
             target = "Lappeng/crafting/MECraftingInventory;injectItems(Lappeng/api/storage/data/IAEItemStack;Lappeng/api/config/Actionable;Lappeng/api/networking/security/IActionSource;)Lappeng/api/storage/data/IAEItemStack;"
         )
     )
-    protected IAEItemStack wrapInjectItems(MECraftingInventory link, IAEItemStack item, Actionable actionable, IActionSource source, Operation<IAEItemStack> operation) {
-        return this.r$nae2$ghostInjecting ? null : operation.call(link, item, actionable, source);
+    protected IAEItemStack wrapInjectItems(MECraftingInventory link, IAEItemStack input, Actionable mode, IActionSource src, Operation<IAEItemStack> operation) {
+        return this.r$nae2$ghostInjecting ? null : operation.call(link, input, mode, src);
     }
 
     @Mixin(targets = "appeng.me.cluster.implementations.CraftingCPUCluster$TaskProgress", remap = false)

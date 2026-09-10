@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraftforge.registries.IRegistryDelegate;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -23,7 +24,7 @@ public class MixinItemColors implements NovaItemColors {
     @Mutable
     private Map<IRegistryDelegate<Item>, IItemColor> itemColorMap;
 
-    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/color/ItemColors;itemColorMap:Ljava/util/Map;", remap = false))
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/color/ItemColors;itemColorMap:Ljava/util/Map;", remap = false, opcode = Opcodes.PUTFIELD))
     public void redMap(ItemColors instance, Map<IRegistryDelegate<Item>, IItemColor> value) {
         this.itemColorMap = new Object2ObjectOpenHashMap<>();
     }

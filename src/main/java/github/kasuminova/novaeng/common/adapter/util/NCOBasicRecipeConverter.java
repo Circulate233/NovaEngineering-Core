@@ -97,7 +97,7 @@ public class NCOBasicRecipeConverter {
                 continue;
             }
 
-            MachineRecipe recipe = recipeSupplier.apply(inputList.get(0));
+            MachineRecipe recipe = recipeSupplier.apply(inputList.getFirst());
 
             // Item Input
             basicRecipe.getItemIngredients().stream()

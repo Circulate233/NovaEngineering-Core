@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraftforge.registries.IRegistryDelegate;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -23,7 +24,7 @@ public class MixinBlockColors implements NovaBlockColors {
     @Mutable
     private Map<IRegistryDelegate<Block>, IBlockColor> blockColorMap;
 
-    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/color/BlockColors;blockColorMap:Ljava/util/Map;", remap = false))
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/color/BlockColors;blockColorMap:Ljava/util/Map;", remap = false, opcode = Opcodes.PUTFIELD))
     public void redMap(BlockColors instance, Map<IRegistryDelegate<Block>, IBlockColor> value) {
         this.blockColorMap = new Object2ObjectOpenHashMap<>();
     }

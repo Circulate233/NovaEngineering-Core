@@ -7,7 +7,7 @@ public class ColorUtils {
     public static Color getGradientColor(final Color[] colors,
                                          final int alpha,
                                          final float percentage) {
-        float percent = Math.max(0, Math.min(1, percentage));
+        float percent = Math.clamp(percentage, 0, 1);
 
         // 确保颜色数组和百分比数组长度相同
         if (colors.length < 2) {

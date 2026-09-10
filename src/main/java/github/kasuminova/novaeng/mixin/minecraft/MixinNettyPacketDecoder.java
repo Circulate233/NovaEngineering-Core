@@ -21,12 +21,12 @@ public class MixinNettyPacketDecoder {
             value = "INVOKE",
             target = "Lnet/minecraft/network/Packet;readPacketData(Lnet/minecraft/network/PacketBuffer;)V")
     )
-    private void onDecode(final Packet<?> packet, final PacketBuffer packetBuffer, final ChannelHandlerContext ctx) throws Exception {
+    private void onDecode(final Packet<?> packet, final PacketBuffer packetBuffer, final ChannelHandlerContext channelHandlerContext) throws Exception {
         final int prevIndex = packetBuffer.readerIndex();
 
         packet.readPacketData(packetBuffer);
 
-        NetworkManager networkManager = ctx.pipeline().get(NetworkManager.class);
+        NetworkManager networkManager = channelHandlerContext.pipeline().get(NetworkManager.class);
         if (networkManager == null) {
             return;
         }

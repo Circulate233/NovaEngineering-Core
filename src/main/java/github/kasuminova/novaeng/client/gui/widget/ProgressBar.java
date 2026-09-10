@@ -113,7 +113,7 @@ public class ProgressBar extends DynamicWidget {
 
         int idx = (int) percent;
         if (idx >= progressTextures.size()) {
-            return Optional.of(progressTextures.get(progressTextures.size() - 1));
+            return Optional.of(progressTextures.getLast());
         } else {
             return Optional.of(progressTextures.get(Math.max(idx, 0)));
         }

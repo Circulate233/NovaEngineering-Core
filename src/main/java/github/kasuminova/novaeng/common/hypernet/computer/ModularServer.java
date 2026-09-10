@@ -216,7 +216,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
             request.modifier().multiply(ModifierKeys.GLOBAL_CALCULATE_EFFICIENCY, 0);
             return;
         }
-        float efficiency = Math.max(Math.min((float) totalHardwareBandwidth / usedHardwareBandwidth, 1.0F), 0.5F);
+        float efficiency = Math.clamp((float) totalHardwareBandwidth / usedHardwareBandwidth, 0.5F, 1.0F);
         if (efficiency < 1.0F) {
             request.modifier().multiply(ModifierKeys.GLOBAL_CALCULATE_EFFICIENCY, efficiency);
         }

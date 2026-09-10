@@ -60,7 +60,7 @@ public class StorageBar extends DynamicWidget {
             while (it.hasNext()) {
                 long usedMemory = it.nextLong();
                 float percent = (float) usedMemory / totalStorage;
-                int width = (int) Math.min(Math.max(LINE_WIDTH * percent, 3), LINE_WIDTH);
+                int width = (int) Math.clamp(LINE_WIDTH * percent, 3, LINE_WIDTH);
 
                 // Body
                 Gui.drawRect(0, 1, width - 1, LINE_HEIGHT - 1, color);

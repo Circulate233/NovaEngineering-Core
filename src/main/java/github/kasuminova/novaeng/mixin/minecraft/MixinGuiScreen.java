@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiScreen {
 
     @Inject(method = "handleComponentHover", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;renderToolTip(Lnet/minecraft/item/ItemStack;II)V"))
-    protected void handleComponentHover(ITextComponent component, int x, int y, CallbackInfo ci, @Local(ordinal = 0) ItemStack itemstack) {
+    protected void handleComponentHover(ITextComponent component, int x, int y, CallbackInfo ci, @Local(name = "itemstack") ItemStack itemstack) {
         GlStateManager.color(1, 1, 1, 1);
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(itemstack, x - 18, y);
     }

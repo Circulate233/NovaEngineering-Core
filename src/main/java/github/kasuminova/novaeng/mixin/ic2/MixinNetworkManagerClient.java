@@ -28,7 +28,7 @@ public class MixinNetworkManagerClient {
         ),
         remap = false
     )
-    private InflaterOutputStream redirectOnPacketDataNewInflaterInst(final OutputStream outputStream) {
+    private InflaterOutputStream redirectOnPacketDataNewInflaterInst(final OutputStream out) {
         return STELLAR_CORE$UNUSED;
     }
 

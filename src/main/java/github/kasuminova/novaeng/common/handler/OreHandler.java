@@ -206,10 +206,10 @@ public class OreHandler {
         public static ItemStack getPriorityItemFromOreDict(String oreName, List<ItemStack> oreEntries) {
             return switch (oreEntries.size()) {
                 case 0 -> ItemStack.EMPTY;
-                case 1 -> oreEntries.get(0).copy();
+                case 1 -> oreEntries.getFirst().copy();
                 default -> {
                     if ("dimensional_shard_ore".equals(oreName)) {
-                        ItemStack item = oreEntries.get(0).copy();
+                        ItemStack item = oreEntries.getFirst().copy();
                         item.setItemDamage(0);
                         yield item;
                     }
@@ -227,7 +227,7 @@ public class OreHandler {
                         if (!candidates.isEmpty()) break;
                     }
 
-                    var out = candidates.isEmpty() ? oreEntries.get(0).copy() : candidates;
+                    var out = candidates.isEmpty() ? oreEntries.getFirst().copy() : candidates;
                     if (out.getItemDamage() == 32767) out.setItemDamage(0);
                     yield out;
                 }

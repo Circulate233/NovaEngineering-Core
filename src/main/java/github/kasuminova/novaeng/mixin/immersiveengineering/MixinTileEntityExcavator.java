@@ -23,7 +23,7 @@ public class MixinTileEntityExcavator {
         ),
         remap = false
     )
-    private void redirectDoProcessOutput(final World ei, final BlockPos world, final ItemStack pos, final EnumFacing stack) {
+    private void redirectDoProcessOutput(final World world, final BlockPos pos, final ItemStack stack, final EnumFacing facing) {
         // 销毁物品！为什么不做掉落物清理！
     }
 

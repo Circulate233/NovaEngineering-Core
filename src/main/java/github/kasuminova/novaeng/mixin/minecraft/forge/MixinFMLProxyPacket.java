@@ -28,7 +28,7 @@ public class MixinFMLProxyPacket {
             ordinal = 1
         )
     )
-    private void injectExceptionAndRELog1(final INetHandler inethandler, final CallbackInfo ci, @Local(name = "t") final Throwable t) {
+    private void injectExceptionAndRELog1(final INetHandler handler, final CallbackInfo ci, @Local(name = "t") final Throwable t) {
         NovaEngineeringCore.log.error("[NovaEng-RELog] Caught critical exception handling a packet on channel {}, re-log exception.", channel);
         NovaEngineeringCore.log.error("[NovaEng-RELog] ", t);
     }
@@ -42,7 +42,7 @@ public class MixinFMLProxyPacket {
             ordinal = 0
         )
     )
-    private void injectExceptionAndRELog0(final INetHandler inethandler, final CallbackInfo ci, @Local(name = "ne") final FMLNetworkException ne) {
+    private void injectExceptionAndRELog0(final INetHandler handler, final CallbackInfo ci, @Local(name = "ne") final FMLNetworkException ne) {
         NovaEngineeringCore.log.error("[NovaEng-RELog] Caught critical exception handling a packet on channel {}, re-log exception.", channel);
         NovaEngineeringCore.log.error("[NovaEng-RELog] ", ne);
     }

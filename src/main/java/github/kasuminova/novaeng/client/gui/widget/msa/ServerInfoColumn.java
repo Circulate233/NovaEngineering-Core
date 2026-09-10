@@ -118,7 +118,7 @@ public class ServerInfoColumn extends ScrollingColumn {
         addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.can_start",
             I18n.format("gui.modular_server_assembler.info.can_start." + (errorTips.isEmpty()))))));
         if (!errorTips.isEmpty()) {
-            errorTips.add(0, I18n.format("gui.modular_server_assembler.error"));
+            errorTips.addFirst(I18n.format("gui.modular_server_assembler.error"));
             addWidget(createLabel(errorTips));
             return;
         }

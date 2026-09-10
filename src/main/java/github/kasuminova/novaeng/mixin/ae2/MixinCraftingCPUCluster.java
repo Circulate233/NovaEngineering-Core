@@ -95,7 +95,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     }
 
     @Inject(method = "updateCraftingLogic", at = @At("HEAD"), cancellable = true)
-    private void injectUpdateCraftingLogicStoreItems(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cgc, final CallbackInfo ci) {
+    private void injectUpdateCraftingLogicStoreItems(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cc, final CallbackInfo ci) {
         if (this.novaeng_ec$core == null) {
             return;
         }
@@ -115,7 +115,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     }
 
     @Inject(method = "updateCraftingLogic", at = @At("TAIL"))
-    private void injectUpdateCraftingLogicTail(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cgc, final CallbackInfo ci) {
+    private void injectUpdateCraftingLogicTail(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cc, final CallbackInfo ci) {
         int currentParallelism = this.usedOps[0];
         this.novaeng_ec$parallelismRecorder.addUsedTime(currentParallelism);
     }

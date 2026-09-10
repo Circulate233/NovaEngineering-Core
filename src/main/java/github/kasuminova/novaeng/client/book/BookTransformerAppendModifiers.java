@@ -30,7 +30,7 @@ public class BookTransformerAppendModifiers extends SectionTransformer {
 
     @Override
     public void transform(BookData book, SectionData section) {
-        ContentListing listing = (ContentListing) section.pages.get(0).content;
+        ContentListing listing = (ContentListing) section.pages.getFirst().content;
         for (Modifier mod : modCollector) {
             PageData page = new PageData();
             page.source = source;
