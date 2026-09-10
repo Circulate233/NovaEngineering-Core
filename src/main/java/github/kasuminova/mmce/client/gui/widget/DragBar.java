@@ -6,8 +6,8 @@ import github.kasuminova.mmce.client.gui.util.RenderSize;
 import github.kasuminova.mmce.client.gui.widget.base.DynamicWidget;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.common.util.DataReference;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
 @SuppressWarnings("unused")
 public class DragBar extends DynamicWidget {
 
-    public static final ResourceLocation DEFAULT_TEX_RES = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/dragbar.png");
+    public static final ResourceLocation DEFAULT_TEX_RES = new ResourceLocation(Tags.MOD_ID, "textures/gui/dragbar.png");
 
     public static final int DEFAULT_BAR_HEIGHT = 7;
 

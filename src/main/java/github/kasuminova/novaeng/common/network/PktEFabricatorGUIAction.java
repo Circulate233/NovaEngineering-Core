@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.common.container.ContainerEFabricatorController
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -45,7 +46,7 @@ public class PktEFabricatorGUIAction implements IMessage, IMessageHandler<PktEFa
                 if (player.openContainer instanceof ContainerEFabricatorController efGUI) {
                     final EFabricatorController owner = efGUI.getOwner();
                     final BlockPos pos = owner.getPos();
-                    player.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.EFABRICATOR_PATTERN_SEARCH.ordinal(), owner.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                    player.openGui(Tags.MOD_ID, CommonProxy.GuiType.EFABRICATOR_PATTERN_SEARCH.ordinal(), owner.getWorld(), pos.getX(), pos.getY(), pos.getZ());
                     if (player.openContainer instanceof ContainerEFabricatorPatternSearch efPatternSearch) {
                         NovaEngineeringCore.NET_CHANNEL.sendTo(
                             new PktEFabricatorPatternSearchGUIUpdate(
@@ -61,7 +62,7 @@ public class PktEFabricatorGUIAction implements IMessage, IMessageHandler<PktEFa
                 if (player.openContainer instanceof ContainerEFabricatorPatternSearch efPatternSearch) {
                     EFabricatorController owner = efPatternSearch.getOwner();
                     BlockPos pos = owner.getPos();
-                    player.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.EFABRICATOR_CONTROLLER.ordinal(), owner.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                    player.openGui(Tags.MOD_ID, CommonProxy.GuiType.EFABRICATOR_CONTROLLER.ordinal(), owner.getWorld(), pos.getX(), pos.getY(), pos.getZ());
                     return;
                 }
                 return;

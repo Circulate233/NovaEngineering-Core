@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockECalculatorThreadCoreHyper extends BlockECalculatorThreadCore {
@@ -11,8 +11,8 @@ public class BlockECalculatorThreadCoreHyper extends BlockECalculatorThreadCore 
 
     protected BlockECalculatorThreadCoreHyper(final String level, final int threads, final int hyperThreads) {
         super(
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_hyper_" + level),
-            NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_hyper_" + level,
+            new ResourceLocation(Tags.MOD_ID, "ecalculator_thread_core_hyper_" + level),
+            Tags.MOD_ID + '.' + "ecalculator_thread_core_hyper_" + level,
             threads, hyperThreads
         );
     }

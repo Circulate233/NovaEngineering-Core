@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockECalculatorCasing extends BlockECalculator {
@@ -9,8 +9,8 @@ public class BlockECalculatorCasing extends BlockECalculator {
 
     protected BlockECalculatorCasing() {
         this.setDefaultState(this.blockState.getBaseState());
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_casing"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_casing");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_casing"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_casing");
     }
 
 }

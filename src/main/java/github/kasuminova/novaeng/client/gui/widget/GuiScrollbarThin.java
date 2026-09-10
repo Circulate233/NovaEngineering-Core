@@ -1,13 +1,13 @@
 package github.kasuminova.novaeng.client.gui.widget;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiScrollbarThin {
     public static final ResourceLocation TEXTURES_TABS = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/guiterminalelement.png");
+        Tags.MOD_ID, "textures/gui/guiterminalelement.png");
 
     private int displayX = 0;
     private int displayY = 0;

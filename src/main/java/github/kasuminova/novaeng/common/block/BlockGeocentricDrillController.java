@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.block;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
@@ -26,8 +26,8 @@ public class BlockGeocentricDrillController extends BlockController {
     public static final BlockGeocentricDrillController INSTANCE = new BlockGeocentricDrillController();
 
     private BlockGeocentricDrillController() {
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "geocentric_drill_controller"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "geocentric_drill_controller");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "geocentric_drill_controller"));
+        setTranslationKey(Tags.MOD_ID + '.' + "geocentric_drill_controller");
     }
 
     public DynamicMachine getParentMachine() {
@@ -46,7 +46,7 @@ public class BlockGeocentricDrillController extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof GeocentricDrillController) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.GEOCENTRIC_DRILL_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.GEOCENTRIC_DRILL_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

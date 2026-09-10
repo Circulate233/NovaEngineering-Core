@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.item.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -33,8 +33,8 @@ public class ECalculatorCell extends Item {
         this.totalBytes = (millionBytes * 1000) * 1024;
         this.setMaxStackSize(1);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_cell_" + millionBytes + "m"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_cell_" + millionBytes + "m");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_cell_" + millionBytes + "m"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_cell_" + millionBytes + "m");
     }
 
     @Override

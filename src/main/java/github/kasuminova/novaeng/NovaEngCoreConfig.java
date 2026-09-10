@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng;
 
 import com.cleanroommc.configanytime.ConfigAnytime;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -10,8 +11,8 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Objects;
 
-@Mod.EventBusSubscriber(modid = NovaEngineeringCore.MOD_ID, value = Side.CLIENT)
-@Config(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_ID)
+@Mod.EventBusSubscriber(modid = Tags.MOD_ID, value = Side.CLIENT)
+@Config(modid = Tags.MOD_ID, name = Tags.MOD_ID)
 public class NovaEngCoreConfig {
 
     @Config.Name("Client")
@@ -33,8 +34,8 @@ public class NovaEngCoreConfig {
 
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (Objects.equals(event.getModID(), NovaEngineeringCore.MOD_ID)) {
-            ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
+        if (Objects.equals(event.getModID(), Tags.MOD_ID)) {
+            ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE);
         }
     }
 
@@ -49,6 +50,16 @@ public class NovaEngCoreConfig {
 
         @Config.Name("ExtremeCraftingUIModification")
         public boolean ExtremeCraftingUIModification = true;
+
+        @Config.Name("TooltipTintStrength")
+        @Config.Comment("把传奇提示的物品配色叠加到 Obscure Tooltips 提示框上的强度：0 为关闭，1 为正片叠底到配色本身。")
+        @Config.RangeDouble(min = 0.0D, max = 1.0D)
+        public double tooltipTintStrength = 1.0D;
+
+        @Config.Name("TooltipFrameOverhang")
+        @Config.Comment("传奇提示的装饰对齐 Obscure 外框时使用的外扩像素；-1 为按提示框样式自动探测。")
+        @Config.RangeInt(min = -1, max = 64)
+        public int tooltipFrameOverhang = -1;
     }
 
     public static class Server {

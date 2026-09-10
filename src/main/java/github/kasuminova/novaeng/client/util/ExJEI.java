@@ -2,8 +2,8 @@ package github.kasuminova.novaeng.client.util;
 
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.util.Functions;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.ItemName;
 import ic2.core.ref.TeBlock;
@@ -29,7 +29,7 @@ public class ExJEI {
     public static void jeiCreate() {
         IItemStack pattern_storage = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.pattern_storage));
         IItemStack replicator = CraftTweakerMC.getIItemStack(BlockName.te.getItemStack(TeBlock.replicator));
-        MCJeiPanel JeiP = new MCJeiPanel("replicator_jei", I18n.format("gui." + NovaEngineeringCore.MOD_ID + ".replicator"));
+        MCJeiPanel JeiP = new MCJeiPanel("replicator_jei", I18n.format("gui." + Tags.MOD_ID + ".replicator"));
         JeiP.setModid("ic2");
         JeiP.recipeCatalysts.addAll(
             Functions.asList(
@@ -80,7 +80,7 @@ public class ExJEI {
                         .addElement(
                             IJeiUtils.createFontInfoElement(
                                 I18n.format(
-                                    "gui." + NovaEngineeringCore.MOD_ID + ".replicator.tooltips1",
+                                    "gui." + Tags.MOD_ID + ".replicator.tooltips1",
                                     Util.toSiString(bValue, 2)
                                 ),
                                 0,

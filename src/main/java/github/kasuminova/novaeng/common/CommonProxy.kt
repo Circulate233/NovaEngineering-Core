@@ -5,7 +5,6 @@ import baubles.api.BaublesApi
 import com.circulation.random_complement.common.util.MEHandler
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2
 import github.kasuminova.novaeng.NovaEngCoreConfig
-import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController
@@ -66,6 +65,7 @@ import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController
 import github.kasuminova.novaeng.common.trait.Register.registerModifiers
 import github.kasuminova.novaeng.common.util.MachineCoolants
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry
+import github.kasuminova.novaeng.novaeng_core.Tags.MOD_ID
 import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.common.base.Mods
 import net.minecraft.entity.player.EntityPlayer
@@ -99,7 +99,7 @@ open class CommonProxy : IGuiHandler {
     }
 
     open fun preInit() {
-        NetworkRegistry.INSTANCE.registerGuiHandler(NovaEngineeringCore.MOD_ID, this)
+        NetworkRegistry.INSTANCE.registerGuiHandler(MOD_ID, this)
 
         MinecraftForge.EVENT_BUS.register(IntegrationCRT.INSTANCE)
         MinecraftForge.EVENT_BUS.register(HyperNetEventHandler.INSTANCE)

@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.BlockGeocentricDrillController;
 import github.kasuminova.novaeng.common.block.BlockHyperNetTerminal;
 import github.kasuminova.novaeng.common.block.BlockSingularityCoreController;
@@ -8,6 +7,7 @@ import github.kasuminova.novaeng.common.block.ecotech.ecalculator.BlockECalculat
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageController;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
@@ -46,7 +46,7 @@ public class MixinMachineRegistry {
             BlockController.MACHINE_CONTROLLERS.put(machine, BlockGeocentricDrillController.INSTANCE);
             return true;
         }
-        ResourceLocation novaEngResLoc = new ResourceLocation(NovaEngineeringCore.MOD_ID, registryName.getPath());
+        ResourceLocation novaEngResLoc = new ResourceLocation(Tags.MOD_ID, registryName.getPath());
         if (BlockEStorageController.REGISTRY.containsKey(novaEngResLoc)) {
             BlockController.MACHINE_CONTROLLERS.put(machine, BlockEStorageController.REGISTRY.get(novaEngResLoc));
             return true;

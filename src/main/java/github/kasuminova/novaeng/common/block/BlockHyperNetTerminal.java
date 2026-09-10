@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.block;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -34,8 +34,8 @@ public class BlockHyperNetTerminal extends BlockController {
     public static final BlockHyperNetTerminal INSTANCE = new BlockHyperNetTerminal();
 
     private BlockHyperNetTerminal() {
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "hypernet_terminal_controller"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "hypernet_terminal_controller");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "hypernet_terminal_controller"));
+        setTranslationKey(Tags.MOD_ID + '.' + "hypernet_terminal_controller");
     }
 
     public DynamicMachine getParentMachine() {
@@ -59,7 +59,7 @@ public class BlockHyperNetTerminal extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileHyperNetTerminal) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.HYPERNET_TERMINAL.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.HYPERNET_TERMINAL.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

@@ -4,8 +4,8 @@ import appeng.api.AEApi;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -19,8 +19,8 @@ public class EStorageCellItem extends EStorageCell<IAEItemStack> {
 
     public EStorageCellItem(final DriveStorageLevel level, final int millionBytes, final int byteMultiplier) {
         super(level, millionBytes, byteMultiplier);
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_cell_item_" + millionBytes + "m"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_cell_item_" + millionBytes + "m");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_cell_item_" + millionBytes + "m"));
+        setTranslationKey(Tags.MOD_ID + '.' + "estorage_cell_item_" + millionBytes + "m");
     }
 
     @Override

@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.enchantment;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -14,7 +14,7 @@ public class MagicBreaking extends Enchantment {
     public MagicBreaking() {
         super(Rarity.VERY_RARE, EnumEnchantmentType.ALL, new EntityEquipmentSlot[]{EntityEquipmentSlot.MAINHAND});
         this.setName("magic_breaking");
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, name));
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, name));
     }
 
     @Override

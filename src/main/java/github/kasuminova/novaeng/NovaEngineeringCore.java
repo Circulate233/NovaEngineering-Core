@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng;
 
-import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
@@ -28,6 +27,7 @@ import github.kasuminova.novaeng.common.network.PktTerminalGuiData;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Mod;
@@ -45,10 +45,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG;
-import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PREFIX;
-
-@Mod(modid = NovaEngineeringCore.MOD_ID, name = NovaEngineeringCore.MOD_NAME, version = NovaEngineeringCore.VERSION,
+@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
     dependencies = "required-after:modularmachinery@[2.3.0,);" +
         "required-after:theoneprobe@[1.12-1.4.28,);" +
         "required-after:appliedenergistics2@[v0.56.4,);" +
@@ -59,42 +56,26 @@ import static github.kasuminova.novaeng.mixin.NovaEngCoreEarlyMixinLoader.LOG_PR
 )
 @SuppressWarnings("MethodMayBeStatic")
 public class NovaEngineeringCore {
-    public static final String MOD_ID = "novaeng_core";
-    public static final String MOD_NAME = "Nova Engineering: Core";
-
-    public static final String VERSION = Tags.VERSION;
 
     public static final String CLIENT_PROXY = "github.kasuminova.novaeng.client.ClientProxy";
     public static final String COMMON_PROXY = "github.kasuminova.novaeng.common.CommonProxy";
 
-    public static final SimpleNetworkWrapper NET_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+    public static final SimpleNetworkWrapper NET_CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MOD_ID);
 
     public static final ParallelNetworkManager PARALLEL_NETWORK_MANAGER = new ParallelNetworkManager();
 
-    @Mod.Instance(MOD_ID)
+    @Mod.Instance(Tags.MOD_ID)
     public static NovaEngineeringCore instance = null;
     @SidedProxy(clientSide = CLIENT_PROXY, serverSide = COMMON_PROXY)
     public static CommonProxy proxy = null;
-    public static Logger log = LogManager.getLogger(MOD_ID);
-
-    static {
-        if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
-            Thread.ofVirtual().name("NovaEng Core Hitokoto Initializer").start(() -> {
-                String hitokoto = HitokotoAPI.getRandomHitokoto();
-                if (hitokoto == null || hitokoto.isEmpty()) {
-                    return;
-                }
-                LOG.info(LOG_PREFIX + "{}", hitokoto);
-            });
-        }
-    }
+    public static Logger log = LogManager.getLogger(Tags.MOD_ID);
 
     public static ResourceLocation getRL(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return new ResourceLocation(Tags.MOD_ID, path);
     }
 
     public static String getRLStr(String path) {
-        return MOD_ID + ":" + path;
+        return Tags.MOD_ID + ":" + path;
     }
 
     @Mod.EventHandler
@@ -105,7 +86,7 @@ public class NovaEngineeringCore {
     @SuppressWarnings({"ValueOfIncrementOrDecrementUsed", "UnusedAssignment"})
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        event.getModMetadata().version = VERSION;
+        event.getModMetadata().version = Tags.VERSION;
 
         byte start = 0;
         NET_CHANNEL.registerMessage(PktHyperNetStatus.class, PktHyperNetStatus.class, start++, Side.CLIENT);

@@ -8,6 +8,7 @@ import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.ThreadCor
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.item.ecalculator.ItemECalculatorThreadCore;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -58,8 +59,8 @@ public class BlockECalculatorThreadCore extends BlockECalculatorPart {
 
     protected BlockECalculatorThreadCore(final String level, final int threads, final int hyperThreads) {
         this(
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_thread_core_" + level),
-            NovaEngineeringCore.MOD_ID + '.' + "ecalculator_thread_core_" + level,
+            new ResourceLocation(Tags.MOD_ID, "ecalculator_thread_core_" + level),
+            Tags.MOD_ID + '.' + "ecalculator_thread_core_" + level,
             threads, hyperThreads
         );
     }

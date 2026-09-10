@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.client.gui.widget.msa.overlay;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotCalculateCardExtension;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class OverlayCalculateCardExt extends SlotConditionTextureOverlay {
-    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/msa_elements.png");
+    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(Tags.MOD_ID, "textures/gui/msa_elements.png");
 
     public static final int TEX_X = 216;
     public static final int TEX_Y = 60;

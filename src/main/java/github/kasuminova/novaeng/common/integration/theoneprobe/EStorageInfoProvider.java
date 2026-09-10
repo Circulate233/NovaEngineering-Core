@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.integration.theoneprobe;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageType;
 import github.kasuminova.novaeng.common.container.data.EStorageCellData;
@@ -8,6 +7,7 @@ import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageEnergyCell;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -112,7 +112,7 @@ public class EStorageInfoProvider implements IProbeInfoProvider {
 
     @Override
     public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "estorage_info_provider";
+        return Tags.MOD_ID + ':' + "estorage_info_provider";
     }
 
     @Override

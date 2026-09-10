@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.client.gui.widget.msa;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.container.Column;
 import github.kasuminova.mmce.client.gui.widget.container.Row;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
 import github.kasuminova.novaeng.client.gui.widget.msa.overlay.OverlayCPU;
 import github.kasuminova.novaeng.client.gui.widget.msa.overlay.OverlayRAM;
@@ -15,11 +14,12 @@ import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotRAM;
 import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotRAMHeatRadiator;
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
 import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvCPUConst;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class AssemblyInvCPU extends AssemblyInvToggleable {
 
-    public static final ResourceLocation WIDGET_TEX_LOCATION = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/msa_cpu.png");
+    public static final ResourceLocation WIDGET_TEX_LOCATION = new ResourceLocation(Tags.MOD_ID, "textures/gui/msa_cpu.png");
 
     public static final int CLOSED_WIDGET_WIDTH = 27;
     public static final int CLOSED_WIDGET_HEIGHT = 26;

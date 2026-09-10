@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.block.ecotech.estorage;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageMEChannel;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.CommonProxy;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -25,8 +25,8 @@ public class BlockEStorageMEChannel extends BlockEStoragePart {
         this.setHarvestLevel("pickaxe", 1);
         this.setCreativeTab(CommonProxy.creativeTabModularMachinery);
         this.setDefaultState(this.blockState.getBaseState());
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_me_channel"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_me_channel");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_me_channel"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "estorage_me_channel");
     }
 
     @Nullable

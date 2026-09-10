@@ -65,6 +65,7 @@ public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
             case "modularrouters" -> Loader.isModLoaded("modularrouters");
             case "nae2" -> Loader.isModLoaded("nae2");
             case "nco" -> Loader.isModLoaded("nuclearcraft");
+            case "obscuretooltips" -> Loader.isModLoaded("obscure_tooltips") && Loader.isModLoaded("legendarytooltips");
             case "opticheck" -> Loader.isModLoaded("opticheck");
             case "packagedauto" -> Loader.isModLoaded("packagedauto");
             case "psi" -> Loader.isModLoaded("psi");

@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.item
 
-import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking
 import github.kasuminova.novaeng.common.util.Functions
+import github.kasuminova.novaeng.novaeng_core.Tags.MOD_ID
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.client.resources.I18n
@@ -43,8 +43,8 @@ open class ItemBasic(name: String) : Item() {
     init {
         this.setMaxStackSize(1)
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE)
-        this.registryName = ResourceLocation(NovaEngineeringCore.MOD_ID, name)
-        this.translationKey = NovaEngineeringCore.MOD_ID + '.' + name
+        this.registryName = ResourceLocation(MOD_ID, name)
+        this.translationKey = MOD_ID + '.' + name
     }
 
     @SideOnly(Side.CLIENT)

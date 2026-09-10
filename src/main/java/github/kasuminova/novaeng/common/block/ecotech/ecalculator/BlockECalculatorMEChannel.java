@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorMEChannel;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -18,8 +18,8 @@ public class BlockECalculatorMEChannel extends BlockECalculatorPart {
     protected BlockECalculatorMEChannel() {
         super(Material.IRON);
         this.setDefaultState(this.blockState.getBaseState());
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_me_channel"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_me_channel");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_me_channel"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_me_channel");
     }
 
     @Nullable

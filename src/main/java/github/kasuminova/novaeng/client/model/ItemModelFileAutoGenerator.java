@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.model;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +21,7 @@ public class ItemModelFileAutoGenerator {
 
     public static void generate(IResourceManager resourceManager, String newPath) throws IOException {
         IResource itemModelPattern = resourceManager.getResource(
-            new ResourceLocation(NovaEngineeringCore.MOD_ID, "models/item/item_model_pattern.json"));
+            new ResourceLocation(Tags.MOD_ID, "models/item/item_model_pattern.json"));
 
         File newItemModelFile = new File("resources/novaeng_core/models/item/" + newPath + ".json");
         if (newItemModelFile.exists()) {

@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.block.ecotech.estorage;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.EnergyCellStatus;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageEnergyCell;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -44,8 +44,8 @@ public class BlockEStorageEnergyCell extends BlockEStoragePart {
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(EnergyCellStatus.STATUS, EnergyCellStatus.EMPTY)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_energy_cell_" + level));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_energy_cell_" + level);
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_energy_cell_" + level));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "estorage_energy_cell_" + level);
         this.maxEnergyStore = maxEnergyStore;
     }
 

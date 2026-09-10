@@ -8,13 +8,13 @@ import github.kasuminova.mmce.client.gui.widget.base.DynamicWidget;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.client.gui.widget.container.Row;
 import github.kasuminova.mmce.client.gui.widget.event.GuiEvent;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
 import github.kasuminova.novaeng.client.gui.widget.ProgressBar;
 import github.kasuminova.novaeng.client.gui.widget.SizedColumn;
 import github.kasuminova.novaeng.client.gui.widget.SizedRow;
 import github.kasuminova.novaeng.client.gui.widget.ecalculator.event.ECGUIDataUpdateEvent;
 import github.kasuminova.novaeng.common.container.data.ECalculatorData;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -94,19 +94,19 @@ public class CPUStatusPanel extends SizedColumn {
         private static final int TEXT_OFFSET_X = 5;
         private static final int TEXT_OFFSET_Y = 24;
 
-        private static final ResourceLocation L4 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L4 = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/thread_module");
-        private static final ResourceLocation L4_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L4_HYPER = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/hyper_threading_module");
 
-        private static final ResourceLocation L6 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L6 = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_thread_module");
-        private static final ResourceLocation L6_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L6_HYPER = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l6_hyper_threading_module");
 
-        private static final ResourceLocation L9 = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L9 = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_thread_module");
-        private static final ResourceLocation L9_HYPER = new ResourceLocation(NovaEngineeringCore.MOD_ID,
+        private static final ResourceLocation L9_HYPER = new ResourceLocation(Tags.MOD_ID,
             "blocks/ec_modular_synthetic_memory/bloom/thread_module/{state}/l9_hyper_threading_module");
 
         private static final TextureProperties BACKGROUND = new TextureProperties(

@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.block.ecotech.estorage;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -26,8 +26,8 @@ public class BlockEStorageTail extends BlockEStorage {
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(BlockController.FORMED, false)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_tail_" + level));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_tail_" + level);
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_tail_" + level));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "estorage_tail_" + level);
     }
 
     @Nonnull

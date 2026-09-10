@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.block;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -27,8 +27,8 @@ public class BlockSingularityCoreController extends BlockController {
     public static final BlockSingularityCoreController INSTANCE = new BlockSingularityCoreController();
 
     private BlockSingularityCoreController() {
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "singularity_core_controller"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "singularity_core_controller");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "singularity_core_controller"));
+        setTranslationKey(Tags.MOD_ID + '.' + "singularity_core_controller");
     }
 
     public DynamicMachine getParentMachine() {
@@ -52,7 +52,7 @@ public class BlockSingularityCoreController extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof SingularityCore) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.SINGULARITY_CORE.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.SINGULARITY_CORE.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

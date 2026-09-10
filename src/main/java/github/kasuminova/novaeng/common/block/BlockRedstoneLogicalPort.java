@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.block;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.block.BlockDynamicColor;
 import hellfirepvp.modularmachinery.common.data.Config;
 import hellfirepvp.modularmachinery.common.tiles.base.ColorableMachineTile;
@@ -38,8 +38,8 @@ public class BlockRedstoneLogicalPort extends BlockContainer implements BlockDyn
         this.setHardness(2.0F);
         this.setResistance(10.0F);
         this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "redstone_logical_port");
-        this.setRegistryName(NovaEngineeringCore.MOD_ID, "redstone_logical_port");
+        this.setTranslationKey(Tags.MOD_ID + '.' + "redstone_logical_port");
+        this.setRegistryName(Tags.MOD_ID, "redstone_logical_port");
         this.setHarvestLevel("pickaxe", 1);
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
     }

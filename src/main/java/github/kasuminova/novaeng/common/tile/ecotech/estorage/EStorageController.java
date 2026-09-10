@@ -4,12 +4,12 @@ import appeng.api.config.Actionable;
 import appeng.api.storage.ICellInventory;
 import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.data.IAEItemStack;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.util.BlockModelHider;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageController;
 import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
 import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.bus.EStorageBus;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.client.ClientProxy;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
@@ -57,7 +57,7 @@ public class EStorageController extends EPartController<EStoragePart> {
     public EStorageController(final ResourceLocation machineRegistryName) {
         this.workMode = WorkMode.SYNC;
         this.parentMachine = MachineRegistry.getRegistry().getMachine(machineRegistryName);
-        this.parentController = BlockEStorageController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, machineRegistryName.getPath()));
+        this.parentController = BlockEStorageController.REGISTRY.get(new ResourceLocation(Tags.MOD_ID, machineRegistryName.getPath()));
     }
 
     public EStorageController() {
@@ -262,7 +262,7 @@ public class EStorageController extends EPartController<EStoragePart> {
             ResourceLocation rl = new ResourceLocation(compound.getString("parentMachine"));
             parentMachine = MachineRegistry.getRegistry().getMachine(rl);
             if (parentMachine != null) {
-                this.parentController = BlockEStorageController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, parentMachine.getRegistryName().getPath()));
+                this.parentController = BlockEStorageController.REGISTRY.get(new ResourceLocation(Tags.MOD_ID, parentMachine.getRegistryName().getPath()));
             } else {
                 ModularMachinery.log.info("Couldn't find machine named " + rl + " for controller at " + getPos());
             }

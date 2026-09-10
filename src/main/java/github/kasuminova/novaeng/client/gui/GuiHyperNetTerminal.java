@@ -19,6 +19,7 @@ import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import github.kasuminova.novaeng.common.util.StringUtils;
 import github.kasuminova.novaeng.common.util.TimeUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.client.ClientScheduler;
 import hellfirepvp.modularmachinery.client.gui.GuiContainerBase;
 import hellfirepvp.modularmachinery.common.crafting.helper.CraftingStatus;
@@ -68,9 +69,9 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
             }
         };
     private static final ResourceLocation TEXTURES_TERMINAL = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/guiterminal.png");
+        Tags.MOD_ID, "textures/gui/guiterminal.png");
     private static final ResourceLocation TEXTURES_TERMINAL_ELEMENTS = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/guiterminalelement.png");
+        Tags.MOD_ID, "textures/gui/guiterminalelement.png");
     private static final int TERMINAL_ELEMENT_WIDTH = 92;
     private static final int TERMINAL_ELEMENT_HEIGHT = 22;
     private static final float FONT_SCALE = 0.72F;

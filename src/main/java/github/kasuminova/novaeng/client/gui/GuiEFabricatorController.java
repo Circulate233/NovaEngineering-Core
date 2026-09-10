@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.client.gui;
 import github.kasuminova.mmce.client.gui.GuiContainerDynamic;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.ControlPanel;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.CraftingStatusPanel;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.HeatStatisticPanel;
@@ -13,6 +12,7 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUp
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController;
 import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -22,13 +22,13 @@ import net.minecraft.util.ResourceLocation;
 public class GuiEFabricatorController extends GuiContainerDynamic<ContainerEFabricatorController> {
 
     public static final ResourceLocation TEXTURES_BACKGROUND_LIGHT = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_light.png");
+        Tags.MOD_ID, "textures/gui/efabricator_light.png");
     public static final ResourceLocation TEXTURES_BACKGROUND_DARK = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_dark.png");
+        Tags.MOD_ID, "textures/gui/efabricator_dark.png");
     public static final ResourceLocation TEXTURES_INVENTORY = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
+        Tags.MOD_ID, "textures/gui/efabricator_inventory.png");
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_elements.png");
+        Tags.MOD_ID, "textures/gui/efabricator_elements.png");
 
     @Getter
     private EFabricatorData data = null;

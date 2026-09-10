@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.TransmitterBusLink;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.TransmitterBusLinkLevel;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorTransmitterBus;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -28,8 +28,8 @@ public class BlockECalculatorTransmitterBus extends BlockECalculatorPart {
 
     protected BlockECalculatorTransmitterBus() {
         super(Material.IRON);
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_transmitter_bus"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_transmitter_bus");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_transmitter_bus"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_transmitter_bus");
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(TransmitterBusLink.LINK, TransmitterBusLink.NONE)

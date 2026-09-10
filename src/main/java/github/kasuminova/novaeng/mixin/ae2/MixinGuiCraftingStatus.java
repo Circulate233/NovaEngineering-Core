@@ -11,9 +11,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import github.kasuminova.mmce.client.gui.util.RenderPos;
 import github.kasuminova.mmce.client.gui.util.TextureProperties;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.ecalculator.ECPUStatus;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
@@ -31,7 +31,7 @@ import java.util.List;
 public abstract class MixinGuiCraftingStatus extends AEBaseGui {
 
     @Unique
-    private static final ResourceLocation novaeng_ec$TEXTURE = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_2.png");
+    private static final ResourceLocation novaeng_ec$TEXTURE = new ResourceLocation(Tags.MOD_ID, "textures/gui/ecalculator_gui_2.png");
     @Unique
     private static final TextureProperties novaeng_ec$L4 = TextureProperties.of(novaeng_ec$TEXTURE, 1, 1, 67, 22);
     @Unique

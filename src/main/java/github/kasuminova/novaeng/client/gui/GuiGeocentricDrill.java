@@ -12,6 +12,7 @@ import github.kasuminova.novaeng.common.container.ContainerGeocentricDrill;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.network.PktGeocentricDrillControl;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -26,7 +27,7 @@ import java.util.Collections;
 public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricDrill> {
 
     public static final ResourceLocation GUI_TEXTURE =
-        new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/guigeocentricdrill.png");
+        new ResourceLocation(Tags.MOD_ID, "textures/gui/guigeocentricdrill.png");
 
     private final OreControlList oreControlList = new OreControlList();
 

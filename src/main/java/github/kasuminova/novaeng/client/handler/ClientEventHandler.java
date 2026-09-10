@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleManager;
@@ -91,7 +92,7 @@ public class ClientEventHandler {
             this.debugMessageUpdateRequired = false;
             this.debugMessageCache.clear();
             this.debugMessageCache.add("");
-            this.debugMessageCache.add(TextFormatting.BLUE + "[NovaEngineering-Core] Ver: " + NovaEngineeringCore.VERSION);
+            this.debugMessageCache.add(TextFormatting.BLUE + "[NovaEngineering-Core] Ver: " + Tags.VERSION);
 
             if (effectRenderer != null) {
                 this.debugMessageCache.add(TextFormatting.GREEN + "Particles: " + TextFormatting.DARK_GREEN + getTotalParticles((AccessorParticleManager) effectRenderer));
@@ -113,7 +114,7 @@ public class ClientEventHandler {
         CPacketProfiler.profilerStartTime = System.currentTimeMillis();
         TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.clear();
 
-        TitleUtils.setRandomTitleSync(String.format("*%s*", event.getManager().getRemoteAddress()));
+        TitleUtils.setTitleSync();
     }
 
     @SubscribeEvent
@@ -121,6 +122,6 @@ public class ClientEventHandler {
         CPacketProfiler.enabled = false;
         CPacketProfiler.profilerStopTime = System.currentTimeMillis();
 
-        TitleUtils.setRandomTitleSync();
+        TitleUtils.setTitleSync();
     }
 }

@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -34,8 +34,8 @@ public class BlockEFabricatorMEChannel extends BlockEFabricatorPart {
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_me_channel"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_me_channel");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "efabricator_me_channel"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "efabricator_me_channel");
     }
 
     @Nullable

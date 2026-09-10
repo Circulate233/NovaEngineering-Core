@@ -4,9 +4,9 @@ import com.circulation.circulation_networks.api.API;
 import com.circulation.circulation_networks.api.node.NodeType;
 import com.circulation.circulation_networks.blocks.nodes.BaseNodeBlock;
 import com.circulation.circulation_networks.tooltip.LocalizedComponent;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.TileDreamEnergyPort;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
@@ -27,8 +27,8 @@ public class BlockDreamEnergyPort extends BaseNodeBlock {
     }
 
     private BlockDreamEnergyPort() {
-        super(NovaEngineeringCore.MOD_ID, "DreamEnergyPort");
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "dream_energy_port");
+        super(Tags.MOD_ID, "DreamEnergyPort");
+        this.setTranslationKey(Tags.MOD_ID + '.' + "dream_energy_port");
         this.setCreativeTab(CreativeTabNovaEng.INSTANCE);
         this.setNodeTileClass(TileDreamEnergyPort.class);
     }

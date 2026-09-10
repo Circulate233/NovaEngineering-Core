@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -48,10 +48,10 @@ public class BlockEFabricatorController extends BlockController {
         this.setHarvestLevel("pickaxe", 2);
         this.fullBlock = false;
 
-        registryName = new ResourceLocation(NovaEngineeringCore.MOD_ID, "extendable_fabricator_subsystem_" + level);
+        registryName = new ResourceLocation(Tags.MOD_ID, "extendable_fabricator_subsystem_" + level);
         machineRegistryName = new ResourceLocation(ModularMachinery.MODID, registryName.getPath());
         setRegistryName(registryName);
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + registryName.getPath());
+        setTranslationKey(Tags.MOD_ID + '.' + registryName.getPath());
     }
 
     @Nonnull
@@ -72,7 +72,7 @@ public class BlockEFabricatorController extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof EFabricatorController) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.EFABRICATOR_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.EFABRICATOR_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

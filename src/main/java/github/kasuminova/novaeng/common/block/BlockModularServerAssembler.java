@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.block;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -29,8 +29,8 @@ public class BlockModularServerAssembler extends BlockController {
     public static final BlockModularServerAssembler INSTANCE = new BlockModularServerAssembler();
 
     private BlockModularServerAssembler() {
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "modular_server_assembler"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "modular_server_assembler");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "modular_server_assembler"));
+        setTranslationKey(Tags.MOD_ID + '.' + "modular_server_assembler");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BlockModularServerAssembler extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileModularServerAssembler) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.MODULAR_SERVER_ASSEMBLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.MODULAR_SERVER_ASSEMBLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

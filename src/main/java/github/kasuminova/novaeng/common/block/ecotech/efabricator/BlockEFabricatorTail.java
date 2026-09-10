@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorTail;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -39,8 +39,8 @@ public class BlockEFabricatorTail extends BlockEFabricatorPart {
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(BlockController.FORMED, false)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_tail_" + level));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_tail_" + level);
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "efabricator_tail_" + level));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "efabricator_tail_" + level);
     }
 
     @javax.annotation.Nullable

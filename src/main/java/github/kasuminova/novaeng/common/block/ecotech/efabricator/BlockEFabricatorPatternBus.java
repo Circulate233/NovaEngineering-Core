@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
 import appeng.tile.inventory.AppEngInternalInventory;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -39,8 +39,8 @@ public class BlockEFabricatorPatternBus extends BlockEFabricatorPart {
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_pattern_bus"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_pattern_bus");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "efabricator_pattern_bus"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "efabricator_pattern_bus");
     }
 
     @Nullable
@@ -65,7 +65,7 @@ public class BlockEFabricatorPatternBus extends BlockEFabricatorPart {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof EFabricatorPatternBus) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.EFABRICATOR_PATTERN_BUS.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.EFABRICATOR_PATTERN_BUS.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

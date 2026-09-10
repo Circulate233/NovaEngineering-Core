@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorParallelProc.Modifier;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -68,8 +68,8 @@ public class BlockEFabricatorParallelProc extends BlockEFabricatorPart {
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_parallel_proc_" + level));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_parallel_proc_" + level);
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "efabricator_parallel_proc_" + level));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "efabricator_parallel_proc_" + level);
         this.modifiers = modifiers;
         this.overclockModifiers = overclockModifiers;
     }

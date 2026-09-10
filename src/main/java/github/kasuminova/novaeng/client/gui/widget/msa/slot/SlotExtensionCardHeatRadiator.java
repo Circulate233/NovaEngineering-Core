@@ -1,14 +1,14 @@
 package github.kasuminova.novaeng.client.gui.widget.msa.slot;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
 import github.kasuminova.novaeng.common.container.slot.SlotConditionItemHandler;
 import github.kasuminova.novaeng.common.container.slot.SlotExtensionCardHeatRadiatorItemHandler;
 import github.kasuminova.novaeng.common.util.RandomUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class SlotExtensionCardHeatRadiator extends SlotAssemblyDecor<SlotExtensionCardHeatRadiatorItemHandler> {
-    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/msa_extension.png");
+    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(Tags.MOD_ID, "textures/gui/msa_extension.png");
     public static final int TEX_X = 121;
     public static final int TEX_Y = 38;
 

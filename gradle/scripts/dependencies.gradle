@@ -22,7 +22,12 @@ repositories {
         name = 'GeckoLib'
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+    }
     mavenCentral()
+    mavenLocal() // Must be last for caching to work
 }
 
 dependencies {
@@ -37,7 +42,9 @@ dependencies {
         compileOnly 'com.cleanroommc:lwjglx:1.0.0'
     }
 
-    modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.711'
+    modImplementation 'CraftTweaker2:CraftTweaker2-API:4.1.20.716'
+    modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.716'
+    modImplementation 'CraftTweaker2:ZenScript:4.1.20.716'
 
     modImplementation 'curse.maven:fugue-1005815:8230893'
     modImplementation 'curse.maven:modularui-624243:7929464'
@@ -121,5 +128,5 @@ dependencies {
     modImplementation 'curse.maven:packagedauto-308380:6932932'
     modImplementation 'curse.maven:packagedastral-811828:7063119'
     modImplementation 'io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0'
-    implementation fg.deobf("curse.maven:obscure-tooltips-715660:8522661")("curse.maven:obscure-tooltips-715660:8522661")
+    modImplementation 'curse.maven:obscure-tooltips-715660:8522661'
 }

@@ -2,7 +2,7 @@ package github.kasuminova.novaeng.client.util;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
-import github.kasuminova.novaeng.client.hitokoto.HitokotoAPI;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import org.lwjgl.opengl.Display;
 
 import java.lang.reflect.Method;
@@ -11,7 +11,7 @@ public class TitleUtils {
     /**
      * 喜欢我硬编码吗.jpg
      */
-    public static final String DEFAULT_TITLE = "Nova Engineering: World 1.20.0 by Hikari_Nova | Core Ver: " + NovaEngineeringCore.VERSION;
+    public static final String DEFAULT_TITLE = "Nova Engineering: World 1.20.0 by Hikari_Nova | Core Ver: " + Tags.VERSION;
     public static final String VANILLA_TITLE = "Minecraft 1.12.2";
 
     public static volatile String currentTitle = null;
@@ -19,79 +19,49 @@ public class TitleUtils {
     public static volatile boolean unsupportedPlatform = false;
 
     /**
-     * 设置一言随机标题，必须在客户端主线程使用。
-     * 如果一言缓存为空，则尝试重新获取一言。
+     * 设置携带状态标记的窗口标题，必须在客户端主线程使用。
      *
      * @param state 当前状态
      */
-    public static void setRandomTitle(final String state) {
+    public static void setTitle(final String state) {
         lastCurrentTitle = currentTitle;
         if (!NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
             return;
         }
 
-        String hitokotoCache = HitokotoAPI.getHitokotoCache();
-        if (hitokotoCache != null) {
-            currentTitle = buildTitle(state, hitokotoCache);
-            setTitle();
-        } else {
-            Thread.ofVirtual().name("NovaEng Title Hitokoto Loader").start(HitokotoAPI::getRandomHitokoto);
-            currentTitle = buildTitle(state, null);
-            setTitle();
-        }
+        currentTitle = buildTitle(state);
+        applyTitle();
     }
 
     /**
-     * 设置一言随机标题，必须在客户端主线程使用。
-     * 如果一言缓存为空，则尝试重新获取一言。
+     * 设置窗口标题，必须在客户端主线程使用。
      */
-    public static void setRandomTitle() {
-        lastCurrentTitle = currentTitle;
-        if (!NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
-            return;
-        }
-
-        String hitokotoCache = HitokotoAPI.getHitokotoCache();
-
-        if (hitokotoCache != null) {
-            currentTitle = buildTitle(null, hitokotoCache);
-            setTitle();
-        } else {
-            currentTitle = buildTitle(null, null);
-            setTitle();
-        }
+    public static void setTitle() {
+        setTitle(null);
     }
 
     /**
-     * 设置一言随机标题，可以在其他线程使用。
+     * 设置携带状态标记的窗口标题，可以在其他线程使用。
      *
      * @param state 当前状态
      */
-    public static void setRandomTitleSync(String state) {
+    public static void setTitleSync(final String state) {
         lastCurrentTitle = currentTitle;
-        currentTitle = buildTitle(state, HitokotoAPI.getHitokotoCache());
+        currentTitle = buildTitle(state);
     }
 
     /**
-     * 设置一言随机标题，可以在其他线程使用。
+     * 设置窗口标题，可以在其他线程使用。
      */
-    public static void setRandomTitleSync() {
-        lastCurrentTitle = currentTitle;
-        currentTitle = buildTitle(null, HitokotoAPI.getHitokotoCache());
+    public static void setTitleSync() {
+        setTitleSync(null);
     }
 
-    public static String buildTitle(final String state, final String hitokoto) {
+    public static String buildTitle(final String state) {
         if (state == null) {
-            if (hitokoto == null || hitokoto.isEmpty()) {
-                return DEFAULT_TITLE;
-            }
-            return String.format("%s | %s", DEFAULT_TITLE, hitokoto);
+            return DEFAULT_TITLE;
         }
-        if (hitokoto == null || hitokoto.isEmpty()) {
-            return String.format("%s | %s", DEFAULT_TITLE, state);
-        }
-
-        return String.format("%s | %s | %s", DEFAULT_TITLE, state, hitokoto);
+        return String.format("%s | %s", DEFAULT_TITLE, state);
     }
 
     public static void checkTitleState() {
@@ -107,11 +77,11 @@ public class TitleUtils {
 //                Minecraft.getMinecraft().shutdown();
 //                return;
             }
-            setTitle();
+            applyTitle();
         }
     }
 
-    private static void setTitle() {
+    private static void applyTitle() {
         if (!NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
             return;
         }

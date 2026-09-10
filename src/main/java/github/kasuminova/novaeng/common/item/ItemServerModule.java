@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.item;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -14,7 +14,7 @@ public class ItemServerModule extends Item {
 
     public ItemServerModule(final String registryName, final ServerModuleBase<?> boundedModule) {
         setCreativeTab(CreativeTabNovaEng.INSTANCE);
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, registryName)).setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + registryName);
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, registryName)).setTranslationKey(Tags.MOD_ID + '.' + registryName);
         this.boundedModule = boundedModule;
     }
 

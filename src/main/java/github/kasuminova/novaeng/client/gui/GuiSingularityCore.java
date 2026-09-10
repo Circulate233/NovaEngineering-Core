@@ -5,13 +5,13 @@ import github.kasuminova.mmce.client.gui.GuiContainerDynamic;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.client.gui.widget.container.Column;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.singularitycore.MultiplierControlPanel;
 import github.kasuminova.novaeng.client.gui.widget.singularitycore.Rings;
 import github.kasuminova.novaeng.client.gui.widget.singularitycore.StartStopPanel;
 import github.kasuminova.novaeng.client.gui.widget.singularitycore.StatusPanel;
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import gregtech.client.shader.Shaders;
 import gregtech.client.shader.postprocessing.BloomEffect;
 import gregtech.client.utils.DepthTextureUtil;
@@ -26,21 +26,21 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiSingularityCore extends GuiContainerDynamic<ContainerSingularityCore> {
 
-    public static final ResourceLocation GUI_BACKGROUND = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_gui.png");
-    public static final ResourceLocation GUI_BACKGROUND_BLOOM = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_gui_bloom.png");
+    public static final ResourceLocation GUI_BACKGROUND = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_gui.png");
+    public static final ResourceLocation GUI_BACKGROUND_BLOOM = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_gui_bloom.png");
 
-    public static final ResourceLocation GUI_SUBASSEMBLY = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_subassembly.png");
-    public static final ResourceLocation GUI_SUBASSEMBLY_2 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_subassembly_2.png");
-    public static final ResourceLocation GUI_SUBASSEMBLY_3 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_subassembly_3.png");
+    public static final ResourceLocation GUI_SUBASSEMBLY = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_subassembly.png");
+    public static final ResourceLocation GUI_SUBASSEMBLY_2 = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_subassembly_2.png");
+    public static final ResourceLocation GUI_SUBASSEMBLY_3 = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_subassembly_3.png");
 
-    public static final ResourceLocation GUI_BUTTON = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_button.png");
+    public static final ResourceLocation GUI_BUTTON = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_button.png");
 
-    public static final ResourceLocation GUI_RING_1_OFF = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_1_off.png");
-    public static final ResourceLocation GUI_RING_1_ON = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_1_on.png");
-    public static final ResourceLocation GUI_RING_2_OFF = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_2_off.png");
-    public static final ResourceLocation GUI_RING_2_ON = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_2_on.png");
-    public static final ResourceLocation GUI_RING_3_OFF = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_3_off.png");
-    public static final ResourceLocation GUI_RING_3_ON = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/singularity_core_rings_3_on.png");
+    public static final ResourceLocation GUI_RING_1_OFF = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_1_off.png");
+    public static final ResourceLocation GUI_RING_1_ON = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_1_on.png");
+    public static final ResourceLocation GUI_RING_2_OFF = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_2_off.png");
+    public static final ResourceLocation GUI_RING_2_ON = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_2_on.png");
+    public static final ResourceLocation GUI_RING_3_OFF = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_3_off.png");
+    public static final ResourceLocation GUI_RING_3_ON = new ResourceLocation(Tags.MOD_ID, "textures/gui/singularity_core_rings_3_on.png");
 
     private static Framebuffer bloomFBO = null;
 

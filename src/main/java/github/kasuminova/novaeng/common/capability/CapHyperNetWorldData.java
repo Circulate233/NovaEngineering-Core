@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.capability;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 public class CapHyperNetWorldData implements ICapabilitySerializable<NBTTagCompound> {
 
-    public static final ResourceLocation NAME = new ResourceLocation(NovaEngineeringCore.MOD_ID, "hypernet_data");
+    public static final ResourceLocation NAME = new ResourceLocation(Tags.MOD_ID, "hypernet_data");
 
     @CapabilityInject(CapHyperNetWorldData.class)
     @SuppressWarnings("NonConstantFieldWithUpperCaseName")

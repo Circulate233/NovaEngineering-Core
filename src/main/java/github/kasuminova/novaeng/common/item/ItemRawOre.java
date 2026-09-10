@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.item;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.util.StringUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -65,7 +66,7 @@ public final class ItemRawOre extends Item {
         this.setCreativeTab(rawOreTab);
         var key = type.getName() + "_" + this.name;
         this.setRegistryName(NovaEngineeringCore.getRL(key));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + key);
+        this.setTranslationKey(Tags.MOD_ID + '.' + key);
         this.rawOD = type.getOdName(name);
         this.oreOD = "ore" + name;
         this.partOD = type.name().toLowerCase() + name;
@@ -249,7 +250,7 @@ public final class ItemRawOre extends Item {
             this.setSoundType(SoundType.STONE);
             this.setCreativeTab(rawOreTab);
             this.setDefaultState(this.blockState.getBaseState());
-            this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "raw_block_" + ItemRawOre.this.name);
+            this.setTranslationKey(Tags.MOD_ID + '.' + "raw_block_" + ItemRawOre.this.name);
             this.setRegistryName(NovaEngineeringCore.getRL("raw_block_" + ItemRawOre.this.name));
             this.rawOD = this.type.getOdName(name);
             this.item = new ItemBLockRawOre();

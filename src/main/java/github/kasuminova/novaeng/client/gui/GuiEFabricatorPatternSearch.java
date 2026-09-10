@@ -4,7 +4,6 @@ import github.kasuminova.mmce.client.gui.GuiContainerDynamic;
 import github.kasuminova.mmce.client.gui.widget.MultiLineLabel;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.PatternPanel;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.SearchPanel;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.TitleButtonLine;
@@ -12,6 +11,7 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFPatternSe
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import lombok.Getter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,11 +24,11 @@ import java.util.Collections;
 public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEFabricatorPatternSearch> {
 
     public static final ResourceLocation TEXTURES_BACKGROUND_DARK = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_pattern_search_bg_dark.png");
+        Tags.MOD_ID, "textures/gui/efabricator_pattern_search_bg_dark.png");
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_search.png");
+        Tags.MOD_ID, "textures/gui/efabricator_search.png");
     public static final ResourceLocation TEXTURES_INVENTORY = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/efabricator_inventory.png");
+        Tags.MOD_ID, "textures/gui/efabricator_inventory.png");
 
     @Getter
     private EFabricatorPatternData data = null;

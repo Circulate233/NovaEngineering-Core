@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.block.ecotech.estorage;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -22,8 +22,8 @@ public class BlockEStorageVent extends BlockEStorage {
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_vent"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_vent");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_vent"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "estorage_vent");
     }
 
 

@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.integration.theoneprobe;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.machine.MachineSpecial;
 import github.kasuminova.novaeng.common.registry.RegistryMachineSpecial;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 
 public class SpecialMachineInfoProvider implements IProbeInfoProvider {
     public static final SpecialMachineInfoProvider INSTANCE = new SpecialMachineInfoProvider();
-    public static final String ID = NovaEngineeringCore.MOD_ID + ':' + "special_machine_info_provider";
+    public static final String ID = Tags.MOD_ID + ':' + "special_machine_info_provider";
 
     private SpecialMachineInfoProvider() {
     }

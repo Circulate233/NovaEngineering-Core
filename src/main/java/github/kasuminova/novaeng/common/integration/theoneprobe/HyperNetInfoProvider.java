@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.integration.theoneprobe;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.hypernet.old.ComputationCenter;
 import github.kasuminova.novaeng.common.hypernet.old.DataProcessor;
@@ -10,6 +9,7 @@ import github.kasuminova.novaeng.common.hypernet.old.NetNodeCache;
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchCognitionData;
 import github.kasuminova.novaeng.common.hypernet.old.research.ResearchStation;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
@@ -229,7 +229,7 @@ public class HyperNetInfoProvider implements IProbeInfoProvider {
 
     @Override
     public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "hypernet_info_provider";
+        return Tags.MOD_ID + ':' + "hypernet_info_provider";
     }
 
     @Override

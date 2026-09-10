@@ -1,13 +1,13 @@
 package github.kasuminova.novaeng.client.gui.widget.msa.slot;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
 import github.kasuminova.novaeng.common.container.slot.SlotCapacitorItemHandler;
 import github.kasuminova.novaeng.common.container.slot.SlotConditionItemHandler;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class SlotCapacitor extends SlotAssembly<SlotCapacitorItemHandler> {
-    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/msa_power.png");
+    public static final ResourceLocation TEX_LOCATION = new ResourceLocation(Tags.MOD_ID, "textures/gui/msa_power.png");
     public static final int TEX_X = 7;
     public static final int TEX_Y = 25;
 

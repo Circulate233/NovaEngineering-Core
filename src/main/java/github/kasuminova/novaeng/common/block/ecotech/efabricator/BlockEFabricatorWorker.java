@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -37,8 +37,8 @@ public class BlockEFabricatorWorker extends BlockEFabricatorPart {
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(WorkerStatus.STATUS, WorkerStatus.OFF)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "efabricator_worker"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "efabricator_worker");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "efabricator_worker"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "efabricator_worker");
     }
 
     @Nullable

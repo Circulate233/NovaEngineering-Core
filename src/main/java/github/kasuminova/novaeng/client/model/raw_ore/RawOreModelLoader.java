@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.ClientProxy;
 import github.kasuminova.novaeng.common.item.ItemRawOre;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.Item;
@@ -23,7 +24,7 @@ public class RawOreModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(ResourceLocation modelLocation) {
-        if (modelLocation.getNamespace().equals(NovaEngineeringCore.MOD_ID)) {
+        if (modelLocation.getNamespace().equals(Tags.MOD_ID)) {
             var path = modelLocation.getPath();
             return path.contains("raw_") && !path.endsWith("_block") && !path.endsWith("_ore");
         }

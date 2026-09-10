@@ -3,13 +3,13 @@ package github.kasuminova.novaeng.client.gui.widget.msa;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.container.Column;
 import github.kasuminova.mmce.client.gui.widget.container.Row;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
 import github.kasuminova.novaeng.client.gui.widget.msa.overlay.OverlayCalculateCardExt;
 import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotCalculateCard;
 import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotCalculateCardExtension;
 import github.kasuminova.novaeng.client.gui.widget.msa.slot.SlotCalculateCardHeatRadiator;
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 
 public class AssemblyInvCalculateCard extends AssemblyInv {
@@ -27,7 +27,7 @@ public class AssemblyInvCalculateCard extends AssemblyInv {
         this.width = CLOSED_WIDTH;
         this.height = CLOSED_HEIGHT;
 
-        this.openedBgTexLocation = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/msa_calculate_card.png");
+        this.openedBgTexLocation = new ResourceLocation(Tags.MOD_ID, "textures/gui/msa_calculate_card.png");
         this.openedInvBgTexWidth = OPENED_WIDTH;
         this.openedInvBgTexHeight = OPENED_HEIGHT;
         this.openedInvBgTexOffsetX = 0;

@@ -3,12 +3,12 @@ package github.kasuminova.novaeng.common.integration.theoneprobe;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.util.TimeRecorder;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
 import github.kasuminova.novaeng.common.util.ColorUtils;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -227,7 +227,7 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
 
     @Override
     public String getID() {
-        return NovaEngineeringCore.MOD_ID + ':' + "ecalculator_info_provider";
+        return Tags.MOD_ID + ':' + "ecalculator_info_provider";
     }
 
     @Override

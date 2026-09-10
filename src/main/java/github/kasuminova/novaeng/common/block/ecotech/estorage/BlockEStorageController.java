@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.block.ecotech.estorage;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -49,10 +49,10 @@ public class BlockEStorageController extends BlockController {
         this.setHarvestLevel("pickaxe", 2);
         this.fullBlock = false;
 
-        registryName = new ResourceLocation(NovaEngineeringCore.MOD_ID, "extendable_digital_storage_subsystem_" + level);
+        registryName = new ResourceLocation(Tags.MOD_ID, "extendable_digital_storage_subsystem_" + level);
         machineRegistryName = new ResourceLocation(ModularMachinery.MODID, registryName.getPath());
         setRegistryName(registryName);
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + registryName.getPath());
+        setTranslationKey(Tags.MOD_ID + '.' + registryName.getPath());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class BlockEStorageController extends BlockController {
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof EStorageController) {
-                playerIn.openGui(NovaEngineeringCore.MOD_ID, CommonProxy.GuiType.ESTORAGE_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Tags.MOD_ID, CommonProxy.GuiType.ESTORAGE_CONTROLLER.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

@@ -4,7 +4,6 @@ import appeng.api.features.IWirelessTermHandler;
 import appeng.helpers.WirelessTerminalGuiObject;
 import baubles.api.BaublesApi;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
 import github.kasuminova.novaeng.client.gui.GuiEFabricatorController;
@@ -40,6 +39,7 @@ import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
 import github.kasuminova.novaeng.common.util.NovaBlockColors;
 import github.kasuminova.novaeng.common.util.NovaItemColors;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -164,8 +164,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void construction() {
         super.construction();
-        ConfigManager.sync(NovaEngineeringCore.MOD_ID, Config.Type.INSTANCE);
-        TitleUtils.setRandomTitle("*Construction*");
+        ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE);
+        TitleUtils.setTitle("*Construction*");
     }
 
     @Override
@@ -182,7 +182,7 @@ public class ClientProxy extends CommonProxy {
             ClientRegistry.bindTileEntitySpecialRenderer(SingularityCore.class, MachineControllerRenderer.INSTANCE);
         }
 
-        TitleUtils.setRandomTitle("*PreInit*");
+        TitleUtils.setTitle("*PreInit*");
     }
 
     @Override
@@ -193,7 +193,7 @@ public class ClientProxy extends CommonProxy {
             ExJEI.jeiCreate();
         }
 
-        TitleUtils.setRandomTitle("*Init*");
+        TitleUtils.setTitle("*Init*");
     }
 
     @Override
@@ -232,14 +232,14 @@ public class ClientProxy extends CommonProxy {
 
         TinkerBook.INSTANCE.addTransformer(BookTransformerAppendModifiers.INSTANCE_FALSE);
 
-        TitleUtils.setRandomTitle("*PostInit*");
+        TitleUtils.setTitle("*PostInit*");
     }
 
     @Override
     public void loadComplete() {
         super.loadComplete();
 
-        TitleUtils.setRandomTitle();
+        TitleUtils.setTitle();
     }
 
     @SubscribeEvent

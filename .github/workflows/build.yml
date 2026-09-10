@@ -1,43 +1,16 @@
-name: Build
+name: Build mod jar
 
 on:
-  push:
-    branches: [ '**' ]
-    tags-ignore: [ 'v*' ]
-  pull_request:
   workflow_dispatch:
+  push:
+  pull_request:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+permissions:
+  contents: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Java 25
-        uses: actions/setup-java@v5
-        with:
-          distribution: zulu
-          java-version: '25'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-
-      - name: Build
-        run: chmod +x gradlew && ./gradlew build
-
-      - name: Read mod version
-        id: props
-        run: |
-          version=$(grep -E '^mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
-          echo "mod_version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ github.event.repository.name }}-${{ steps.props.outputs.mod_version }}
-          path: build/libs/*.jar
-          if-no-files-found: error
+    uses: FormlessDragon/.github/.github/workflows/build.yml@main
+    secrets: inherit
+    permissions:
+      contents: write

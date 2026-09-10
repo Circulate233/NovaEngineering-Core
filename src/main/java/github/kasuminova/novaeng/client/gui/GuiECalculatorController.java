@@ -5,7 +5,6 @@ import github.kasuminova.mmce.client.gui.util.RenderPos;
 import github.kasuminova.mmce.client.gui.util.TextureProperties;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.ecalculator.CPUStatusPanel;
 import github.kasuminova.novaeng.client.gui.widget.ecalculator.MonitorPanel;
 import github.kasuminova.novaeng.client.gui.widget.ecalculator.StorageBar;
@@ -13,16 +12,17 @@ import github.kasuminova.novaeng.client.gui.widget.ecalculator.event.ECGUIDataUp
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
 import github.kasuminova.novaeng.common.container.data.ECalculatorData;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiECalculatorController extends GuiContainerDynamic<ContainerECalculatorController> {
 
-    public static final ResourceLocation ELEMENT_1 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_1.png");
-    public static final ResourceLocation ELEMENT_2 = new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_gui_2.png");
+    public static final ResourceLocation ELEMENT_1 = new ResourceLocation(Tags.MOD_ID, "textures/gui/ecalculator_gui_1.png");
+    public static final ResourceLocation ELEMENT_2 = new ResourceLocation(Tags.MOD_ID, "textures/gui/ecalculator_gui_2.png");
     private static final TextureProperties BACKGROUND = new TextureProperties(
-        new ResourceLocation(NovaEngineeringCore.MOD_ID, "textures/gui/ecalculator_background.png"),
+        new ResourceLocation(Tags.MOD_ID, "textures/gui/ecalculator_background.png"),
         0, 0, 255, 221
     );
 

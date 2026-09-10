@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.ParallelProcStatus;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorParallelProc;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorPart;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -33,8 +33,8 @@ public class BlockECalculatorParallelProc extends BlockECalculatorPart {
     protected BlockECalculatorParallelProc(final String level, final int parallelism) {
         super(Material.IRON);
         this.parallelism = parallelism;
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_parallel_proc_" + level));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_parallel_proc_" + level);
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_parallel_proc_" + level));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_parallel_proc_" + level);
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(ParallelProcStatus.STATUS, ParallelProcStatus.OFF)

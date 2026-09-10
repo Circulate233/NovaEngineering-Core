@@ -4,8 +4,8 @@ import appeng.api.AEApi;
 import appeng.api.storage.IStorageChannel;
 import com.mekeng.github.common.me.data.IAEGasStack;
 import com.mekeng.github.common.me.storage.IGasStorageChannel;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -18,8 +18,8 @@ public class EStorageCellGas extends EStorageCell<IAEGasStack> {
 
     public EStorageCellGas(final DriveStorageLevel level, final int millionBytes, final int byteMultiplier) {
         super(level, millionBytes, byteMultiplier);
-        setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_cell_gas_" + millionBytes + "m"));
-        setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_cell_gas_" + millionBytes + "m");
+        setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_cell_gas_" + millionBytes + "m"));
+        setTranslationKey(Tags.MOD_ID + '.' + "estorage_cell_gas_" + millionBytes + "m");
     }
 
     @Override

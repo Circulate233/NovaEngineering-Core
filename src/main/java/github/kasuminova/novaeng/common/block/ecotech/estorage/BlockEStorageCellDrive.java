@@ -5,7 +5,6 @@ import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import appeng.tile.inventory.AppEngCellInventory;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStatus;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageCapacity;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
@@ -15,6 +14,7 @@ import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCell;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -57,8 +57,8 @@ public class BlockEStorageCellDrive extends BlockEStoragePart {
                                             .withProperty(DriveStorageCapacity.STORAGE_CAPACITY, DriveStorageCapacity.EMPTY)
                                             .withProperty(DriveStatus.STATUS, DriveStatus.IDLE)
         );
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "estorage_cell_drive"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "estorage_cell_drive");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "estorage_cell_drive"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "estorage_cell_drive");
     }
 
     @Nullable

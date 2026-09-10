@@ -1,13 +1,13 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
 import appeng.tile.inventory.AppEngInternalInventory;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveLink;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStatus;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorCellDrive;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -31,8 +31,8 @@ public class BlockECalculatorCellDrive extends BlockECalculatorPart {
 
     protected BlockECalculatorCellDrive() {
         super(Material.IRON);
-        this.setRegistryName(new ResourceLocation(NovaEngineeringCore.MOD_ID, "ecalculator_cell_drive"));
-        this.setTranslationKey(NovaEngineeringCore.MOD_ID + '.' + "ecalculator_cell_drive");
+        this.setRegistryName(new ResourceLocation(Tags.MOD_ID, "ecalculator_cell_drive"));
+        this.setTranslationKey(Tags.MOD_ID + '.' + "ecalculator_cell_drive");
         this.setDefaultState(this.blockState.getBaseState()
                                             .withProperty(FacingProp.HORIZONTALS, EnumFacing.NORTH)
                                             .withProperty(DriveLink.LINK, DriveLink.NONE)

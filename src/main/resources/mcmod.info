@@ -1,23 +1,17 @@
-{
-  "modListVersion": 2,
-  "modList": [
-    {
-      "modid": "novaeng_core",
-      "name": "Nova Engineering - Core",
-      "description": "新星工程计划核心模组。",
-      "version": "${version}",
-      "mcversion": "${mcversion}",
-      "url": "https://github.com/NovaEngineering-Source/NovaEngineering-Core",
-      "updateUrl": "",
-      "authorList": [
-        "Kasumi_Nova"
-      ],
-      "credits": "",
-      "logoFile": "",
-      "screenshots": [],
-      "dependencies": [],
-      "requiredMods": [],
-      "useDependencyInformation": true
-    }
-  ]
-}
+[{
+	"modid": "${mod_id}",
+	"name": "${mod_name}",
+	"version": "${mod_version}",
+	"mcversion": "1.12.2",
+	"description": "${mod_description}",
+	"authorList": ["${mod_authors}"],
+	"credits": "${mod_credits}",
+	"license": "${mod_license}",
+	"url": "${mod_url}",
+	"issueTrackerUrl": "${mod_issue_tracker_url}",
+	"updateJSON": "${mod_update_json}",
+	"iconItem": "${mod_icon_item}",
+	"logoFile": "${mod_logo_path}",
+	"iconFile": "${mod_icon_path}",
+	"backgroundFile": "${mod_background_path}"
+}]

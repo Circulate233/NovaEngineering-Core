@@ -11,6 +11,7 @@ import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
 import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.client.ClientProxy;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
@@ -76,7 +77,7 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
     public ECalculatorController(final ResourceLocation machineRegistryName) {
         this();
         this.parentMachine = MachineRegistry.getRegistry().getMachine(machineRegistryName);
-        this.parentController = BlockECalculatorController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, machineRegistryName.getPath()));
+        this.parentController = BlockECalculatorController.REGISTRY.get(new ResourceLocation(Tags.MOD_ID, machineRegistryName.getPath()));
     }
 
     public ECalculatorController() {
@@ -350,7 +351,7 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
             ResourceLocation rl = new ResourceLocation(compound.getString("parentMachine"));
             parentMachine = MachineRegistry.getRegistry().getMachine(rl);
             if (parentMachine != null) {
-                this.parentController = BlockECalculatorController.REGISTRY.get(new ResourceLocation(NovaEngineeringCore.MOD_ID, parentMachine.getRegistryName().getPath()));
+                this.parentController = BlockECalculatorController.REGISTRY.get(new ResourceLocation(Tags.MOD_ID, parentMachine.getRegistryName().getPath()));
             } else {
                 ModularMachinery.log.info("Couldn't find machine named " + rl + " for controller at " + getPos());
             }

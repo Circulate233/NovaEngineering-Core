@@ -1,43 +1,67 @@
+import org.jetbrains.gradle.ext.Gradle
+
 plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id 'xyz.wagyourtail.unimined' version '1.4.37-kappa'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'com.gradleup.shadow' version '9.4.0'
+    id 'xyz.wagyourtail.unimined' version '1.4.37-kappa'
     id 'com.diffplug.spotless' version '8.4.0'
-    id "org.jetbrains.kotlin.plugin.lombok" version '2.3.21'
-    id 'org.jetbrains.kotlin.jvm' version '2.4.10'
-    id "org.jetbrains.kotlin.kapt" version '2.3.21'
+    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.plugin.lombok" version '2.4.20'
+    id "org.jetbrains.kotlin.kapt" version '2.4.20'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
 
+private String gitOutput(List<String> args, String fallback) {
+    try {
+        def process = new ProcessBuilder(['git'] + args)
+            .directory(rootProject.projectDir)
+            .redirectErrorStream(true)
+            .start()
+        def stdout = process.inputStream.getText('UTF-8').trim()
+        if (process.waitFor() == 0 && !stdout.isEmpty()) {
+            return stdout
+        }
+    } catch (Exception ignored) {
+        // Fall through to the fallback for source archives or environments without git.
+    }
+    return fallback
+}
+
+private String defaultModVersion() {
+    def previousTag = gitOutput(['describe', '--tags', '--abbrev=0', '--exclude=dev'], '0.0.0')
+    def shortHash = gitOutput(['rev-parse', '--short', 'HEAD'], 'unknown')
+    return "${previousTag}+${shortHash}"
+}
+
+if (!gradle.startParameter.projectProperties.containsKey('mod_version')) {
+    project.setProperty('mod_version', defaultModVersion())
+}
+
+// Early Assertions
 assertProperty 'mod_version'
 assertProperty 'root_package'
 assertProperty 'mod_id'
 assertProperty 'mod_name'
 
 assertSubProperties 'use_lombok_ap', 'lombok_version'
-assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
+assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
 assertSubProperties 'use_asset_mover', 'asset_mover_version'
 
-setDefaultProperty 'generate_sources_jar', true, true
+setDefaultProperty 'generate_sources_jar', true, false
 setDefaultProperty 'generate_javadocs_jar', true, false
-setDefaultProperty 'minecraft_username', true, 'Kasumi_Nova'
+setDefaultProperty 'minecraft_username', true, 'Developer'
 setDefaultProperty 'extra_jvm_args', false, ''
-setDefaultProperty 'enable_junit_testing', false, false
-setDefaultProperty 'show_testing_output', false, false
-setDefaultProperty 'enable_shadow', false, false
-setDefaultProperty 'enable_lwjglx', false, true
-setDefaultProperty 'enable_foundation_debug', false, false
 
 version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    archivesName = 'NovaEngineering-Core'
+    archivesName = propertyString('mod_id')
 }
 
 java {
@@ -57,89 +81,56 @@ configurations {
     implementation.extendsFrom(contain)
     modCompileOnly
     compileOnly.extendsFrom(modCompileOnly)
+    modRuntimeOnly
+    runtimeOnly.extendsFrom(modRuntimeOnly)
 }
 
-def generatedTagsDir = layout.buildDirectory.dir('generated/sources/tags/main/java')
-
-def generateTags = tasks.register('generateTags') {
-    outputs.dir(generatedTagsDir)
-    inputs.property('packageName', propertyString('root_package'))
-    inputs.property('modVersion', version.toString())
-    doLast {
-        def packageName = propertyString('root_package')
-        def outputFile = generatedTagsDir.get().file("${packageName.replace('.', '/')}/Tags.java").asFile
-        outputFile.parentFile.mkdirs()
-        outputFile.text = """package ${packageName};
-
-public final class Tags {
-    public static final String VERSION = "${version}";
-
-    private Tags() {
-    }
-}
-"""
-    }
-}
-
-sourceSets {
-    api {
-        java.srcDirs = ['src/api/java']
-        resources.srcDirs = []
-    }
-    main {
-        java.srcDirs = ['src/main/java']
-        java.srcDir generateTags
-        resources.srcDirs = ['src/main/resources']
-        compileClasspath += sourceSets.api.output
-        runtimeClasspath += sourceSets.api.output
-    }
-}
-
-String remapTaskName = propertyBool('enable_shadow') ? 'remapShadowJar' : 'remapJar'
+String remapTaskName = propertyBool('enable_shadow') ? "remapShadowJar" : "remapJar"
 
 unimined.minecraft {
-    version '1.12.2'
+    version "1.12.2"
 
     mappings {
-        mcp('stable', '39-1.12')
+        mcp("stable", "39-1.12")
     }
 
     cleanroom {
         if (propertyBool('use_access_transformer')) {
             accessTransformer "${rootProject.projectDir}/src/main/resources/${propertyString('access_transformer_locations')}"
         }
-        loader '0.5.14-alpha'
+        loader "0.5.14-alpha"
         runs.auth.username = minecraft_username
         runs.all {
-            systemProperty('crl.dev.mixin', 'mixins.novaeng_core.json,mixins.novaeng_core.mod.json')
+            systemProperty("crl.dev.mixin", "${mod_id}.default.mixin.json,${mod_id}.mod.mixin.json")
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
-                jvmArgs += extraArgs.split(/\s+/).toList()
+                jvmArgs += extraArgs.split { "\\s+" }.toList()
             }
             if (propertyBool('enable_foundation_debug')) {
-                systemProperty('foundation.dump', 'true')
-                systemProperty('foundation.verbose', 'true')
+                systemProperty("foundation.dump", "true")
+                systemProperty("foundation.verbose", "true")
             }
             if (propertyBool('is_coremod')) {
-                systemProperty('fml.coreMods.load', propertyString('coremod_plugin_class_name'))
+                systemProperty("fml.coreMods.load", propertyString('coremod_plugin_class_name'))
             }
+            return
         }
     }
 
     defaultRemapJar = false
 
-    String jarTaskName = propertyBool('enable_shadow') ? 'shadowJar' : 'jar'
+    String jarTaskName = propertyBool('enable_shadow') ? "shadowJar" : "jar"
 
     remap(tasks.named(jarTaskName).get()) {
         mixinRemap {
             enableBaseMixin()
             enableMixinExtra()
-            disableRefmap()
         }
     }
 
     mods {
         remap(configurations.modCompileOnly)
+        remap(configurations.modRuntimeOnly)
     }
 }
 
@@ -147,6 +138,7 @@ dependencies {
     if (propertyBool('use_lombok_ap')) {
         compileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
         annotationProcessor "org.projectlombok:lombok:${propertyString('lombok_version')}"
+
         testCompileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
         testAnnotationProcessor "org.projectlombok:lombok:${propertyString('lombok_version')}"
     }
@@ -163,17 +155,66 @@ dependencies {
 
 apply from: 'gradle/scripts/dependencies.gradle'
 
-processResources {
-    inputs.property('version', version.toString())
-    inputs.property('mcversion', '1.12.2')
-    filesMatching('mcmod.info') {
-        expand(
-                version: version.toString(),
-                mcversion: '1.12.2'
-        )
+def generatedTagsSourceDir = layout.buildDirectory.dir('generated/sources/tags/java')
+def generateTagsSource = tasks.register('generateTagsSource') {
+    def tagsPackage = "${propertyString('root_package')}.${propertyString('mod_id')}"
+    def outputFile = generatedTagsSourceDir.map {
+        it.file("${tagsPackage.replace('.', '/')}/Tags.java")
     }
-    if (propertyBool('use_access_transformer')) {
-        rename '(.+_at.cfg)', 'META-INF/$1'
+
+    inputs.property('root_package', propertyString('root_package'))
+    inputs.property('mod_id', propertyString('mod_id'))
+    inputs.property('mod_name', propertyString('mod_name'))
+    inputs.property('mod_version', propertyString('mod_version'))
+    outputs.file(outputFile)
+
+    doLast {
+        def file = outputFile.get().asFile
+        file.parentFile.mkdirs()
+        file.text = """package ${tagsPackage};
+
+public final class Tags {
+
+    public static final String MOD_ID = "${propertyString('mod_id')}";
+    public static final String MOD_NAME = "${propertyString('mod_name')}";
+    public static final String VERSION = "${propertyString('mod_version')}";
+
+    private Tags() {
+    }
+}
+"""
+    }
+}
+
+processResources {
+    rename '(.+_at.cfg)', 'META-INF/$1'
+    def resourceProps = [
+        mod_id               : propertyString('mod_id'),
+        mod_name             : propertyString('mod_name'),
+        mod_version          : propertyString('mod_version'),
+        mod_description      : propertyString('mod_description'),
+        mod_authors          : propertyStringList('mod_authors', ',').collect { it.strip() }.join('", "'),
+        mod_credits          : propertyString('mod_credits'),
+        mod_license          : propertyString('mod_license'),
+        mod_url              : propertyString('mod_url'),
+        mod_issue_tracker_url: propertyString('mod_issue_tracker_url'),
+        mod_update_json      : propertyString('mod_update_json'),
+        mod_icon_item        : propertyString('mod_icon_item'),
+        mod_logo_path        : propertyString('mod_logo_path'),
+        mod_icon_path        : propertyString('mod_icon_path'),
+        mod_background_path  : propertyString('mod_background_path')
+    ]
+    inputs.properties(resourceProps)
+    filesMatching(['mcmod.info', 'pack.mcmeta']) {
+        expand(resourceProps)
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedTagsSourceDir
+        }
     }
 }
 
@@ -182,24 +223,12 @@ if (!propertyBool('enable_shadow')) {
 }
 
 compileJava {
-    dependsOn tasks.named('compileApiJava')
-    dependsOn generateTags
+    dependsOn(generateTagsSource)
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
-    options.release = 25
 }
 
-compileTestJava {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
-    options.release = 25
-}
-
-tasks.withType(JavaCompile).configureEach {
-    dependsOn generateTags
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    enabled = false
+tasks.matching { it.name == 'sourcesJar' }.configureEach {
+    dependsOn(generateTagsSource)
 }
 
 jar {
@@ -212,37 +241,34 @@ jar {
     }
     doFirst {
         manifest {
-            def attributeMap = [
-                    'ModType'     : 'CRL',
-                    'MixinConfigs': 'mixins.novaeng_core.json,mixins.novaeng_core.mod.json'
-            ]
+            def attribute_map = [:]
+            attribute_map['ModType'] = "CRL"
+            attribute_map['MixinConfigs'] = "${mod_id}.default.mixin.json,${mod_id}.mod.mixin.json"
             if (configurations.contain.size() > 0) {
-                attributeMap['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
-                attributeMap['NonModDeps'] = true
+                attribute_map['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
+                attribute_map['NonModDeps'] = true
             }
             if (propertyBool('is_coremod')) {
-                attributeMap['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
+                attribute_map['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
                 if (propertyBool('coremod_includes_mod')) {
-                    attributeMap['FMLCorePluginContainsFMLMod'] = true
+                    attribute_map['FMLCorePluginContainsFMLMod'] = true
                 }
             }
             if (propertyBool('use_access_transformer')) {
-                attributeMap['FMLAT'] = propertyString('access_transformer_locations')
+                attribute_map['FMLAT'] = propertyString('access_transformer_locations')
             }
-            attributes(attributeMap)
+            attributes(attribute_map)
         }
     }
     finalizedBy(tasks.named(remapTaskName).get())
 }
 
-tasks.named('sourcesJar') {
-    dependsOn generateTags
-}
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    archiveClassifier = 'shadow'
+    archiveClassifier = "shadow"
 }
+
 
 tasks.named(remapTaskName).configure {
     doFirst {
@@ -253,19 +279,56 @@ tasks.named(remapTaskName).configure {
     }
 }
 
-test {
-    enabled = propertyBool('enable_junit_testing')
-    if (propertyBool('enable_junit_testing')) {
-        useJUnitPlatform()
-        javaLauncher.set(javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(25)
-        })
-        if (propertyBool('show_testing_output')) {
-            testLogging {
-                showStandardStreams = true
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+    project {
+        settings {
+            runConfigurations {
+                "0. Apply Spotless"(Gradle) {
+                    taskNames = ["spotlessApply"]
+                }
+                "1. Run Client"(Gradle) {
+                    taskNames = ["runClient"]
+                }
+                "2. Run Server"(Gradle) {
+                    taskNames = ["runServer"]
+                }
+                "3. Build Mod"(Gradle) {
+                    taskNames = ["build"]
+                }
+            }
+            compiler.javac {
+                afterEvaluate {
+                    javacAdditionalOptions = "-encoding utf8"
+                    moduleJavacAdditionalOptions = [
+                            (project.name + ".main"): tasks.compileJava.options.compilerArgs.collect { '"' + it + '"' }.join(' ')
+                    ]
+                }
             }
         }
     }
+}
+
+compileTestJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
+}
+
+test {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    })
+    if (propertyBool('show_testing_output')) {
+        testLogging {
+            showStandardStreams = true
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 apply from: 'gradle/scripts/publishing.gradle'

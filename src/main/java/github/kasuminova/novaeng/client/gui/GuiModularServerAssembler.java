@@ -4,7 +4,6 @@ import github.kasuminova.mmce.client.gui.GuiContainerDynamic;
 import github.kasuminova.mmce.client.gui.util.MousePos;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetController;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.widget.msa.AssemblyInvCPU;
 import github.kasuminova.novaeng.client.gui.widget.msa.AssemblyInvCalculateCard;
 import github.kasuminova.novaeng.client.gui.widget.msa.AssemblyInvExtension;
@@ -14,6 +13,7 @@ import github.kasuminova.novaeng.client.gui.widget.msa.ServerInfoColumn;
 import github.kasuminova.novaeng.client.gui.widget.msa.event.AssemblerInvUpdateEvent;
 import github.kasuminova.novaeng.common.container.ContainerModularServerAssembler;
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler;
+import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,10 +21,10 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiModularServerAssembler extends GuiContainerDynamic<ContainerModularServerAssembler> {
     public static final ResourceLocation TEXTURES_BACKGROUND = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/modular_server_assembler.png");
+        Tags.MOD_ID, "textures/gui/modular_server_assembler.png");
 
     public static final ResourceLocation TEXTURES_ELEMENTS = new ResourceLocation(
-        NovaEngineeringCore.MOD_ID, "textures/gui/msa_elements.png");
+        Tags.MOD_ID, "textures/gui/msa_elements.png");
 
     public static final int MAIN_GUI_WIDTH = 329;
     public static final int MAIN_GUI_HEIGHT = 206;
