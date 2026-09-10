@@ -44,7 +44,7 @@ dependencies {
 
     modImplementation 'CraftTweaker2:CraftTweaker2-API:4.1.20.716'
     modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.716'
-    modRuntimeOnly 'CraftTweaker2:ZenScript:4.1.20.716'
+    modImplementation 'CraftTweaker2:ZenScript:4.1.20.716'
 
     modImplementation 'curse.maven:fugue-1005815:8230893'
     modImplementation 'curse.maven:modularui-624243:7929464'
