@@ -47,7 +47,7 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
     dependencies = "required-after:modularmachinery@[2.3.0,);" +
-        "required-after:theoneprobe@[1.12-1.4.28,);" +
+        "required-after:theoneprobe;" +
         "required-after:appliedenergistics2@[v0.56.4,);" +
         "required-after:ae2fc@[2.6.3-r,);" +
         "required-after:lumenized@[1.0.2,);",
