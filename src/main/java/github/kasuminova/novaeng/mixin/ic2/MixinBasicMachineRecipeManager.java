@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Mixin(value = BasicMachineRecipeManager.class, remap = false)
 public abstract class MixinBasicMachineRecipeManager {
