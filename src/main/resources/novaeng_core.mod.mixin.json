@@ -21,11 +21,6 @@
     "legendarytooltips.MixinTooltipDecor",
     "mmce.MixinIngredientItemStackRenderer",
     "modularrouters.MixinClientProxy",
-    "obscuretooltips.MixinGraphicUtils",
-    "obscuretooltips.MixinLegendaryTooltipDecor",
-    "obscuretooltips.MixinNineSlicedFrame",
-    "obscuretooltips.MixinTooltipRenderer",
-    "obscuretooltips.MixinTooltipState",
     "opticheck.MixinOptiCheckScreen",
     "packagedauto.MixinGuiUnpackager"
   ],

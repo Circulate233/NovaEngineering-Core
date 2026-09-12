@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng;
 
-import com.cleanroommc.configanytime.ConfigAnytime;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -24,12 +23,8 @@ public class NovaEngCoreConfig {
     @Config.Name("MachineAssemblyTool")
     public static MachineAssemblyTool MACHINE_ASSEMBLY_TOOL = new MachineAssemblyTool();
 
-    @Config.RequiresMcRestart
-    @Config.Name("javaCheck")
-    public static boolean javaCheck = true;
-
     static {
-        ConfigAnytime.register(NovaEngCoreConfig.class);
+        ConfigManager.register(NovaEngCoreConfig.class);
     }
 
     @SubscribeEvent
@@ -50,16 +45,6 @@ public class NovaEngCoreConfig {
 
         @Config.Name("ExtremeCraftingUIModification")
         public boolean ExtremeCraftingUIModification = true;
-
-        @Config.Name("TooltipTintStrength")
-        @Config.Comment("把传奇提示的物品配色叠加到 Obscure Tooltips 提示框上的强度：0 为关闭，1 为正片叠底到配色本身。")
-        @Config.RangeDouble(min = 0.0D, max = 1.0D)
-        public double tooltipTintStrength = 1.0D;
-
-        @Config.Name("TooltipFrameOverhang")
-        @Config.Comment("传奇提示的装饰对齐 Obscure 外框时使用的外扩像素；-1 为按提示框样式自动探测。")
-        @Config.RangeInt(min = -1, max = 64)
-        public int tooltipFrameOverhang = -1;
     }
 
     public static class Server {

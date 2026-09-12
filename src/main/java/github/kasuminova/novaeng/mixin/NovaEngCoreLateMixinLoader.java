@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
 import java.util.Set;
+import static net.minecraftforge.fml.common.Loader.isModLoaded;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
 public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
@@ -38,40 +39,39 @@ public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
         String group = mixinName.substring(0, split);
 
         return switch (group) {
-            case "dme" -> Loader.isModLoaded("deepmoblearning")
+            case "dme" -> isModLoaded("deepmoblearning")
                 && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution");
-            case "botania_r" -> Loader.isModLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
-            case "ae2" -> Loader.isModLoaded("appliedenergistics2");
-            case "ar" -> Loader.isModLoaded("advancedrocketry");
-            case "actuallyadditions" -> Loader.isModLoaded("actuallyadditions");
-            case "astralsorcery" -> Loader.isModLoaded("astralsorcery");
-            case "athenaeum" -> Loader.isModLoaded("athenaeum");
-            case "betterp2p" -> Loader.isModLoaded("betterp2p");
-            case "botania" -> Loader.isModLoaded("botania");
-            case "codechickenlib" -> Loader.isModLoaded("codechickenlib");
-            case "cofh" -> Loader.isModLoaded("cofhcore");
-            case "draconicevolution" -> Loader.isModLoaded("draconicevolution");
-            case "electroblobs" -> Loader.isModLoaded("ebwizardry");
-            case "enderio" -> Loader.isModLoaded("enderio");
-            case "extrabotany" -> Loader.isModLoaded("extrabotany");
-            case "ic2" -> Loader.isModLoaded("ic2");
-            case "immersiveengineering" -> Loader.isModLoaded("immersiveengineering");
-            case "jei" -> Loader.isModLoaded("jei");
-            case "jetif" -> Loader.isModLoaded("jetif");
-            case "legendarytooltips" -> Loader.isModLoaded("legendarytooltips");
-            case "libvulpes" -> Loader.isModLoaded("libvulpes");
-            case "lootoverhaul" -> Loader.isModLoaded("lootoverhaul");
-            case "mets" -> Loader.isModLoaded("mets");
-            case "modularrouters" -> Loader.isModLoaded("modularrouters");
-            case "nae2" -> Loader.isModLoaded("nae2");
-            case "nco" -> Loader.isModLoaded("nuclearcraft");
-            case "obscuretooltips" -> Loader.isModLoaded("obscure_tooltips") && Loader.isModLoaded("legendarytooltips");
-            case "opticheck" -> Loader.isModLoaded("opticheck");
-            case "packagedauto" -> Loader.isModLoaded("packagedauto");
-            case "psi" -> Loader.isModLoaded("psi");
-            case "rftools" -> Loader.isModLoaded("rftools");
-            case "techguns" -> Loader.isModLoaded("techguns");
-            case "threng" -> Loader.isModLoaded("threng");
+            case "botania_r" -> isModLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
+            case "ae2" -> isModLoaded("appliedenergistics2");
+            case "ar" -> isModLoaded("advancedrocketry");
+            case "actuallyadditions" -> isModLoaded("actuallyadditions");
+            case "astralsorcery" -> isModLoaded("astralsorcery");
+            case "athenaeum" -> isModLoaded("athenaeum");
+            case "betterp2p" -> isModLoaded("betterp2p");
+            case "botania" -> isModLoaded("botania");
+            case "codechickenlib" -> isModLoaded("codechickenlib");
+            case "cofh" -> isModLoaded("cofhcore");
+            case "draconicevolution" -> isModLoaded("draconicevolution");
+            case "electroblobs" -> isModLoaded("ebwizardry");
+            case "enderio" -> isModLoaded("enderio");
+            case "extrabotany" -> isModLoaded("extrabotany");
+            case "ic2" -> isModLoaded("ic2");
+            case "immersiveengineering" -> isModLoaded("immersiveengineering");
+            case "jei" -> isModLoaded("jei");
+            case "jetif" -> isModLoaded("jetif");
+            case "legendarytooltips" -> isModLoaded("legendarytooltips");
+            case "libvulpes" -> isModLoaded("libvulpes");
+            case "lootoverhaul" -> isModLoaded("lootoverhaul");
+            case "mets" -> isModLoaded("mets");
+            case "modularrouters" -> isModLoaded("modularrouters");
+            case "nae2" -> isModLoaded("nae2");
+            case "nco" -> isModLoaded("nuclearcraft");
+            case "opticheck" -> isModLoaded("opticheck");
+            case "packagedauto" -> isModLoaded("packagedauto");
+            case "psi" -> isModLoaded("psi");
+            case "rftools" -> isModLoaded("rftools");
+            case "techguns" -> isModLoaded("techguns");
+            case "threng" -> isModLoaded("threng");
             default -> true;
         };
     }
