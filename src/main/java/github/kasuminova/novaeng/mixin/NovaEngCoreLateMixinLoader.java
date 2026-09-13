@@ -43,6 +43,7 @@ public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
                 && Loader.instance().getIndexedModList().get("deepmoblearning").getName().equals("DeepMobEvolution");
             case "botania_r" -> isModLoaded("botania") && NovaEngCoreConfig.SERVER.bot;
             case "ae2" -> isModLoaded("appliedenergistics2");
+            case "alfheim" -> isModLoaded("alfheim");
             case "ar" -> isModLoaded("advancedrocketry");
             case "actuallyadditions" -> isModLoaded("actuallyadditions");
             case "astralsorcery" -> isModLoaded("astralsorcery");

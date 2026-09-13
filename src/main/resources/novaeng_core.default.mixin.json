@@ -11,11 +11,14 @@
   "client": [
     "minecraft.AccessorParticleManager",
     "minecraft.MixinBlockColors",
+    "minecraft.MixinChunkCacheLighting",
+    "minecraft.MixinEntityRenderer",
     "minecraft.MixinFontRenderer",
     "minecraft.MixinGuiScreen",
     "minecraft.MixinItemColors",
     "minecraft.MixinNetHandlerPlayClient",
     "minecraft.MixinNettyCompressionDecoder",
+    "minecraft.MixinWorldLighting",
     "minecraft.forge.MixinForgeHooksClient"
   ],
   "mixins": [

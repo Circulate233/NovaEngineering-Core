@@ -14,6 +14,7 @@
     "ae2.MixinGuiCraftConfirm",
     "ae2.MixinGuiCraftingStatus",
     "ae2.MixinGuiPatternTerm",
+    "alfheim.MixinLightingEngine",
     "botania.MixinClientProxy",
     "ic2.MixinNetworkManagerClient",
     "jei.MixinInputHandler",

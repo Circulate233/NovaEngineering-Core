@@ -39,12 +39,8 @@ public class NovaEngCoreConfig {
         @Config.Name("EnableNovaEngTitle")
         public boolean enableNovaEngTitle = true;
 
-        @Config.RequiresMcRestart
-        @Config.Name("爆炸")
-        public boolean piece = false;
-
-        @Config.Name("ExtremeCraftingUIModification")
-        public boolean ExtremeCraftingUIModification = true;
+        @Config.Name("EnableFullbright")
+        public boolean enableFullbright = true;
     }
 
     public static class Server {

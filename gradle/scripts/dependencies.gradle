@@ -130,5 +130,9 @@ dependencies {
     modImplementation 'curse.maven:packagedauto-308380:6932932'
     modImplementation 'curse.maven:packagedastral-811828:7063119'
     modImplementation 'io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0'
+    runtimeOnly 'org.jetbrains.kotlin:kotlin-reflect:2.2.20'
     modImplementation 'curse.maven:obscure-tooltips-715660:8522661'
+    modImplementation("curse.maven:alfheim-lighting-engine-910715:6687458")
+    modImplementation("curse.maven:red-core-873867:6147102")
+    modImplementation("curse.maven:stellarcore-1064321:8849440")
 }

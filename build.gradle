@@ -116,8 +116,31 @@ unimined.minecraft {
             if (propertyBool('is_coremod')) {
                 systemProperty("fml.coreMods.load", propertyString('coremod_plugin_class_name'))
             }
+            def mcpCsvDir = file("${rootDir}/run/mcp")
+            jvmArgs('-Xmx6G')
+            systemProperty("net.minecraftforge.gradle.GradleStart.csvDir", mcpCsvDir.absolutePath.replace('\\', '/'))
+            systemProperty("net.minecraftforge.gradle.GradleStart.srg.notch-srg", new File(mcpCsvDir, 'methods.csv').absolutePath.replace('\\', '/'))
             return
         }
+    }
+
+    def mcpCsvConfig = configurations.detachedConfiguration(dependencies.create('de.oceanlabs.mcp:mcp_stable:39-1.12@zip'))
+    def prepareMcpCsv = tasks.register('prepareMcpCsv') {
+        def archive = mcpCsvConfig.singleFile
+        def outputDir = file("${rootDir}/run/mcp")
+        outputs.files(new File(outputDir, 'fields.csv'), new File(outputDir, 'methods.csv'))
+        doLast {
+            outputDir.mkdirs()
+            copy {
+                from(zipTree(archive)) {
+                    include 'fields.csv', 'methods.csv'
+                }
+                into outputDir
+            }
+        }
+    }
+    tasks.matching { it.name in ['runClient', 'runServer'] }.configureEach {
+        dependsOn prepareMcpCsv
     }
 
     defaultRemapJar = false

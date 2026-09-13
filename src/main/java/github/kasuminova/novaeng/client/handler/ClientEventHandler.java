@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.handler;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.client.util.ClientLightingGuard;
 import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
@@ -64,6 +65,13 @@ public class ClientEventHandler {
             return;
         }
         this.clientTick++;
+
+        if (ClientLightingGuard.consumeRenderRefresh()) {
+            final Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.world != null && minecraft.renderGlobal != null) {
+                minecraft.renderGlobal.loadRenderers();
+            }
+        }
 
         if (this.clientTick % 5 == 0) {
             if (NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
