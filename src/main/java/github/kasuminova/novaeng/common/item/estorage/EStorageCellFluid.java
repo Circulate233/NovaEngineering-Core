@@ -1,19 +1,14 @@
 package github.kasuminova.novaeng.common.item.estorage;
 
-import appeng.api.AEApi;
-import appeng.api.storage.IStorageChannel;
-import appeng.api.storage.channels.IFluidStorageChannel;
-import appeng.api.storage.data.IAEFluidStack;
-import appeng.fluids.helper.FluidCellConfig;
+import ae2.api.stacks.AEKeyType;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class EStorageCellFluid extends EStorageCell<IAEFluidStack> {
+public class EStorageCellFluid extends EStorageCell {
 
     public static final EStorageCellFluid LEVEL_A = new EStorageCellFluid(DriveStorageLevel.A, 16, 4);
     public static final EStorageCellFluid LEVEL_B = new EStorageCellFluid(DriveStorageLevel.B, 64, 16);
@@ -35,14 +30,9 @@ public class EStorageCellFluid extends EStorageCell<IAEFluidStack> {
         return byteMultiplier * 1024;
     }
 
-    @Override
-    public IItemHandler getConfigInventory(final ItemStack is) {
-        return new FluidCellConfig(is);
-    }
-
     @Nonnull
     @Override
-    public IStorageChannel<IAEFluidStack> getChannel() {
-        return AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
+    public AEKeyType getKeyType() {
+        return AEKeyType.fluids();
     }
 }

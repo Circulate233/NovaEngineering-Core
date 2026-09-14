@@ -1,29 +1,31 @@
 package github.kasuminova.novaeng.common.item.estorage;
 
-import appeng.api.AEApi;
-import appeng.api.config.FuzzyMode;
-import appeng.api.implementations.items.IStorageCell;
-import appeng.api.storage.data.IAEStack;
-import appeng.items.AEBaseItem;
-import appeng.items.contents.CellConfig;
-import appeng.items.contents.CellUpgrades;
-import appeng.util.Platform;
+import ae2.api.storage.cells.IBasicCellItem;
+import ae2.api.stacks.AEKey;
+import ae2.api.stacks.AEKeyType;
+import ae2.api.config.FuzzyMode;
+import ae2.api.upgrades.IUpgradeInventory;
+import ae2.api.upgrades.UpgradeInventories;
+import ae2.items.AEBaseItem;
+import ae2.items.contents.CellConfig;
+import ae2.util.ConfigInventory;
+import ae2.util.Platform;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Set;
 
-public abstract class EStorageCell<T extends IAEStack<T>> extends AEBaseItem implements IStorageCell<T> {
+public abstract class EStorageCell extends AEBaseItem implements IBasicCellItem {
     @Getter
     protected final DriveStorageLevel level;
     protected final int totalBytes;
@@ -40,12 +42,9 @@ public abstract class EStorageCell<T extends IAEStack<T>> extends AEBaseItem imp
 
     @Override
     @SideOnly(Side.CLIENT)
-    @SuppressWarnings("DataFlowIssue")
     protected void addCheckedInformation(final ItemStack stack, final World world, final List<String> lines, final ITooltipFlag advancedTooltips) {
         super.addCheckedInformation(stack, world, lines, advancedTooltips);
-        AEApi.instance()
-             .client()
-             .addCellInformation(EStorageCellHandler.getHandler(stack).getCellInventory(stack, null, this.getChannel()), lines);
+        addCellInformationToTooltip(stack, lines);
         lines.add(I18n.format("novaeng.estorage_cell.insert.tip"));
         lines.add(I18n.format("novaeng.estorage_cell.extract.tip"));
         if (level == DriveStorageLevel.B) {
@@ -67,43 +66,31 @@ public abstract class EStorageCell<T extends IAEStack<T>> extends AEBaseItem imp
     }
 
     @Override
-    public boolean isBlackListed(@Nonnull final ItemStack cellItem, @Nonnull final T requestedAddition) {
+    public boolean isBlackListed(@Nonnull final ItemStack cellItem, @Nonnull final AEKey requestedAddition) {
         return false;
     }
 
+    @Nonnull
     @Override
-    public boolean storableInStorageCell() {
-        return false;
+    public abstract AEKeyType getKeyType();
+
+    @Override
+    public IUpgradeInventory getUpgrades(final ItemStack is) {
+        return UpgradeInventories.forItem(is, getKeyType() == AEKeyType.items() ? 4 : 3);
     }
 
     @Override
-    public boolean isStorageCell(@Nonnull final ItemStack i) {
-        return true;
-    }
-
-    @Override
-    public boolean isEditable(final ItemStack is) {
-        return true;
-    }
-
-    @Override
-    public IItemHandler getUpgradesInventory(final ItemStack is) {
-        return new CellUpgrades(is, 2);
-    }
-
-    @Override
-    public IItemHandler getConfigInventory(final ItemStack is) {
-        return new CellConfig(is);
+    public ConfigInventory getConfigInventory(final ItemStack is) {
+        return CellConfig.create(Set.of(getKeyType()), is, getTotalTypes(is));
     }
 
     @Override
     public FuzzyMode getFuzzyMode(final ItemStack is) {
-        final String fz = Platform.openNbtData(is).getString("FuzzyMode");
-        try {
-            return FuzzyMode.valueOf(fz);
-        } catch (final Throwable t) {
+        final NBTTagCompound tag = is.getTagCompound();
+        if (tag == null || !tag.hasKey("FuzzyMode", 8)) {
             return FuzzyMode.IGNORE_ALL;
         }
+        return FuzzyMode.valueOf(tag.getString("FuzzyMode"));
     }
 
     @Override

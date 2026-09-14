@@ -13,7 +13,6 @@ public final class MixinDecisions {
     public static final boolean actuallyAdditionsLoaded = isPresent("actuallyadditions");
     public static final boolean astralSorceryLoaded = isPresent("astralsorcery");
     public static final boolean athenaeumLoaded = isPresent("athenaeum");
-    public static final boolean betterP2pLoaded = isPresent("betterp2p");
     public static final boolean baseLoaded = isPresent("base");
     public static final boolean biomesOPlentyLoaded = isPresent("biomesoplenty");
     public static final boolean bibliocraftLoaded = isPresent("bibliocraft");
@@ -48,7 +47,6 @@ public final class MixinDecisions {
     public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean mmceLoaded = isPresent("modularmachinery");
     public static final boolean modularRoutersLoaded = isPresent("modularrouters");
-    public static final boolean nae2Loaded = isPresent("nae2");
     public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
     public static final boolean packagedAstralLoaded = isPresent("packagedastral");
@@ -96,7 +94,6 @@ public final class MixinDecisions {
             case "actuallyadditions" -> actuallyAdditionsLoaded;
             case "astralsorcery" -> astralSorceryLoaded;
             case "athenaeum" -> athenaeumLoaded;
-            case "betterp2p" -> betterP2pLoaded;
             case "base" -> baseLoaded && NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
             case "biomesoplenty" -> biomesOPlentyLoaded && NovaEngCoreConfig.CLIENT.optimizeBopFog;
             case "bibliocraft" -> bibliocraftLoaded;
@@ -122,7 +119,6 @@ public final class MixinDecisions {
             case "ctm" -> ctmLoaded;
             case "mmce" -> mmceLoaded;
             case "modularrouters" -> modularRoutersLoaded;
-            case "nae2" -> nae2Loaded;
             case "neofontrender" -> neoFontRenderLoaded;
             case "revoui" -> neoFontRenderUiLoaded && actiniumLoaded;
             case "nco" -> nuclearcraftLoaded;
