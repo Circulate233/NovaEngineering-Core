@@ -90,6 +90,20 @@ configurations {
 
 String remapTaskName = propertyBool('enable_shadow') ? "remapShadowJar" : "remapJar"
 
+def devMappingsJar = layout.projectDirectory.file(".gradle/unimined/local/mappings/srg2mcp.jar")
+def devMappingsSrg = layout.projectDirectory.file(".gradle/unimined/local/mappings/srg2mcp.tsrg")
+def devMappingsCsvDir = layout.buildDirectory.dir("dev/mcp-csv")
+def prepareDevMappings = tasks.register("prepareDevMappings", Copy) {
+    from({ zipTree(devMappingsJar.asFile) }) {
+        include "fields.csv", "methods.csv"
+    }
+    into(devMappingsCsvDir)
+}
+
+tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
+    dependsOn(prepareDevMappings)
+}
+
 unimined.minecraft {
     version "1.12.2"
 
@@ -101,10 +115,12 @@ unimined.minecraft {
         if (propertyBool('use_access_transformer')) {
             accessTransformer "${rootProject.projectDir}/src/main/resources/${propertyString('access_transformer_locations')}"
         }
-        loader "0.5.14-alpha"
+        loader "0.6.10-alpha"
         runs.auth.username = minecraft_username
         runs.all {
-            systemProperty("crl.dev.mixin", "${mod_id}.default.mixin.json,${mod_id}.mod.mixin.json")
+            systemProperty("crl.dev.mixin", "${mod_id}.mixin.json")
+            systemProperty("net.minecraftforge.gradle.GradleStart.srg.notch-srg", devMappingsSrg.asFile.absolutePath)
+            systemProperty("net.minecraftforge.gradle.GradleStart.csvDir", devMappingsCsvDir.get().asFile.absolutePath)
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
                 jvmArgs += extraArgs.split { "\\s+" }.toList()
@@ -113,34 +129,12 @@ unimined.minecraft {
                 systemProperty("foundation.dump", "true")
                 systemProperty("foundation.verbose", "true")
             }
+            systemProperty('mixin.debug.export', 'true')
             if (propertyBool('is_coremod')) {
                 systemProperty("fml.coreMods.load", propertyString('coremod_plugin_class_name'))
             }
-            def mcpCsvDir = file("${rootDir}/run/mcp")
-            jvmArgs('-Xmx6G')
-            systemProperty("net.minecraftforge.gradle.GradleStart.csvDir", mcpCsvDir.absolutePath.replace('\\', '/'))
-            systemProperty("net.minecraftforge.gradle.GradleStart.srg.notch-srg", new File(mcpCsvDir, 'methods.csv').absolutePath.replace('\\', '/'))
             return
         }
-    }
-
-    def mcpCsvConfig = configurations.detachedConfiguration(dependencies.create('de.oceanlabs.mcp:mcp_stable:39-1.12@zip'))
-    def prepareMcpCsv = tasks.register('prepareMcpCsv') {
-        def archive = mcpCsvConfig.singleFile
-        def outputDir = file("${rootDir}/run/mcp")
-        outputs.files(new File(outputDir, 'fields.csv'), new File(outputDir, 'methods.csv'))
-        doLast {
-            outputDir.mkdirs()
-            copy {
-                from(zipTree(archive)) {
-                    include 'fields.csv', 'methods.csv'
-                }
-                into outputDir
-            }
-        }
-    }
-    tasks.matching { it.name in ['runClient', 'runServer'] }.configureEach {
-        dependsOn prepareMcpCsv
     }
 
     defaultRemapJar = false
@@ -272,7 +266,7 @@ jar {
         manifest {
             def attribute_map = [:]
             attribute_map['ModType'] = "CRL"
-            attribute_map['MixinConfigs'] = "${mod_id}.default.mixin.json,${mod_id}.mod.mixin.json"
+            attribute_map['MixinConfigs'] = "${mod_id}.mixin.json"
             if (configurations.contain.size() > 0) {
                 attribute_map['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
                 attribute_map['NonModDeps'] = true

@@ -54,7 +54,7 @@ dependencies {
     modImplementation("curse.maven:circulation-flow-networks-1519385:8699343")
     modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
     modImplementation 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
-    modImplementation 'curse.maven:lumenized-1234162:6378222'
+    modImplementation 'curse.maven:lumenized-1234162:6734060'
     modImplementation 'curse.maven:mantle-74924:2713386'
     modImplementation 'curse.maven:tinkers-construct-74072:2902483'
     modImplementation 'curse.maven:not-enough-energistics-515565:5234732'
@@ -135,4 +135,5 @@ dependencies {
     modImplementation("curse.maven:alfheim-lighting-engine-910715:6687458")
     modImplementation("curse.maven:red-core-873867:6147102")
     modImplementation("curse.maven:stellarcore-1064321:8849440")
+    modImplementation("curse.maven:biomesoplenty-220318:3558882")
 }
