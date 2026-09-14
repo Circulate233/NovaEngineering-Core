@@ -26,6 +26,10 @@ repositories {
         name = 'Modrinth'
         url = 'https://api.modrinth.com/maven'
     }
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
     mavenCentral()
     mavenLocal() // Must be last for caching to work
 }
@@ -53,25 +57,22 @@ dependencies {
     modImplementation name: 'resourceloader', version: '1.5.3', classifier: 'main'
     modImplementation("curse.maven:circulation-flow-networks-1519385:8699343")
     modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
-    modImplementation 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
+    modImplementation name: 'appcompat', version: '0.0.0+ecf0ef8', classifier: 'dev'
     modImplementation 'curse.maven:lumenized-1234162:6734060'
     modImplementation 'curse.maven:mantle-74924:2713386'
     modImplementation 'curse.maven:tinkers-construct-74072:2902483'
-    modImplementation 'curse.maven:not-enough-energistics-515565:5234732'
     modImplementation 'curse.maven:psi-241665:3085917'
     modImplementation 'curse.maven:psio-339394:3077697'
     modImplementation 'curse.maven:RandomTweaker-514170:5528753'
     modImplementation 'curse.maven:jetif-303122:2919936'
     modImplementation 'curse.maven:ctm-267602:2915363'
-    modImplementation 'curse.maven:had-enough-items-557549:7057606'
+    modImplementation 'curse.maven:had-enough-items-557549:8648715'
     modImplementation 'curse.maven:the-one-probe-245211:2667280'
     modImplementation 'curse.maven:FTB-Library-237167:2985811'
     modImplementation 'curse.maven:FTBU-237102:3157548'
-    modImplementation 'curse.maven:ae2-extended-life-570458:6302098'
-    modImplementation 'curse.maven:ae2fluidcraft-rework-unofficial-1404390:7336029'
-    modCompileOnly 'curse.maven:MekanismEnergistics-1027681:5775101'
-    modImplementation 'curse.maven:nae2-884359:5380800'
-    modImplementation 'curse.maven:CodeChickenLib-242818:2779848'
+    modImplementation 'com.github.FormlessDragon:Applied-Energistics-2-Supergiant:v1.0.14:dev'
+    modCompileOnly 'com.github.FormlessDragon:Applied-Mekanistics:v1.1.1:dev'
+    modImplementation 'curse.maven:codechicken-lib-cre-1328922:6898525'
     modImplementation 'curse.maven:wanionlib-253043:4623135'
     modImplementation 'curse.maven:avaritia-1-1x-unofficial-1165010:7939693'
     modImplementation 'curse.maven:eternal-singularity-253077:2922583'
@@ -101,7 +102,6 @@ dependencies {
     modCompileOnly 'curse.maven:more-electric-tools-366298:3491973'
     modImplementation 'curse.maven:extrabotany-299086:3112313'
     modImplementation 'curse.maven:libnine-322344:3509087'
-    modImplementation 'curse.maven:lazy-ae2-322347:3254160'
     modCompileOnly 'curse.maven:better-chat-363860:3048407'
     modCompileOnly 'curse.maven:lunatriuscore-225605:2489549'
     modCompileOnly 'curse.maven:immersive-engineering-231951:2974106'
@@ -113,7 +113,6 @@ dependencies {
     modImplementation 'curse.maven:extended-crafting-nomifactory-edition-398267:5778512'
     modImplementation 'curse.maven:techguns-244201:2958103'
     modImplementation 'curse.maven:legendary-tooltips-532127:5734973'
-    modImplementation 'curse.maven:betterer-p2p-943734:4928154'
     modImplementation 'curse.maven:nuclearcraft-overhauled-336895:6605808'
     modImplementation 'curse.maven:loot-overhaul-299389:2711740'
     modImplementation 'curse.maven:BloodMagic-224791:2822288'
@@ -122,7 +121,7 @@ dependencies {
     modRuntimeOnly 'curse.maven:patchouli-306770:3162874'
     modCompileOnly 'curse.maven:libvulpes-236541:3801015'
     modCompileOnly 'curse.maven:advanced-rocketry-236542:4671856'
-    modImplementation 'curse.maven:random-complement-1198138:7340975'
+    modImplementation 'curse.maven:random-complement-1198138:8828633'
     modImplementation 'curse.maven:modular-routers-250294:2954953'
     modImplementation 'curse.maven:actually-additions-228404:3117927'
     modImplementation 'curse.maven:brandons-core-231382:3408276'
@@ -136,4 +135,5 @@ dependencies {
     modImplementation("curse.maven:red-core-873867:6147102")
     modImplementation("curse.maven:stellarcore-1064321:8849440")
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
+    modCompileOnly "curse.maven:mouse-tweaks-unofficial-461660:5876158"
 }

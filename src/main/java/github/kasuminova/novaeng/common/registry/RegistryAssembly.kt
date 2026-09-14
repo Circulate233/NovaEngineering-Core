@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION", "IMPOSSIBLE_IS_CHECK_WARNING")
+@file:Suppress("DEPRECATION", "IMPOSSIBLE_IS_CHECK", "USELESS_IS_CHECK")
 
 package github.kasuminova.novaeng.common.registry
 
@@ -132,9 +132,7 @@ object RegistryAssembly {
     @Suppress("UNCHECKED_CAST")
     private fun regMEK() {
         val reactorMachine = NEWDynamicMachine("")
-        if (reactorMachine is AccessorAbstractMachine) {
-            reactorMachine.setRegistryName(ResourceLocation("mek", "reactor"))
-        }
+        setRegistryNameIfAccessor(reactorMachine, ResourceLocation("mek", "reactor"))
         val reactor = NEWMachineAssemblyManager.BlockPair(GeneratorsBlocks.Reactor, 0)
         val mekReactor = reactorMachine.pattern
         val reactorGlass0 = IBlockStateDescriptor(GeneratorsBlocks.ReactorGlass.getStateFromMeta(0))
@@ -254,9 +252,7 @@ object RegistryAssembly {
         )
 
         val thermalEvaporationMachine = NEWDynamicMachine("")
-        if (thermalEvaporationMachine is AccessorAbstractMachine) {
-            thermalEvaporationMachine.setRegistryName(ResourceLocation("mek", "thermalEvaporation".camelToSnake()))
-        }
+        setRegistryNameIfAccessor(thermalEvaporationMachine, ResourceLocation("mek", "thermalEvaporation".camelToSnake()))
         val thermalEvaporationArray = thermalEvaporationMachine.pattern
         val thermalEvaporation = NEWMachineAssemblyManager.BlockPair(MekanismBlocks.BasicBlock, 14)
         val thermal = packBlock(MekanismBlocks.BasicBlock2.defaultState)
@@ -336,9 +332,7 @@ object RegistryAssembly {
     @Optional.Method(modid = "botania")
     private fun regBot() {
         val terraPlateMachine = NEWDynamicMachine("")
-        if (terraPlateMachine is AccessorAbstractMachine) {
-            terraPlateMachine.setRegistryName(ResourceLocation("botania", "terra_plate"))
-        }
+        setRegistryNameIfAccessor(terraPlateMachine, ResourceLocation("botania", "terra_plate"))
         val terraplateArray = terraPlateMachine.pattern
         val stone = packBlock(ModBlocks.livingrock.defaultState)
         val lapis = packBlock(Blocks.LAPIS_BLOCK.defaultState)
@@ -361,9 +355,7 @@ object RegistryAssembly {
         )
 
         val alfheimportalMachine = NEWDynamicMachine("")
-        if (alfheimportalMachine is AccessorAbstractMachine) {
-            alfheimportalMachine.setRegistryName(ResourceLocation("botania", "alfheimportal"))
-        }
+        setRegistryNameIfAccessor(alfheimportalMachine, ResourceLocation("botania", "alfheimportal"))
         val alfheimportalArray = alfheimportalMachine.pattern
         val wood = packBlock(ModBlocks.livingwood.defaultState)
         val lightwood = packBlock(ModBlocks.livingwood.getStateFromMeta(5))
@@ -436,9 +428,7 @@ object RegistryAssembly {
         name: String
     ): NEWDynamicMachine {
         val machine = NEWDynamicMachine("")
-        if (machine is AccessorAbstractMachine) {
-            machine.setRegistryName(ResourceLocation("astralsorcery", name))
-        }
+        setRegistryNameIfAccessor(machine, ResourceLocation("astralsorcery", name))
         val newBlcokArray = machine.pattern
         for ((key, value) in array.pattern) {
             val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(value.state)))
@@ -453,9 +443,7 @@ object RegistryAssembly {
         name: String
     ): NEWDynamicMachine {
         val machine = NEWDynamicMachine("")
-        if (machine is AccessorAbstractMachine) {
-            machine.setRegistryName(ResourceLocation("packagedastral", name))
-        }
+        setRegistryNameIfAccessor(machine, ResourceLocation("packagedastral", name))
         val newBlcokArray = machine.pattern
         for ((key, value) in array.pattern) {
             val info = BlockArray.BlockInformation(ObjectLists.singleton(IBlockStateDescriptor(value.state)))
@@ -467,6 +455,12 @@ object RegistryAssembly {
     private fun NEWDynamicMachine.setName(name: String): NEWDynamicMachine {
         this.localizedName = I18n.translateToLocal(name)
         return this
+    }
+
+    private fun setRegistryNameIfAccessor(machine: Any, registryName: ResourceLocation) {
+        if (machine is AccessorAbstractMachine) {
+            machine.setRegistryName(registryName)
+        }
     }
 
     private fun String.camelToSnake(): String {

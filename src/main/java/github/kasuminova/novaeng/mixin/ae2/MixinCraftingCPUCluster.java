@@ -1,19 +1,10 @@
 package github.kasuminova.novaeng.mixin.ae2;
 
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.crafting.ICraftingJob;
-import appeng.api.networking.crafting.ICraftingLink;
-import appeng.api.networking.crafting.ICraftingRequester;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.networking.security.IActionSource;
-import appeng.crafting.MECraftingInventory;
-import appeng.me.cache.CraftingGridCache;
-import appeng.me.cluster.implementations.CraftingCPUCluster;
-import appeng.me.helpers.MachineSource;
-import appeng.tile.crafting.TileCraftingTile;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import ae2.api.networking.IGrid;
+import ae2.api.networking.IGridNode;
+import ae2.me.cluster.implementations.CraftingCPUCluster;
+import ae2.me.helpers.MachineSource;
+import ae2.tile.crafting.ICraftingCPUTileEntity;
 import github.kasuminova.mmce.common.util.TimeRecorder;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
@@ -21,7 +12,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorCont
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorMEChannel;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import javax.annotation.Nullable;
 
 @Mixin(value = CraftingCPUCluster.class, remap = false)
 public abstract class MixinCraftingCPUCluster implements ECPUCluster {
@@ -40,170 +29,72 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Unique
     private final TimeRecorder novaeng_ec$parallelismRecorder = new TimeRecorder();
     @Unique
-    private ECalculatorThreadCore novaeng_ec$core = null;
+    private ECalculatorThreadCore novaeng_ec$core;
     @Unique
-    private ECalculatorController novaeng_ec$virtualCPUOwner = null;
+    private ECalculatorController novaeng_ec$virtualCPUOwner;
     @Unique
-    private long novaeng_ec$usedExtraStorage = 0;
-    @Shadow
-    private long availableStorage;
+    private long novaeng_ec$usedExtraStorage;
 
     @Shadow
-    private boolean isDestroyed;
+    protected long storage;
+    @Shadow
+    protected int accelerator;
+    @Shadow
+    protected boolean destroyed;
+    @Shadow
+    protected MachineSource machineSrc;
 
     @Shadow
-    private int accelerator;
+    public abstract IGrid getGrid();
 
     @Shadow
-    private MECraftingInventory inventory;
+    public abstract World getLevel();
 
-    @Shadow
-    private boolean isComplete;
-
-    @Shadow
-    private ICraftingLink myLastLink;
-
-    @Shadow
-    private MachineSource machineSrc;
-    @Final
-    @Shadow
-    private int[] usedOps;
-
-    @Shadow
-    public abstract void destroy();
-
-    @Shadow
-    public abstract void cancel();
-
-    @Inject(method = "submitJob", at = @At(value = "INVOKE", target = "Lappeng/api/networking/crafting/ICraftingJob;getOutput()Lappeng/api/storage/data/IAEItemStack;"))
-    private void injectSubmitJob(final IGrid g, final ICraftingJob job, final IActionSource src, final ICraftingRequester requestingMachine, final CallbackInfoReturnable<ICraftingLink> cir) {
-        if (this.novaeng_ec$virtualCPUOwner == null) {
-            return;
-        }
-        this.novaeng_ec$virtualCPUOwner.onVirtualCPUSubmitJob(job.getByteTotal());
-    }
-
-    @Inject(method = "cancel", at = @At("RETURN"))
-    private void injectCancel(final CallbackInfo ci) {
-        if (this.novaeng_ec$core == null) {
-            return;
-        }
-        // Ensure inventory is empty
-        if (this.inventory.getItemList().isEmpty()) {
-            this.destroy();
-        }
-    }
-
-    @Inject(method = "updateCraftingLogic", at = @At("HEAD"), cancellable = true)
-    private void injectUpdateCraftingLogicStoreItems(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cc, final CallbackInfo ci) {
-        if (this.novaeng_ec$core == null) {
-            return;
-        }
-        if (this.myLastLink != null) {
-            if (this.myLastLink.isCanceled()) {
-                this.myLastLink = null;
-                this.cancel();
-            }
-        }
-        if (this.isComplete) {
-            // Ensure inventory is empty
-            if (this.inventory.getItemList().isEmpty()) {
-                this.destroy();
-                ci.cancel();
-            }
-        }
-    }
-
-    @Inject(method = "updateCraftingLogic", at = @At("TAIL"))
-    private void injectUpdateCraftingLogicTail(final IGrid grid, final IEnergyGrid eg, final CraftingGridCache cc, final CallbackInfo ci) {
-        int currentParallelism = this.usedOps[0];
-        this.novaeng_ec$parallelismRecorder.addUsedTime(currentParallelism);
-    }
-
-    @WrapOperation(
-        method = "updateCraftingLogic",
-        at = @At(
-            value = "INVOKE",
-            target = "Lappeng/tile/crafting/TileCraftingTile;isActive()Z"
-        )
-    )
-    private boolean redirectUpdateCraftingLogicIsActive(final TileCraftingTile instance, final Operation<Boolean> original) {
-        if (this.novaeng_ec$core != null) {
-            ECalculatorController controller = this.novaeng_ec$core.getController();
-            return controller != null && controller.getChannel() != null && controller.getChannel().getProxy().isActive();
-        }
-        if (this.novaeng_ec$virtualCPUOwner != null) {
-            ECalculatorController controller = this.novaeng_ec$virtualCPUOwner;
-            return controller.getChannel() != null && controller.getChannel().getProxy().isActive();
-        }
-        return original.call(instance);
-    }
-
-    @Inject(method = "destroy", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "destroy", at = @At("HEAD"))
     private void injectDestroy(final CallbackInfo ci) {
-        if (this.novaeng_ec$core == null) {
-            return;
+        if (!this.destroyed && this.novaeng_ec$core != null) {
+            this.novaeng_ec$core.onCPUDestroyed((CraftingCPUCluster) (Object) this);
         }
-        if (this.isDestroyed) {
-            ci.cancel();
-            return;
-        }
-        this.novaeng_ec$core.onCPUDestroyed((CraftingCPUCluster) (Object) this);
     }
 
     @Inject(method = "isActive", at = @At("HEAD"), cancellable = true)
     private void injectIsActive(final CallbackInfoReturnable<Boolean> cir) {
-        if (this.novaeng_ec$core == null && this.novaeng_ec$virtualCPUOwner == null) {
-            return;
-        }
-        if (this.novaeng_ec$core != null) {
-            ECalculatorController controller = this.novaeng_ec$core.getController();
-            cir.setReturnValue(controller != null && controller.getChannel() != null && controller.getChannel().getProxy().isActive());
-        }
-        if (this.novaeng_ec$virtualCPUOwner != null) {
-            ECalculatorController controller = this.novaeng_ec$virtualCPUOwner;
-            cir.setReturnValue(controller.getChannel() != null && controller.getChannel().getProxy().isActive());
+        ECalculatorController controller = this.novaeng_ec$getOwner();
+        if (controller != null) {
+            ECalculatorMEChannel channel = controller.getChannel();
+            cir.setReturnValue(channel != null && channel.getMainNode().isActive());
         }
     }
 
     @Inject(method = "getGrid", at = @At("HEAD"), cancellable = true)
     private void injectGetGrid(final CallbackInfoReturnable<IGrid> cir) {
-        if (this.novaeng_ec$core != null) {
-            final ECalculatorController controller = this.novaeng_ec$core.getController();
-            if (controller == null) {
-                return;
-            }
-            final ECalculatorMEChannel channel = controller.getChannel();
-            if (channel == null) {
-                return;
-            }
-            IGridNode node = channel.getProxy().getNode();
-            cir.setReturnValue(node == null ? null : node.getGrid());
+        ECalculatorController controller = this.novaeng_ec$getOwner();
+        if (controller == null) {
+            return;
         }
-        if (this.novaeng_ec$virtualCPUOwner != null) {
-            final ECalculatorMEChannel channel = this.novaeng_ec$virtualCPUOwner.getChannel();
-            if (channel == null) {
-                return;
-            }
-            IGridNode node = channel.getProxy().getNode();
-            cir.setReturnValue(node == null ? null : node.getGrid());
+
+        ECalculatorMEChannel channel = controller.getChannel();
+        if (channel == null) {
+            cir.setReturnValue(null);
+            return;
         }
+
+        IGridNode node = channel.getMainNode().getNode();
+        cir.setReturnValue(node == null ? null : node.grid());
     }
 
     @Inject(method = "getCore", at = @At("HEAD"), cancellable = true)
-    private void injectGetCore(final CallbackInfoReturnable<TileCraftingTile> cir) {
-        if (this.novaeng_ec$core != null || this.novaeng_ec$virtualCPUOwner != null) {
+    private void injectGetCore(final CallbackInfoReturnable<ICraftingCPUTileEntity> cir) {
+        if (this.novaeng_ec$getOwner() != null) {
             cir.setReturnValue(null);
         }
     }
 
-    @Inject(method = "getWorld", at = @At("HEAD"), cancellable = true)
-    private void injectGetWorld(final CallbackInfoReturnable<World> cir) {
-        if (this.novaeng_ec$core != null) {
-            cir.setReturnValue(this.novaeng_ec$core.getWorld());
-        }
-        if (this.novaeng_ec$virtualCPUOwner != null) {
-            cir.setReturnValue(this.novaeng_ec$virtualCPUOwner.getWorld());
+    @Inject(method = "getLevel", at = @At("HEAD"), cancellable = true)
+    private void injectGetLevel(final CallbackInfoReturnable<World> cir) {
+        ECalculatorController controller = this.novaeng_ec$getOwner();
+        if (controller != null) {
+            cir.setReturnValue(controller.getWorld());
         }
     }
 
@@ -212,17 +103,24 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
         if (this.novaeng_ec$core != null) {
             this.novaeng_ec$core.markNoUpdateSync();
             ci.cancel();
-        }
-        if (this.novaeng_ec$virtualCPUOwner != null) {
+        } else if (this.novaeng_ec$virtualCPUOwner != null) {
             this.novaeng_ec$virtualCPUOwner.markNoUpdateSync();
             ci.cancel();
         }
     }
 
     @Unique
+    private ECalculatorController novaeng_ec$getOwner() {
+        if (this.novaeng_ec$core != null) {
+            return this.novaeng_ec$core.getController();
+        }
+        return this.novaeng_ec$virtualCPUOwner;
+    }
+
+    @Unique
     @Override
     public void novaeng_ec$setAvailableStorage(final long availableStorage) {
-        this.availableStorage = availableStorage;
+        this.storage = availableStorage;
     }
 
     @Unique
@@ -241,14 +139,9 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Override
     public void novaeng_ec$setThreadCore(final ECalculatorThreadCore threadCore) {
         this.novaeng_ec$core = threadCore;
-
-        final ECalculatorController controller = threadCore.getController();
-        if (controller == null) {
-            return;
-        }
-        final ECalculatorMEChannel channel = controller.getChannel();
-        if (channel != null) {
-            this.machineSrc = new MachineSource(channel);
+        ECalculatorController controller = threadCore.getController();
+        if (controller != null && controller.getChannel() != null) {
+            this.machineSrc = new MachineSource(controller.getChannel());
         }
     }
 
@@ -256,32 +149,16 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Override
     public void novaeng_ec$setVirtualCPUOwner(@Nullable final ECalculatorController virtualCPUOwner) {
         this.novaeng_ec$virtualCPUOwner = virtualCPUOwner;
-        if (virtualCPUOwner == null) {
-            return;
-        }
-
-        final ECalculatorMEChannel channel = virtualCPUOwner.getChannel();
-        if (channel != null) {
-            this.machineSrc = new MachineSource(channel);
+        if (virtualCPUOwner != null && virtualCPUOwner.getChannel() != null) {
+            this.machineSrc = new MachineSource(virtualCPUOwner.getChannel());
         }
     }
 
     @Unique
     @Override
     public Levels novaeng_ec$getControllerLevel() {
-        final ECalculatorController controller;
-        if (this.novaeng_ec$core != null) {
-            controller = this.novaeng_ec$core.getController();
-        } else if (this.novaeng_ec$virtualCPUOwner != null) {
-            controller = this.novaeng_ec$virtualCPUOwner;
-        } else {
-            return null;
-        }
-
-        if (controller != null) {
-            return controller.getLevel();
-        }
-        return null;
+        ECalculatorController controller = this.novaeng_ec$getOwner();
+        return controller == null ? null : controller.getLevel();
     }
 
     @Unique
@@ -299,8 +176,7 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     @Unique
     @Override
     public void novaeng_ec$markDestroyed() {
-        this.isDestroyed = true;
-        this.isComplete = true;
+        this.destroyed = true;
     }
 
     @Unique
@@ -314,5 +190,4 @@ public abstract class MixinCraftingCPUCluster implements ECPUCluster {
     public TimeRecorder novaeng_ec$getParallelismRecorder() {
         return this.novaeng_ec$parallelismRecorder;
     }
-
 }

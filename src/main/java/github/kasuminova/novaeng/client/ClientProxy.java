@@ -1,8 +1,5 @@
 package github.kasuminova.novaeng.client;
 
-import appeng.api.features.IWirelessTermHandler;
-import appeng.helpers.WirelessTerminalGuiObject;
-import baubles.api.BaublesApi;
 import github.kasuminova.mmce.client.renderer.MachineControllerRenderer;
 import github.kasuminova.novaeng.client.book.BookTransformerAppendModifiers;
 import github.kasuminova.novaeng.client.gui.GuiECalculatorController;
@@ -14,7 +11,6 @@ import github.kasuminova.novaeng.client.gui.GuiGeocentricDrill;
 import github.kasuminova.novaeng.client.gui.GuiHyperNetTerminal;
 import github.kasuminova.novaeng.client.gui.GuiMachineAssemblyTool;
 import github.kasuminova.novaeng.client.gui.GuiModularServerAssembler;
-import github.kasuminova.novaeng.client.gui.GuiNEWCraftConfirm;
 import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.handler.BlockAngelRendererHandler;
 import github.kasuminova.novaeng.client.handler.ClientEventHandler;
@@ -275,14 +271,6 @@ public class ClientProxy extends CommonProxy {
             case EFABRICATOR_PATTERN_BUS -> new GuiEFabricatorPatternBus((EFabricatorPatternBus) present, player);
             case GEOCENTRIC_DRILL_CONTROLLER -> new GuiGeocentricDrill((GeocentricDrillController) present, player);
             case ECALCULATOR_CONTROLLER -> new GuiECalculatorController((ECalculatorController) present, player);
-            case AUTO_CRAFTGUI -> {
-                var stack = y == 1 ? BaublesApi.getBaublesHandler(player).getStackInSlot(x)
-                    : player.inventory.getStackInSlot(x);
-                if (stack.getItem() instanceof IWirelessTermHandler wt) {
-                    yield new GuiNEWCraftConfirm(player.inventory,
-                        new WirelessTerminalGuiObject(wt, stack, player, player.world, x, y, Integer.MIN_VALUE));
-                } else yield null;
-            }
             case MACHINE_ASSEMBLY_TOOL -> new GuiMachineAssemblyTool(player);
         };
     }

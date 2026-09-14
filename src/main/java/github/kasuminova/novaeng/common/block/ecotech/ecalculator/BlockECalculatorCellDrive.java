@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveLink;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStatus;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStorageLevel;
@@ -81,11 +81,11 @@ public class BlockECalculatorCellDrive extends BlockECalculatorPart {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof ECalculatorCellDrive drive) {
             AppEngInternalInventory inv = drive.getDriveInv();
-            for (int i = 0; i < inv.getSlots(); i++) {
+            for (int i = 0; i < inv.size(); i++) {
                 ItemStack stack = inv.getStackInSlot(i);
                 if (!stack.isEmpty()) {
                     spawnAsEntity(worldIn, pos, stack);
-                    inv.setStackInSlot(i, ItemStack.EMPTY);
+                    inv.setItemDirect(i, ItemStack.EMPTY);
                 }
             }
         }

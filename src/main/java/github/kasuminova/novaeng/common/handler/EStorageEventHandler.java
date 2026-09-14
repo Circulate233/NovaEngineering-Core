@@ -1,15 +1,13 @@
 package github.kasuminova.novaeng.common.handler;
 
-import appeng.api.config.SecurityPermissions;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.networking.security.ISecurityGrid;
-import appeng.me.helpers.IGridProxyable;
-import appeng.tile.inventory.AppEngCellInventory;
+import ae2.api.networking.IGridNode;
+import ae2.api.networking.security.IActionHost;
+import ae2.api.storage.StorageCells;
+import ae2.api.util.DimensionalBlockPos;
+import ae2.util.inv.AppEngCellInventory;
+import ae2.util.Platform;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.ContainerEStorageController;
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.network.PktEStorageGUIData;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
@@ -33,17 +31,15 @@ public class EStorageEventHandler {
 
     public static final EStorageEventHandler INSTANCE = new EStorageEventHandler();
 
-    private static boolean canInteract(final EntityPlayer player, final IGridProxyable proxyable) {
-        final IGridNode gn = proxyable.getProxy().getNode();
+    private static boolean canInteract(final EntityPlayer player,
+                                      final TileEntity target,
+                                      final IActionHost actionHost) {
+        final IGridNode gn = actionHost.getActionableNode();
         if (gn != null) {
-            final IGrid g = gn.getGrid();
-            final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-            if (!eg.isNetworkPowered()) {
+            if (!gn.isPowered()) {
                 return true;
             }
-
-            final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-            return sg.hasPermission(player, SecurityPermissions.BUILD);
+            return Platform.hasPermissions(new DimensionalBlockPos(target), player);
         }
         return true;
     }
@@ -73,7 +69,7 @@ public class EStorageEventHandler {
         EStorageController controller = drive.getController();
         if (controller != null) {
             EStorageMEChannel channel = controller.getChannel();
-            if (channel != null && !canInteract(player, channel)) {
+            if (channel != null && !canInteract(player, drive, channel)) {
                 player.sendMessage(new TextComponentTranslation("novaeng.estorage_cell_drive.player.no_permission"));
                 event.setCanceled(true);
                 return;
@@ -85,7 +81,7 @@ public class EStorageEventHandler {
         AppEngCellInventory inv = drive.getDriveInv();
         ItemStack stackInSlot = inv.getStackInSlot(0);
         if (stackInSlot.isEmpty()) {
-            if (stackInHand.isEmpty() || EStorageCellHandler.getHandler(stackInHand) == null) {
+            if (stackInHand.isEmpty() || !StorageCells.isCellHandled(stackInHand)) {
                 return;
             }
             player.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, inv.insertItem(0, stackInHand.copy(), false));

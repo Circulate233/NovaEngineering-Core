@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.tile.ecotech.estorage;
 
-import appeng.api.config.Actionable;
-import appeng.api.storage.ICellInventory;
-import appeng.api.storage.ICellInventoryHandler;
-import appeng.api.storage.data.IAEItemStack;
+import ae2.api.config.Actionable;
+import ae2.api.storage.IStorageProvider;
+import ae2.api.storage.cells.StorageCell;
 import github.kasuminova.novaeng.client.util.BlockModelHider;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageController;
-import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
 import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.bus.EStorageBus;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -160,23 +158,15 @@ public class EStorageController extends EPartController<EStoragePart> {
     public void recalculateEnergyUsage() {
         double newIdleDrain = 64;
         for (final EStorageCellDrive drive : getCellDrives()) {
-            ECellDriveWatcher<IAEItemStack> watcher = drive.getWatcher();
-            if (watcher == null) {
+            StorageCell cell = drive.getCellHandler();
+            if (cell == null) {
                 continue;
             }
-            ICellInventoryHandler<?> cellInventory = (ICellInventoryHandler<?>) watcher.getInternal();
-            if (cellInventory == null) {
-                continue;
-            }
-            ICellInventory<?> cellInv = cellInventory.getCellInv();
-            if (cellInv == null) {
-                continue;
-            }
-            newIdleDrain += cellInv.getIdleDrain();
+            newIdleDrain += cell.getIdleDrain();
         }
         this.idleDrain = newIdleDrain;
-        if (this.channel != null) {
-            this.channel.getProxy().setIdlePowerUsage(idleDrain);
+        if (channel != null) {
+            IStorageProvider.requestUpdate(channel.getMainNode());
         }
     }
 

@@ -1,16 +1,10 @@
 package github.kasuminova.novaeng.common.util
 
-import appeng.api.AEApi
-import appeng.api.config.Actionable
-import appeng.api.networking.storage.IStorageGrid
-import appeng.api.storage.IMEMonitor
-import appeng.api.storage.channels.IFluidStorageChannel
-import appeng.api.storage.channels.IItemStorageChannel
-import appeng.api.storage.data.IAEFluidStack
-import appeng.api.storage.data.IAEItemStack
-import appeng.helpers.WirelessTerminalGuiObject
-import appeng.me.helpers.PlayerSource
-import com.circulation.random_complement.common.util.MEHandler
+import ae2.api.config.Actionable
+import ae2.api.networking.security.IActionHost
+import ae2.container.AEBaseContainer
+import ae2.api.storage.MEStorage
+import ae2.me.helpers.PlayerSource
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager.Ingredient
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager.OperatingStatus
 import hellfirepvp.modularmachinery.common.util.BlockArray
@@ -263,22 +257,13 @@ class AssemblyBlockArray : BlockArray {
         val list = getMaterialList(info)
 
         var hasAE = false
-        var wobj: WirelessTerminalGuiObject? = null
-        var items: IMEMonitor<IAEItemStack>? = null
-        var fluids: IMEMonitor<IAEFluidStack>? = null
+        var terminal: IActionHost? = null
+        var storage: MEStorage? = null
 
         if (usingAE) {
-            wobj = MEHandler.getTerminalGuiObject(player)
-            wobj?.actionableNode?.grid?.let {
-                val grid = it.getCache<IStorageGrid>(IStorageGrid::class.java)
-                items = grid.getInventory(
-                    AEApi.instance().storage()
-                        .getStorageChannel(IItemStorageChannel::class.java)
-                )
-                fluids = grid.getInventory(
-                    AEApi.instance().storage()
-                        .getStorageChannel(IFluidStorageChannel::class.java)
-                )
+            terminal = (player.openContainer as? AEBaseContainer)?.target as? IActionHost
+            terminal?.actionableNode?.grid()?.let { grid ->
+                storage = grid.storageService.inventory
                 hasAE = true
             }
         }
@@ -313,26 +298,17 @@ class AssemblyBlockArray : BlockArray {
                 val ingredient = ingredientAndIBlockState.first
                 if (ingredient.isItem) {
                     if (ingredient.itemStack.isEmpty) continue
-                    val item = items!!.extractItems(
-                        ingredient.aEItemStack,
-                        Actionable.MODULATE,
-                        PlayerSource(player, wobj)
-                    )
-                    if (item == null || item.stackSize == 0L) continue
+                    val key = ingredient.aeItemKey ?: continue
+                    val item = storage!!.extract(key, ingredient.itemStack.count.toLong(), Actionable.MODULATE,
+                        PlayerSource(player, terminal))
+                    if (item == 0L) continue
                     placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
                     return OperatingStatus.SUCCESS
                 } else {
-                    val fluid = fluids!!.extractItems(
-                        ingredient.aEFluidStack,
-                        Actionable.SIMULATE,
-                        PlayerSource(player, wobj)
-                    )
-                    if (fluid == null || fluid.stackSize < 1000) continue
-                    fluids.extractItems(
-                        ingredient.aEFluidStack,
-                        Actionable.MODULATE,
-                        PlayerSource(player, wobj)
-                    )
+                    val key = ingredient.aeFluidKey ?: continue
+                    val fluid = storage!!.extract(key, 1000, Actionable.SIMULATE, PlayerSource(player, terminal))
+                    if (fluid < 1000) continue
+                    storage!!.extract(key, 1000, Actionable.MODULATE, PlayerSource(player, terminal))
                     placeBlock(player, world, pos, ingredientAndIBlockState.getSecond())
                     return OperatingStatus.SUCCESS
                 }
