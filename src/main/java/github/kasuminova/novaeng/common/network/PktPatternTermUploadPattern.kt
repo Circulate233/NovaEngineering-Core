@@ -1,15 +1,12 @@
 package github.kasuminova.novaeng.common.network
 
-import appeng.api.AEApi
-import appeng.api.networking.crafting.ICraftingPatternDetails
-import appeng.api.networking.security.IActionHost
-import appeng.api.storage.data.IAEItemStack
-import appeng.container.implementations.ContainerPatternEncoder
-import appeng.items.misc.ItemEncodedPattern
-import appeng.me.GridAccessException
-import com.glodblock.github.util.FluidCraftingPatternDetails
+import ae2.api.crafting.IPatternDetails
+import ae2.api.crafting.PatternDetailsHelper
+import ae2.api.networking.security.IActionHost
+import ae2.container.me.patternencode.ContainerPatternEncodingTerm
+import ae2.container.SlotSemantics
+import ae2.core.definitions.AEItems
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel
-import github.kasuminova.novaeng.mixin.ae2.AccessorContainerPatternEncoder
 import hellfirepvp.modularmachinery.ModularMachinery
 import io.netty.buffer.ByteBuf
 import net.minecraft.item.ItemStack
@@ -29,42 +26,28 @@ class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUplo
         val player = ctx.serverHandler.player
         ModularMachinery.EXECUTE_MANAGER.addSyncTask {
             val container = player.openContainer
-            if (container !is ContainerPatternEncoder) {
+            if (container !is ContainerPatternEncodingTerm) {
                 return@addSyncTask
             }
 
-            val patternSlotOUT = (container as AccessorContainerPatternEncoder).getPatternSlotOUT()
-            val patternStack = patternSlotOUT.stack
+            val patternStack = container.getSlots(SlotSemantics.ENCODED_PATTERN).firstOrNull()?.getStack()
+                ?: return@addSyncTask
             if (patternStack.isEmpty) {
                 return@addSyncTask
             }
 
-            val part = container.part
-            val itemObject = (container as AccessorContainerPatternEncoder).getIGuiItemObject()
-            val channelNodes = if (part != null) {
-                try {
-                    part.proxy.grid.getMachines(EFabricatorMEChannel::class.java)
-                } catch (_: GridAccessException) {
-                    return@addSyncTask
-                }
-            } else if (itemObject is IActionHost) {
-                itemObject.actionableNode.grid.getMachines(EFabricatorMEChannel::class.java)
-            } else {
+            val itemObject = container.getTarget() as? IActionHost ?: return@addSyncTask
+            val node = itemObject.getActionableNode() ?: return@addSyncTask
+            val channelNodes = node.grid().getMachines(EFabricatorMEChannel::class.java)
+            if (channelNodes.isEmpty()) {
                 return@addSyncTask
             }
 
-            if (channelNodes.isEmpty) return@addSyncTask
+            val pattern: IPatternDetails = PatternDetailsHelper.decodePattern(patternStack, player.world)
+                ?: return@addSyncTask
+            val out = pattern.primaryOutput.what
 
-            val item = patternStack.item
-            val out: IAEItemStack? = if (item is ItemEncodedPattern) {
-                val pattern: ICraftingPatternDetails = item.getPatternForItem(patternStack, player.world)
-                if (pattern.isCraftable || pattern is FluidCraftingPatternDetails) {
-                    pattern.condensedOutputs[0]
-                } else return@addSyncTask
-            } else return@addSyncTask
-
-            for (channelNode in channelNodes) {
-                val channel = channelNode.machine as EFabricatorMEChannel
+            for (channel in channelNodes) {
                 channel.controller?.let {
                     for (patternBus in it.getPatternBuses()) {
                         if (patternBus.aePatterns.contains(out)) {
@@ -73,23 +56,16 @@ class PktPatternTermUploadPattern : IMessage, IMessageHandler<PktPatternTermUplo
                                     "novaeng.efabricator_parallel_proc.tooltip.0"
                                 )
                             )
-                            player.inventory.placeItemBackInInventory(
-                                player.world,
-                                AEApi.instance().definitions().materials().blankPattern()
-                                    .maybeStack(patternSlotOUT.stack.count).orElse(
-                                        ItemStack.EMPTY
-                                    )
-                            )
-                            patternSlotOUT.putStack(ItemStack.EMPTY)
+                            player.inventory.placeItemBackInInventory(player.world, ItemStack(AEItems.BLANK_PATTERN.item(), patternStack.count))
+                            container.clear()
                             return@addSyncTask
                         }
                     }
                 }
             }
-            for (channelNode in channelNodes) {
-                val channel = channelNode.machine as EFabricatorMEChannel
+            for (channel in channelNodes) {
                 if (channel.insertPattern(patternStack)) {
-                    patternSlotOUT.putStack(ItemStack.EMPTY)
+                    container.clear()
                     break
                 }
             }

@@ -1,16 +1,12 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.AEApi
-import appeng.api.config.Actionable
-import appeng.api.config.PowerMultiplier
-import appeng.api.networking.energy.IEnergyGrid
-import appeng.api.storage.channels.IItemStorageChannel
-import appeng.api.storage.data.IAEItemStack
-import appeng.api.storage.data.IItemList
-import appeng.me.GridAccessException
-import appeng.util.Platform
-import appeng.util.item.ItemList
-import github.kasuminova.mmce.client.util.ItemStackUtils
+import ae2.api.config.Actionable
+import ae2.api.config.PowerMultiplier
+import ae2.api.networking.energy.IEnergyService
+import ae2.api.storage.MEStorage
+import ae2.api.storage.StorageHelper
+import ae2.api.stacks.KeyCounter
+import ae2.api.stacks.GenericStack
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.client.util.BlockModelHider
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController
@@ -28,7 +24,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.block.Block
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.nbt.NBTTagList
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.util.Constants
@@ -77,10 +72,7 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     val coolantInputHandlers = ObjectArrayList<IFluidHandler>()
     val coolantOutputHandlers = ObjectArrayList<IFluidHandler>()
 
-    val itemChannel = AEApi.instance().storage()
-        .getStorageChannel(IItemStorageChannel::class.java)
-
-    var outputBuffer: IItemList<IAEItemStack> = ItemList()
+    var outputBuffer: KeyCounter = KeyCounter()
 
     val parentController: BlockEFabricatorController?
         get() {
@@ -140,7 +132,7 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     }
 
     override fun onSyncTick(): Boolean {
-        if (channel == null || !channel!!.proxy.isActive) {
+        if (channel == null || !channel!!.mainNode.isActive) {
             this.tickExecutor = null
             return false
         }
@@ -227,12 +219,8 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     }
 
     fun supplyWorkerPower() {
-        val energy: IEnergyGrid
-        try {
-            energy = channel!!.proxy.energy
-        } catch (ignored: GridAccessException) {
-            return
-        }
+        val node = channel!!.mainNode.node ?: return
+        val energy: IEnergyService = node.grid().energyService
 
         for (worker in this.getWorkers()) {
             if (worker.energyCache < worker.getMaxEnergyCache()) {
@@ -248,24 +236,19 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     }
 
     fun clearOutputBuffer() {
-        try {
-            val proxy = this.channel!!.proxy
-            val inv = proxy.storage.getInventory(itemChannel)
-            for (stack in outputBuffer) {
-                val notInserted = Platform.poweredInsert<IAEItemStack?>(
-                    proxy.energy,
-                    inv,
-                    stack.copy(),
-                    this.channel!!.source
-                )
-                if (notInserted != null) {
-                    stack.stackSize = notInserted.stackSize
-                } else {
-                    stack.stackSize = 0
-                }
+        val node = this.channel!!.mainNode.node ?: return
+        val energy = node.grid().energyService
+        val inventory: MEStorage = node.grid().storageService.inventory
+        for (entry in outputBuffer) {
+            val inserted = StorageHelper.poweredInsert(
+                energy,
+                inventory,
+                entry.key,
+                entry.longValue,
+                this.channel!!.source
+            )
+            outputBuffer.set(entry.key, entry.longValue - inserted)
             }
-        } catch (ignored: GridAccessException) {
-        }
     }
 
     override fun updateComponents() {
@@ -356,7 +339,7 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
         if (this.energyConsumePerTick != newIdleDrain) {
             this.energyConsumePerTick = newIdleDrain
             if (this.channel != null) {
-                this.channel!!.proxy.idlePowerUsage = this.energyConsumePerTick
+                this.channel!!.mainNode.setIdlePowerUsage(this.energyConsumePerTick)
             }
         }
     }
@@ -364,9 +347,9 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
     fun insertPattern(patternStack: ItemStack): Boolean {
         for (patternBus in this.getPatternBuses()) {
             val patternInv = patternBus.patterns
-            for (i in 0..<patternInv.slots) {
+            for (i in 0..<patternInv.size()) {
                 if (patternInv.getStackInSlot(i).isEmpty) {
-                    patternInv.setStackInSlot(i, ItemUtils.copyStackWithSize(patternStack, 1))
+                    patternInv.setItemDirect(i, ItemUtils.copyStackWithSize(patternStack, 1))
                     return true
                 }
             }
@@ -559,15 +542,12 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
         activeCooling = compound.getBoolean("activeCooling")
         coolantCache = compound.getInteger("coolantCache")
 
-        outputBuffer = ItemList()
+        outputBuffer = KeyCounter()
         val list = compound.getTagList("outputBuffer", Constants.NBT.TAG_COMPOUND)
-
-        list.forEach {
-            outputBuffer.add(
-                itemChannel.createStack(
-                    ItemStackUtils.readNBTOversize(it as NBTTagCompound)
-                )
-            )
+        for (stack in GenericStack.readList(list)) {
+            if (stack != null) {
+                outputBuffer.add(stack.what(), stack.amount())
+            }
         }
 
         loaded = prevLoaded
@@ -587,13 +567,13 @@ class EFabricatorController() : EPartController<EFabricatorPart>() {
         compound.setBoolean("activeCooling", activeCooling)
         compound.setInteger("coolantCache", coolantCache)
 
-        val list = NBTTagList()
         synchronized(outputBuffer) {
-            for (stack in outputBuffer) {
-                list.appendTag(ItemStackUtils.writeNBTOversize(stack.getCachedItemStack(stack.stackSize)))
+            val stacks = ObjectArrayList<GenericStack>()
+            for (entry in outputBuffer) {
+                stacks.add(GenericStack(entry.key, entry.longValue))
             }
+            compound.setTag("outputBuffer", GenericStack.writeList(stacks))
         }
-        compound.setTag("outputBuffer", list)
     }
 
     override fun readMachineNBT(compound: NBTTagCompound) {

@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common.item;
 
-import appeng.me.helpers.AENetworkProxy;
-import appeng.me.helpers.IGridProxyable;
+import ae2.me.helpers.IGridConnectedTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,9 +31,8 @@ public class ItemBlockME extends ItemBlock {
                                 @Nonnull final IBlockState newState) {
         if (super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState)) {
             TileEntity tile = world.getTileEntity(pos);
-            if (tile instanceof IGridProxyable) {
-                AENetworkProxy proxy = ((IGridProxyable) tile).getProxy();
-                proxy.setOwner(player);
+            if (tile instanceof IGridConnectedTile gridConnectedTile) {
+                gridConnectedTile.setOwner(player);
             }
             return true;
         }

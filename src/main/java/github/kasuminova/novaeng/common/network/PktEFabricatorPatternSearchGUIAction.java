@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.network;
 
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;

@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.container.data;
 
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.util.BlockPos2ValueMap;
@@ -21,7 +21,7 @@ public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
         for (final EFabricatorPatternBus patternBus : efController.getPatternBuses()) {
             final AppEngInternalInventory patternInv = patternBus.getPatterns();
             final BlockPos pos = patternBus.getPos();
-            for (int i = 0; i < patternInv.getSlots(); i++) {
+            for (int i = 0; i < patternInv.size(); i++) {
                 final ItemStack patternStack = patternInv.getStackInSlot(i);
                 if (!patternStack.isEmpty()) {
                     patterns.computeIfAbsent(pos, key -> new ObjectLinkedOpenHashSet<>())
