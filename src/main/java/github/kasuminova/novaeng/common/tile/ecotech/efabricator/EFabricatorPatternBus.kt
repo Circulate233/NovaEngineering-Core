@@ -1,17 +1,11 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.implementations.ICraftingPatternItem
-import appeng.api.networking.crafting.ICraftingPatternDetails
-import appeng.api.networking.events.MENetworkCraftingPatternChange
-import appeng.api.storage.data.IAEItemStack
-import appeng.items.misc.ItemEncodedPattern
-import appeng.me.GridAccessException
-import appeng.tile.inventory.AppEngInternalInventory
-import appeng.util.inv.IAEAppEngInventory
-import appeng.util.inv.InvOperation
-import com.glodblock.github.util.FluidCraftingPatternDetails
-import com.glodblock.github.util.FluidPatternDetails
-import github.kasuminova.mmce.common.util.PatternItemFilter
+import ae2.api.crafting.IPatternDetails
+import ae2.api.crafting.PatternDetailsHelper
+import ae2.api.networking.crafting.ICraftingProvider
+import ae2.api.stacks.AEKey
+import ae2.util.inv.AppEngInternalInventory
+import ae2.util.inv.InternalInventoryHost
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData
@@ -21,40 +15,34 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.items.CapabilityItemHandler
-import net.minecraftforge.items.IItemHandler
-import java.util.Objects
 import java.util.function.Consumer
-import java.util.function.IntFunction
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 import javax.annotation.Nonnull
 
-class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
+class EFabricatorPatternBus : EFabricatorPart(), InternalInventoryHost {
 
     companion object {
         const val PATTERN_SLOTS = 12 * 6
     }
 
-    val aePatterns = ObjectOpenHashSet<IAEItemStack>()
-    val patterns = AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE)
-    private val details = ObjectArrayList<ICraftingPatternDetails?>(PATTERN_SLOTS)
+    val aePatterns = ObjectOpenHashSet<AEKey>()
+    val patterns = AppEngInternalInventory(this, PATTERN_SLOTS, 1)
+    private val details = ObjectArrayList<IPatternDetails?>(PATTERN_SLOTS)
 
     init {
         // Initialize details...
-        IntStream.range(0, PATTERN_SLOTS).mapToObj<ICraftingPatternDetails?>(IntFunction { i: Int -> null })
-            .forEach { e: ICraftingPatternDetails? -> details.add(e) }
+        repeat(PATTERN_SLOTS) { details.add(null) }
     }
 
     private fun refreshPatterns() {
         for (i in 0..<PATTERN_SLOTS) {
             refreshPattern(i)
         }
+        refreshPatternOutputs()
         notifyPatternChanged()
     }
 
@@ -63,67 +51,39 @@ class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
 
         val pattern = patterns.getStackInSlot(slot)
         val item = pattern.item
-        if (pattern.isEmpty || item !is ICraftingPatternItem) {
+        if (pattern.isEmpty) {
             return
         }
 
-        val detail = item.getPatternForItem(pattern, getWorld())
-        if (detail != null && (detail.isCraftable || detail is FluidCraftingPatternDetails)) {
-            details[slot] = detail
-        }
+        details[slot] = PatternDetailsHelper.decodePattern(pattern, getWorld())
     }
 
-    fun getDetails(): MutableList<ICraftingPatternDetails?> {
-        return details.stream()
-            .filter { obj: ICraftingPatternDetails? -> Objects.nonNull(obj) }
-            .collect(Collectors.toList())
+    fun getDetails(): List<IPatternDetails> {
+        return details.filterNotNull()
     }
 
     val validPatterns: Int
-        get() = details.stream().filter { obj: ICraftingPatternDetails? -> Objects.nonNull(obj) }.count()
-            .toInt()
+        get() = details.count { it != null }
 
-    override fun saveChanges() {
+    override fun saveChangedInventory(inv: AppEngInternalInventory) {
         markNoUpdateSync()
     }
 
-    override fun onChangeInventory(
-        inv: IItemHandler,
-        slot: Int,
-        mc: InvOperation,
-        removedStack: ItemStack,
-        newStack: ItemStack
-    ) {
+    override fun isClientSide(): Boolean {
+        return world != null && world.isRemote
+    }
+
+    override fun onChangeInventory(inv: AppEngInternalInventory, slot: Int) {
         refreshPattern(slot)
-        notifyPatternChanged()
         sendPatternSearchGUIUpdateToClient(slot)
-        when (mc) {
-            InvOperation.EXTRACT -> removePattern(removedStack)
-            InvOperation.INSERT -> addPattern(newStack)
-            InvOperation.SET -> {
-                removePattern(removedStack)
-                addPattern(newStack)
-            }
-        }
+        refreshPatternOutputs()
+        notifyPatternChanged()
     }
 
-    private fun addPattern(stack: ItemStack) {
-        val item = stack.item
-        if (item is ItemEncodedPattern) {
-            val pattern = item.getPatternForItem(stack, this.world) ?: return
-            if (pattern.isCraftable || pattern is FluidPatternDetails) {
-                aePatterns.add(pattern.condensedOutputs[0])
-            }
-        }
-    }
-
-    private fun removePattern(stack: ItemStack) {
-        val item = stack.item
-        if (item is ItemEncodedPattern) {
-            val pattern = item.getPatternForItem(stack, this.world) ?: return
-            if (pattern.isCraftable || pattern is FluidPatternDetails) {
-                aePatterns.remove(pattern.condensedOutputs[0])
-            }
+    private fun refreshPatternOutputs() {
+        aePatterns.clear()
+        for (detail in details) {
+            detail?.primaryOutput?.what?.let(aePatterns::add)
         }
     }
 
@@ -131,13 +91,9 @@ class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
         if (this.partController == null) {
             return
         }
-        try {
-            val channel: EFabricatorMEChannel? = this.partController.channel
-            if (channel != null && channel.proxy.isActive) {
-                channel.proxy.grid
-                    .postEvent(MENetworkCraftingPatternChange(channel, channel.proxy.node))
-            }
-        } catch (ignored: GridAccessException) {
+        val channel: EFabricatorMEChannel? = this.partController.channel
+        if (channel != null && channel.mainNode.isActive) {
+            ICraftingProvider.requestUpdate(channel.mainNode)
         }
         this.partController.recalculateEnergyUsage()
     }
@@ -190,17 +146,15 @@ class EFabricatorPatternBus : EFabricatorPart(), IAEAppEngInventory {
     override fun <T> getCapability(@Nonnull capability: Capability<T?>, facing: EnumFacing?): T? {
         val cap = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
         if (capability === cap) {
-            return cap.cast<T?>(patterns)
+            return cap.cast<T?>(patterns.toItemHandler())
         }
         return super.getCapability<T?>(capability, facing)
     }
 
     override fun readCustomNBT(compound: NBTTagCompound) {
         super.readCustomNBT(compound)
-        patterns.readFromNBT(compound.getCompoundTag("patterns"))
-        for (stack in patterns) {
-            addPattern(stack)
-        }
+        patterns.readFromNBT(compound, "patterns")
+        refreshPatterns()
     }
 
     override fun writeCustomNBT(compound: NBTTagCompound?) {

@@ -277,6 +277,201 @@ tasks.register('installRuntimeTestClient', JavaExec) {
     }
 }
 
+def runtimeTestConfigDir = layout.projectDirectory.dir('.github/runtime-test-config')
+def runtimeTestServerConfigDir = layout.buildDirectory.dir('runtime-test/server/config')
+def runtimeTestInstanceTemplate = layout.buildDirectory.file(
+    'runtime-test/cleanroom-instance-template.zip'
+)
+def runtimeTestTemplateRequiredEntries = [
+    'instance.cfg',
+    'mmc-pack.json',
+    'patches/net.minecraft.json',
+    'patches/net.minecraftforge.json',
+    'patches/org.lwjgl3.json'
+]
+
+def runtimeTestConfigFiles = providers.provider {
+    def dir = runtimeTestConfigDir.asFile
+    if (!dir.isDirectory()) {
+        return []
+    }
+    def files = dir.listFiles({ candidate ->
+        candidate.isFile() && candidate.name.endsWith('.cfg')
+    } as FileFilter)
+    if (files == null) {
+        return []
+    }
+    return files.toList().sort { left, right -> left.name <=> right.name }
+}
+
+def downloadRuntimeTestTemplate = { String downloadUrl, File target ->
+    def partial = new File(target.parentFile, "${target.name}.part")
+    def lastError = null
+    for (int attempt = 1; attempt <= 3; attempt++) {
+        try {
+            java.net.HttpURLConnection connection =
+                java.net.URI.create(downloadUrl).toURL().openConnection()
+            connection.setConnectTimeout(30000)
+            connection.setReadTimeout(120000)
+            connection.setInstanceFollowRedirects(true)
+            connection.setRequestProperty('User-Agent', 'novaeng-runtime-test')
+            def status = connection.getResponseCode()
+            if (status != 200) {
+                throw new GradleException("HTTP ${status}")
+            }
+            partial.withOutputStream { output ->
+                connection.getInputStream().withCloseable { input ->
+                    input.transferTo(output)
+                }
+            }
+            connection.disconnect()
+            return partial
+        } catch (Exception error) {
+            lastError = error
+            partial.delete()
+            logger.lifecycle(
+                "[RuntimeTest] 模板下载第 ${attempt} 次失败：${error.message}"
+            )
+            if (attempt < 3) {
+                Thread.sleep(2000L * attempt)
+            }
+        }
+    }
+    throw new GradleException(
+        "无法下载 Cleanroom 模板 ${downloadUrl}：${lastError}"
+    )
+}
+
+def stageRuntimeTestServerConfig = tasks.register('stageRuntimeTestServerConfig', Sync) {
+    group = 'unimined'
+    description = '把 .github/runtime-test-config 下的 cfg 放到运行时测试服务端的 config 目录。'
+    from(runtimeTestConfigDir) {
+        include '*.cfg'
+    }
+    into(runtimeTestServerConfigDir)
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+
+def injectRuntimeTestClientConfig = tasks.register('injectRuntimeTestClientConfig') {
+    group = 'unimined'
+    description = '把运行时测试配置注入 Cleanroom MMC 模板 zip，解压后即成为客户端的 config。'
+    inputs.files(runtimeTestConfigFiles)
+    inputs.property('cleanroomVersion', cleanroomVersion)
+    inputs.property('requiredEntries', runtimeTestTemplateRequiredEntries)
+    outputs.upToDateWhen { false }
+    doLast {
+        def configFiles = runtimeTestConfigFiles.get()
+        if (configFiles.isEmpty()) {
+            logger.lifecycle(
+                '[RuntimeTest] .github/runtime-test-config 下没有 cfg，跳过客户端配置注入。'
+            )
+            return
+        }
+
+        def templateFile = runtimeTestInstanceTemplate.get().asFile
+        if (!templateFile.isFile()) {
+            templateFile.parentFile.mkdirs()
+            def templateUrl = 'https://github.com/CleanroomMC/Cleanroom/releases/download/' +
+                "${cleanroomVersion}/cleanroom-${cleanroomVersion}.zip"
+            logger.lifecycle("[RuntimeTest] 本地缺少模板，开始下载：${templateUrl}")
+            def downloaded = downloadRuntimeTestTemplate(templateUrl, templateFile)
+            java.nio.file.Files.move(
+                downloaded.toPath(),
+                templateFile.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+            )
+        }
+
+        def additions = new LinkedHashMap<String, File>()
+        configFiles.each { configFile ->
+            additions.put("minecraft/config/${configFile.name}".toString(), configFile)
+        }
+
+        def rewritten = new File(templateFile.parentFile, "${templateFile.name}.injected")
+        rewritten.delete()
+        def written = new LinkedHashSet<String>()
+        new java.util.zip.ZipFile(templateFile).withCloseable { sourceZip ->
+            def rawOutput = new FileOutputStream(rewritten)
+            try {
+                new java.util.zip.ZipOutputStream(
+                    new BufferedOutputStream(rawOutput)
+                ).withCloseable { targetZip ->
+                    sourceZip.entries().each { entry ->
+                        if (additions.containsKey(entry.name)) {
+                            // 模板自带同名配置：丢弃，稍后写入我们的版本。
+                            return
+                        }
+                        def copied = new java.util.zip.ZipEntry(entry.name)
+                        copied.time = entry.time
+                        if (entry.comment != null) {
+                            copied.comment = entry.comment
+                        }
+                        if (entry.extra != null) {
+                            copied.extra = entry.extra
+                        }
+                        targetZip.putNextEntry(copied)
+                        if (!entry.isDirectory()) {
+                            sourceZip.getInputStream(entry).withCloseable { input ->
+                                input.transferTo(targetZip)
+                            }
+                        }
+                        targetZip.closeEntry()
+                        written.add(entry.name)
+                    }
+                    additions.each { entryName, configFile ->
+                        def added = new java.util.zip.ZipEntry(entryName)
+                        added.time = configFile.lastModified()
+                        targetZip.putNextEntry(added)
+                        configFile.withInputStream { input ->
+                            input.transferTo(targetZip)
+                        }
+                        targetZip.closeEntry()
+                        written.add(entryName)
+                    }
+                }
+            } finally {
+                rawOutput.close()
+            }
+        }
+
+        runtimeTestTemplateRequiredEntries.each { requiredEntry ->
+            if (!written.contains(requiredEntry)) {
+                rewritten.delete()
+                throw new GradleException(
+                    "Cleanroom 模板缺少 ${requiredEntry}，已放弃写入注入后的模板。"
+                )
+            }
+        }
+        additions.keySet().each { injectedEntry ->
+            if (!written.contains(injectedEntry)) {
+                rewritten.delete()
+                throw new GradleException("配置注入失败：${injectedEntry} 未写入模板。")
+            }
+        }
+        if (rewritten.length() <= 0L) {
+            rewritten.delete()
+            throw new GradleException('注入后的模板为空，已放弃覆盖原模板。')
+        }
+
+        java.nio.file.Files.move(
+            rewritten.toPath(),
+            templateFile.toPath(),
+            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+        )
+        logger.lifecycle(
+            "[RuntimeTest] 已向客户端模板注入 ${additions.size()} 个配置：" +
+                additions.keySet().join(', ')
+        )
+    }
+}
+
+tasks.named('stageRuntimeTestMods') {
+    dependsOn stageRuntimeTestServerConfig
+}
+tasks.named('installRuntimeTestClient') {
+    dependsOn injectRuntimeTestClientConfig
+}
+
 tasks.register('printRuntimeTestPaths') {
     doLast {
         println "runtimeTestModsDir=${runtimeTestModsDir.get().absolutePath}"

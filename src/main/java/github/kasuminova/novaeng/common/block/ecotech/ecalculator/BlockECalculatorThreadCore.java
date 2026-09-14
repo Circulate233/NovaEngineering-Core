@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.block.ecotech.ecalculator;
 
-import appeng.me.cluster.implementations.CraftingCPUCluster;
+import ae2.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.util.Sides;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
