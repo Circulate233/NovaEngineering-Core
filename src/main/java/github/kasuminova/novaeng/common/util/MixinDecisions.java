@@ -14,7 +14,6 @@ public final class MixinDecisions {
     public static final boolean actuallyAdditionsLoaded = isPresent("actuallyadditions");
     public static final boolean astralSorceryLoaded = isPresent("astralsorcery");
     public static final boolean athenaeumLoaded = isPresent("athenaeum");
-    public static final boolean betterP2pLoaded = isPresent("betterp2p");
     public static final boolean botaniaLoaded = isPresent("botania");
     public static final boolean codeChickenLibLoaded = isPresent("codechickenlib");
     public static final boolean cofhLoaded = isPresent("cofhcore");
@@ -32,7 +31,6 @@ public final class MixinDecisions {
     public static final boolean lootOverhaulLoaded = isPresent("lootoverhaul");
     public static final boolean metsLoaded = isPresent("mets");
     public static final boolean modularRoutersLoaded = isPresent("modularrouters");
-    public static final boolean nae2Loaded = isPresent("nae2");
     public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean opticCheckLoaded = isPresent("opticheck");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
@@ -59,7 +57,6 @@ public final class MixinDecisions {
             case "actuallyadditions" -> actuallyAdditionsLoaded;
             case "astralsorcery" -> astralSorceryLoaded;
             case "athenaeum" -> athenaeumLoaded;
-            case "betterp2p" -> betterP2pLoaded;
             case "botania" -> botaniaLoaded;
             case "codechickenlib" -> codeChickenLibLoaded;
             case "cofh" -> cofhLoaded;
@@ -76,7 +73,6 @@ public final class MixinDecisions {
             case "lootoverhaul" -> lootOverhaulLoaded;
             case "mets" -> metsLoaded;
             case "modularrouters" -> modularRoutersLoaded;
-            case "nae2" -> nae2Loaded;
             case "nco" -> nuclearcraftLoaded;
             case "opticheck" -> opticCheckLoaded;
             case "packagedauto" -> packagedAutoLoaded;

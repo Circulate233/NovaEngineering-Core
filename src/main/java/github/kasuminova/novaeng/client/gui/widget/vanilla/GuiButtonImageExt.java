@@ -1,11 +1,18 @@
 package github.kasuminova.novaeng.client.gui.widget.vanilla;
 
-import appeng.client.gui.widgets.ITooltip;
+import ae2.client.gui.widgets.ITooltip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class GuiButtonImageExt extends GuiButtonImage implements ITooltip {
 
@@ -25,37 +32,25 @@ public class GuiButtonImageExt extends GuiButtonImage implements ITooltip {
     }
 
     @Override
-    public String getMessage() {
-        return message;
+    public @NotNull List<ITextComponent> getTooltipMessage() {
+        if (message.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(new TextComponentString(message));
     }
 
     public GuiButtonImageExt setMessage(final String message) {
-        this.message = message;
+        this.message = Objects.requireNonNull(message, "message");
         return this;
     }
 
     @Override
-    public int xPos() {
-        return x;
+    public Rectangle getTooltipArea() {
+        return new Rectangle(x, y, width, height);
     }
 
     @Override
-    public int yPos() {
-        return y;
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public boolean isVisible() {
+    public boolean isTooltipAreaVisible() {
         return visible;
     }
 

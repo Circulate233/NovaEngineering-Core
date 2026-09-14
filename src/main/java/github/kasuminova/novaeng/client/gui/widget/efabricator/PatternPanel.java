@@ -1,7 +1,8 @@
 package github.kasuminova.novaeng.client.gui.widget.efabricator;
 
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.storage.data.IAEItemStack;
+import ae2.api.crafting.IPatternDetails;
+import ae2.api.stacks.AEKey;
+import ae2.api.stacks.GenericStack;
 import github.kasuminova.mmce.client.gui.util.MousePos;
 import github.kasuminova.mmce.client.gui.util.RenderFunction;
 import github.kasuminova.mmce.client.gui.util.RenderPos;
@@ -24,8 +25,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import mezz.jei.api.search.ISearchIndex;
 import mezz.jei.search.GeneralizedSuffixTree;
-import mezz.jei.search.ISearchStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -59,8 +60,8 @@ public class PatternPanel extends SizedColumn {
 
     private final Map<BlockPos, Int2ObjectMap<PatternSlot>> patterns = new Object2ObjectLinkedOpenHashMap<>();
     private final InternalColumn internal = new InternalColumn();
-    private ISearchStorage<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
-    private ISearchStorage<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
+    private ISearchIndex<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
+    private ISearchIndex<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
     private String inputSearchContent = "";
     private String outputSearchContent = "";
 
@@ -69,8 +70,8 @@ public class PatternPanel extends SizedColumn {
         addWidget(internal);
     }
 
-    private static String getClearColorName(final IAEItemStack input) {
-        return COLOR_CODE_PATTERN.matcher(input.getDefinition().getDisplayName()).replaceAll("");
+    private static String getClearColorName(final AEKey input) {
+        return COLOR_CODE_PATTERN.matcher(input.getDisplayName().getFormattedText()).replaceAll("");
     }
 
     @Override
@@ -113,7 +114,7 @@ public class PatternPanel extends SizedColumn {
                         return;
                     }
 
-                    final Int2ObjectMap<PatternSlot> slotMap = patterns.computeIfAbsent(pos, key -> new Int2ObjectLinkedOpenHashMap<>());
+                    final Int2ObjectMap<PatternSlot> slotMap = patterns.computeIfAbsent(pos, _ -> new Int2ObjectLinkedOpenHashMap<>());
                     PatternSlot slot = slotMap.get(slotID);
                     if (slot == null) {
                         slot = new PatternSlot(pos, slotID);
@@ -131,20 +132,24 @@ public class PatternPanel extends SizedColumn {
 
                 for (Int2ObjectMap<PatternSlot> slotPattern : patterns.values()) {
                     for (final PatternSlot slot : slotPattern.values()) {
-                        ICraftingPatternDetails details = slot.getDetails();
+                        IPatternDetails details = slot.getDetails();
                         if (details == null) {
                             continue;
                         }
 
-                        IAEItemStack[] inputs = details.getCondensedInputs();
-                        IAEItemStack primaryOutput = details.getPrimaryOutput();
+                        IPatternDetails.IInput[] inputs = details.getInputs();
+                        GenericStack primaryOutput = details.getPrimaryOutput();
 
-                        for (final IAEItemStack input : inputs) {
-                            String displayName = getClearColorName(input);
+                        for (final IPatternDetails.IInput input : inputs) {
+                            GenericStack[] possibleInputs = input.possibleInputs();
+                            if (possibleInputs.length == 0) {
+                                continue;
+                            }
+                            String displayName = getClearColorName(possibleInputs[0].what());
                             inputSearchStorage.put(displayName.toLowerCase(), slot);
                         }
                         if (primaryOutput != null) {
-                            String displayName = getClearColorName(primaryOutput);
+                            String displayName = getClearColorName(primaryOutput.what());
                             outputSearchStorage.put(displayName.toLowerCase(), slot);
                         }
                     }
@@ -161,20 +166,24 @@ public class PatternPanel extends SizedColumn {
                         if (changed == null) {
                             return;
                         }
-                        ICraftingPatternDetails details = changed.getDetails();
+                        IPatternDetails details = changed.getDetails();
                         if (details == null) {
                             return;
                         }
 
-                        IAEItemStack[] inputs = details.getCondensedInputs();
-                        IAEItemStack primaryOutput = details.getPrimaryOutput();
+                        IPatternDetails.IInput[] inputs = details.getInputs();
+                        GenericStack primaryOutput = details.getPrimaryOutput();
 
-                        for (final IAEItemStack input : inputs) {
-                            String displayName = getClearColorName(input);
+                        for (final IPatternDetails.IInput input : inputs) {
+                            GenericStack[] possibleInputs = input.possibleInputs();
+                            if (possibleInputs.length == 0) {
+                                continue;
+                            }
+                            String displayName = getClearColorName(possibleInputs[0].what());
                             inputSearchStorage.put(displayName.toLowerCase(), changed);
                         }
                         if (primaryOutput != null) {
-                            String displayName = getClearColorName(primaryOutput);
+                            String displayName = getClearColorName(primaryOutput.what());
                             outputSearchStorage.put(displayName.toLowerCase(), changed);
                         }
                     });

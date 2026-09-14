@@ -1,10 +1,7 @@
 package github.kasuminova.novaeng.common
 
-import appeng.api.AEApi
-import baubles.api.BaublesApi
-import com.circulation.random_complement.common.util.MEHandler
-import github.kasuminova.mmce.common.integration.ModIntegrationAE2
 import github.kasuminova.novaeng.NovaEngCoreConfig
+import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController
@@ -14,10 +11,8 @@ import github.kasuminova.novaeng.common.container.ContainerEStorageController
 import github.kasuminova.novaeng.common.container.ContainerGeocentricDrill
 import github.kasuminova.novaeng.common.container.ContainerHyperNetTerminal
 import github.kasuminova.novaeng.common.container.ContainerModularServerAssembler
-import github.kasuminova.novaeng.common.container.ContainerNEWCraftConfirm
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler
 import github.kasuminova.novaeng.common.handler.ECalculatorEventHandler
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler
 import github.kasuminova.novaeng.common.handler.EStorageEventHandler
@@ -64,8 +59,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController
 import github.kasuminova.novaeng.common.trait.Register.registerModifiers
 import github.kasuminova.novaeng.common.util.MachineCoolants
-import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry
-import github.kasuminova.novaeng.novaeng_core.Tags.MOD_ID
+import github.kasuminova.novaeng.novaeng_core.Tags
 import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.common.base.Mods
 import net.minecraft.entity.player.EntityPlayer
@@ -99,7 +93,7 @@ open class CommonProxy : IGuiHandler {
     }
 
     open fun preInit() {
-        NetworkRegistry.INSTANCE.registerGuiHandler(MOD_ID, this)
+        NetworkRegistry.INSTANCE.registerGuiHandler(Tags.MOD_ID, this)
 
         MinecraftForge.EVENT_BUS.register(IntegrationCRT.INSTANCE)
         MinecraftForge.EVENT_BUS.register(HyperNetEventHandler.INSTANCE)
@@ -160,10 +154,6 @@ open class CommonProxy : IGuiHandler {
                 RegistryMachineSpecial.registrySpecialMachine(SmallOreDrill)
             }
         }
-        if (Mods.AE2.isPresent) {
-            val handlers = ((AEApi.instance().registries().cell()) as AccessorCellRegistry).getHandlers()
-            handlers.add(0, EStorageCellHandler.INSTANCE)
-        }
         registerModifiers()
     }
 
@@ -206,20 +196,14 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.EFABRICATOR_CONTROLLER -> {
                 val efController = present as? EFabricatorController
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
-                        player, efController.channel!!.proxy
-                    )
-                ) {
+                if (efController?.channel != null && !efController.channel!!.mainNode.isActive) {
                     null
                 } else ContainerEFabricatorController(efController, player)
             }
 
             GuiType.EFABRICATOR_PATTERN_SEARCH -> {
                 val efController = present as? EFabricatorController
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
-                        player, efController.channel!!.proxy
-                    )
-                ) {
+                if (efController?.channel != null && !efController.channel!!.mainNode.isActive) {
                     null
                 } else ContainerEFabricatorPatternSearch(efController, player)
             }
@@ -227,10 +211,7 @@ open class CommonProxy : IGuiHandler {
             GuiType.EFABRICATOR_PATTERN_BUS -> {
                 val efPatternBus = present as? EFabricatorPatternBus
                 val efController = efPatternBus?.controller
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
-                        player, efController.channel!!.proxy
-                    )
-                ) {
+                if (efController?.channel != null && !efController.channel!!.mainNode.isActive) {
                     null
                 } else ContainerEFabricatorPatternBus(efPatternBus, player)
             }
@@ -242,22 +223,9 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.ECALCULATOR_CONTROLLER -> {
                 val ecController = present as ECalculatorController?
-                if (ecController != null && ecController.channel != null && ModIntegrationAE2.securityCheck(
-                        player, ecController.channel.getProxy()
-                    )
-                ) {
+                if (ecController?.channel != null && !ecController.channel.mainNode.isActive) {
                     null
                 } else ContainerECalculatorController(present, player)
-            }
-
-            GuiType.AUTO_CRAFTGUI -> {
-                val stack = if (y == 1) BaublesApi.getBaublesHandler(player).getStackInSlot(x)
-                else player.inventory.getStackInSlot(x)
-
-                MEHandler.getTerminalGuiObject(stack, player, x, y)?.let {
-                    return ContainerNEWCraftConfirm(player.inventory, it)
-                }
-                null
             }
 
             GuiType.MACHINE_ASSEMBLY_TOOL -> null
@@ -278,7 +246,6 @@ open class CommonProxy : IGuiHandler {
         EFABRICATOR_PATTERN_BUS(EFabricatorPatternBus::class.java),
         GEOCENTRIC_DRILL_CONTROLLER(GeocentricDrillController::class.java),
         ECALCULATOR_CONTROLLER(ECalculatorController::class.java),
-        AUTO_CRAFTGUI(null),
         MACHINE_ASSEMBLY_TOOL(null)
     }
 }
