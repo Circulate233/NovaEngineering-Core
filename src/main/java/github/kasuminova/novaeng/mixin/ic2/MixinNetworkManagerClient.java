@@ -17,7 +17,7 @@ import java.util.zip.InflaterOutputStream;
 public class MixinNetworkManagerClient {
 
     @Unique
-    private static final InflaterOutputStream STELLAR_CORE$UNUSED = new InflaterOutputStream(new ByteArrayOutputStream());
+    private static final InflaterOutputStream NOVA$DISCARD_SINK = new InflaterOutputStream(new ByteArrayOutputStream());
 
     @Redirect(
         method = "onPacketData",
@@ -29,7 +29,7 @@ public class MixinNetworkManagerClient {
         remap = false
     )
     private InflaterOutputStream redirectOnPacketDataNewInflaterInst(final OutputStream out) {
-        return STELLAR_CORE$UNUSED;
+        return NOVA$DISCARD_SINK;
     }
 
     @Redirect(

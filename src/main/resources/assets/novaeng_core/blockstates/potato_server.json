@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "novaeng_core:potato_server" },
+    "facing=south": { "model": "novaeng_core:potato_server", "y": 180 },
+    "facing=west":  { "model": "novaeng_core:potato_server", "y": 270 },
+    "facing=east":  { "model": "novaeng_core:potato_server", "y": 90 }
+  }
+}

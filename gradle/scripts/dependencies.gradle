@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.cleanroommc:sponge-mixin:0.20.12+mixin.0.8.7'
+    compileOnly 'com.cleanroommc:sponge-mixin:0.20.13+mixin.0.8.7'
     annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
     annotationProcessor 'com.google.guava:guava:32.0.1-android'
     annotationProcessor 'com.google.code.gson:gson:2.8.9'
@@ -39,7 +39,7 @@ dependencies {
     annotationProcessor 'org.jetbrains:annotations:24.1.0'
 
     if (propertyBool('enable_lwjglx')) {
-        compileOnly 'com.cleanroommc:lwjglx:1.0.0'
+        compileOnly 'com.cleanroommc:lwjglxx:1.1.22'
     }
 
     modImplementation 'CraftTweaker2:CraftTweaker2-API:4.1.20.716'
@@ -49,8 +49,18 @@ dependencies {
     modImplementation 'curse.maven:fugue-1005815:8230893'
     modImplementation 'curse.maven:modularui-624243:7929464'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:5354477'
-    modImplementation name: 'MMCE-ComponentModelHider', version: '1.1', classifier: 'dev'
-    modImplementation name: 'resourceloader', version: '1.5.3', classifier: 'main'
+    modImplementation("curse.maven:component-model-hider-940949:4885858")
+    modImplementation("curse.maven:resource-loader-226447:2477566")
+    modCompileOnly 'curse.maven:base-246996:3440963'
+    modCompileOnly 'curse.maven:bibliocraft-228027:3647708'
+    modCompileOnly 'curse.maven:cooking-for-blockheads-231484:2862651'
+    modCompileOnly 'curse.maven:ingameime-vintage-1281907:8566984'
+    modCompileOnly 'curse.maven:random-psideas-302313:3215550'
+    modCompileOnly 'curse.maven:tinkers-antique-1242239:8666425'
+    modCompileOnly 'curse.maven:tinkers-evolution-384589:8349133'
+    modCompileOnly 'curse.maven:tinkers-tool-leveling-250957:2630860'
+    modCompileOnly 'curse.maven:zettai-grimoires-417570:3496150'
+    modCompileOnly 'curse.maven:zettai-psi-537428:3662855'
     modImplementation("curse.maven:circulation-flow-networks-1519385:8699343")
     modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
     modImplementation 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
@@ -76,8 +86,8 @@ dependencies {
     modImplementation 'curse.maven:avaritia-1-1x-unofficial-1165010:7939693'
     modImplementation 'curse.maven:eternal-singularity-253077:2922583'
     modCompileOnly 'curse.maven:optifine-check-626981:3806565'
-    modImplementation 'curse.maven:industrialcraft-2-242638:3078604'
-    modImplementation 'curse.maven:mekanism-ce-unofficial-840735:5946841'
+    modImplementation 'curse.maven:industrialcraft-2-242638:2835644'
+    modImplementation 'curse.maven:mekanism-ce-unofficial-840735:7163564'
     modImplementation 'curse.maven:RedstoneFlux-270789:2920436'
     modImplementation 'curse.maven:geckolib-388172:4020277'
     modImplementation 'curse.maven:botania-225643:3330934'
@@ -100,7 +110,7 @@ dependencies {
     modCompileOnly 'curse.maven:ender-io-64578:4674244'
     modCompileOnly 'curse.maven:more-electric-tools-366298:3491973'
     modImplementation 'curse.maven:extrabotany-299086:3112313'
-    modImplementation 'curse.maven:libnine-322344:3509087'
+    modImplementation 'curse.maven:libnine-322344:3073839'
     modImplementation 'curse.maven:lazy-ae2-322347:3254160'
     modCompileOnly 'curse.maven:better-chat-363860:3048407'
     modCompileOnly 'curse.maven:lunatriuscore-225605:2489549'
@@ -136,4 +146,8 @@ dependencies {
     modImplementation("curse.maven:red-core-873867:6147102")
     modImplementation("curse.maven:stellarcore-1064321:8849440")
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
+    modImplementation("curse.maven:journeymap-32274:8880583")
+    modImplementation("curse.maven:ender-utilities-224320:2977010")
+    modCompileOnly("curse.maven:actinium-1650442:8910637")
+    modCompileOnly("curse.maven:chisel-235279:2915375")
 }

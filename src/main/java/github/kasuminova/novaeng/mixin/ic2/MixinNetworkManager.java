@@ -20,7 +20,7 @@ import java.util.zip.DeflaterOutputStream;
 public class MixinNetworkManager {
 
     @Unique
-    private static final DeflaterOutputStream STELLAR_CORE$UNUSED = new DeflaterOutputStream(new ByteArrayOutputStream());
+    private static final DeflaterOutputStream NOVA$DISCARD_SINK = new DeflaterOutputStream(new ByteArrayOutputStream());
 
     @Redirect(
         method = "sendLargePacket",
@@ -32,7 +32,7 @@ public class MixinNetworkManager {
         remap = false
     )
     private DeflaterOutputStream redirectSendLargePacketNewDeflaterInst(final OutputStream out) {
-        return STELLAR_CORE$UNUSED;
+        return NOVA$DISCARD_SINK;
     }
 
     @Redirect(

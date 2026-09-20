@@ -55,6 +55,7 @@ import github.kasuminova.novaeng.common.registry.RegistryBlocks
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet
 import github.kasuminova.novaeng.common.registry.RegistryItems
 import github.kasuminova.novaeng.common.registry.RegistryMachineSpecial
+import github.kasuminova.novaeng.common.handler.RegistryRemapHandler
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController
@@ -64,6 +65,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController
 import github.kasuminova.novaeng.common.trait.Register.registerModifiers
 import github.kasuminova.novaeng.common.util.MachineCoolants
+import github.kasuminova.novaeng.common.util.MixinDecisions
 import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry
 import github.kasuminova.novaeng.novaeng_core.Tags.MOD_ID
 import hellfirepvp.modularmachinery.ModularMachinery
@@ -84,6 +86,7 @@ open class CommonProxy : IGuiHandler {
     init {
         MinecraftForge.EVENT_BUS.register(RegistryBlocks())
         MinecraftForge.EVENT_BUS.register(RegistryItems())
+        MinecraftForge.EVENT_BUS.register(RegistryRemapHandler.INSTANCE)
     }
 
     open fun setColor(od: String?, color: Int) {
@@ -115,7 +118,7 @@ open class CommonProxy : IGuiHandler {
 
         if (NovaEngCoreConfig.SERVER.specialMachine) MinecraftForge.EVENT_BUS.register(IEHandler.INSTANCE)
 
-        if (Loader.isModLoaded("ic2")) {
+        if (MixinDecisions.ic2Loaded) {
             IntegrationIC2.preInit()
         }
 
@@ -144,14 +147,14 @@ open class CommonProxy : IGuiHandler {
             }
             RegistryMachineSpecial.registrySpecialMachine(DreamEnergyCore.INSTANCE)
             RegistryMachineSpecial.registrySpecialMachine(GeocentricDrill.INSTANCE)
-            if (Loader.isModLoaded("deepmoblearning")) {
+            if (MixinDecisions.deepMobLearningLoaded) {
                 RegistryMachineSpecial.registrySpecialMachine(MaterialSequenceProcessing)
                 RegistryMachineSpecial.registrySpecialMachine(BiogenicSimulationComputer)
             }
-            if (Loader.isModLoaded("avaritia")) {
+            if (MixinDecisions.avaritiaLoaded) {
                 RegistryMachineSpecial.registrySpecialMachine(SpaceGenerator)
             }
-            if (Loader.isModLoaded("immersiveengineering")) {
+            if (MixinDecisions.immersiveEngineeringLoaded) {
                 RegistryMachineSpecial.registrySpecialMachine(MineralExtractor)
                 RegistryMachineSpecial.registrySpecialMachine(VoidMiner)
                 RegistryMachineSpecial.registrySpecialMachine(DifferentWorld)
@@ -206,7 +209,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.EFABRICATOR_CONTROLLER -> {
                 val efController = present as? EFabricatorController
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController?.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -216,7 +219,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.EFABRICATOR_PATTERN_SEARCH -> {
                 val efController = present as? EFabricatorController
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController?.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -227,7 +230,7 @@ open class CommonProxy : IGuiHandler {
             GuiType.EFABRICATOR_PATTERN_BUS -> {
                 val efPatternBus = present as? EFabricatorPatternBus
                 val efController = efPatternBus?.controller
-                if (efController != null && efController.channel != null && ModIntegrationAE2.securityCheck(
+                if (efController?.channel != null && ModIntegrationAE2.securityCheck(
                         player, efController.channel!!.proxy
                     )
                 ) {
@@ -242,7 +245,7 @@ open class CommonProxy : IGuiHandler {
 
             GuiType.ECALCULATOR_CONTROLLER -> {
                 val ecController = present as ECalculatorController?
-                if (ecController != null && ecController.channel != null && ModIntegrationAE2.securityCheck(
+                if (ecController?.channel != null && ModIntegrationAE2.securityCheck(
                         player, ecController.channel.getProxy()
                     )
                 ) {

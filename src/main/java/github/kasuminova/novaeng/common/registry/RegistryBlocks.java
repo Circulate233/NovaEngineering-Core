@@ -245,6 +245,8 @@ public class RegistryBlocks {
         GenericRegistryPrimer.INSTANCE.wipe(event.getGenericType());
 
         ItemRawOre.regAll();
+        RegistryExtended.declareBasicItems();
+        RegistryExtended.registerBlocks();
         registerBlocks();
         registerTileEntities();
 

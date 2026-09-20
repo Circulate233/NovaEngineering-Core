@@ -4,6 +4,7 @@ package github.kasuminova.novaeng.common.registry
 
 import github.kasuminova.mmce.common.util.DynamicPattern
 import github.kasuminova.novaeng.common.util.Functions
+import github.kasuminova.novaeng.common.util.MixinDecisions
 import github.kasuminova.novaeng.common.util.NEWDynamicMachine
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
 import github.kasuminova.novaeng.mixin.mmce.AccessorAbstractMachine
@@ -48,10 +49,10 @@ object RegistryAssembly {
     }
 
     fun regAll() {
-        if (Loader.isModLoaded("astralsorcery")) regAS()
+        if (MixinDecisions.astralSorceryLoaded) regAS()
         if (Loader.isModLoaded("mekanism")) regMEK()
-        if (Loader.isModLoaded("botania")) regBot()
-        if (Loader.isModLoaded("packagedastral")) regPackagedastral()
+        if (MixinDecisions.botaniaLoaded) regBot()
+        if (MixinDecisions.packagedAutoLoaded) regPackagedastral()
     }
 
     @Optional.Method(modid = "astralsorcery")

@@ -40,7 +40,7 @@ public class PktEFabricatorPatternSearchGUIUpdate implements IMessage, IMessageH
 
     @Override
     public void fromBytes(final ByteBuf buf) {
-        this.type = UpdateType.values()[buf.readByte()];
+        this.type = (buf.readByte() & 1) == 0 ? UpdateType.SINGLE : UpdateType.FULL;
         this.data = EFabricatorPatternData.readFrom(buf);
     }
 

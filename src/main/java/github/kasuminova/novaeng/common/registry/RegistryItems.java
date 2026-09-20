@@ -147,9 +147,12 @@ public class RegistryItems {
         ITEMS_TO_REGISTER.addAll(ItemBasic.Companion.getAllItem());
         ITEMS_TO_REGISTER.add(ItemMachineAssemblyTool.INSTANCE);
 
+        RegistryExtended.registerItems();
+
         registerItems();
 
         GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
+        RegistryExtended.registerOreDict();
         for (var regOre : ItemRawOre.regOres) {
             regOre.run();
         }

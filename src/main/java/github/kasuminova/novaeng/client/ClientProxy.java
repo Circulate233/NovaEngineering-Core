@@ -37,6 +37,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatt
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.tile.machine.SingularityCore;
+import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.common.util.NovaBlockColors;
 import github.kasuminova.novaeng.common.util.NovaItemColors;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -91,6 +92,8 @@ public class ClientProxy extends CommonProxy {
     private static final Object2IntMap<String> colorCache = new Object2IntOpenHashMap<>();
     @Getter
     private static List<String> itemDisplayTooltip;
+    private static final Object COLOR_ITEMS_LOCK = new Object();
+    private static final Object COLOR_BLOCKS_LOCK = new Object();
     private static List<Item> colorsItems = new ReferenceArrayList<>();
     private static List<ItemRawOre.BlockRawOre> colorsBlocks = new ReferenceArrayList<>();
 
@@ -145,11 +148,25 @@ public class ClientProxy extends CommonProxy {
     }
 
     public static void addColorRawOreItem(Item item) {
-        if (item != null) colorsItems.add(item);
+        if (item == null) {
+            return;
+        }
+        synchronized (COLOR_ITEMS_LOCK) {
+            if (colorsItems != null) {
+                colorsItems.add(item);
+            }
+        }
     }
 
     public static void addColorRawOreBlock(ItemRawOre.BlockRawOre block) {
-        if (block != null) colorsBlocks.add(block);
+        if (block == null) {
+            return;
+        }
+        synchronized (COLOR_BLOCKS_LOCK) {
+            if (colorsBlocks != null) {
+                colorsBlocks.add(block);
+            }
+        }
     }
 
     public void setColor(String od, int color) {
@@ -189,7 +206,7 @@ public class ClientProxy extends CommonProxy {
     public void init() {
         super.init();
 
-        if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
+        if (MixinDecisions.ic2Loaded && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiCreate();
         }
 
@@ -204,7 +221,18 @@ public class ClientProxy extends CommonProxy {
         var blockColors = (NovaBlockColors) mc.getBlockColors();
         var itemColors = (NovaItemColors) mc.getItemColors();
 
-        for (var item : colorsItems) {
+        final List<Item> itemColorSnapshot;
+        synchronized (COLOR_ITEMS_LOCK) {
+            itemColorSnapshot = colorsItems == null ? List.of() : new ReferenceArrayList<>(colorsItems);
+            colorsItems = null;
+        }
+        final List<ItemRawOre.BlockRawOre> blockColorSnapshot;
+        synchronized (COLOR_BLOCKS_LOCK) {
+            blockColorSnapshot = colorsBlocks == null ? List.of() : new ReferenceArrayList<>(colorsBlocks);
+            colorsBlocks = null;
+        }
+
+        for (var item : itemColorSnapshot) {
             if (item instanceof ItemRawOre r) {
                 final int i = getColorForODFirst(r.getPartOD());
                 itemColors.n$put(item, new IColor(i));
@@ -215,18 +243,19 @@ public class ClientProxy extends CommonProxy {
                 itemColors.n$put(item, new IColor(i));
             }
         }
-        colorsItems = null;
 
-        for (var block : colorsBlocks) {
+        for (var block : blockColorSnapshot) {
+            if (block == null) {
+                continue;
+            }
             final int i = getColorForODFirst(block.getPartOD());
             blockColors.n$put(block, new IColor(i));
         }
-        colorsBlocks = null;
 
         ClientCommandHandler.instance.registerCommand(ExportResearchDataToJson.INSTANCE);
         ClientCommandHandler.instance.registerCommand(CommandPacketProfiler.INSTANCE);
 
-        if (Loader.isModLoaded("ic2") && Loader.isModLoaded("randomtweaker")) {
+        if (MixinDecisions.ic2Loaded && Loader.isModLoaded("randomtweaker")) {
             ExJEI.jeiRecipeRegister();
         }
 

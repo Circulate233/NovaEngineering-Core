@@ -3,9 +3,7 @@ package github.kasuminova.novaeng.client.util;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.novaeng_core.Tags;
-import org.lwjgl.opengl.Display;
-
-import java.lang.reflect.Method;
+import org.lwjglx.opengl.Display;
 
 public class TitleUtils {
     /**
@@ -16,7 +14,6 @@ public class TitleUtils {
 
     public static volatile String currentTitle = null;
     public static volatile String lastCurrentTitle = null;
-    public static volatile boolean unsupportedPlatform = false;
 
     /**
      * 设置携带状态标记的窗口标题，必须在客户端主线程使用。
@@ -83,22 +80,6 @@ public class TitleUtils {
 
     private static void applyTitle() {
         if (!NovaEngCoreConfig.CLIENT.enableNovaEngTitle) {
-            return;
-        }
-        if (!unsupportedPlatform) {
-            try {
-                Class<?> Display = Class.forName("org.lwjgl.opengl.Display");
-                Method getWindow = Display.getDeclaredMethod("getWindow");
-                long result = (long) getWindow.invoke(null);
-                if (result != 0) {
-                    Class<?> GLFW = Class.forName("org.lwjgl.glfw.GLFW");
-                    Method glfwSetWindowTitle = GLFW.getDeclaredMethod("glfwSetWindowTitle", long.class, CharSequence.class);
-                    glfwSetWindowTitle.invoke(null, result, currentTitle);
-                }
-            } catch (Exception e) {
-                NovaEngineeringCore.log.warn("Failed to set CleanroomLoader title, maybe platform is unsupported.", e);
-                unsupportedPlatform = true;
-            }
             return;
         }
         Display.setTitle(currentTitle);

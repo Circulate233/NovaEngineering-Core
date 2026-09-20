@@ -1,0 +1,7 @@
+{
+	"variants": {
+	"normal": {
+		"model": "novaeng_core:server_tier_1"
+		}
+	}
+}

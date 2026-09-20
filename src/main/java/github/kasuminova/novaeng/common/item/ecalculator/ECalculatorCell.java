@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.input.Keyboard;
+import org.lwjglx.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import java.util.List;

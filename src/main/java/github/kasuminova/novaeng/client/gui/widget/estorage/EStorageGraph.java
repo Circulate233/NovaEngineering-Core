@@ -15,7 +15,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
-import org.lwjgl.input.Keyboard;
+import org.lwjglx.input.Keyboard;
 
 import java.util.Collections;
 

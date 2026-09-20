@@ -47,7 +47,7 @@ public abstract class MixinWorldLighting {
 
     @Redirect(method = "markBlocksDirtyVertical",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;checkLightFor(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)Z"))
-    private static boolean nova$skipVerticalLightPropagation(final World world, final EnumSkyBlock type, final BlockPos pos) {
-        return !world.isRemote && world.checkLightFor(type, pos);
+    private static boolean nova$skipVerticalLightPropagation(final World world, final EnumSkyBlock lightType, final BlockPos pos) {
+        return !world.isRemote && world.checkLightFor(lightType, pos);
     }
 }

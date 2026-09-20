@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "novaeng_core:items/expert_tools-layer0"
+  }
+}
