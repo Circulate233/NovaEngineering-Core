@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.block.ecotech.efabricator;
 
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.block.prop.FacingProp;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
@@ -76,11 +76,11 @@ public class BlockEFabricatorPatternBus extends BlockEFabricatorPart {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof EFabricatorPatternBus terminal) {
             AppEngInternalInventory inv = terminal.getPatterns();
-            for (int i = 0; i < inv.getSlots(); i++) {
+            for (int i = 0; i < inv.size(); i++) {
                 ItemStack stack = inv.getStackInSlot(i);
                 if (!stack.isEmpty()) {
                     spawnAsEntity(worldIn, pos, stack);
-                    inv.setStackInSlot(i, ItemStack.EMPTY);
+                    inv.setItemDirect(i, ItemStack.EMPTY);
                 }
             }
         }

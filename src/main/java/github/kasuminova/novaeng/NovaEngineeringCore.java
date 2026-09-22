@@ -5,7 +5,6 @@ import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
-import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
@@ -48,8 +47,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
     dependencies = "required-after:modularmachinery@[2.3.0,);" +
         "required-after:theoneprobe;" +
-        "required-after:appliedenergistics2@[v0.56.4,);" +
-        "required-after:ae2fc@[2.6.3-r,);" +
+        "required-after:ae2@[1.0.14,);" +
         "required-after:lumenized@[1.0.2,);",
     acceptedMinecraftVersions = "[1.12, 1.13)",
     acceptableRemoteVersions = "[1.21.7, 1.24.0)"
@@ -113,7 +111,6 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktItemDisplay.class, PktItemDisplay.class, start++, Side.SERVER);
-        NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
         proxy.preInit();
     }

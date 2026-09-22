@@ -1,7 +1,9 @@
 package github.kasuminova.novaeng.common.integration.theoneprobe;
 
-import appeng.api.storage.data.IAEItemStack;
-import appeng.me.cluster.implementations.CraftingCPUCluster;
+import ae2.api.stacks.AEItemKey;
+import ae2.api.stacks.GenericStack;
+import ae2.api.networking.crafting.CraftingJobStatus;
+import ae2.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.util.TimeRecorder;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
@@ -81,16 +83,17 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         box = newBox(probeInfo).vertical();
         box.text("{*top.ecalculator.thread_core.crafting*}");
         for (final CraftingCPUCluster cpu : cpus) {
-            final IAEItemStack output = cpu.getFinalOutput();
-            if (output == null) {
+            final CraftingJobStatus status = cpu.getJobStatus();
+            if (status == null || status.crafting() == null || !(status.crafting().what() instanceof AEItemKey itemKey)) {
                 continue;
             }
 
             final IProbeInfo taskBox = newBox(box).vertical();
             IProbeInfo row = taskBox.horizontal(taskBox.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER));
 
-            final long count = output.getStackSize();
-            final ItemStack stack = output.getCachedItemStack(1);
+            final GenericStack output = status.crafting();
+            final long count = output.amount();
+            final ItemStack stack = itemKey.toStack(1);
             row.item(stack);
             row.itemLabel(stack);
             row.text("  x " + count);

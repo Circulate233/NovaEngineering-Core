@@ -16,7 +16,6 @@ public final class MixinDecisions {
     public static final boolean actuallyAdditionsLoaded = isPresent("actuallyadditions");
     public static final boolean astralSorceryLoaded = isPresent("astralsorcery");
     public static final boolean athenaeumLoaded = isPresent("athenaeum");
-    public static final boolean betterP2pLoaded = isPresent("betterp2p");
     public static final boolean baseLoaded = isPresent("base");
     public static final boolean biomesOPlentyLoaded = isPresent("biomesoplenty");
     public static final boolean bibliocraftLoaded = isPresent("bibliocraft");
@@ -41,7 +40,6 @@ public final class MixinDecisions {
     public static final boolean metsLoaded = isPresent("mets");
     public static final boolean mekanismLoaded = isPresent("mekanism");
     public static final boolean modularRoutersLoaded = isPresent("modularrouters");
-    public static final boolean nae2Loaded = isPresent("nae2");
     public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
     public static final boolean psiLoaded = isPresent("psi");
@@ -72,7 +70,6 @@ public final class MixinDecisions {
             case "actuallyadditions" -> actuallyAdditionsLoaded;
             case "astralsorcery" -> astralSorceryLoaded;
             case "athenaeum" -> athenaeumLoaded;
-            case "betterp2p" -> betterP2pLoaded;
             case "base" -> baseLoaded && NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
             case "biomesoplenty" -> biomesOPlentyLoaded && NovaEngCoreConfig.CLIENT.optimizeBopFog;
             case "bibliocraft" -> bibliocraftLoaded;
@@ -96,7 +93,6 @@ public final class MixinDecisions {
             case "mets" -> metsLoaded;
             case "mekanism" -> mekanismLoaded;
             case "modularrouters" -> modularRoutersLoaded;
-            case "nae2" -> nae2Loaded;
             case "nco" -> nuclearcraftLoaded;
             case "packagedauto" -> packagedAutoLoaded;
             case "psi" -> psiLoaded;
@@ -131,8 +127,7 @@ public final class MixinDecisions {
             case "zenscript.MixinTypeRegistry",
                  "zenscript.MixinJavaMethod" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
             case "minecraft.MixinFallbackResourceManager",
-                 "libnine.MixinL9Models",
-                 "ae2.MixinUVLModelLoader" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
+                 "libnine.MixinL9Models" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinStitcher",
                  "minecraft.MixinStitcherSlot",
                  "minecraft.AccessorStitcherSlot" -> NovaEngCoreConfig.CLIENT.optimizeStitcherFrontier;
