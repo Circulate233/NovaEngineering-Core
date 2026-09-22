@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,6 +25,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>Each query first resolves and opens the current winning source. Static sources then share one
  * parsed result, while unknown and mutable sources are parsed every time. The cache therefore
  * avoids duplicate JSON parsing without bypassing dynamic overlay lookup or priority semantics.</p>
+ *
+ * <p>Nesting is tolerated through a depth counter rather than being rejected. A reload started from inside
+ * another reload would otherwise abort the outer reload with an exception, which is a far worse outcome than
+ * serving a slightly longer lived answer.</p>
  */
 public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex {
 
@@ -31,6 +36,7 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
     private static final ModelJsonMetadataIndex INSTANCE = new ModelJsonMetadataIndexImpl();
 
     private final AtomicLong nextGeneration = new AtomicLong();
+    private final AtomicInteger depth = new AtomicInteger();
     private final AtomicReference<Generation> activeGeneration = new AtomicReference<>();
 
     private ModelJsonMetadataIndexImpl() {
@@ -47,12 +53,8 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
 
     @Override
     public void begin() {
-        final Generation generation = new Generation(this.nextGeneration.incrementAndGet());
-        if (!this.activeGeneration.compareAndSet(null, generation)) {
-            final IllegalStateException failure = new IllegalStateException(
-                "A model metadata generation is already active");
-            NovaEngineeringCore.log.error("Failed to begin a nested model metadata generation.", failure);
-            throw failure;
+        if (this.depth.incrementAndGet() == 1) {
+            this.activeGeneration.set(new Generation(this.nextGeneration.incrementAndGet()));
         }
     }
 
@@ -74,15 +76,14 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
 
     @Override
     public void end() {
-        final Generation generation = this.activeGeneration.getAndSet(null);
-        if (generation == null) {
-            final IllegalStateException failure = new IllegalStateException(
-                "No model metadata generation is active");
-            NovaEngineeringCore.log.error("Failed to end a model metadata generation.", failure);
-            throw failure;
+        if (this.depth.updateAndGet(current -> current > 0 ? current - 1 : 0) != 0) {
+            return;
         }
-        generation.metadata.clear();
-        generation.loggedFailures.clear();
+        final Generation generation = this.activeGeneration.getAndSet(null);
+        if (generation != null) {
+            generation.metadata.clear();
+            generation.loggedFailures.clear();
+        }
     }
 
     private Metadata lookup(final ResourceLocation location) {

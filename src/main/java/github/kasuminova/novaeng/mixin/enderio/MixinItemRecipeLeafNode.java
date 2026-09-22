@@ -2,14 +2,13 @@ package github.kasuminova.novaeng.mixin.enderio;
 
 import com.enderio.core.common.util.NNList;
 import crazypants.enderio.base.recipe.lookup.ItemRecipeLeafNode;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,13 +22,15 @@ import java.util.Set;
  *
  * <p>The mirror is validated against the list size on every query and rebuilt when they disagree, so any
  * mutation performed outside this class is picked up rather than producing a stale answer.</p>
+ *
+ * <p>The mirror map keys by reference and is only reached through the monitor taken below, so it needs no
+ * wrapper of its own: a synchronized view would take the same lock a second time on every access.</p>
  */
 @Mixin(value = ItemRecipeLeafNode.class, remap = false)
 public class MixinItemRecipeLeafNode<REC> {
 
     @Unique
-    private static final Map<NNList<?>, Set<Object>> nova$members =
-        Collections.synchronizedMap(new IdentityHashMap<>());
+    private static final Map<NNList<?>, Set<Object>> nova$members = new Reference2ObjectOpenHashMap<>();
 
     @Redirect(method = "addRecipe", at = @At(value = "INVOKE",
         target = "Lcom/enderio/core/common/util/NNList;contains(Ljava/lang/Object;)Z", remap = false),

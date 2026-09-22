@@ -14,6 +14,7 @@ import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import lombok.Getter;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import org.lwjglx.input.Keyboard;
 
@@ -28,19 +29,19 @@ public class EStorageGraph extends Row {
         this.controllerGUI = controllerGUI;
         addWidget(graphBar = new EStorageGraphBar(controllerGUI));
         WidgetController widgetController = controllerGUI.getWidgetController();
-        widgetController.addWidgetContainer(new FluidGraph(this));
-        widgetController.addWidgetContainer(new ItemGraph(this));
+        widgetController.addWidget(new FluidGraph(this));
+        widgetController.addWidget(new ItemGraph(this));
         if (getMekEngLoad()) {
-            widgetController.addWidgetContainer(new GasGraph(this));
+            widgetController.addWidget(new GasGraph(this));
         }
-        widgetController.addWidgetContainer(new TotalGraph(this));
-        widgetController.addWidgetContainer(new FluidTypeGraph(this));
-        widgetController.addWidgetContainer(new ItemTypeGraph(this));
+        widgetController.addWidget(new TotalGraph(this));
+        widgetController.addWidget(new FluidTypeGraph(this));
+        widgetController.addWidget(new ItemTypeGraph(this));
         if (getMekEngLoad()) {
-            widgetController.addWidgetContainer(new GasTypeGraph(this));
+            widgetController.addWidget(new GasTypeGraph(this));
         }
-        widgetController.addWidgetContainer(new EnergyCapacityGraph(this));
-        widgetController.addWidgetContainer(new EnergyUsageGraph(this));
+        widgetController.addWidget(new EnergyCapacityGraph(this));
+        widgetController.addWidget(new EnergyUsageGraph(this));
     }
 
     @Override
@@ -426,7 +427,7 @@ public class EStorageGraph extends Row {
                 && ((shiftDown || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) && !Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
                 return;
             }
-            shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+            shiftDown = GuiScreen.isShiftKeyDown();
             if (shiftDown) {
                 label.setContents(Collections.singletonList(
                     I18n.format("gui.estorage_controller.graph.energy_stored",

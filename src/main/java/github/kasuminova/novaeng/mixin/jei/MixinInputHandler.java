@@ -67,7 +67,7 @@ public abstract class MixinInputHandler {
             ItemStack stack = ItemStack.EMPTY;
             if (v instanceof ItemStack i) {
                 stack = i;
-            } else if (v instanceof BookmarkItem<?> b && b.ingredient instanceof ItemStack i) {
+            } else if (v instanceof BookmarkItem<?> b && b.getIngredient() instanceof ItemStack i) {
                 stack = i;
             }
             if (stack.isEmpty()) {

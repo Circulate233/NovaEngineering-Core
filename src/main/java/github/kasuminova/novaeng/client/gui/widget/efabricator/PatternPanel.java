@@ -24,8 +24,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import mezz.jei.api.search.ISearchIndex;
 import mezz.jei.search.GeneralizedSuffixTree;
-import mezz.jei.search.ISearchStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -59,8 +59,8 @@ public class PatternPanel extends SizedColumn {
 
     private final Map<BlockPos, Int2ObjectMap<PatternSlot>> patterns = new Object2ObjectLinkedOpenHashMap<>();
     private final InternalColumn internal = new InternalColumn();
-    private ISearchStorage<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
-    private ISearchStorage<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
+    private ISearchIndex<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
+    private ISearchIndex<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
     private String inputSearchContent = "";
     private String outputSearchContent = "";
 

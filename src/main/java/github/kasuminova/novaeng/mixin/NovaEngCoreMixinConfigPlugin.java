@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
-public class NovaEngCoreLateMixinLoader implements IMixinConfigPlugin {
+public class NovaEngCoreMixinConfigPlugin implements IMixinConfigPlugin {
 
     private static final String MIXIN_ROOT = "github.kasuminova.novaeng.mixin.";
 

@@ -113,6 +113,31 @@ public class NovaEngCoreConfig {
         public boolean optimizeCtmBakeReplay = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeThermalTransposerRecipes")
+        @Config.Comment("Skip Thermal Expansion's JEI transposer fill and extract recipe generation.")
+        public boolean optimizeThermalTransposerRecipes = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCreativeTabLookup")
+        @Config.Comment("Memoise ContentTweaker's creative tab label lookup. Applies on both sides.")
+        public boolean optimizeCreativeTabLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapThemeCopy")
+        @Config.Comment("Skip JourneyMap's theme resource unpack while its mod jar is unchanged.")
+        public boolean optimizeJourneymapThemeCopy = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEventBusRegistration")
+        @Config.Comment("Answer Forge's event registration lookups without throwing on every miss. Applies on both sides.")
+        public boolean optimizeEventBusRegistration = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeZenScriptCompilation")
+        @Config.Comment("Use a fastutil type table and cached method metadata while compiling scripts. Applies on both sides.")
+        public boolean optimizeZenScriptCompilation = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeEntityGatherer")
         @Config.Comment("Index client chunks that can contain entities for Actinium gathering.")
         public boolean optimizeEntityGatherer = true;

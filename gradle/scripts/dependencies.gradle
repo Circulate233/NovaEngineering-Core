@@ -73,7 +73,7 @@ dependencies {
     modImplementation 'curse.maven:RandomTweaker-514170:5528753'
     modImplementation 'curse.maven:jetif-303122:2919936'
     modImplementation 'curse.maven:ctm-267602:2915363'
-    modImplementation 'curse.maven:had-enough-items-557549:7057606'
+    modImplementation 'curse.maven:had-enough-items-557549:8934963'
     modImplementation 'curse.maven:the-one-probe-245211:2667280'
     modImplementation 'curse.maven:FTB-Library-237167:2985811'
     modImplementation 'curse.maven:FTBU-237102:3157548'
@@ -107,7 +107,7 @@ dependencies {
     modCompileOnly 'curse.maven:athenaeum-284350:4633750'
     modCompileOnly 'curse.maven:artisan-worktables-284351:3205284'
     modCompileOnly 'curse.maven:endercore-231868:4671384'
-    modCompileOnly 'curse.maven:ender-io-64578:4674244'
+    modCompileOnly 'curse.maven:enderio-ceu-1530854:8734036'
     modCompileOnly 'curse.maven:more-electric-tools-366298:3491973'
     modImplementation 'curse.maven:extrabotany-299086:3112313'
     modImplementation 'curse.maven:libnine-322344:3073839'
@@ -146,8 +146,10 @@ dependencies {
     modImplementation("curse.maven:red-core-873867:6147102")
     modImplementation("curse.maven:stellarcore-1064321:8849440")
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
-    modImplementation("curse.maven:journeymap-32274:8880583")
+    modImplementation("curse.maven:journeymap-32274:8923612")
     modImplementation("curse.maven:ender-utilities-224320:2977010")
     modCompileOnly("curse.maven:actinium-1650442:8910637")
     modCompileOnly("curse.maven:chisel-235279:2915375")
+    modCompileOnly 'curse.maven:librarianlib-continuous-1058274:6617935'
+    modCompileOnly 'curse.maven:contenttweaker-237065:3331364'
 }

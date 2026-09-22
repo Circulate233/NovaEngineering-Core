@@ -23,7 +23,6 @@ public final class MixinDecisions {
     public static final boolean botaniaLoaded = isPresent("botania");
     public static final boolean cofhLoaded = isPresent("cofhcore");
     public static final boolean craftTweakerLoaded = isPresent("crafttweaker");
-    public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean deepMobLearningLoaded = isPresent("deepmoblearning");
     public static final boolean draconicEvolutionLoaded = isPresent("draconicevolution");
     public static final boolean electroblobsLoaded = isPresent("ebwizardry");
@@ -80,7 +79,6 @@ public final class MixinDecisions {
             case "botania" -> botaniaLoaded;
             case "cofh" -> cofhLoaded;
             case "crafttweaker" -> craftTweakerLoaded;
-            case "ctm" -> ctmLoaded;
             case "draconicevolution" -> draconicEvolutionLoaded;
             case "electroblobs" -> electroblobsLoaded;
             case "enderio" -> enderioLoaded;
@@ -124,22 +122,20 @@ public final class MixinDecisions {
                  "minecraft.forge.MixinCloudRenderer" -> NovaEngCoreConfig.CLIENT.optimizeCloudColorUpload;
             case "ic2.MixinBlockStateContainer",
                  "ic2.MixinIc2BlockStateInstance" -> NovaEngCoreConfig.CLIENT.optimizeIc2PropertyTables;
-            case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
-                || NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
+            case "cofh.MixinTransposerRecipeCategoryFill",
+                 "cofh.MixinTransposerRecipeCategoryExtract" -> NovaEngCoreConfig.CLIENT.optimizeThermalTransposerRecipes;
+            case "contenttweaker.MixinCreativeTabsResourceList",
+                 "minecraft.AccessorCreativeTabs" -> NovaEngCoreConfig.CLIENT.optimizeCreativeTabLookup;
+            case "journeymap.MixinFileHandler" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy;
+            case "minecraft.forge.MixinEventBus" -> NovaEngCoreConfig.CLIENT.optimizeEventBusRegistration;
+            case "zenscript.MixinTypeRegistry",
+                 "zenscript.MixinJavaMethod" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
             case "minecraft.MixinFallbackResourceManager",
                  "libnine.MixinL9Models",
                  "ae2.MixinUVLModelLoader" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinStitcher",
                  "minecraft.MixinStitcherSlot",
                  "minecraft.AccessorStitcherSlot" -> NovaEngCoreConfig.CLIENT.optimizeStitcherFrontier;
-            case "ctm.AccessorModelCTMReplay",
-                 "ctm.InvokerModelCTMReplay",
-                 "ctm.MixinModelCTMBakeTrace",
-                 "ctm.MixinModelManager",
-                 "ctm.MixinMultipartModelReplay",
-                 "ctm.MixinTextureMetadataHandlerReplay",
-                 "ctm.MixinVanillaModelWrapperReplay",
-                 "ctm.MixinWeightedRandomModelReplay" -> NovaEngCoreConfig.CLIENT.optimizeCtmBakeReplay;
             case "actinium.MixinChunk",
                  "actinium.MixinChunkProviderClient",
                  "actinium.MixinEntityGatherer",
