@@ -113,6 +113,11 @@ public class NovaEngCoreConfig {
         public boolean optimizeCtmBakeReplay = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("DiagObjModelProbe")
+        @Config.Comment("Diagnostic only. Count OBJModel construction and wrapping sources per .obj path, dumped at the end of each model reload. Changes no behaviour.")
+        public boolean diagObjModelProbe = false;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeThermalTransposerRecipes")
         @Config.Comment("Skip Thermal Expansion's JEI transposer fill and extract recipe generation.")
         public boolean optimizeThermalTransposerRecipes = true;

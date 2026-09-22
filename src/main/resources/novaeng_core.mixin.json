@@ -141,8 +141,6 @@
     "jetif.MixinCompatFluxNetworks",
     "journeymap.MixinFileHandler",
     "legendarytooltips.MixinTooltipDecor",
-    "lumenized.AccessorBloomEffectUtil",
-    "lumenized.MixinBloomEffectUtilOccupancy",
     "minecraft.AccessorParticleManager",
     "minecraft.MixinAbstractTexture",
     "minecraft.MixinBlockColors",
@@ -172,7 +170,10 @@
     "minecraft.MixinStitcher",
     "minecraft.MixinStitcherSlot",
     "minecraft.AccessorStitcherSlot",
-    "minecraft.MixinItemStackLegacyRedirect"
+    "minecraft.MixinItemStackLegacyRedirect",
+    "diagnostic.MixinDiagOBJModel",
+    "diagnostic.MixinDiagOBJLoader",
+    "diagnostic.MixinDiagModelReloadEnd"
   ],
   "server": [
     "ae2.MixinPacketInventoryAction",

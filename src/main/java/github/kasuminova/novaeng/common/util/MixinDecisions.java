@@ -37,7 +37,6 @@ public final class MixinDecisions {
     public static final boolean libvulpesLoaded = isPresent("libvulpes");
     public static final boolean lootOverhaulLoaded = isPresent("lootoverhaul");
     public static final boolean libNineLoaded = isPresent("libnine");
-    public static final boolean lumenizedLoaded = isPresent("lumenized");
     public static final boolean metsLoaded = isPresent("mets");
     public static final boolean mekanismLoaded = isPresent("mekanism");
     public static final boolean modularRoutersLoaded = isPresent("modularrouters");
@@ -92,7 +91,6 @@ public final class MixinDecisions {
             case "libvulpes" -> libvulpesLoaded;
             case "lootoverhaul" -> lootOverhaulLoaded;
             case "libnine" -> libNineLoaded;
-            case "lumenized" -> lumenizedLoaded && actiniumLoaded;
             case "mets" -> metsLoaded;
             case "mekanism" -> mekanismLoaded;
             case "modularrouters" -> modularRoutersLoaded;
@@ -108,6 +106,9 @@ public final class MixinDecisions {
     }
 
     private static boolean isOptimizationEnabled(final String mixinName) {
+        if (mixinName.startsWith("diagnostic.")) {
+            return NovaEngCoreConfig.CLIENT.diagObjModelProbe;
+        }
         return switch (mixinName) {
             case "astralsorcery.MixinTexturePreloader",
                  "astralsorcery.MixinBindableResourceLazyAllocation" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryTexturePreload;
@@ -146,8 +147,6 @@ public final class MixinDecisions {
             case "actinium.MixinGLStateManagerVertexArray",
                  "actinium.MixinImmediateCommandListVertexArray",
                  "actinium.MixinPassThroughGLStateManagerVertexArray" -> NovaEngCoreConfig.CLIENT.optimizeVaoBindings;
-            case "lumenized.AccessorBloomEffectUtil",
-                 "lumenized.MixinBloomEffectUtilOccupancy" -> NovaEngCoreConfig.CLIENT.optimizeEmptyBloom;
             default -> true;
         };
     }
