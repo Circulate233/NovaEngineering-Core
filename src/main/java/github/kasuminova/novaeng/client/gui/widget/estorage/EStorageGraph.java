@@ -16,7 +16,7 @@ import hellfirepvp.modularmachinery.common.base.Mods;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 
 import java.util.Collections;
 

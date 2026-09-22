@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 
 import java.util.Collections;
 
