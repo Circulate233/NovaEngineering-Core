@@ -3,7 +3,7 @@ package github.kasuminova.novaeng.client.util;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.novaeng_core.Tags;
-import org.lwjglx.opengl.Display;
+import org.lwjgl.opengl.Display;
 
 public class TitleUtils {
     /**

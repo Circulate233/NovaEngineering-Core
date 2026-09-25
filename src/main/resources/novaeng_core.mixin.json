@@ -159,6 +159,8 @@
     "minecraft.MixinWorldLighting",
     "minecraft.forge.MixinCloudRenderer",
     "minecraft.forge.MixinForgeHooksClient",
+    "minecraft.forge.MixinModelLoaderVanillaModelWrapper",
+    "minecraft.forge.MixinModelLoaderVanillaModelWrapper$AccessorModelLoader",
     "mmce.MixinIngredientItemStackRenderer",
     "modularrouters.MixinClientProxy",
     "packagedauto.MixinGuiUnpackager",

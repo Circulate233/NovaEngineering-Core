@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
-import org.lwjglx.input.Mouse
+import org.lwjgl.input.Mouse
 
 @SideOnly(Side.CLIENT)
 object MachineAssemblyHandlerClient {
