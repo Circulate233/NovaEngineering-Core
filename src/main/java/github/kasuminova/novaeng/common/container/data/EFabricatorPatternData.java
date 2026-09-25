@@ -55,14 +55,18 @@ public record EFabricatorPatternData(Map<BlockPos, Set<PatternData>> patterns) {
 
     public void writeTo(final ByteBuf buf) {
         buf.writeByte(patterns.size());
-        patterns.forEach((pos, patternSet) -> {
+        for (final Set<PatternData> patternSet : patterns.values()) {
+            if (patternSet.isEmpty()) {
+                continue;
+            }
+            final BlockPos pos = patternSet.iterator().next().pos();
             buf.writeLong(pos.toLong());
             buf.writeByte(patternSet.size());
-            patternSet.forEach(pattern -> {
+            for (final PatternData pattern : patternSet) {
                 buf.writeByte(pattern.slot());
                 ByteBufUtils.writeItemStack(buf, pattern.pattern());
-            });
-        });
+            }
+        }
     }
 
     public record PatternData(BlockPos pos, int slot, ItemStack pattern) {

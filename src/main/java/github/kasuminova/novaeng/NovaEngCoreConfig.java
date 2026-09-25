@@ -103,16 +103,6 @@ public class NovaEngCoreConfig {
         public boolean optimizeResourceExistence = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeStitcherFrontier")
-        @Config.Comment("Prune impossible texture Stitcher subtrees with exact capacity frontiers.")
-        public boolean optimizeStitcherFrontier = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeCtmBakeReplay")
-        @Config.Comment("Replay proven same-parameter CTM initialization traces instead of duplicate parent bakes.")
-        public boolean optimizeCtmBakeReplay = true;
-
-        @Config.RequiresMcRestart
         @Config.Name("DiagObjModelProbe")
         @Config.Comment("Diagnostic only. Count OBJModel construction and wrapping sources per .obj path, dumped at the end of each model reload. Changes no behaviour.")
         public boolean diagObjModelProbe = false;
@@ -163,9 +153,85 @@ public class NovaEngCoreConfig {
         public boolean optimizeVaoBindings = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeEmptyBloom")
-        @Config.Comment("Skip Lumenized bloom FBO work only when terrain and custom bloom are known empty.")
-        public boolean optimizeEmptyBloom = true;
+        @Config.Name("OptimizeReusableVBOUploader")
+        @Config.Comment("Upload only finished MMCE vertex bytes when a reusable client-array buffer has excess capacity.")
+        public boolean optimizeReusableVBOUploader = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeClientBiomeLookup")
+        @Config.Comment("Resolve client biome lookups with one chunk query instead of a residency check plus another lookup.")
+        public boolean optimizeClientBiomeLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeClientChunkLookup")
+        @Config.Comment("Resolve client chunks with one primitive-map lookup and without a null wrapper allocation.")
+        public boolean optimizeClientChunkLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeNae2BeamCube")
+        @Config.Comment("Build NAE2 beam cube faces without repeating set membership checks or color unpacking.")
+        public boolean optimizeNae2BeamCube = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeClientChunkPresence")
+        @Config.Comment("Test client chunk presence with one loaded-chunk map query.")
+        public boolean optimizeClientChunkPresence = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeTextureBind")
+        @Config.Comment("Use fastutil maps in TextureManager and skip consecutive identical binds.")
+        public boolean optimizeTextureBind = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeItemLightingBuffers")
+        @Config.Comment("Reuse constant item-lighting float buffers instead of rewriting one shared buffer.")
+        public boolean optimizeItemLightingBuffers = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeTesrRendererLookup")
+        @Config.Comment("Use a reference-equality map for TESR class-to-renderer lookup.")
+        public boolean optimizeTesrRendererLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeBufferBuilderEndian")
+        @Config.Comment("Reuse process endianness for packed BufferBuilder color writes.")
+        public boolean optimizeBufferBuilderEndian = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEntityDataMaps")
+        @Config.Comment("Use primitive and reference fastutil maps for entity data manager lookups.")
+        public boolean optimizeEntityDataMaps = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeItemModelMaps")
+        @Config.Comment("Use primitive and reference fastutil maps for item model mesher lookups.")
+        public boolean optimizeItemModelMaps = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeTrsrCenterCache")
+        @Config.Comment("Cache TRSR corner-to-center conversions on the source transform instance.")
+        public boolean optimizeTrsrCenterCache = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeClientFastutilMaps")
+        @Config.Comment("Replace remaining client HashMaps for entity renderers, texture atlases, and item tool classes with fastutil maps.")
+        public boolean optimizeClientFastutilMaps = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeInventoryTickWork")
+        @Config.Comment("Defer the inventory_changed trigger to one pass per tick (a criterion satisfied only for part of one tick is no longer granted) and skip the per-tick map walk while the player holds none.")
+        public boolean optimizeInventoryTickWork = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeIntHashMap")
+        @Config.Comment("Replace vanilla IntHashMap chaining with a primitive fastutil map. Applies on both sides.")
+        public boolean optimizeIntHashMap = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeItemOverrideList")
+        @Config.Comment("Skip empty item-override matching and reuse the immutable override list.")
+        public boolean optimizeItemOverrideList = true;
+
     }
 
     @SuppressWarnings("CanBeFinal")

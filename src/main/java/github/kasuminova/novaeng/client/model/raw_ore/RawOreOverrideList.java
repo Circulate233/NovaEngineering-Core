@@ -57,6 +57,16 @@ public class RawOreOverrideList extends ItemOverrideList {
             TRSRTransformation.quatFromXYZDegrees(new Vector3f(ax, ay, az)), new Vector3f(s, s, s), null));
     }
 
+    /**
+     * Cached baked models hold quads with atlas UVs from the reload that baked them.
+     * A resource reload may re-stitch the atlas, so cached models must be rebuilt.
+     */
+    public void clearCache() {
+        synchronized (this.cache) {
+            this.cache.clear();
+        }
+    }
+
     @NotNull
     @Override
     public IBakedModel handleItemState(@NotNull IBakedModel base, @NotNull ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {

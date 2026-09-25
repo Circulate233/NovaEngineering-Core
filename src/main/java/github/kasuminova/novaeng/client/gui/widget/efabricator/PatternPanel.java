@@ -19,10 +19,10 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFPatternSe
 import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFPatternSearchGUIUpdateEvent;
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorPatternSearchGUIAction;
+import github.kasuminova.novaeng.common.util.BlockPos2ValueMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import mezz.jei.api.search.ISearchIndex;
 import mezz.jei.search.GeneralizedSuffixTree;
@@ -57,7 +57,7 @@ public class PatternPanel extends SizedColumn {
 
     private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§.");
 
-    private final Map<BlockPos, Int2ObjectMap<PatternSlot>> patterns = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<BlockPos, Int2ObjectMap<PatternSlot>> patterns = new BlockPos2ValueMap<>();
     private final InternalColumn internal = new InternalColumn();
     private ISearchIndex<PatternSlot> inputSearchStorage = new GeneralizedSuffixTree<>();
     private ISearchIndex<PatternSlot> outputSearchStorage = new GeneralizedSuffixTree<>();
@@ -96,12 +96,12 @@ public class PatternPanel extends SizedColumn {
 
             final AtomicBoolean somethingRemoved = new AtomicBoolean(fullUpdate);
             final AtomicBoolean rebuildWidget = new AtomicBoolean(fullUpdate);
-            data.patterns().forEach((pos, patternSet) -> {
+            for (final Set<EFabricatorPatternData.PatternData> patternSet : data.patterns().values()) {
                 if (patternSet.isEmpty()) {
-                    return;
+                    continue;
                 }
-
-                patternSet.forEach(pattern -> {
+                for (final EFabricatorPatternData.PatternData pattern : patternSet) {
+                    final BlockPos pos = pattern.pos();
                     final ItemStack patternStack = pattern.pattern();
                     final int slotID = pattern.slot();
                     if (patternStack.isEmpty()) {
@@ -110,7 +110,7 @@ public class PatternPanel extends SizedColumn {
                             somethingRemoved.set(true);
                             rebuildWidget.set(true);
                         }
-                        return;
+                        continue;
                     }
 
                     final Int2ObjectMap<PatternSlot> slotMap = patterns.computeIfAbsent(pos, key -> new Int2ObjectLinkedOpenHashMap<>());
@@ -122,8 +122,8 @@ public class PatternPanel extends SizedColumn {
                     }
 
                     slot.setStackInSlot(patternStack);
-                });
-            });
+                }
+            }
 
             if (fullUpdate || somethingRemoved.get()) {
                 inputSearchStorage = new GeneralizedSuffixTree<>();
@@ -150,20 +150,22 @@ public class PatternPanel extends SizedColumn {
                     }
                 }
             } else {
-                data.patterns().forEach((pos, patternSet) -> {
+                for (final Set<EFabricatorPatternData.PatternData> patternSet : data.patterns().values()) {
                     if (patternSet.isEmpty()) {
-                        return;
+                        continue;
                     }
-
-                    Int2ObjectMap<PatternSlot> slotMap = patterns.get(pos);
-                    patternSet.forEach(pattern -> {
+                    final Int2ObjectMap<PatternSlot> slotMap = patterns.get(patternSet.iterator().next().pos());
+                    if (slotMap == null) {
+                        continue;
+                    }
+                    for (final EFabricatorPatternData.PatternData pattern : patternSet) {
                         PatternSlot changed = slotMap.get(pattern.slot());
                         if (changed == null) {
-                            return;
+                            continue;
                         }
                         ICraftingPatternDetails details = changed.getDetails();
                         if (details == null) {
-                            return;
+                            continue;
                         }
 
                         IAEItemStack[] inputs = details.getCondensedInputs();
@@ -177,8 +179,8 @@ public class PatternPanel extends SizedColumn {
                             String displayName = getClearColorName(primaryOutput);
                             outputSearchStorage.put(displayName.toLowerCase(), changed);
                         }
-                    });
-                });
+                    }
+                }
             }
 
             if (rebuildWidget.get()) {

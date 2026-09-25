@@ -13,6 +13,10 @@ public class NonBlockingHashMapFacade<K, V> extends HashMap<K, V> {
 
     private final NonBlockingHashMap<K, V> delegate = new NonBlockingHashMap<>();
 
+    public NonBlockingHashMapFacade() {
+        super(0);
+    }
+
     @Override
     public V get(final Object key) {
         return this.delegate.get(key);

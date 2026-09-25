@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.gl;
 
-import java.util.ArrayDeque;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Thread-local implementation of {@link GenericAttributeState} using exact raw float bits.
@@ -21,7 +21,7 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
 
     @Override
     public void pushDrawFormat(final boolean colorArrayEnabled, final boolean secondaryUvArrayEnabled) {
-        this.contexts.get().drawFormats.push(new DrawFormat(colorArrayEnabled, secondaryUvArrayEnabled));
+        this.contexts.get().drawFormats.add(new DrawFormat(colorArrayEnabled, secondaryUvArrayEnabled));
     }
 
     @Override
@@ -33,7 +33,7 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
         if (secondaryUvArrayEnabled) {
             context.secondaryUv.known = false;
         }
-        context.drawFormats.pop();
+        context.popDrawFormat();
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
                                      final float w) {
         final ContextState context = this.contexts.get();
         context.color.bindIndex(index);
-        final DrawFormat format = context.drawFormats.peek();
+        final DrawFormat format = context.peekDrawFormat();
         return format == null || !format.colorArrayEnabled && !context.color.matches(x, y, z, w);
     }
 
@@ -56,7 +56,7 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
                                            final float w) {
         final ContextState context = this.contexts.get();
         context.secondaryUv.bindIndex(index);
-        final DrawFormat format = context.drawFormats.peek();
+        final DrawFormat format = context.peekDrawFormat();
         return format == null || !format.secondaryUvArrayEnabled && !context.secondaryUv.matches(x, y, z, w);
     }
 
@@ -109,9 +109,19 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
     private static final class ContextState {
         private final AttributeValue color = new AttributeValue();
         private final AttributeValue secondaryUv = new AttributeValue();
-        private final ArrayDeque<DrawFormat> drawFormats = new ArrayDeque<>();
+        private final ObjectArrayList<DrawFormat> drawFormats = new ObjectArrayList<>();
         private boolean vertexArrayKnown;
         private int vertexArray;
+
+        private DrawFormat peekDrawFormat() {
+            return this.drawFormats.isEmpty() ? null : this.drawFormats.getLast();
+        }
+
+        private void popDrawFormat() {
+            if (!this.drawFormats.isEmpty()) {
+                this.drawFormats.removeLast();
+            }
+        }
     }
 
     private static final class AttributeValue {

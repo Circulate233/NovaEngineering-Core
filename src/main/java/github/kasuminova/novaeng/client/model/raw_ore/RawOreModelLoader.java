@@ -77,6 +77,6 @@ public class RawOreModelLoader implements ICustomModelLoader {
 
     @Override
     public void onResourceManagerReload(@NotNull IResourceManager resourceManager) {
-
+        this.overrideList.clearCache();
     }
 }
