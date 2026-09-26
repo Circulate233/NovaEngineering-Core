@@ -268,7 +268,7 @@ public final class ItemRawOre extends Item {
                 this.setCreativeTab(rawOreTab);
                 this.setTranslationKey(BlockRawOre.this.getTranslationKey());
                 this.setRegistryName(BlockRawOre.this.getRegistryName());
-                OreDictionary.registerOre(BlockRawOre.this.getRawOD(), this);
+                regOres.add(() -> OreDictionary.registerOre(BlockRawOre.this.getRawOD(), this));
             }
 
             public String getPartOD() {

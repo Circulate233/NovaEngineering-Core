@@ -153,8 +153,8 @@ public class RegistryItems {
 
         GenericRegistryPrimer.INSTANCE.fillRegistry(event.getRegistry().getRegistrySuperType(), event.getRegistry());
         RegistryExtended.registerOreDict();
-        for (var regOre : ItemRawOre.regOres) {
-            regOre.run();
+        for (var i = 0; i < ItemRawOre.regOres.size(); i++) {
+            ItemRawOre.regOres.get(i).run();
         }
         ItemRawOre.regOres = null;
     }
