@@ -1,5 +1,5 @@
 {
-    "name": "安装指南",
+    "name": "Installation Manual",
     "icon": "redstonearsenal:tool.wrench_flux",
     "category": "novaeng_core:eco_ae/computatum",
     "sortnum": 0,
@@ -7,21 +7,21 @@
         {
             "type": "1",
             "item": "novaeng_core:extendable_calculator_subsystem_l4",
-            "text": "升级版的合成处理器$(br)模块化设计，不同等级的结构相同，只有部件等级不同，因此安装方法通用。$(br)JEI查询控制器配方，在“结构预览”一栏能看到结构图。$(br)调整至合适大小后点击“投影至世界”。"
+            "text": "Upgraded Crafting Processor$(br)Modular design. Structures of different tiers are identical, only the component tiers differ, so the installation method is universal.$(br)Look up the controller recipe in JEI; you can see the structure diagram in the 'Structure Preview' section.$(br)After adjusting to the appropriate size, click 'Project to World'."
         },
         {
             "type": "image",
             "images": [
                 "novaeng_core:textures/gui/terminalis/eco_ae/manualis.png"
             ],
-            "text": "$(6)注意：最大大小12，大部分方块有方向要求"
+            "text": "$(6)Note: Maximum size is 12, and most blocks have orientation requirements."
         },
         {
             "type": "2_com",
             "item1": "novaeng_core:ecalculator_cell_64m",
-            "text1": "SHIFT右键将CE闪存晶阵放入驱动器",
+            "text1": "SHIFT right-click to insert the CE Flash Crystal Array into the drive.",
             "item2": "novaeng_core:ecalculator_me_channel",
-            "text2": "该方块用于连接AE线缆，使EC如同合成处理器一样接入AE。"
+            "text2": "This block is used to connect AE cables, allowing EC to interface with AE just like a crafting processor."
         }
     ]
 }

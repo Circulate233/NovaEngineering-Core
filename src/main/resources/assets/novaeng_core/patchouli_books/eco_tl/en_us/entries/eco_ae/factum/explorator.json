@@ -1,5 +1,5 @@
 {
-    "name": "放入样板与样板管理器",
+    "name": "Insert the pattern and the pattern manager.",
     "icon": "artisanworktables:artisans_lens_wood",
     "category": "novaeng_core:eco_ae/factum",
     "sortnum": 1,
@@ -12,7 +12,7 @@
         },
         {
             "type": "texttl",
-            "text": "你有三种方法存取样板：$(br)-样板终端点击此按钮，写好的样板会送至样板总线$(br)-在控制器处，点击按钮进入样板管理器，将样板拖入结果框$(br)-手动放至样板总线"
+            "text": "You have three ways to store and retrieve patterns:$(br)-Click this button in the Pattern Terminal, and the written pattern will be sent to the Pattern Bus$(br)-At the controller, click the button to enter the Pattern Manager, and drag the pattern into the result box$(br)-Manually place it into the Pattern Bus"
         },
         {
             "type": "image",
@@ -22,7 +22,7 @@
         },
         {
             "type": "texttl",
-            "text": "样板管理器亦能根据原料与产物搜索对应样板。"
+            "text": "The Pattern Manager can also search for corresponding patterns based on ingredients and products."
         }
     ]
 }
