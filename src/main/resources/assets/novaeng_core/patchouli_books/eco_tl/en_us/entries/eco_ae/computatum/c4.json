@@ -9,11 +9,11 @@
             "item1": "novaeng_core:extendable_calculator_subsystem_l4",
             "item2": "novaeng_core:ecalculator_thread_core_l4",
             "item3": "novaeng_core:ecalculator_parallel_proc_l4",
-            "text": "对应位置安装这套部件，使阵列升级至C4。$(br)每大小提供：$(br)$(a)└ +2晶阵槽位$(br)└ +128并行数$(br)└ +1线程/+2超线程"
+            "text": "Install this set of components in the corresponding positions to upgrade the array to C4. $(br)Each size provides: $(br)$(a)└ +2 crystal array slots$(br)└ +128 parallel count$(br)└ +1 thread/+2 hyper-threading"
         },
         {
             "type": "texttl",
-            "text": "7355608$(br)$()你不知为何想起了这样的数字"
+            "text": "7355608$(br)$()This number appeared in your mind... for some reason"
         }
 
     ]

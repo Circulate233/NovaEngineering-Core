@@ -8,7 +8,7 @@
             "type": "2_ad",
             "item1": "novaeng_core:extendable_fabricator_subsystem_l9",
             "item2": "novaeng_core:efabricator_parallel_proc_l9",
-            "text": "对应位置安装这套部件，使阵列升级至F4。$(br)每大小提供：$(br)$(a)└ +512并行数$(br)└ +144样板位"
+            "text": "对应位置安装这套部件，使阵列升级至F9。$(br)每大小提供：$(br)$(a)└ +512并行数$(br)└ +144样板位"
         },
         {
             "type": "texttl",

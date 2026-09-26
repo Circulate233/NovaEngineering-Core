@@ -1,7 +1,7 @@
 {
-	"name": "§6ECO_Tl终端",
-	"subtitle": "试验性教学设备",
-	"landing_text": "用于指导某些机器的搭建与使用",
+	"name": "§6ECO_Tl终端 / ECO_Tl Terminal",
+	"subtitle": "试验性教学设备 / Experimental Tutorial Device",
+	"landing_text": "用于指导某些机器的搭建与使用 / Guide for some machines",
 	"version": 0,
 	"pause_game": true,
 	"book_texture": "novaeng_core:textures/gui/terminalis/facies.png",

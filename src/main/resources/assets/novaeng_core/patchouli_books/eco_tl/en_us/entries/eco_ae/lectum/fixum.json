@@ -1,5 +1,5 @@
 {
-    "name": "安装指南",
+    "name": "Installation Manual",
     "icon": "redstonearsenal:tool.wrench_flux",
     "category": "novaeng_core:eco_ae/lectum",
     "sortnum": 0,
@@ -7,28 +7,28 @@
         {
             "type": "1",
             "item": "novaeng_core:extendable_digital_storage_subsystem_l4",
-            "text": "升级版的驱动器，只能使用容量极高的专用存储矩阵。$(br)模块化设计，不同等级的结构相同，只有部件等级不同，因此安装方法通用。$(br)JEI查询控制器配方，在“结构预览”一栏能看到结构图。$(br)调整至合适大小后点击“投影至世界”。"
+            "text": "Upgraded Crafting Processor$(br)Modular design. Structures of different tiers are identical, only the component tiers differ, so the installation method is universal.$(br)Look up the controller recipe in JEI; you can see the structure diagram in the 'Structure Preview' section.$(br)After adjusting to the appropriate size, click 'Project to World'."
         },
         {
             "type": "image",
             "images": [
                 "novaeng_core:textures/gui/terminalis/eco_ae/manualis.png"
             ],
-            "text": "$(6)注意：大小上限为12，大部分方块有方向要求"
+            "text": "$(6)Note: Maximum size is 12, and most blocks have orientation requirements."
         },
         {
             "type": "2_com",
             "item1": "novaeng_core:estorage_cell_drive",
-            "text1": "搭建完成后，手持存储矩阵，SHIFT右键LD以安装",
+            "text1": "After construction is complete, hold the Storage Matrix and SHIFT right-click the LD to install it.",
             "item2": "novaeng_core:estorage_me_channel",
-            "text2": "该方块用于连接AE线缆，使EL如同驱动器一样接入AE。"
+            "text2": "This block is used to connect AE cables, allowing EL to interface with AE just like a drive."
         },
         {
             "type": "image",
             "images":[
                 "novaeng_core:textures/gui/terminalis/eco_ae/manualis_lecti.png"
             ],
-            "text": "上：空的驱动器（左）和安装元件后（右）$(br)下：连接线缆的LC"
+            "text": "Top: empty drive (left) and after installing components (right)$(br)Bottom: LC connected to cables"
         }
     ]
 }
