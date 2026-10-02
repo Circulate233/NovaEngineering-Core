@@ -109,7 +109,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeThermalTransposerRecipes")
-        @Config.Comment("Skip Thermal Expansion's JEI transposer fill and extract recipe generation.")
+        @Config.Comment("Thermal Expansion's transposer JEI pages add one auto-generated entry per fluid container item in the pack (pour into it / drain it), and the drain probe behind those rows is the expensive half of its JEI setup. Skip that per-container scan only; the machine's own registered recipes and its JEI catalyst entry stay.")
         public boolean optimizeThermalTransposerRecipes = true;
 
         @Config.RequiresMcRestart
@@ -152,85 +152,124 @@ public class NovaEngCoreConfig {
         @Config.Comment("Suppress proven redundant VAO binds with raw-path invalidation.")
         public boolean optimizeVaoBindings = true;
 
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeReusableVBOUploader")
-        @Config.Comment("Upload only finished MMCE vertex bytes when a reusable client-array buffer has excess capacity.")
-        public boolean optimizeReusableVBOUploader = true;
+        @Config.Name("OptimizeTesrRenderDistance")
+        @Config.Comment("Skip a tile entity renderer once its whole render volume sits further away than TesrRenderDistance. Render volumes larger than two chunks and infinite bounding boxes are never skipped.")
+        public boolean optimizeTesrRenderDistance = true;
+
+        @Config.Name("TesrRenderDistance")
+        @Config.Comment("Block distance past which a tile entity renderer is skipped. 0 disables the check.")
+        @Config.RangeInt(min = 0, max = 512)
+        public int tesrRenderDistance = 64;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeClientBiomeLookup")
-        @Config.Comment("Resolve client biome lookups with one chunk query instead of a residency check plus another lookup.")
-        public boolean optimizeClientBiomeLookup = true;
+        @Config.Name("OptimizeTesrFrustumCulling")
+        @Config.Comment("Cull tile entity renderers whose render volume lies entirely outside the view frustum. The renderer only culls whole chunks, so a renderer in a visible chunk but behind the camera is drawn in full; nothing it draws can reach the screen.")
+        public boolean optimizeTesrFrustumCulling = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeClientChunkLookup")
-        @Config.Comment("Resolve client chunks with one primitive-map lookup and without a null wrapper allocation.")
-        public boolean optimizeClientChunkLookup = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeNae2BeamCube")
-        @Config.Comment("Build NAE2 beam cube faces without repeating set membership checks or color unpacking.")
-        public boolean optimizeNae2BeamCube = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeClientChunkPresence")
-        @Config.Comment("Test client chunk presence with one loaded-chunk map query.")
-        public boolean optimizeClientChunkPresence = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeTextureBind")
-        @Config.Comment("Use fastutil maps in TextureManager and skip consecutive identical binds.")
-        public boolean optimizeTextureBind = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeItemLightingBuffers")
-        @Config.Comment("Reuse constant item-lighting float buffers instead of rewriting one shared buffer.")
-        public boolean optimizeItemLightingBuffers = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeTesrRendererLookup")
-        @Config.Comment("Use a reference-equality map for TESR class-to-renderer lookup.")
-        public boolean optimizeTesrRendererLookup = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeBufferBuilderEndian")
-        @Config.Comment("Reuse process endianness for packed BufferBuilder color writes.")
-        public boolean optimizeBufferBuilderEndian = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeEntityDataMaps")
-        @Config.Comment("Use primitive and reference fastutil maps for entity data manager lookups.")
-        public boolean optimizeEntityDataMaps = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeItemModelMaps")
-        @Config.Comment("Use primitive and reference fastutil maps for item model mesher lookups.")
-        public boolean optimizeItemModelMaps = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeTrsrCenterCache")
-        @Config.Comment("Cache TRSR corner-to-center conversions on the source transform instance.")
-        public boolean optimizeTrsrCenterCache = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeClientFastutilMaps")
-        @Config.Comment("Replace remaining client HashMaps for entity renderers, texture atlases, and item tool classes with fastutil maps.")
-        public boolean optimizeClientFastutilMaps = true;
+        @Config.Name("OptimizeDraconicModelGeometry")
+        @Config.Comment("The draconic reactor core and chaos stabiliser core draw one CodeChicken Lib model every frame with a spin transform as their only operation, and the library applies it to every vertex while writing them. Move the transform to the GL matrix and remember the vertices, so a frame costs one addVertexData per vertex instead of the library's per-vertex pipeline. The shaders these renderers use read the standard matrices and follow on their own.")
+        public boolean optimizeDraconicModelGeometry = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeInventoryTickWork")
-        @Config.Comment("Defer the inventory_changed trigger to one pass per tick (a criterion satisfied only for part of one tick is no longer granted) and skip the per-tick map walk while the player holds none.")
+        @Config.Comment("Coalesce inventory_changed checks caused by main-inventory slot updates into one evaluation at the end of the player tick. Criteria are evaluated against the final inventory state of that tick.")
         public boolean optimizeInventoryTickWork = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeIntHashMap")
-        @Config.Comment("Replace vanilla IntHashMap chaining with a primitive fastutil map. Applies on both sides.")
-        public boolean optimizeIntHashMap = true;
+        @Config.Name("OptimizeVintageFixJarCache")
+        @Config.Comment("Let VintageFix read back its jar discovery cache by giving its serializer the constructorless instantiator it needs. Applies on both sides.")
+        public boolean optimizeVintageFixJarCache = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeItemOverrideList")
-        @Config.Comment("Skip empty item-override matching and reuse the immutable override list.")
-        public boolean optimizeItemOverrideList = true;
+        @Config.Name("OptimizeNonNullListClear")
+        @Config.Comment("Clear a NonNullList through its delegate instead of removing every entry one at a time. Applies on both sides.")
+        public boolean optimizeNonNullListClear = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiAsyncSearchIndex")
+        @Config.Comment("Build the JEI default and tooltip search indexes on HEI's background worker instead of on the loading thread, which shortens start-up by roughly two seconds. Disable if a mod misbehaves when its tooltip code runs off-thread.")
+        public boolean optimizeJeiAsyncSearchIndex = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiStackUidCache")
+        @Config.Comment("Let JEI reuse stack unique identifiers by stack content instead of by instance identity, so repeated ingredients stop being re-identified from scratch.")
+        public boolean optimizeJeiStackUidCache = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiItemList")
+        @Config.Comment("Fill the creative tabs of JEI's item list concurrently instead of one after another. Each tab walks the whole item registry on its own, so this is the bulk of the item list build. Disable if a mod misbehaves when its creative tab code runs on another thread.")
+        public boolean optimizeJeiItemList = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCustomLoadingScreen")
+        @Config.Comment("Skip the second of the two back-to-back resource reloads Custom Loading Screen performs while constructing its renderer; the first one already refreshed every resource pack.")
+        public boolean optimizeCustomLoadingScreen = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeLibrarianLibFieldScan")
+        @Config.Comment("Skip the kotlin-reflect property walk LibrarianLib performs on every registered class while building its save field cache, for classes that were not compiled by Kotlin and therefore have no Kotlin properties.")
+        public boolean optimizeLibrarianLibFieldScan = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCodeChickenBlockstateScan")
+        @Config.Comment("Answer CodeChicken Lib's per-block blockstate existence probes from StellarCore's classpath asset index instead of walking every resource pack and throwing a FileNotFoundException for each miss.")
+        public boolean optimizeCodeChickenBlockstateScan = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCodeChickenErrorStateLog")
+        @Config.Comment("CodeChicken Lib logs a FATAL per tick whenever it bakes a block state that declares ModelErrorStateProperty.ERROR_STATE without a value, which is the normal state of every block state that has not been through ModelBakery.handleExtendedState yet; JourneyMap's worker threads hit it on every block they visit. Report it once per game session instead, and keep the model unrendered as before.")
+        public boolean optimizeCodeChickenErrorStateLog = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapBlockSprites")
+        @Config.Comment("JourneyMap re-reads the raw block state and bakes it straight from the chunk, which no CodeChicken Lib bakery can bake: the sprite map and the model error state only exist after ModelBakery.handleExtendedState ran. Resolve block sprites from the block's own extended state instead, so blocks baked by CodeChicken Lib (Thermal Expansion and Thermal Dynamics) show their sprites on the map instead of showing nothing.")
+        public boolean optimizeJourneymapBlockSprites = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapChunkDrain")
+        @Config.Comment("JourneyMap writes its pending chunks back by rebuilding the pending map's iterator on every loop iteration, so draining N chunks allocates N iterators for a map that only ever needs one. Walk it once and remove through the iterator instead.")
+        public boolean optimizeJourneymapChunkDrain = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapChunkBuffer")
+        @Config.Comment("JourneyMap serialises each chunk into a ByteArrayOutputStream that starts at 8 KB and doubles from there, copying the whole buffer on every growth, and throws the stream away once the bytes have been copied out of it. Serve each write from a per-thread buffer that is reset and reused instead, so the stream and its array are allocated once per writing thread rather than once per chunk.")
+        public boolean optimizeJourneymapChunkBuffer = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapSpriteDedupe")
+        @Config.Comment("JourneyMap's sprite pass builds a HashSet and an ArrayList per block purely to drop duplicate quads before reading their sprites, and discards both when the loop ends. Hand both out from a thread local and clear them for the next call instead, so colouring a chunk allocates two containers rather than two per block.")
+        public boolean optimizeJourneymapSpriteDedupe = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeChiselCtmConnectionOffsets")
+        @Config.Comment("Chisel's CTM resolves the neighbouring block of a face through Dir.applyConnection, which is pos.add(offset), and CTMLogic.buildConnectionMap asks all eight directions of that face - each one with the same position and facing, so each one computing the same neighbour and allocating a BlockPos for it. Remember the last answer per thread so the repeat asks reuse it. While sections are being meshed this was the largest single allocation site in the client, about 30% of everything allocated.")
+        public boolean optimizeChiselCtmConnectionOffsets = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEntityLookupIteration")
+        @Config.Comment("ClassInheritanceMultiMap.getByClass returns an anonymous Iterable whose iterator() takes an iterator from the section's list and wraps it in a filter - three throwaway objects per call, on the path every World.getEntitiesWithinAABB takes. Walk the list by index with the same isInstance test instead, which allocates one object instead of three. This is an overwrite with no runtime fallback, so the setting only takes effect when the mixin is applied.")
+        public boolean optimizeEntityLookupIteration = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMekanismObjQuads")
+        @Config.Comment("Mekanism's OBJ transmitter model cannot answer for the block states JourneyMap asks it about: it keys its cache on unlisted properties, which a state read straight out of the chunk does not carry, so the lookup throws inside its own try block and every call rebuilds every vertex, UV, normal and float array from scratch. Remember the quads it produced for a state instance instead. The list is handed out unchanged, keyed by the state, the render layer and the model.")
+        public boolean optimizeMekanismObjQuads = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeResourceLocationStableValue")
+        @Config.Comment("Serve ResourceLocation.toString() and hashCode() from one lazily built stable string instead of concatenating (and re-hashing) namespace and path on every call. Costs one extra reference per instance and keeps one string per location alive; disable to restore the vanilla behaviour.")
+        public boolean optimizeResourceLocationStableValue = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMekanismModuleLookup")
+        @Config.Comment("Remember the module list Mekanism deserialises for an item stack instead of rebuilding it on every lookup. The MekaSuit armour asks for the modules of its own stack whenever attribute modifiers are recalculated, and each ask re-read the modules NBT and reconstructed every module. The cached list is invalidated by the stack's tag hash, so installing or removing a module is picked up.")
+        public boolean optimizeMekanismModuleLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeKonkreteLocalsCopy")
+        @Config.Comment("Konkrete unpacks each bundled localisation file into a String before writing it out, concatenating one line at a time, which copies the whole file again on every line and then once more on write. Write each line through as it is read instead: same bytes, one pass. FancyMenu runs this for every translation during client setup.")
+        public boolean optimizeKonkreteLocalsCopy = true;
 
     }
 
@@ -247,6 +286,51 @@ public class NovaEngCoreConfig {
         @Config.RequiresMcRestart
         @Config.Name("bot")
         public boolean bot = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeDECoreHatchScan")
+        @Config.Comment("Bind Modular Machinery energy hatches to Draconic Evolution energy cores from Circulation Networks block entity lifecycle events instead of rescanning a cube around every hatch on a timer.")
+        public boolean optimizeDECoreHatchScan = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeStructureLookup")
+        @Config.Comment("Walk the known structure starts of a map generator from a cached array instead of probing its open hash map on every position query.")
+        public boolean optimizeStructureLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAe2ItemListCapacity")
+        @Config.Comment("Start an AE2 item list with the capacity of the largest list seen so far instead of growing it from the default capacity, which removes a chain of rehashes from every item list built for a crafting job.")
+        public boolean optimizeAe2ItemListCapacity = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeBiomeIdLookup")
+        @Config.Comment("Resolve a biome from a copied id table. A registry keeps its ids in a Guava HashBiMap, so asking it for a biome by id boxes the id and walks a hash bucket, and Forge's wrapper never fills the vanilla array that would answer that in one step; a world generator asks for a biome by id for every chunk it decorates. The table is dropped whenever the registry rewrites its id mapping, including the renumbering done when a world is loaded. Applies on both sides.")
+        public boolean optimizeBiomeIdLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeForgeEventDispatch")
+        @Config.Comment("Dispatch an event that cannot be canceled without asking every listener whether the event was canceled, which is two virtual calls per listener per post on a call site shared by every event type. Applies on both sides.")
+        public boolean optimizeForgeEventDispatch = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMekanismNetworkTargets")
+        @Config.Comment("Hand the per-acceptor targets of a Mekanism energy network out again instead of allocating one per acceptor on every tick, which also removes the two enum maps each target builds. Applies on both sides.")
+        public boolean optimizeMekanismNetworkTargets = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeChunkPaletteGrowth")
+        @Config.Comment("Grow a chunk section's block state palette by two bits per overflow instead of one, which halves how often the section's 4096 entries have to be rebuilt through a fresh palette while the section is read from NBT.")
+        public boolean optimizeChunkPaletteGrowth = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeUniversalTweaksEntityBlacklist")
+        @Config.Comment("Remember Universal Tweaks' entity desync blacklist decision per entity type instead of rescanning the list for every entity and every tracked entry. Applies on both sides.")
+        public boolean optimizeUniversalTweaksEntityBlacklist = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("GuardForgeNetworkReplyTarget")
+        @Config.Comment("Forge keeps the send target of a packet in a channel attribute instead of on the packet, and OutboundTarget.REPLY - the target used to send a reply back to where it came from - resolves it as ImmutableList.of(packet.getDispatcher()) without the null check that PLAYER and TOSERVER have in the same enum. When another send on that channel, a reply in the case seen here, takes the attribute between the set and the outbound handler's read, a broadcast is dispatched as REPLY; its packet was built by the codec and has no dispatcher, so the NullPointerException that follows is caught by FMLProxyPacket.processPacket, which answers with rejectHandshake(\"A fatal error has occurred, this connection is terminated\") and drops the player out of the world. Drop such a packet silently instead - it could not be delivered under that target anyway. Applies on both sides.")
+        public boolean guardForgeNetworkReplyTarget = true;
     }
 
     public static class MachineAssemblyTool {

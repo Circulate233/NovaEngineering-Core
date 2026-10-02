@@ -1,27 +1,41 @@
 package github.kasuminova.novaeng.mixin.cofh;
 
 import cofh.thermalexpansion.plugins.jei.machine.transposer.TransposerRecipeCategoryFill;
-import mezz.jei.api.IModRegistry;
+import mezz.jei.api.ingredients.IIngredientRegistry;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Removes the transposer's JEI fill (bucket filling) recipe registration.
+ * Stops the transposer's JEI fill category from synthesising an entry per fluid container item.
  *
- * <p>Whether this replaces the method at all is decided by the {@code OptimizeThermalTransposerRecipes} switch
- * before the mixin is applied, so the body is the permanent replacement rather than a conditional skip.</p>
+ * <p>After handing out the machine's registered recipes, {@code getRecipes} walks every item stack JEI knows about
+ * and, for each one carrying the fluid handler item capability, runs the fill probe and adds a container display
+ * for pouring that fluid into it. One row per bucket, tank and cell across the whole pack - generated display
+ * entries, not recipes.</p>
+ *
+ * <p>The ingredient scan is answered with an empty list, so the loop turns idle and none of those wrappers are
+ * built or probed; everything the category registers besides them - the machine's own recipes and its catalyst
+ * entry - passes through the original code untouched.</p>
  */
 @Mixin(value = TransposerRecipeCategoryFill.class, remap = false)
 public class MixinTransposerRecipeCategoryFill {
 
-    /**
-     * @author circulation
-     * @reason The category derives one entry per container and fluid pair; when this mixin is applied the setup
-     *         is meant to be skipped entirely. Mixin application is already gated by the same switch.
-     */
-    @Overwrite(remap = false)
-    public static void initialize(final IModRegistry registry) {
-        // Registration is intentionally dropped.
+    @Redirect(
+        method = "getRecipes",
+        at = @At(value = "INVOKE",
+            target = "Lmezz/jei/api/ingredients/IIngredientRegistry;getIngredients(Ljava/lang/Class;)Ljava/util/List;"),
+        remap = false,
+        require = 1
+    )
+    private static List<ItemStack> nova$skipContainerScan(final IIngredientRegistry registry, final Class<ItemStack> type) {
+        if (type != ItemStack.class) {
+            return registry.getIngredients(type);
+        }
+        return Collections.emptyList();
     }
-
 }

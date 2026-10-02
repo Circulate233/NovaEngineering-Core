@@ -26,13 +26,22 @@ public abstract class MixinTileMultiblockMachineController extends TileEntity {
     @Shadow(remap = false)
     public abstract TileMultiblockMachineController getController();
 
+    @Unique
+    private DynamicMachine novaeng$specialKey;
+
+    @Unique
+    private int novaeng$specialVersion = -1;
+
+    @Unique
+    private MachineSpecial novaeng$special;
+
     @Inject(method = "doRestrictedTick", at = @At("HEAD"), remap = false, cancellable = true)
     private void injectUpdate(final CallbackInfo ci) {
         DynamicMachine foundMachine = getFoundMachine();
         if (foundMachine == null) {
             return;
         }
-        MachineSpecial specialMachine = RegistryMachineSpecial.getSpecialMachine(foundMachine.getRegistryName());
+        MachineSpecial specialMachine = novaeng$resolveSpecial(foundMachine);
 
         boolean client = getWorld().isRemote;
         if (client) {
@@ -46,6 +55,23 @@ public abstract class MixinTileMultiblockMachineController extends TileEntity {
                 specialMachine.onSyncTick(getController());
             }
         }
+    }
+
+    /**
+     * The machine of a controller only changes when its structure is re-checked, so the registry
+     * lookup is remembered until either that machine or the registry itself changes.
+     */
+    @Unique
+    private MachineSpecial novaeng$resolveSpecial(final DynamicMachine machine) {
+        final int version = RegistryMachineSpecial.version();
+        if (machine == this.novaeng$specialKey && version == this.novaeng$specialVersion) {
+            return this.novaeng$special;
+        }
+        final MachineSpecial resolved = RegistryMachineSpecial.getSpecialMachine(machine.getRegistryName());
+        this.novaeng$specialKey = machine;
+        this.novaeng$specialVersion = version;
+        this.novaeng$special = resolved;
+        return resolved;
     }
 
     @Inject(method = "resetMachine", at = @At("HEAD"), remap = false)

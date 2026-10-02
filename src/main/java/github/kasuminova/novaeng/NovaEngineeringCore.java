@@ -4,6 +4,7 @@ import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
+import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
@@ -27,6 +28,8 @@ import github.kasuminova.novaeng.common.network.PktTerminalGuiData;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
+import github.kasuminova.novaeng.common.util.MixinDecisions;
+import github.kasuminova.novaeng.common.util.NovaBiomeIdCache;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
@@ -116,6 +119,10 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
         proxy.preInit();
+
+        if (MixinDecisions.deCoreBindingEnabled()) {
+            DECoreBindingIndex.register();
+        }
     }
 
     @Mod.EventHandler
@@ -136,6 +143,9 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
+        // A loaded world renumbers the registry ids it was written with, so a biome table built
+        // before this point describes the wrong world.
+        NovaBiomeIdCache.invalidate();
         event.registerServerCommand(CommandSPacketProfiler.INSTANCE);
         event.registerServerCommand(CommandBuilder.INSTANCE);
         WorldLoadedHandler.REGISTERED_DIMENSIONS.clear();

@@ -73,7 +73,7 @@ dependencies {
     modImplementation 'curse.maven:RandomTweaker-514170:5528753'
     modImplementation 'curse.maven:jetif-303122:2919936'
     modImplementation 'curse.maven:ctm-267602:2915363'
-    modImplementation 'curse.maven:had-enough-items-557549:8934963'
+    modImplementation 'mezz:jei:4.35.0'
     modImplementation 'curse.maven:the-one-probe-245211:2667280'
     modImplementation 'curse.maven:FTB-Library-237167:2985811'
     modImplementation 'curse.maven:FTBU-237102:3157548'
@@ -141,6 +141,7 @@ dependencies {
     modImplementation 'curse.maven:packagedastral-811828:7063119'
     modImplementation 'io.github.chaosunity.forgelin:Forgelin-Continuous:2.2.20.0'
     runtimeOnly 'org.jetbrains.kotlin:kotlin-reflect:2.2.20'
+    compileOnly 'org.jetbrains.kotlin:kotlin-reflect:2.2.20'
     modImplementation("curse.maven:alfheim-lighting-engine-910715:6687458")
     modImplementation("curse.maven:red-core-873867:6147102")
     modImplementation("curse.maven:stellarcore-1064321:8849440")
@@ -151,4 +152,6 @@ dependencies {
     modCompileOnly("curse.maven:chisel-235279:2915375")
     modCompileOnly 'curse.maven:librarianlib-continuous-1058274:6617935'
     modCompileOnly 'curse.maven:contenttweaker-237065:3331364'
+    modCompileOnly 'curse.maven:vintagefix-871198:8895999'
+    modCompileOnly 'curse.maven:universal-tweaks-705000:5138787'
 }

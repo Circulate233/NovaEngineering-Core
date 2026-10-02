@@ -13,14 +13,22 @@ public class RegistryMachineSpecial {
 
     private static final Map<ResourceLocation, MachineSpecial> MACHINE_SPECIAL_REGISTRY = new Object2ObjectOpenHashMap<>();
 
+    /** Bumped on every registration so callers caching a lookup can tell whether it is still valid. */
+    private static volatile int version;
+
     public static void registrySpecialMachine(final MachineSpecial machineSpecial) {
         Preconditions.checkNotNull(machineSpecial);
         MACHINE_SPECIAL_REGISTRY.put(machineSpecial.getRegistryName(), machineSpecial);
+        version++;
     }
 
     @Nullable
     public static MachineSpecial getSpecialMachine(final ResourceLocation registryName) {
         return MACHINE_SPECIAL_REGISTRY.get(registryName);
+    }
+
+    public static int version() {
+        return version;
     }
 
     public static Map<ResourceLocation, MachineSpecial> getSpecialMachineRegistry() {

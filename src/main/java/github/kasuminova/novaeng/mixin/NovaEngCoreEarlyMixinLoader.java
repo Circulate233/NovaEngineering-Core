@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.mixin;
 
+import com.cleanroommc.discovery.CleanroomModDiscoverer;
+import github.kasuminova.novaeng.common.util.VintageFixJarCacheFix;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +32,9 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(final Map<String, Object> data) {
-
+        // Runs before VintageFix's tweak loads and deserializes its jar discovery cache.
+        if ( CleanroomModDiscoverer.instance().isModPresent("vintagefix"))
+            VintageFixJarCacheFix.apply();
     }
 
     @Override
