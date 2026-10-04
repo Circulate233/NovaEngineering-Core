@@ -148,7 +148,7 @@ dependencies {
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
     modImplementation("curse.maven:journeymap-32274:8923612")
     modImplementation("curse.maven:ender-utilities-224320:2977010")
-    modCompileOnly("curse.maven:actinium-1650442:8910637")
+    modCompileOnly("curse.maven:actinium-1650442:9041604")
     modCompileOnly("curse.maven:chisel-235279:2915375")
     modCompileOnly 'curse.maven:librarianlib-continuous-1058274:6617935'
     modCompileOnly 'curse.maven:contenttweaker-237065:3331364'

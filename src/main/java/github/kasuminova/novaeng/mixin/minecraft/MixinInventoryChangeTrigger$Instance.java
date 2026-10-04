@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+import java.util.Arrays;
+
 /**
  * Rewrites the inventory_changed criterion evaluation so it stops doing work it cannot need.
  *
@@ -58,6 +60,17 @@ public class MixinInventoryChangeTrigger$Instance {
     private int[] nova$anyItem;
 
     /**
+     * Scratch bitmap reused across evaluations.
+     *
+     * <p>Every evaluation needs the same "all predicates still unmatched" bitmap, sized by the predicate count. The
+     * criterion is evaluated on the server thread only - {@code Listeners.trigger} walks its listeners in a plain loop
+     * - so one buffer per instance is safe, and its length is keyed to the predicate array the instance was built
+     * with, which never changes.</p>
+     */
+    @Unique
+    private long[] nova$unmatchedScratch;
+
+    /**
      * @author circulation
      * @reason Test only the predicates that can match the slot's item, through a bitmap of unmatched predicates, and
      * skip counting that no bound consumes.
@@ -78,10 +91,13 @@ public class MixinInventoryChangeTrigger$Instance {
         final int[] anyItem = this.nova$anyItem;
 
         final int wordCount = (predicateCount + Long.SIZE - 1) / Long.SIZE;
-        final long[] unmatched = new long[wordCount];
-        for (int word = 0; word < wordCount; word++) {
-            unmatched[word] = -1L;
+        long[] unmatched = this.nova$unmatchedScratch;
+        if (unmatched == null || unmatched.length != wordCount) {
+            unmatched = new long[wordCount];
+            this.nova$unmatchedScratch = unmatched;
         }
+        Arrays.fill(unmatched, -1L);
+
         final int bitsInLastWord = predicateCount & (Long.SIZE - 1);
         if (bitsInLastWord != 0) {
             unmatched[wordCount - 1] = (1L << bitsInLastWord) - 1L;

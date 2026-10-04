@@ -131,6 +131,8 @@ public final class MixinDecisions {
             case "astralsorcery.MixinTexturePreloader",
                  "astralsorcery.MixinBindableResourceLazyAllocation" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryTexturePreload;
             case "astralsorcery.MixinAstralSorceryConfig" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryConfigSave;
+            case "astralsorcery.MixinTileAccelerationBlacklist" ->
+                NovaEngCoreConfig.SERVER.optimizeHorologiumAccelerationBlacklist;
             case "enderio.MixinRecipeFactoryXmlInputFactory" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoXmlFactory;
             case "botania.MixinRenderTileTinyPotatoLazyCosmetics" -> NovaEngCoreConfig.CLIENT.optimizeBotaniaTinyPotato;
             case "bibliocraft.MixinPaintingUtil" -> NovaEngCoreConfig.CLIENT.optimizeBiblioCraftPaintingCache;
@@ -199,6 +201,8 @@ public final class MixinDecisions {
                     && NovaEngCoreConfig.CLIENT.optimizeDraconicModelGeometry;
             case "minecraft.forge.MixinASMEventHandler",
                  "minecraft.forge.MixinEventBusPost" -> NovaEngCoreConfig.SERVER.optimizeForgeEventDispatch;
+            case "minecraft.MixinWorldEntitySpawner" ->
+                NovaEngCoreConfig.SERVER.optimizeSpawnListResolution;
             case "minecraft.forge.MixinFMLOutboundHandlerReply" ->
                 NovaEngCoreConfig.SERVER.guardForgeNetworkReplyTarget;
             case "mekanism.MixinEnergyNetworkTargetPool",

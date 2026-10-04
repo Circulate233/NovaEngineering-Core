@@ -309,8 +309,18 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeForgeEventDispatch")
-        @Config.Comment("Dispatch an event that cannot be canceled without asking every listener whether the event was canceled, which is two virtual calls per listener per post on a call site shared by every event type. Applies on both sides.")
+        @Config.Comment("Replace EventBus#post so an event that cannot be canceled dispatches without asking every listener whether the event was canceled, and without allocating a callback handle per post; the generic-event filter is still applied. Applies on both sides.")
         public boolean optimizeForgeEventDispatch = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeSpawnListResolution")
+        @Config.Comment("A spawn attempt resolves the same position's spawn list twice, once to pick a candidate and once to check that candidate. Reuse the first result for the second check, which removes a biome lookup and a PotentialSpawns event per attempt; the memo is dropped as soon as the position or creature type changes. Applies on both sides.")
+        public boolean optimizeSpawnListResolution = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeHorologiumAccelerationBlacklist")
+        @Config.Comment("Astral Sorcery's Horologium effect asks whether a tile may be accelerated for every candidate it probes and every element it accelerates, and each ask lower-cases the tile class name and walks the blacklist. Answer per tile class instead, dropping the memo whenever a blacklist list grows. Applies on both sides.")
+        public boolean optimizeHorologiumAccelerationBlacklist = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeMekanismNetworkTargets")
