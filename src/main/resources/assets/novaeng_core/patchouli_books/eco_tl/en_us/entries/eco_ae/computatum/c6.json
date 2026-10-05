@@ -9,7 +9,7 @@
             "item1": "novaeng_core:extendable_calculator_subsystem_l6",
             "item2": "novaeng_core:ecalculator_thread_core_l6",
             "item3": "novaeng_core:ecalculator_parallel_proc_l6",
-            "text": "对应位置安装这套部件，使阵列升级至C6。$(br)每大小提供：$(br)$(a)└ +2晶阵槽位$(br)└ +384并行数$(br)└ +2线程/+4超线程"
+            "text": "Install this set of components in the corresponding positions to upgrade the array to C6. $(br)Each size provides: $(br)$(a)└ +2 crystal array slots$(br)└ +384 parallel count$(br)└ +2 threads/+4 hyper-threading"
         }
     ]
 }

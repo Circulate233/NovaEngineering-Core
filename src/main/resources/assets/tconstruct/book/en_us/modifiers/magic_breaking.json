@@ -2,12 +2,12 @@
   "modifier": "magic_breaking",
   "text": [
     {
-      "text": "你的伤害总能穿透一切防御"
+      "text": "Your damage can always penetrate all defenses."
     }
   ],
   "effects": [
-    "使得武器具有破魔性",
-    "只需要强化一次"
+    "Grants the weapon anti-magic properties,"
+    "Only needs to be upgraded once"
   ],
   "demoTool": [
     "tconstruct:broadsword"

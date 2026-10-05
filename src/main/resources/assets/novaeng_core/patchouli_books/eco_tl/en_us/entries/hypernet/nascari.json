@@ -1,5 +1,5 @@
 {
-    "name": "算力生产",
+    "name": "Computing Power Production",
     "icon": "contenttweaker:hypernet_cpu_t1",
     "category": "novaeng_core:hypernet",
     "sortnum": 1,
@@ -7,25 +7,25 @@
         {
             "type": "2_com",
             "item1": "modularmachinery:data_processor_t1_factory_controller",
-            "text1": "算力由计算机提供，计算机会按需调节耗能。",
+            "text1": "Computing power is provided by computers, and computers will adjust energy consumption on demand.",
             "item2": "modularmachinery:blockupgradebus",
-            "text2": "模块总线用于安装硬件，高等级有更多槽位。"
+            "text2": "The Module Bus is used to install hardware. Higher tiers have more slots."
         },
         {
             "type": "texttl",
-            "text": "每T算力会产生2HU热量，但每台计算机的散热有限，超过上限会积累热量导致无法运行。$(br)2级及以上计算机可以使用碎冰、液氮或极寒之凛冰辅助冷却，但仍然有上限。$(br)因此每台计算机能承担的最高算力：$(a)20T（1级）$(9)2P（2级）$(d)24P（3级）$(c)700P（4级）"
+            "text": "Every 1T of computing power generates 2HU of heat, but each computer's heat dissipation is limited. Exceeding the limit will cause heat to accumulate and prevent it from operating.$(br)Tier 2 and above computers can use crushed ice, liquid nitrogen, or Frigid Cryotheum for auxiliary cooling, but there is still a limit.$(br)Therefore, the maximum computing power each computer can handle:$(a)20T (Tier 1) $(9)2P (Tier 2) $(d)24P (Tier 3) $(c)700P (Tier 4)"
         },
         {
             "type": "2_com",
             "item1": "contenttweaker:hypernet_cpu_t1",
-            "text1": "CPU生产算力，工作时会消耗耐久，耗尽后不产生算力。$(br)提供算力：$(br)$(a)1T（1级）$(9)5T（2级）$(br)$(d)60T（3级）$(c)675T（4级）",
+            "text1": "CPUs produce computing power and consume durability while working. Once depleted, they no longer produce computing power.$(br)Computing power provided:$(br)$(a)1T (Tier 1) $(9)5T (Tier 2)$(br)$(d)60T (Tier 3) $(c)675T (Tier 4)",
             "item2": "contenttweaker:hypernet_gpu_t1",
-            "text2": "GPU提供远多于CPU的算力，但合成需要高一级的CPU，且耐久低于同级CPU。$(br)提供算力：$(br)$(a)25T（1级）$(9)375T（2级）$(br)$(d)5P（3级）$(d)700P（核心）"
+            "text2": "GPUs provide far more computing power than CPUs, but crafting them requires a CPU one tier higher, and their durability is lower than that of CPUs of the same tier.$(br)Computing power provided:$(br)$(a)25T (Tier 1) $(9)375T (Tier 2)$(br)$(d)5P (Tier 3) $(d)700P (Core)"
         },
         {
             "type": "1",
             "item": "contenttweaker:hypernet_ram_t1",
-            "text": "内存条提供本机算力上限，没有内存条的计算机无法提供算力。同样有耐久。$(br)算力上限：$(br)$(a)2T（1级）$(br)$(9)10T（2级）$(br)$(d)125T（3级）$(br)$(6)1.2P（4级）$(br)$(c)12.5P（5级）$(d)700P（核心）"
+            "text": "RAM sticks provide the local computing power limit. A computer without RAM sticks cannot provide computing power. They also have durability.$(br)Computing power limit:$(br)$(a)2T (Tier 1)$(br)$(9)10T (Tier 2)$(br)$(d)125T (Tier 3)$(br)$(6)1.2P (Tier 4)$(br)$(c)12.5P (Tier 5) $(d)700P (Core)"
         }
     ]
 }

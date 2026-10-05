@@ -1,5 +1,5 @@
 {
-    "name": "科研项目",
+    "name": "Research Projects",
     "icon": "botania:vial",
     "category": "novaeng_core:hypernet",
     "sortnum": 2,
@@ -9,12 +9,12 @@
             "item1": "modularmachinery:research_station_t1_factory_controller",
             "item2": "modularmachinery:research_station_t2_factory_controller",
             "item3": "modularmachinery:research_station_t3_factory_controller",
-            "text": "研究站用于进行科研项目，每个研究站能进行1个项目，不可排队。$(br)高难度的研究需要高级的研究站。研究站难度上限：$(a)7.9（1级）$(9)9.9（2级）$(c)14.1（3级）"
+            "text": "Research Stations are used to carry out research projects. Each Research Station can work on 1 project, and queuing is not allowed.$(br)Higher-difficulty research requires higher-tier Research Stations. Research Station difficulty limits:$(a)7.9 (Tier 1) $(9)9.9 (Tier 2) $(c)14.1 (Tier 3)"
         },
         {
             "type": "1",
             "item": "modularmachinery:database_t1_factory_controller",
-            "text": "数据库用于存储已经研究和正在研究的科技，容量20。$(br)挖下控制器不保留存储的科技。$(br)使用科技的设备需要与数据库连接至同一网络。"
+            "text": "The Database is used to store technologies that have been researched and are currently being researched. Capacity: 20.$(br)Breaking the controller does not preserve the stored technologies.$(br)Devices that use technologies need to be connected to the same network as the Database."
         }
     ]
 }

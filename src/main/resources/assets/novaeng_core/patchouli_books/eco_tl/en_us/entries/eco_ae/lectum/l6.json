@@ -8,14 +8,14 @@
             "type": "2_ad",
             "item1": "novaeng_core:estorage_energy_cell_l6",
             "item2": "novaeng_core:extendable_digital_storage_subsystem_l6",
-            "text": "对应位置安装这套部件，使阵列最高支持LE6级存储元件。"
+            "text": "Install this set of components in the corresponding positions to make the array support up to LE6-tier storage components."
         },
         {
             "type": "2_com",
             "item1": "novaeng_core:estorage_cell_item_64m",
-            "text1": "容量：$(a)315类型 8388608K个物品",
+            "text1": "Capacity: $(a)315 types, 8388608K items",
             "item2": "novaeng_core:estorage_cell_fluid_64m",
-            "text2": "容量：$(b)25类型 8388608K桶液体"
+            "text2": "Capacity: $(b)25 types, 8388608K buckets of fluid"
         }
     ]
 }

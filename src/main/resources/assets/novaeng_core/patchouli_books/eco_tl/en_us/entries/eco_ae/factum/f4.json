@@ -8,11 +8,11 @@
             "type": "2_ad",
             "item1": "novaeng_core:extendable_fabricator_subsystem_l4",
             "item2": "novaeng_core:efabricator_parallel_proc_l4",
-            "text": "对应位置安装这套部件，使阵列升级至F4。$(br)每大小提供：$(br)$(a)└ +48并行数$(br)└ +144样板位"
+            "text": "Install this set of components in the corresponding positions to upgrade the array to F4. $(br)Each size provides: $(br)$(a)└ +48 parallel count$(br)└ +144 pattern slots"
         },
         {
             "type": "texttl",
-            "text": "启动超频时：$(br)$(a)└ +64并行数$(br)└ +144样板位$(br)$(c)└ x4能量消耗|不叠加$(br)└ -2%总并行数$(br)$()启动主动冷却与超频时：$(br)$(a)└ +64并行数$(br)└ +144样板位"
+            "text": "When overclocking is enabled:$(br)$(a)└ +64 parallel count$(br)└ +144 pattern slots$(br)$(c)└ x4 energy consumption | does not stack$(br)└ -2% total parallel count$(br)$()When active cooling and overclocking are enabled:$(br)$(a)└ +64 parallel count$(br)└ +144 pattern slots"
         }
     ]
 }
