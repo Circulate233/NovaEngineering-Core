@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.mixin;
+package github.kasuminova.novaeng;
 
 import com.cleanroommc.discovery.CleanroomModDiscoverer;
 import github.kasuminova.novaeng.common.util.VintageFixJarCacheFix;

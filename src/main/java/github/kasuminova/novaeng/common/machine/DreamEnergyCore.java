@@ -210,6 +210,19 @@ public class DreamEnergyCore implements MachineSpecial {
                   .computeIfAbsent(pos, m -> new FixedSizeDeque<>(MinuteScale));
     }
 
+    /**
+     * Drops the energy history kept for {@code world}.
+     *
+     * <p>{@link #map} is keyed by the {@link World} itself, so an entry outlives the
+     * world it describes and keeps every chunk, entity and tile entity in it reachable.
+     * Nothing else ever removes one - the per-position histories are not dropped when a
+     * core is dismantled either - so the unload event is the only thing standing between
+     * this map and a world-sized leak per dimension visited.</p>
+     */
+    public static void removeWorld(final World world) {
+        map.remove(world);
+    }
+
     @Override
     public ResourceLocation getRegistryName() {
         return REGISTRY_NAME;

@@ -144,7 +144,7 @@ dependencies {
     compileOnly 'org.jetbrains.kotlin:kotlin-reflect:2.2.20'
     modImplementation("curse.maven:alfheim-lighting-engine-910715:6687458")
     modImplementation("curse.maven:red-core-873867:6147102")
-    modImplementation("curse.maven:stellarcore-1064321:8849440")
+    modImplementation("curse.maven:stellarcore-1064321:9027331")
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
     modImplementation("curse.maven:journeymap-32274:8923612")
     modImplementation("curse.maven:ender-utilities-224320:2977010")

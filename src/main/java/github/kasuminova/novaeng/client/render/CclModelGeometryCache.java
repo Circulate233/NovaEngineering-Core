@@ -3,13 +3,14 @@ package github.kasuminova.novaeng.client.render;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.google.common.collect.MapMaker;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.Map;
 
 /**
  * Remembers the packed vertex data a CodeChicken Lib model produced, so a renderer that draws the same static model
@@ -28,7 +29,21 @@ import java.nio.IntBuffer;
  */
 public final class CclModelGeometryCache {
 
-    private static final Object2ObjectOpenHashMap<Object, int[]> CACHE = new Object2ObjectOpenHashMap<>();
+    /**
+     * Remembered vertices, keyed weakly by the library's model object.
+     *
+     * <p>Weak keys rather than a clear() hook, because nothing here outlives the model:
+     * the value is a plain {@code int[]} that does not reference its key, so once a
+     * resource reload rebuilds the models the old entries become unreachable and go
+     * away on their own. (That only works because of the missing back-reference - a
+     * cache whose value holds its own key, as the HyperNet controller caches do, keeps
+     * the key strongly reachable and has to be cleared by hand.)</p>
+     *
+     * <p>Also concurrent: {@code remember} and {@code replay} run on whichever thread
+     * is drawing, and the previous {@code Object2ObjectOpenHashMap} was not safe for
+     * that.</p>
+     */
+    private static final Map<Object, int[]> CACHE = new MapMaker().weakKeys().makeMap();
     private static final ThreadLocal<int[]> SCRATCH = new ThreadLocal<>();
 
     private CclModelGeometryCache() {

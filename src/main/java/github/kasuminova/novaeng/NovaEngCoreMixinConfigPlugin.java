@@ -1,4 +1,4 @@
-package github.kasuminova.novaeng.mixin;
+package github.kasuminova.novaeng;
 
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.novaeng_core.Tags;

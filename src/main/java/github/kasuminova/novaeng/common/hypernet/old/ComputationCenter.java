@@ -12,6 +12,7 @@ import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
 import hellfirepvp.modularmachinery.common.tiles.TileFactoryController;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import lombok.Getter;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -27,13 +28,21 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ZenRegister
 @ZenClass("novaeng.hypernet.ComputationCenter")
 public class ComputationCenter {
-    private static final Map<TileMultiblockMachineController, ComputationCenter> CACHED_COMPUTATION_CENTER = new WeakHashMap<>();
+    /**
+     * Centers by controller, compared by identity - the tile does not override
+     * equals/hashCode.
+     *
+     * <p>This used to be a {@link java.util.WeakHashMap}, which did nothing: every value
+     * holds its own key in {@link #owner}, so the entry keeps the key strongly reachable
+     * and the weak reference is never enqueued. The entries have to be removed by hand,
+     * which is what {@link #removeCache} and {@link #removeWorld} are for.</p>
+     */
+    private static final Map<TileMultiblockMachineController, ComputationCenter> CACHED_COMPUTATION_CENTER = new Reference2ObjectOpenHashMap<>();
     private static final boolean DEBUG_LOG_BUDGET = false;
     @Getter
     private final TileMultiblockMachineController owner;
@@ -61,9 +70,29 @@ public class ComputationCenter {
             ComputationCenter computationCenter = CACHED_COMPUTATION_CENTER.get(ctrl);
             if (computationCenter == null) {
                 computationCenter = new ComputationCenter(ctrl, ctrl.getCustomDataTag());
-                CACHED_COMPUTATION_CENTER.put(ctrl, computationCenter);
+                // An invalidated controller is never ticked again; caching it would pin the
+                // tile, and through it the whole World, with nothing left to evict it.
+                if (!ctrl.isInvalid()) {
+                    CACHED_COMPUTATION_CENTER.put(ctrl, computationCenter);
+                }
             }
             return computationCenter;
+        }
+    }
+
+    public static void removeCache(final TileMultiblockMachineController ctrl) {
+        synchronized (CACHED_COMPUTATION_CENTER) {
+            CACHED_COMPUTATION_CENTER.remove(ctrl);
+        }
+    }
+
+    /**
+     * Drops every center whose controller belongs to {@code world}. Backstop for
+     * {@link #removeCache}, for controllers that never reach {@code invalidate()}.
+     */
+    public static void removeWorld(final World world) {
+        synchronized (CACHED_COMPUTATION_CENTER) {
+            CACHED_COMPUTATION_CENTER.keySet().removeIf(ctrl -> ctrl.getWorld() == world);
         }
     }
 

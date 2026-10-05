@@ -1,8 +1,7 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import github.kasuminova.novaeng.common.hypernet.old.NetNodeCache;
+import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.machine.MachineSpecial;
-import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import github.kasuminova.novaeng.common.registry.RegistryMachineSpecial;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
@@ -91,11 +90,19 @@ public abstract class MixinTileMultiblockMachineController extends TileEntity {
         novaeng_hypernet$removeCache();
     }
 
+    /**
+     * Forgets this controller in every controller-keyed HyperNet cache.
+     *
+     * <p>Unconditional on purpose. This used to only fire when
+     * {@code RegistryHyperNet.isHyperNetSupported(getFoundMachine())} held, which leaks
+     * exactly when it matters: a tile that is invalidating has often already lost its
+     * found machine, so the lookup returns null, the guard fails, and the cache keeps
+     * the tile - and through its {@code world} field the entire World - forever. The
+     * caches are identity-keyed maps; removing a key that was never in one costs a
+     * lookup and nothing else.</p>
+     */
     @Unique
     private void novaeng_hypernet$removeCache() {
-        TileMultiblockMachineController controller = (TileMultiblockMachineController) (Object) this;
-        if (RegistryHyperNet.isHyperNetSupported(controller.getFoundMachine())) {
-            NetNodeCache.removeCache(controller);
-        }
+        HyperNetCaches.remove((TileMultiblockMachineController) (Object) this);
     }
 }

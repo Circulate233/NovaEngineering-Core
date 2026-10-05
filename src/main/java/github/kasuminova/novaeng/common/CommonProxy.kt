@@ -28,6 +28,8 @@ import github.kasuminova.novaeng.common.handler.HyperNetMachineEventHandler
 import github.kasuminova.novaeng.common.handler.IEHandler
 import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler
 import github.kasuminova.novaeng.common.handler.OreHandler
+import github.kasuminova.novaeng.common.handler.RegistryRemapHandler
+import github.kasuminova.novaeng.common.handler.WorldCacheCleanupHandler
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetTerminal
 import github.kasuminova.novaeng.common.hypernet.old.machine.AssemblyLine
@@ -55,7 +57,6 @@ import github.kasuminova.novaeng.common.registry.RegistryBlocks
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet
 import github.kasuminova.novaeng.common.registry.RegistryItems
 import github.kasuminova.novaeng.common.registry.RegistryMachineSpecial
-import github.kasuminova.novaeng.common.handler.RegistryRemapHandler
 import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal
 import github.kasuminova.novaeng.common.tile.TileModularServerAssembler
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController
@@ -110,6 +111,7 @@ open class CommonProxy : IGuiHandler {
         MinecraftForge.EVENT_BUS.register(EFabricatorEventHandler.INSTANCE)
         MinecraftForge.EVENT_BUS.register(ECalculatorEventHandler.INSTANCE)
         MinecraftForge.EVENT_BUS.register(WorldLoadedHandler.INSTANCE)
+        MinecraftForge.EVENT_BUS.register(WorldCacheCleanupHandler.INSTANCE)
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE)
         MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE)
         MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler)

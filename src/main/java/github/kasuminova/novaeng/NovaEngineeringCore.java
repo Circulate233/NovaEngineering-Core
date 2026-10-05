@@ -4,6 +4,7 @@ import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
+import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
@@ -163,6 +164,10 @@ public class NovaEngineeringCore {
         for (final String message : SPacketProfiler.getFullProfilerMessages()) {
             log.info(message);
         }
+        // The per-world unload events should already have emptied these, but a controller
+        // that outlived its world's unload would keep that world - and every chunk and
+        // entity in it - for the rest of the process. Nothing survives a server stop.
+        HyperNetCaches.clear();
     }
 
 }

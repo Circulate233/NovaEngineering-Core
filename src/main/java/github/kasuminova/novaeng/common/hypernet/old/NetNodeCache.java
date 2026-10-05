@@ -8,6 +8,7 @@ import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import io.netty.util.internal.ThrowableUtil;
+import net.minecraft.world.World;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -70,7 +71,12 @@ public class NetNodeCache {
                 T instance = constructor.newInstance(ctrl);
                 instance.readNBT();
 
-                CACHED_NODES.put(ctrl, instance);
+                // An invalidated controller is never ticked again, and this map is keyed by
+                // identity - the tile does not override equals/hashCode. Caching one would pin
+                // it, and through its world field the entire World, for the rest of the session.
+                if (!ctrl.isInvalid()) {
+                    CACHED_NODES.put(ctrl, instance);
+                }
                 return instance;
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(
@@ -86,5 +92,21 @@ public class NetNodeCache {
 
     public static void removeCache(TileMultiblockMachineController ctrl) {
         CACHED_NODES.remove(ctrl);
+    }
+
+    /**
+     * Drops every node whose controller belongs to {@code world}.
+     *
+     * <p>Backstop for {@link #removeCache}: a controller that never reaches
+     * {@code invalidate()} - the world was torn down under it, or a mod swapped the
+     * tile out without the usual lifecycle - would otherwise keep its world, and
+     * every chunk and entity in it, alive for the rest of the session.</p>
+     */
+    public static void removeWorld(final World world) {
+        CACHED_NODES.keySet().removeIf(ctrl -> ctrl.getWorld() == world);
+    }
+
+    public static void clearCache() {
+        CACHED_NODES.clear();
     }
 }
