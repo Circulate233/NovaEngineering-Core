@@ -52,7 +52,7 @@ object RegistryAssembly {
         if (MixinDecisions.astralSorceryLoaded) regAS()
         if (Loader.isModLoaded("mekanism")) regMEK()
         if (MixinDecisions.botaniaLoaded) regBot()
-        if (MixinDecisions.packagedAutoLoaded) regPackagedastral()
+        if (MixinDecisions.packagedAutoLoaded && MixinDecisions.packagedAstralLoaded) regPackagedastral()
     }
 
     @Optional.Method(modid = "astralsorcery")

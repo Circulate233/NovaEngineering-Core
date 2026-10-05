@@ -31,6 +31,12 @@ repositories {
 }
 
 dependencies {
+    contain 'com.github.luben:zstd-jni:1.5.7-4'
+    // Unimined's Minecraft libraries are not inherited by the standalone JUnit source set.
+    // Match Cleanroom 0.6.13-alpha; these are test dependencies, not bundled networking libraries.
+    testImplementation 'io.netty:netty-codec-base:4.2.15.Final'
+    testImplementation 'io.netty:netty-transport:4.2.15.Final'
+
     compileOnly 'com.cleanroommc:sponge-mixin:0.20.13+mixin.0.8.7'
     annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
     annotationProcessor 'com.google.guava:guava:32.0.1-android'
@@ -134,7 +140,7 @@ dependencies {
     modCompileOnly 'curse.maven:advanced-rocketry-236542:4671856'
     modImplementation 'curse.maven:random-complement-1198138:7340975'
     modImplementation 'curse.maven:modular-routers-250294:2954953'
-    modImplementation 'curse.maven:actually-additions-228404:3117927'
+    modCompileOnly 'curse.maven:actually-additions-228404:3117927'
     modImplementation 'curse.maven:brandons-core-231382:3408276'
     modImplementation 'curse.maven:draconic-evolution-223565:3431261'
     modImplementation 'curse.maven:packagedauto-308380:6932932'

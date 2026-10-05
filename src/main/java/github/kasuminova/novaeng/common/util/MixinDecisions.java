@@ -50,6 +50,7 @@ public final class MixinDecisions {
     public static final boolean nae2Loaded = isPresent("nae2");
     public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
+    public static final boolean packagedAstralLoaded = isPresent("packagedastral");
     public static final boolean psiLoaded = isPresent("psi");
     public static final boolean rftoolsLoaded = isPresent("rftools");
     public static final boolean techgunsLoaded = isPresent("techguns");

@@ -21,6 +21,9 @@ public class NovaEngCoreConfig {
     @Config.Name("Server")
     public static Server SERVER = new Server();
 
+    @Config.Name("Network")
+    public static Network NETWORK = new Network();
+
     @Config.Name("MachineAssemblyTool")
     public static MachineAssemblyTool MACHINE_ASSEMBLY_TOOL = new MachineAssemblyTool();
 
@@ -33,6 +36,76 @@ public class NovaEngCoreConfig {
         if (Objects.equals(event.getModID(), Tags.MOD_ID)) {
             ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE);
         }
+    }
+
+    @SuppressWarnings("CanBeFinal")
+    public static class Network {
+        @Config.RequiresMcRestart
+        @Config.Comment("Collect and print a bandwidth summary when a client disconnects or the server stops. Disabled by default and independent of optimization.")
+        public boolean enableBandwidthMonitoring = false;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Aggregate serialized PLAY traffic with Zstd after Forge login on dedicated-server and LAN TCP connections. Keep this switch the same on both endpoints. Pure single-player LocalChannel traffic bypasses the complete byte-processing chain; the chunk cache remains independent and can still run locally.")
+        public boolean enableBandwidthOptimization = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Train a server-side connection dictionary from observed PLAY packets. Connections always synchronize the current dictionary; disabling this planner uses the empty version-zero dictionary.")
+        public boolean enableBandwidthDictionary = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Increase both CustomPayload limits, the outer frame limit and the decompression limit. Large packets require support on both endpoints and any proxy.")
+        public boolean expandPacketLimits = true;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 1, max = 64)
+        @Config.Comment("Maximum ordinary CustomPayload size in MiB in either direction. Configure the same limit on both endpoints.")
+        public int maxCustomPayloadMiB = 8;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 1, max = 20)
+        @Config.Comment("Maximum batching delay in milliseconds, excluding event-loop scheduling delays.")
+        public int aggregationDelayMillis = 20;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 4, max = 1024)
+        @Config.Comment("Flush a batch once it reaches this many KiB; a larger individual packet is flushed immediately.")
+        public int aggregationTargetKiB = 64;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 21, max = 25)
+        @Config.Comment("Zstd history window log2(bytes): 21 = 2 MiB, 23 = 8 MiB, 25 = 32 MiB. Native memory usage scales with connections.")
+        public int compressionWindowLog = 23;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse Zstd history across outgoing batches. Disable on the sender for independently decompressible batches, for example for packet recording.")
+        public boolean reuseCompressionContext = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Replace repeated outgoing CustomPayload channel names with bounded connection-local indices. Definitions travel in-band; no capability negotiation is needed.")
+        public boolean indexCustomPayloadChannels = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Server-side: retain already-sent chunks just outside a remote player's view, with live block/tile updates, to avoid full resends when returning.")
+        public boolean delayedChunkCache = true;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 0, max = 1024)
+        @Config.Comment("Maximum extra watched chunks per player. Zero disables retention.")
+        public int delayedChunkCacheSize = 60;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 0, max = 16)
+        @Config.Comment("Maximum cached distance beyond the normal server view radius, in chunks. Does not increase the normal view distance.")
+        public int delayedChunkCacheDistance = 5;
+
+        @Config.RequiresMcRestart
+        @Config.RangeInt(min = 1, max = 600)
+        @Config.Comment("Retention timeout in monotonic elapsed seconds, checked every server world tick.")
+        public int delayedChunkCacheSeconds = 60;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("CustomPayload channels which flush preceding packets and bypass aggregation, for proxy/mod compatibility.")
+        public String[] unaggregatedChannels = new String[]{"FML|HS", "REGISTER", "UNREGISTER", "MC|Brand"};
     }
 
     @SuppressWarnings("CanBeFinal")

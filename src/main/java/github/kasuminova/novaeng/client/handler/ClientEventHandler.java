@@ -5,6 +5,8 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.util.ClientLightingGuard;
 import github.kasuminova.novaeng.client.util.TitleUtils;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -116,6 +118,9 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onServerConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        BandwidthStats.setEnabled(NovaEngCoreConfig.NETWORK.enableBandwidthMonitoring);
+        BandwidthDictionary.setEnabled(NovaEngCoreConfig.NETWORK.enableBandwidthDictionary);
+        BandwidthStats.reset();
         CPacketProfiler.enabled = true;
         CPacketProfiler.PACKET_TOTAL_SIZE.clear();
         CPacketProfiler.TOTAL_RECEIVED_DATA_SIZE.set(0);
@@ -127,6 +132,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onServerDisconnected(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+        BandwidthStats.logSummary("client disconnect");
         CPacketProfiler.enabled = false;
         CPacketProfiler.profilerStopTime = System.currentTimeMillis();
 

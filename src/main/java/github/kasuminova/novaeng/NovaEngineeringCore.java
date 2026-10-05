@@ -7,6 +7,8 @@ import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
@@ -144,6 +146,10 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
+        BandwidthStats.setEnabled(NovaEngCoreConfig.NETWORK.enableBandwidthMonitoring);
+        BandwidthDictionary.setEnabled(NovaEngCoreConfig.NETWORK.enableBandwidthDictionary);
+        BandwidthDictionary.reset();
+        BandwidthStats.reset();
         // A loaded world renumbers the registry ids it was written with, so a biome table built
         // before this point describes the wrong world.
         NovaBiomeIdCache.invalidate();
@@ -156,6 +162,7 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStopping(FMLServerStoppingEvent event) {
+        BandwidthStats.logSummary("server stopping");
         log.info("{}服务器正在关闭，正在生成网络包报告。", TextFormatting.BLUE);
         for (final String message : SPacketProfiler.getProfilerMessages()) {
             log.info(message);
