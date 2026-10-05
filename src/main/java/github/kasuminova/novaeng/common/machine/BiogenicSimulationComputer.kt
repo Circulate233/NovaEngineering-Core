@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.machine
 
-import appeng.util.Platform
+import ae2.util.Platform
 import crafttweaker.CraftTweakerAPI
 import crafttweaker.api.item.IItemStack
 import crafttweaker.api.minecraft.CraftTweakerMC

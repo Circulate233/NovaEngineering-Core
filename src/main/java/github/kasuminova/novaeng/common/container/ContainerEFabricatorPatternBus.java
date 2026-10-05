@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.common.container;
 
-import appeng.container.AEBaseContainer;
-import appeng.container.slot.SlotRestrictedInput;
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.container.AEBaseContainer;
+import ae2.container.slot.RestrictedInputSlot;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,13 +19,13 @@ public class ContainerEFabricatorPatternBus extends AEBaseContainer {
         super(player.inventory, owner);
         this.owner = owner;
 
-        this.bindPlayerInventory(getInventoryPlayer(), 27, 150);
+        this.addPlayerInventorySlots(27, 150);
 
         AppEngInternalInventory patterns = owner.getPatterns();
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
-                this.addSlotToContainer(new SlotRestrictedInput(SlotRestrictedInput.PlacableItemType.ENCODED_PATTERN, patterns,
-                    (row * COLS) + col, 8 + (col * 18), 28 + (row * 18), getInventoryPlayer()));
+                this.addSlotToContainer(new RestrictedInputSlot(RestrictedInputSlot.PlacableItemType.ENCODED_PATTERN, patterns,
+                    (row * COLS) + col, 8 + (col * 18), 28 + (row * 18)));
             }
         }
     }

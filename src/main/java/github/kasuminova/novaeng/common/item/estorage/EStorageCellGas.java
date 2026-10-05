@@ -1,16 +1,14 @@
 package github.kasuminova.novaeng.common.item.estorage;
 
-import appeng.api.AEApi;
-import appeng.api.storage.IStorageChannel;
-import com.mekeng.github.common.me.data.IAEGasStack;
-import com.mekeng.github.common.me.storage.IGasStorageChannel;
-import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
+import ae2.api.stacks.AEKeyType;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import me.ramidzkh.mekae2.ae2.AEGasKeyType;
+import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class EStorageCellGas extends EStorageCell<IAEGasStack> {
+public class EStorageCellGas extends EStorageCell {
 
     public static final EStorageCellGas LEVEL_A = new EStorageCellGas(DriveStorageLevel.A, 16, 4);
     public static final EStorageCellGas LEVEL_B = new EStorageCellGas(DriveStorageLevel.B, 64, 16);
@@ -35,7 +33,7 @@ public class EStorageCellGas extends EStorageCell<IAEGasStack> {
 
     @NotNull
     @Override
-    public IStorageChannel<IAEGasStack> getChannel() {
-        return AEApi.instance().storage().getStorageChannel(IGasStorageChannel.class);
+    public AEKeyType getKeyType() {
+        return AEGasKeyType.TYPE;
     }
 }

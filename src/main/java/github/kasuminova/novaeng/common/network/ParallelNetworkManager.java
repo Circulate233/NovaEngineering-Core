@@ -1,18 +1,13 @@
 package github.kasuminova.novaeng.common.network;
 
-import appeng.core.sync.network.NetworkHandler;
 import github.kasuminova.mmce.common.util.concurrent.Action;
 import github.kasuminova.mmce.common.util.concurrent.ActionExecutor;
-import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.mod.Mods;
 import hellfirepvp.modularmachinery.ModularMachinery;
-import ic2.core.network.NetworkManager;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import mekanism.common.Mekanism;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.network.FMLEventChannel;
 
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -25,38 +20,8 @@ public class ParallelNetworkManager {
     private final ReferenceSet<Object> blacklistChannels = new ReferenceOpenHashSet<>();
 
     public void init() {
-        if (Mods.IC2.loaded()) {
-            initializeIC2Blacklist();
-        }
-        if (Mods.AE2.loaded()) {
-            initializeAE2Blacklist();
-        }
         if (Mods.MEKCEU.loaded()) {
             initializeMekanismCEuBlacklist();
-        }
-    }
-
-    @Optional.Method(modid = "ic2")
-    private void initializeIC2Blacklist() {
-        try {
-            FMLEventChannel channel = ObfuscationReflectionHelper.getPrivateValue(NetworkManager.class, null, "channel");
-            if (channel != null) {
-                addBlacklistChannel(channel);
-            }
-        } catch (Throwable e) {
-            NovaEngineeringCore.log.warn(e);
-        }
-    }
-
-    @Optional.Method(modid = "appliedenergistics2")
-    private void initializeAE2Blacklist() {
-        try {
-            FMLEventChannel ec = ObfuscationReflectionHelper.getPrivateValue(NetworkHandler.class, NetworkHandler.instance(), "ec");
-            if (ec != null) {
-                addBlacklistChannel(ec);
-            }
-        } catch (Throwable e) {
-            NovaEngineeringCore.log.warn(e);
         }
     }
 

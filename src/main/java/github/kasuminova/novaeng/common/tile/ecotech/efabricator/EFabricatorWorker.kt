@@ -1,11 +1,9 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.config.Actionable
-import appeng.api.networking.energy.IEnergyGrid
-import appeng.api.storage.data.IAEItemStack
-import appeng.api.storage.data.IItemList
-import appeng.me.GridAccessException
-import appeng.util.item.AEItemStack
+import ae2.api.config.Actionable
+import ae2.api.networking.energy.IEnergyService
+import ae2.api.stacks.AEItemKey
+import ae2.api.stacks.KeyCounter
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus
 import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate
@@ -73,13 +71,9 @@ class EFabricatorWorker : EFabricatorPart() {
         }
         var energy = this.energyCache.toDouble()
         val c = controller.channel
-        var grid: IEnergyGrid? = null
-        if (c != null) {
-            try {
-                grid = c.proxy.grid.getCache(IEnergyGrid::class.java)
-                energy += grid.storedPower
-            } catch (ignored: GridAccessException) {
-            }
+        val energyService: IEnergyService? = c?.mainNode?.node?.grid()?.energyService
+        if (energyService != null) {
+            energy += energyService.getStoredPower()
         }
         var parallelism = min(max(controller.getAvailableParallelism(), 1).toDouble(), energy / energyUsage).toInt()
         if (controller.activeCooling) {
@@ -87,7 +81,7 @@ class EFabricatorWorker : EFabricatorPart() {
         }
 
         var completed = 0
-        val outputBuffer: IItemList<IAEItemStack> = controller.outputBuffer
+        val outputBuffer: KeyCounter = controller.outputBuffer
         var craftWork: CraftWork
         synchronized(outputBuffer) {
             while ((parallelism > completed) && !queue.isEmpty) {
@@ -103,10 +97,16 @@ class EFabricatorWorker : EFabricatorPart() {
                 }
                 for (remain in out.remaining) {
                     if (!remain.isEmpty) {
-                        outputBuffer.add(AEItemStack.fromItemStack(remain))
+                        val key = AEItemKey.of(remain)
+                        if (key != null) {
+                            outputBuffer.add(key, remain.count.toLong())
+                        }
                     }
                 }
-                outputBuffer.add(AEItemStack.fromItemStack(out.output))
+                val key = AEItemKey.of(out.output)
+                if (key != null) {
+                    outputBuffer.add(key, out.output.count.toLong())
+                }
 
                 completed += out.size
             }
@@ -117,9 +117,9 @@ class EFabricatorWorker : EFabricatorPart() {
             if (`in` > energyCache) {
                 `in` -= energyCache
                 energyCache = 0
-                if (grid != null) {
-                    synchronized(grid) {
-                        grid.injectPower(`in`.toDouble(), Actionable.MODULATE)
+                if (energyService != null) {
+                    synchronized(energyService) {
+                        energyService.injectPower(`in`.toDouble(), Actionable.MODULATE)
                     }
                 }
             } else {

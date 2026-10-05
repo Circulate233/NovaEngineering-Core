@@ -1,38 +1,29 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator
 
-import appeng.api.networking.GridFlags
-import appeng.api.networking.IGridNode
-import appeng.api.networking.crafting.ICraftingPatternDetails
-import appeng.api.networking.crafting.ICraftingProvider
-import appeng.api.networking.crafting.ICraftingProviderHelper
-import appeng.api.networking.events.MENetworkChannelsChanged
-import appeng.api.networking.events.MENetworkCraftingPatternChange
-import appeng.api.networking.events.MENetworkEventSubscribe
-import appeng.api.networking.events.MENetworkPowerStatusChange
-import appeng.api.networking.security.IActionHost
-import appeng.api.networking.security.IActionSource
-import appeng.api.util.AECableType
-import appeng.api.util.AEPartLocation
-import appeng.api.util.DimensionalCoord
-import appeng.me.GridAccessException
-import appeng.me.helpers.AENetworkProxy
-import appeng.me.helpers.IGridProxyable
-import appeng.me.helpers.MachineSource
-import com.glodblock.github.common.item.ItemFluidPacket
-import com.glodblock.github.common.item.fake.FakeItemRegister
-import com.glodblock.github.util.FluidCraftingPatternDetails
-import github.kasuminova.mmce.common.util.PatternItemFilter
+import ae2.api.AECapabilities
+import ae2.api.crafting.IPatternDetails
+import ae2.api.crafting.PatternDetailsHelper
+import ae2.api.networking.GridFlags
+import ae2.api.networking.IGridNode
+import ae2.api.networking.IGridNodeListener
+import ae2.api.networking.IManagedGridNode
+import ae2.api.networking.crafting.ICraftingProvider
+import ae2.api.stacks.AEItemKey
+import ae2.api.stacks.KeyCounter
+import ae2.api.networking.security.IActionSource
+import ae2.api.util.AECableType
+import ae2.me.ManagedGridNode
+import ae2.me.helpers.IGridConnectedTile
+import ae2.me.helpers.MachineSource
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker.CraftWork
 import hellfirepvp.modularmachinery.ModularMachinery
-import net.minecraft.inventory.InventoryCrafting
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fluids.FluidStack
-import javax.annotation.Nonnull
-import kotlin.math.min
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
 
-class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, IGridProxyable {
+class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IGridConnectedTile {
 
     companion object {
         private fun getContainerItem(stackInSlot: ItemStack?): ItemStack {
@@ -56,15 +47,26 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
         }
     }
 
-    private val aEProxy: AENetworkProxy = AENetworkProxy(this, "channel", this.visualItemStack, true)
+    private val nodeListener = object : IGridNodeListener<EFabricatorMEChannel> {
+        override fun onSaveChanges(nodeOwner: EFabricatorMEChannel, node: IGridNode) {
+            nodeOwner.saveChanges()
+        }
+
+        override fun onStateChanged(nodeOwner: EFabricatorMEChannel, node: IGridNode, state: IGridNodeListener.State) {
+            nodeOwner.postPatternChange()
+        }
+    }
+
+    @JvmField
+    val mainNode: IManagedGridNode = ManagedGridNode(this, nodeListener)
+        .setIdlePowerUsage(1.0)
+        .setFlags(GridFlags.REQUIRE_CHANNEL, GridFlags.DENSE_CAPACITY)
+        .setVisualRepresentation(this.visualItemStack)
+        .setInWorldNode(true)
+        .setTagName("channel")
     val source: IActionSource = MachineSource(this)
 
     private var wasActive = false
-
-    init {
-        this.aEProxy.idlePowerUsage = 1.0
-        this.aEProxy.setFlags(GridFlags.REQUIRE_CHANNEL, GridFlags.DENSE_CAPACITY)
-    }
 
     val visualItemStack: ItemStack
         get() {
@@ -73,109 +75,47 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
             else ItemStack(controller.parentController)
         }
 
-    @MENetworkEventSubscribe
-    fun stateChange(c: MENetworkPowerStatusChange?) {
-        postPatternChangeEvent()
-    }
-
-    @MENetworkEventSubscribe
-    fun stateChange(c: MENetworkChannelsChanged?) {
-        postPatternChangeEvent()
-    }
-
-    // Crafting Provider
-    private fun postPatternChangeEvent() {
-        val currentActive = this.aEProxy.isActive
+    private fun postPatternChange() {
+        val currentActive = this.mainNode.isActive
         if (this.wasActive != currentActive) {
             this.wasActive = currentActive
-            try {
-                this.aEProxy.grid.postEvent(MENetworkCraftingPatternChange(this, aEProxy.node))
-            } catch (ignored: GridAccessException) {
-            }
+            ICraftingProvider.requestUpdate(mainNode)
         }
     }
 
-    override fun provideCrafting(craftingTracker: ICraftingProviderHelper) {
-        val controller: EFabricatorController = controller ?: return
-
-        val patternBuses: List<EFabricatorPatternBus> = controller.getPatternBuses()
-        patternBuses.stream()
-            .flatMap { patternBus: EFabricatorPatternBus? ->
-                patternBus!!.getDetails().stream()
-            }
-            .filter { details: ICraftingPatternDetails? -> details!!.isCraftable || details is FluidCraftingPatternDetails }
-            .forEach { details: ICraftingPatternDetails? -> craftingTracker.addCraftingOption(this, details) }
+    override fun getAvailablePatterns(): List<IPatternDetails> {
+        return controller?.getPatternBuses()?.flatMap { it.getDetails() } ?: emptyList()
     }
 
-    override fun pushPattern(pattern: ICraftingPatternDetails, table: InventoryCrafting): Boolean {
+    override fun pushPattern(pattern: IPatternDetails, inputHolder: Array<KeyCounter>, multiplier: Int): Boolean {
         if (isBusy()) {
             return false
         }
 
-        if (!pattern.isCraftable) {
-            if (pattern is FluidCraftingPatternDetails) {
-                return pushFluidPattern(pattern, table)
-            }
-            return false
-        }
-
-        val output = pattern.getOutput(table, this.getWorld())
-        if (output.isEmpty) {
+        val outputKey = pattern.primaryOutput.what as? AEItemKey ?: return false
+        if (inputHolder.size > 9 || multiplier <= 0) {
             return false
         }
 
         val remaining = Array<ItemStack>(9) { i -> ItemStack.EMPTY }
-        var size = 0
-        for (i in 0..<min(table.sizeInventory, 9)) {
-            val item = table.getStackInSlot(i)
-            if (item.isEmpty) {
-                remaining[i] = ItemStack.EMPTY
-            } else {
-                if (size == 0) {
-                    size = item.count
-                }
-                remaining[i] = getContainerItem(item)
+        for (i in inputHolder.indices) {
+            val entries = inputHolder[i].toList()
+            if (entries.size != 1 || entries[0].longValue > Int.MAX_VALUE) {
+                return false
             }
+            val key = entries[0].key as? AEItemKey ?: return false
+            remaining[i] = getContainerItem(key.toStack(entries[0].longValue.toInt()))
         }
 
-        output.count *= size
-
-        return partController.offerWork(CraftWork(remaining, output, size))
-    }
-
-    private fun pushFluidPattern(pattern: FluidCraftingPatternDetails, table: InventoryCrafting): Boolean {
-        val outputs = pattern.outputs
-        val output =
-            if (outputs[0] != null) outputs[0]!!.getCachedItemStack(outputs[0]!!.stackSize) else ItemStack.EMPTY
-
-        if (output.isEmpty) return false
-
-        val remaining = Array<ItemStack>(9) { i -> ItemStack.EMPTY }
-        var size = 0
-        for (i in 0..<min(table.sizeInventory, 9)) {
-            val item = table.getStackInSlot(i)
-            if (item.isEmpty) {
-                remaining[i] = ItemStack.EMPTY
-            } else {
-                if (size == 0) {
-                    size = item.count
-                    if (item.item is ItemFluidPacket) {
-                        val amount = (FakeItemRegister.getStack<Any?>(item) as FluidStack).amount
-                        val pamount = (FakeItemRegister.getStack<Any?>(pattern.inputs[i]) as FluidStack).amount
-                        size = amount / pamount
-                    }
-                }
-                remaining[i] = getContainerItem(item)
-            }
+        val outputAmount = Math.multiplyExact(pattern.primaryOutput.amount, multiplier.toLong())
+        if (outputAmount > Int.MAX_VALUE) {
+            return false
         }
-
-        output.count *= size
-
-        return partController.offerWork(CraftWork(remaining, output, size))
+        return partController?.offerWork(CraftWork(remaining, outputKey.toStack(outputAmount.toInt()), multiplier)) ?: false
     }
 
     fun insertPattern(patternStack: ItemStack): Boolean {
-        if (!PatternItemFilter.INSTANCE.allowInsert(null, -1, patternStack)) {
+        if (!PatternDetailsHelper.isEncodedPattern(patternStack)) {
             return false
         }
         if (partController != null) {
@@ -191,70 +131,59 @@ class EFabricatorMEChannel : EFabricatorPart(), ICraftingProvider, IActionHost, 
         return true
     }
 
-    // Misc
-    @Nonnull
-    override fun getActionableNode(): IGridNode {
-        return aEProxy.node
-    }
-
-    @Nonnull
-    override fun getProxy(): AENetworkProxy {
-        return aEProxy
-    }
-
-    @Nonnull
-    override fun getLocation(): DimensionalCoord {
-        return DimensionalCoord(this)
-    }
-
-    override fun gridChanged() {
-    }
-
-    override fun getGridNode(@Nonnull dir: AEPartLocation): IGridNode? {
-        return aEProxy.node
-    }
-
-    @Nonnull
-    override fun getCableConnectionType(@Nonnull dir: AEPartLocation): AECableType {
-        return AECableType.DENSE_SMART
-    }
-
-    override fun securityBreak() {
-        getWorld().destroyBlock(getPos(), true)
-    }
-
     override fun readCustomNBT(compound: NBTTagCompound?) {
         super.readCustomNBT(compound)
-        aEProxy.readFromNBT(compound)
+        mainNode.loadFromNBT(compound)
     }
 
     override fun writeCustomNBT(compound: NBTTagCompound?) {
         super.writeCustomNBT(compound)
-        aEProxy.writeToNBT(compound)
+        mainNode.saveToNBT(compound)
     }
 
     override fun onChunkUnload() {
         super.onChunkUnload()
-        aEProxy.onChunkUnload()
+        mainNode.destroy()
     }
 
     override fun invalidate() {
         super.invalidate()
-        aEProxy.invalidate()
+        mainNode.destroy()
     }
 
     override fun onAssembled() {
         super.onAssembled()
-        aEProxy.setVisualRepresentation(this.visualItemStack)
+        mainNode.setVisualRepresentation(this.visualItemStack)
         ModularMachinery.EXECUTE_MANAGER.addSyncTask {
-            aEProxy.onReady()
-            partController.recalculateEnergyUsage()
+            if (!mainNode.isReady() && !getWorld().isRemote) {
+                mainNode.create(getWorld(), getPos())
+            }
+            partController?.recalculateEnergyUsage()
         }
     }
 
     override fun onDisassembled() {
         super.onDisassembled()
-        aEProxy.setVisualRepresentation(this.visualItemStack)
-        aEProxy.invalidate()
+        mainNode.setVisualRepresentation(this.visualItemStack)
+        mainNode.destroy()
+    }
+
+    override fun getMainNode(): IManagedGridNode = mainNode
+
+    override fun saveChanges() {
+        markDirty()
+    }
+
+    override fun getCableConnectionType(dir: EnumFacing): AECableType = AECableType.DENSE_SMART
+
+    override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
+        return capability === AECapabilities.IN_WORLD_GRID_NODE_HOST || super.hasCapability(capability, facing)
+    }
+
+    override fun <T> getCapability(capability: Capability<T?>, facing: EnumFacing?): T? {
+        if (capability === AECapabilities.IN_WORLD_GRID_NODE_HOST) {
+            return AECapabilities.IN_WORLD_GRID_NODE_HOST.cast(this)
+        }
+        return super.getCapability(capability, facing)
     }
 }
