@@ -190,6 +190,7 @@ public final class MixinDecisions {
             case "minecraft.MixinClippingHelperFrustumCapture" ->
                 NovaEngCoreConfig.CLIENT.optimizeTesrFrustumCulling;
             case "minecraft.MixinInventoryChangeTrigger$Instance",
+                 "minecraft.MixinInventoryChangeTrigger$Listeners",
                  "minecraft.MixinInventoryPlayer",
                  "minecraft.MixinEntityPlayerMPInventoryWork" -> NovaEngCoreConfig.CLIENT.optimizeInventoryTickWork;
             case "minecraft.MixinNonNullList" -> NovaEngCoreConfig.CLIENT.optimizeNonNullListClear;
