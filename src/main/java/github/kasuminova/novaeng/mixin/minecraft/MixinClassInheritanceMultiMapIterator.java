@@ -1,15 +1,22 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import github.kasuminova.novaeng.common.util.ClassFilteredIterable;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.util.ClassInheritanceMultiMap;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Answers {@code getByClass} with a walk that allocates one object instead of three.
@@ -36,6 +43,7 @@ import java.util.Map;
 @Mixin(value = ClassInheritanceMultiMap.class)
 public abstract class MixinClassInheritanceMultiMapIterator<T> {
 
+    @Mutable
     @Shadow
     @Final
     private Map<Class<?>, List<T>> map;
@@ -43,11 +51,23 @@ public abstract class MixinClassInheritanceMultiMapIterator<T> {
     @Shadow
     protected abstract Class<?> initializeClassLookup(Class<?> clazz);
 
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/util/ClassInheritanceMultiMap;map:Ljava/util/Map;", opcode = Opcodes.PUTFIELD))
+    public void nova$redMap(ClassInheritanceMultiMap<?> instance, Map<Class<?>, List<T>> value) {
+        map = new Reference2ObjectOpenHashMap<>();
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Sets;newIdentityHashSet()Ljava/util/Set;"))
+    public Set<?> nova$redSet() {
+        return new ReferenceOpenHashSet<>();
+    }
+
     @Overwrite
     public <S> Iterable<S> getByClass(final Class<S> clazz) {
-        final List<T> list = this.map.get(this.initializeClassLookup(clazz));
+        final Class<?> key = this.initializeClassLookup(clazz);
+        List<T> list = this.map.get(key);
         if (list == null) {
-            return Collections::emptyIterator;
+            list = new ObjectArrayList<>(0);
+            this.map.put(key, list);
         }
         return new ClassFilteredIterable<>(list, clazz);
     }

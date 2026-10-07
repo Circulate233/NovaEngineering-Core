@@ -53,6 +53,5 @@ public class NovaEngCoreMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) {
-
     }
 }

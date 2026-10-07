@@ -24,6 +24,9 @@ public class NovaEngCoreConfig {
     @Config.Name("Network")
     public static Network NETWORK = new Network();
 
+    @Config.Name("Performance")
+    public static Performance PERFORMANCE = new Performance();
+
     @Config.Name("MachineAssemblyTool")
     public static MachineAssemblyTool MACHINE_ASSEMBLY_TOOL = new MachineAssemblyTool();
 
@@ -36,6 +39,39 @@ public class NovaEngCoreConfig {
         if (Objects.equals(event.getModID(), Tags.MOD_ID)) {
             ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE);
         }
+    }
+
+    @SuppressWarnings("CanBeFinal")
+    public static class Performance {
+        @Config.RequiresMcRestart
+        @Config.Comment("Create entity class indexes only when that chunk section is queried.")
+        public boolean lazyEntityClassIndexes = true;
+        @Config.RequiresMcRestart
+        @Config.Comment("Bound idle MMCE recipe contexts and discard data rebuilt on the next borrow.")
+        public boolean boundedRecipeContexts = true;
+        @Config.RangeInt(min = 0, max = 1024)
+        public int recipeContextsPerRecipe = 8;
+        @Config.RangeInt(min = 0, max = 65536)
+        public int recipeContextLimit = 1024;
+        @Config.RequiresMcRestart
+        @Config.Comment("Share a stack index within one inventory_changed evaluation.")
+        public boolean sharedInventoryView = true;
+        @Config.RequiresMcRestart
+        @Config.Comment("Avoid replaying MMCE comparator notifications for an already committed mutation.")
+        public boolean coalesceMmceNotifications = true;
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse supported AE interface insertion preparation within an MMCE output operation.")
+        public boolean batchAe2Outputs = true;
+        @Config.RequiresMcRestart
+        @Config.Comment("Release oversized idle VintageFix scratch after two low-use 64-task windows. Actinium mesh scratch is controlled in actinium-options.json.")
+        public boolean trimChunkBuildScratch = true;
+        @Config.RequiresMcRestart
+        @Config.Comment("Apply non-blocking byte backpressure to ordinary Actinium chunk rebuilds.")
+        public boolean chunkBuildMemoryBudget = true;
+        @Config.RangeInt(min = 16, max = 2048)
+        public int chunkBuildMemoryBudgetMiB = 128;
+        @Config.Comment("Collect bounded tick and allocation-work counters. Also controllable with /nova_perf.")
+        public boolean diagnostics = false;
     }
 
     @SuppressWarnings("CanBeFinal")
@@ -236,13 +272,18 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeTesrFrustumCulling")
-        @Config.Comment("Cull tile entity renderers whose render volume lies entirely outside the view frustum. The renderer only culls whole chunks, so a renderer in a visible chunk but behind the camera is drawn in full; nothing it draws can reach the screen.")
+        @Config.Comment("Cull finite, non-global tile entity renderers outside the current world render camera. Independent of the distance limit; shadow passes are preserved.")
         public boolean optimizeTesrFrustumCulling = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeDraconicModelGeometry")
-        @Config.Comment("The draconic reactor core and chaos stabiliser core draw one CodeChicken Lib model every frame with a spin transform as their only operation, and the library applies it to every vertex while writing them. Move the transform to the GL matrix and remember the vertices, so a frame costs one addVertexData per vertex instead of the library's per-vertex pipeline. The shaders these renderers use read the standard matrices and follow on their own.")
+        @Config.Comment("Move the draconic reactor and chaos stabiliser model transform to the GL matrix and append each cached static model in one bulk vertex write.")
         public boolean optimizeDraconicModelGeometry = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeSoundUpdateWakeups")
+        @Config.Comment("Notify the sound command thread once after each tickable sound's volume, pitch and position update. Commands and play/stop notifications remain unchanged.")
+        public boolean optimizeSoundUpdateWakeups = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeInventoryTickWork")
@@ -402,7 +443,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeChunkPaletteGrowth")
-        @Config.Comment("Grow a chunk section's block state palette by two bits per overflow instead of one, which halves how often the section's 4096 entries have to be rebuilt through a fresh palette while the section is read from NBT.")
+        @Config.Comment("Bulk-decode supported REID sections at the Anvil boundary, choosing the final palette width once. Ordinary palette growth and network decoding remain vanilla. The configuration name is retained for compatibility.")
         public boolean optimizeChunkPaletteGrowth = true;
 
         @Config.RequiresMcRestart

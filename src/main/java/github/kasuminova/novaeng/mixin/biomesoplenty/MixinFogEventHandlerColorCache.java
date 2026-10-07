@@ -1,12 +1,12 @@
 package github.kasuminova.novaeng.mixin.biomesoplenty;
 
 import biomesoplenty.common.handler.FogEventHandler;
+import github.kasuminova.novaeng.client.util.ClientWorldMemos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -24,14 +24,10 @@ public abstract class MixinFogEventHandlerColorCache {
     @Shadow
     private static boolean fogInit;
 
-    @Unique
-    private static World nova$cachedWorld;
-
     @Inject(method = "onRenderFog", at = @At("HEAD"), require = 1)
     private void nova$invalidateOnWorldChange(final EntityViewRenderEvent.RenderFogEvent event, final CallbackInfo ci) {
         final World world = event.getEntity().world;
-        if (nova$cachedWorld != world) {
-            nova$cachedWorld = world;
+        if (ClientWorldMemos.FOG.select(world)) {
             fogInit = false;
         }
     }

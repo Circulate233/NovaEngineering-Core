@@ -1,14 +1,13 @@
 package github.kasuminova.novaeng.mixin.actinium;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.gtnewhorizons.angelica.glsm.GLStateManager;
+import com.gtnewhorizons.angelica.glsm.backend.RenderBackend;
 import github.kasuminova.novaeng.client.gl.GenericAttributeState;
 import github.kasuminova.novaeng.client.gl.GenericAttributeStateImpl;
-import com.gtnewhorizons.angelica.glsm.GLStateManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -17,42 +16,40 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = GLStateManager.class, remap = false)
 public abstract class MixinGLStateManagerGenericAttributes {
 
-    @WrapOperation(method = "flushDeferredVertexAttribs()V",
+    @Redirect(method = "flushDeferredVertexAttribs()V",
         at = @At(value = "INVOKE",
             target = "Lcom/gtnewhorizons/angelica/glsm/backend/RenderBackend;vertexAttrib4f(IFFFF)V",
             ordinal = 0,
             remap = false),
         remap = false, require = 1)
-    private static void nova$flushColor(@Coerce final Object backend,
+    private static void nova$flushColor(final RenderBackend backend,
                                         final int index,
                                         final float x,
                                         final float y,
                                         final float z,
-                                        final float w,
-                                        final Operation<Void> original) {
+                                        final float w) {
         final GenericAttributeState state = GenericAttributeStateImpl.instance();
         if (state.shouldUploadColor(index, x, y, z, w)) {
-            original.call(backend, index, x, y, z, w);
+            backend.vertexAttrib4f(index, x, y, z, w);
             state.recordAttribute(index, x, y, z, w);
         }
     }
 
-    @WrapOperation(method = "flushDeferredVertexAttribs()V",
+    @Redirect(method = "flushDeferredVertexAttribs()V",
         at = @At(value = "INVOKE",
             target = "Lcom/gtnewhorizons/angelica/glsm/backend/RenderBackend;vertexAttrib4f(IFFFF)V",
             ordinal = 1,
             remap = false),
         remap = false, require = 1)
-    private static void nova$flushSecondaryUv(@Coerce final Object backend,
+    private static void nova$flushSecondaryUv(final RenderBackend backend,
                                               final int index,
                                               final float x,
                                               final float y,
                                               final float z,
-                                              final float w,
-                                              final Operation<Void> original) {
+                                              final float w) {
         final GenericAttributeState state = GenericAttributeStateImpl.instance();
         if (state.shouldUploadSecondaryUv(index, x, y, z, w)) {
-            original.call(backend, index, x, y, z, w);
+            backend.vertexAttrib4f(index, x, y, z, w);
             state.recordAttribute(index, x, y, z, w);
         }
     }

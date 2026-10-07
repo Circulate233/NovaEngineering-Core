@@ -160,4 +160,5 @@ dependencies {
     modCompileOnly 'curse.maven:contenttweaker-237065:3331364'
     modCompileOnly 'curse.maven:vintagefix-871198:8895999'
     modCompileOnly 'curse.maven:universal-tweaks-705000:5138787'
+    modImplementation("curse.maven:reid-629017:8029704")
 }

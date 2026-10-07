@@ -173,6 +173,8 @@ dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'it.unimi.dsi:fastutil:8.5.18'
+    testImplementation 'org.ow2.asm:asm-tree:9.9.1'
+    testImplementation 'org.ow2.asm:asm-analysis:9.9.1'
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'

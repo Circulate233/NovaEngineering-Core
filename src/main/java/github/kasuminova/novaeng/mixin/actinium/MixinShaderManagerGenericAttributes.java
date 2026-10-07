@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.mixin.actinium;
 
+import com.gtnewhorizons.angelica.glsm.ffp.ShaderManager;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import github.kasuminova.novaeng.client.gl.GenericAttributeState;
 import github.kasuminova.novaeng.client.gl.GenericAttributeStateImpl;
-import com.gtnewhorizons.angelica.glsm.ffp.ShaderManager;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(value = ShaderManager.class, remap = false)
 public abstract class MixinShaderManagerGenericAttributes {
 
+    // Keep the scope through draw observers: they may set constants after the initial flush.
+    // Array-backed values must become unknown after those callbacks, including exceptional exits.
     @WrapMethod(method = "preDraw(ZZZZ)V", remap = false, require = 1)
     private void nova$withDrawFormat(final boolean hasColor,
                                      final boolean hasNormal,

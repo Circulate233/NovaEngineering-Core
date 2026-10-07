@@ -7,8 +7,6 @@ import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
-import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
-import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
@@ -28,8 +26,11 @@ import github.kasuminova.novaeng.common.network.PktResearchTaskProvide;
 import github.kasuminova.novaeng.common.network.PktResearchTaskProvideCreative;
 import github.kasuminova.novaeng.common.network.PktResearchTaskReset;
 import github.kasuminova.novaeng.common.network.PktTerminalGuiData;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
+import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
+import github.kasuminova.novaeng.common.performance.RecipeContextPool;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.common.util.NovaBiomeIdCache;
@@ -175,6 +176,9 @@ public class NovaEngineeringCore {
         // that outlived its world's unload would keep that world - and every chunk and
         // entity in it - for the rest of the process. Nothing survives a server stop.
         HyperNetCaches.clear();
+        if (MixinDecisions.recipeContextPoolEnabled()) {
+            RecipeContextPool.reset();
+        }
     }
 
 }

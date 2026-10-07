@@ -1,19 +1,17 @@
 package github.kasuminova.novaeng.mixin.actinium;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.dhj.actinium.render.terrain.ActiniumWorldRenderer;
 import com.dhj.actinium.render.terrain.TileEntityGlStateGuard;
+import com.llamalad7.mixinextras.sugar.Local;
+import github.kasuminova.novaeng.client.render.TileEntityBatchScopes;
+import github.kasuminova.novaeng.client.render.TileEntityBatchScopes.State;
+import github.kasuminova.novaeng.client.render.TileEntityRenderCulling;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.ArrayDeque;
 
 /**
  * Opens Actinium's TESR GL guard and FastTESR batch only when the current render pass reaches an
@@ -24,39 +22,11 @@ import java.util.ArrayDeque;
 public abstract class MixinActiniumWorldRendererLazyBatch {
 
     @Unique
-    private static final ThreadLocal<ArrayDeque<BatchState>> nova$batchStates = new ThreadLocal<>();
-
-    @WrapMethod(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        remap = false,
-        require = 1
-    )
-    private int nova$withLazyBatchScope(@Coerce final Object tileEntityRenderContext, final Operation<Integer> original) {
-        ArrayDeque<BatchState> states = nova$batchStates.get();
-        if (states == null) {
-            states = new ArrayDeque<>();
-            nova$batchStates.set(states);
+    private static void nova$restoreOpenedBatch() {
+        final State state = TileEntityBatchScopes.current();
+        if (state != null && state.isBatchOpened()) {
+            TileEntityGlStateGuard.restoreForBatch();
         }
-        states.push(new BatchState());
-        try {
-            return original.call(tileEntityRenderContext);
-        } finally {
-            states.pop();
-            if (states.isEmpty()) {
-                nova$batchStates.remove();
-            }
-        }
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
-            target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;push()V",
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$deferGuardPush() {
     }
 
     @Redirect(
@@ -70,24 +40,12 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
     private void nova$deferBatchOpen(final TileEntityRendererDispatcher dispatcher) {
     }
 
-    @WrapOperation(
-        method = "renderBlockEntityList(Ljava/util/List;Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)V",
-        at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;render(Lnet/minecraft/tileentity/TileEntity;FI)V",
-            remap = true),
-        remap = false,
-        require = 1
-    )
-    private void nova$openBatchBeforeFirstRender(final TileEntityRendererDispatcher dispatcher,
-                                                 final TileEntity tileentityIn,
-                                                 final float partialTicks,
-                                                 final int destroyStage,
-                                                 final Operation<Void> original) {
-        final BatchState state = nova$currentBatchState();
-        if (state != null) {
-            state.ensureOpened(dispatcher);
+    @Unique
+    private static void nova$drawOpenedBatch(final TileEntityRendererDispatcher dispatcher, final int renderPass) {
+        final State state = TileEntityBatchScopes.current();
+        if (state != null && state.isBatchOpened()) {
+            dispatcher.drawBatch(renderPass);
         }
-        original.call(dispatcher, tileentityIn, partialTicks, destroyStage);
     }
 
     @Redirect(
@@ -169,49 +127,57 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
     }
 
     @Unique
-    private static BatchState nova$currentBatchState() {
-        final ArrayDeque<BatchState> states = nova$batchStates.get();
-        return states == null ? null : states.peek();
-    }
-
-    @Unique
-    private static void nova$restoreOpenedBatch() {
-        final BatchState state = nova$currentBatchState();
-        if (state != null && state.batchOpened) {
-            TileEntityGlStateGuard.restoreForBatch();
-        }
-    }
-
-    @Unique
-    private static void nova$drawOpenedBatch(final TileEntityRendererDispatcher dispatcher, final int renderPass) {
-        final BatchState state = nova$currentBatchState();
-        if (state != null && state.batchOpened) {
-            dispatcher.drawBatch(renderPass);
-        }
-    }
-
-    @Unique
     private static void nova$popOpenedGuard() {
-        final BatchState state = nova$currentBatchState();
-        if (state != null && state.guardPushed) {
-            TileEntityGlStateGuard.pop();
+        final State state = TileEntityBatchScopes.current();
+        try {
+            if (state != null && state.isGuardPushed()) {
+                TileEntityGlStateGuard.pop();
+            }
+        } finally {
+            TileEntityBatchScopes.end();
         }
     }
 
-    @Unique
-    private static final class BatchState {
-        private boolean guardPushed;
-        private boolean batchOpened;
+    @Redirect(
+        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
+        at = @At(value = "INVOKE",
+            target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;push()V",
+            remap = false),
+        remap = false,
+        require = 1
+    )
+    private void nova$deferGuardPush() {
+        // The original guard push/pop already encloses the full method in a try/finally.
+        TileEntityBatchScopes.begin();
+    }
 
-        private void ensureOpened(final TileEntityRendererDispatcher dispatcher) {
-            if (!this.guardPushed) {
-                TileEntityGlStateGuard.push();
-                this.guardPushed = true;
-            }
-            if (!this.batchOpened) {
-                dispatcher.preDrawBatch();
-                this.batchOpened = true;
-            }
+    @Redirect(
+        method = "renderBlockEntityListInternal(Ljava/util/List;Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;Z)V",
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;render(Lnet/minecraft/tileentity/TileEntity;FI)V",
+            remap = true),
+        remap = false,
+        require = 1
+    )
+    private void nova$openBatchBeforeFirstRender(final TileEntityRendererDispatcher dispatcher,
+                                                 final TileEntity tileentityIn,
+                                                 final float partialTicks,
+                                                 final int destroyStage,
+                                                 @Local(argsOnly = true) final boolean globalRendererList) {
+        // The section builder has already classified entries in the global list.
+        if (!globalRendererList && TileEntityRenderCulling.shouldSkip(tileentityIn)) {
+            return;
+        }
+        final State state = TileEntityBatchScopes.current();
+        if (state != null) {
+            state.ensureOpened(dispatcher);
+        }
+        final TileEntityRenderCulling.Approval previous = TileEntityRenderCulling.approve(tileentityIn);
+        try {
+            dispatcher.render(tileentityIn, partialTicks, destroyStage);
+        } finally {
+            TileEntityRenderCulling.restoreApproval(previous);
         }
     }
+
 }

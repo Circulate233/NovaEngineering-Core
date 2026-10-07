@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.gl;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * Thread-local implementation of {@link GenericAttributeState} using exact raw float bits.
@@ -8,6 +8,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 public final class GenericAttributeStateImpl implements GenericAttributeState {
 
     private static final GenericAttributeState INSTANCE = new GenericAttributeStateImpl();
+    private static final int COLOR_ARRAY = 1;
+    private static final int SECONDARY_UV_ARRAY = 2;
+    private static final int NO_DRAW_FORMAT = -1;
 
     private final ThreadLocal<ContextState> contexts = ThreadLocal.withInitial(ContextState::new);
 
@@ -21,7 +24,8 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
 
     @Override
     public void pushDrawFormat(final boolean colorArrayEnabled, final boolean secondaryUvArrayEnabled) {
-        this.contexts.get().drawFormats.add(new DrawFormat(colorArrayEnabled, secondaryUvArrayEnabled));
+        this.contexts.get().drawFormats.add((colorArrayEnabled ? COLOR_ARRAY : 0)
+            | (secondaryUvArrayEnabled ? SECONDARY_UV_ARRAY : 0));
     }
 
     @Override
@@ -44,8 +48,8 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
                                      final float w) {
         final ContextState context = this.contexts.get();
         context.color.bindIndex(index);
-        final DrawFormat format = context.peekDrawFormat();
-        return format == null || !format.colorArrayEnabled && !context.color.matches(x, y, z, w);
+        final int format = context.peekDrawFormat();
+        return format == NO_DRAW_FORMAT || (format & COLOR_ARRAY) == 0 && !context.color.matches(x, y, z, w);
     }
 
     @Override
@@ -56,8 +60,8 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
                                            final float w) {
         final ContextState context = this.contexts.get();
         context.secondaryUv.bindIndex(index);
-        final DrawFormat format = context.peekDrawFormat();
-        return format == null || !format.secondaryUvArrayEnabled && !context.secondaryUv.matches(x, y, z, w);
+        final int format = context.peekDrawFormat();
+        return format == NO_DRAW_FORMAT || (format & SECONDARY_UV_ARRAY) == 0 && !context.secondaryUv.matches(x, y, z, w);
     }
 
     @Override
@@ -109,17 +113,17 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
     private static final class ContextState {
         private final AttributeValue color = new AttributeValue();
         private final AttributeValue secondaryUv = new AttributeValue();
-        private final ObjectArrayList<DrawFormat> drawFormats = new ObjectArrayList<>();
+        private final IntArrayList drawFormats = new IntArrayList();
         private boolean vertexArrayKnown;
         private int vertexArray;
 
-        private DrawFormat peekDrawFormat() {
-            return this.drawFormats.isEmpty() ? null : this.drawFormats.getLast();
+        private int peekDrawFormat() {
+            return this.drawFormats.isEmpty() ? NO_DRAW_FORMAT : this.drawFormats.getInt(this.drawFormats.size() - 1);
         }
 
         private void popDrawFormat() {
             if (!this.drawFormats.isEmpty()) {
-                this.drawFormats.removeLast();
+                this.drawFormats.removeInt(this.drawFormats.size() - 1);
             }
         }
     }
@@ -170,6 +174,4 @@ public final class GenericAttributeStateImpl implements GenericAttributeState {
         }
     }
 
-    private record DrawFormat(boolean colorArrayEnabled, boolean secondaryUvArrayEnabled) {
-    }
 }

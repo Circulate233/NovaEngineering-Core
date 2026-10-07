@@ -19,8 +19,7 @@ import java.util.Map;
  * <p>CodeChicken Lib renders a model by walking its vertices and applying a list of operations to each one, and the
  * draconic renderers hand it nothing but a transformation matrix - so what varies between frames is only the transform,
  * and the vertices themselves are constant. Moving that transform to the GL matrix (see the renderer mixins) leaves the
- * vertex data identical every frame, which is what makes it worth keeping: replaying it costs one
- * {@code addVertexData} per vertex instead of the library's per-vertex transform, UV, normal and lightmap work.</p>
+ * vertex data identical every frame, so the whole packed model can be appended in one operation.</p>
  *
  * <p>The cache is filled by the library itself: the first time a model is drawn the caller lets it render normally and
  * then records what it wrote, so the replayed data is exactly what the library produced. Only the
@@ -44,7 +43,6 @@ public final class CclModelGeometryCache {
      * that.</p>
      */
     private static final Map<Object, int[]> CACHE = new MapMaker().weakKeys().makeMap();
-    private static final ThreadLocal<int[]> SCRATCH = new ThreadLocal<>();
 
     private CclModelGeometryCache() {
     }
@@ -59,23 +57,15 @@ public final class CclModelGeometryCache {
             return false;
         }
         final BufferBuilder buffer = state.r;
-        if (buffer == null || buffer.getVertexFormat() != DefaultVertexFormats.POSITION_TEX) {
+        if (buffer == null || buffer.getVertexFormat() != DefaultVertexFormats.POSITION_TEX
+            || buffer.getVertexCount() != 0) {
             return false;
         }
         final int[] cached = CACHE.get(model);
         if (cached == null) {
             return false;
         }
-        final int intsPerVertex = buffer.getVertexFormat().getIntegerSize();
-        int[] scratch = SCRATCH.get();
-        if (scratch == null || scratch.length < intsPerVertex) {
-            scratch = new int[intsPerVertex];
-            SCRATCH.set(scratch);
-        }
-        for (int i = 0; i < cached.length; i += intsPerVertex) {
-            System.arraycopy(cached, i, scratch, 0, intsPerVertex);
-            buffer.addVertexData(scratch);
-        }
+        buffer.addVertexData(cached);
         return true;
     }
 

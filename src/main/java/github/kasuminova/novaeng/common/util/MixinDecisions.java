@@ -2,9 +2,6 @@ package github.kasuminova.novaeng.common.util;
 
 import com.cleanroommc.discovery.CleanroomModDiscoverer;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
-import net.minecraft.launchwrapper.Launch;
-
-import java.io.IOException;
 
 public final class MixinDecisions {
 
@@ -26,6 +23,7 @@ public final class MixinDecisions {
     public static final boolean craftTweakerLoaded = isPresent("crafttweaker");
     public static final boolean customLoadingScreenLoaded = isPresent("customloadingscreen");
     public static final boolean deepMobLearningLoaded = isPresent("deepmoblearning");
+    public static final boolean reidLoaded = isPresent("jeid") || isPresent("reid");
     public static final boolean draconicAdditionsLoaded = isPresent("draconicadditions");
     public static final boolean draconicEvolutionLoaded = isPresent("draconicevolution");
     public static final boolean electroblobsLoaded = isPresent("ebwizardry");
@@ -37,7 +35,10 @@ public final class MixinDecisions {
     public static final boolean jeiLoaded = isPresent("jei");
     public static final boolean jetifLoaded = isPresent("jetif");
     public static final boolean journeymapLoaded = isPresent("journeymap");
+    public static final boolean neoFontRenderLoaded = isPresent("neofontrender");
+    public static final boolean neoFontRenderUiLoaded = isPresent("neofontrender_ui_enhancements");
     public static final boolean legendaryTooltipsLoaded = isPresent("legendarytooltips");
+    public static final boolean konkreteLoaded = isPresent("konkrete");
     public static final boolean librarianLibLoaded = isPresent("librarianlib");
     public static final boolean libvulpesLoaded = isPresent("libvulpes");
     public static final boolean lootOverhaulLoaded = isPresent("lootoverhaul");
@@ -66,6 +67,14 @@ public final class MixinDecisions {
             && NovaEngCoreConfig.SERVER.optimizeDECoreHatchScan;
     }
 
+    public static boolean recipeContextPoolEnabled() {
+        return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.boundedRecipeContexts;
+    }
+
+    public static boolean aeOutputPreparationEnabled() {
+        return mmceLoaded && ae2Loaded && NovaEngCoreConfig.PERFORMANCE.batchAe2Outputs;
+    }
+
     public static boolean shouldApply(final String mixinName) {
         final int split = mixinName.indexOf('.');
         if (split < 0) {
@@ -76,7 +85,8 @@ public final class MixinDecisions {
         }
 
         return switch (mixinName.substring(0, split)) {
-            case "dme" -> deepMobLearningLoaded && hasClassBytes("mustapelto.deepmoblearning.common.metadata.MetadataManager");
+            case "dme" -> deepMobLearningLoaded;
+            case "reid" -> reidLoaded;
             case "botania_r" -> botaniaLoaded && NovaEngCoreConfig.SERVER.bot;
             case "ae2" -> ae2Loaded;
             case "alfheim" -> alfheimLoaded;
@@ -113,6 +123,8 @@ public final class MixinDecisions {
             case "mmce" -> mmceLoaded;
             case "modularrouters" -> modularRoutersLoaded;
             case "nae2" -> nae2Loaded;
+            case "neofontrender" -> neoFontRenderLoaded;
+            case "revoui" -> neoFontRenderUiLoaded && actiniumLoaded;
             case "nco" -> nuclearcraftLoaded;
             case "packagedauto" -> packagedAutoLoaded;
             case "psi" -> psiLoaded;
@@ -129,6 +141,19 @@ public final class MixinDecisions {
             return NovaEngCoreConfig.CLIENT.diagObjModelProbe;
         }
         return switch (mixinName) {
+            case "actinium.MixinBuildContextMemory", "actinium.MixinVintageScratchMemory" ->
+                NovaEngCoreConfig.PERFORMANCE.trimChunkBuildScratch || NovaEngCoreConfig.PERFORMANCE.chunkBuildMemoryBudget;
+            case "actinium.MixinChunkJobMemoryBudget", "actinium.MixinChunkOutputBudget",
+                 "actinium.MixinBuildOutputBudgetRelease", "actinium.MixinSortOutputBudgetRelease",
+                 "actinium.MixinRenderSectionMemoryBudget" ->
+                NovaEngCoreConfig.PERFORMANCE.chunkBuildMemoryBudget;
+            case "mmce.InvokerItemOutputBus", "mmce.MixinItemOutputPreparation",
+                 "ae2.MixinNetworkInventoryOutputPreparation" -> aeOutputPreparationEnabled();
+            case "mmce.MixinTileNotificationGeneration", "mmce.MixinTaskExecutorNotifications" ->
+                NovaEngCoreConfig.PERFORMANCE.coalesceMmceNotifications;
+            case "minecraft.MixinClassInheritanceMultiMapLazy" -> NovaEngCoreConfig.PERFORMANCE.lazyEntityClassIndexes;
+            case "mmce.MixinRecipeCraftingContextMemory",
+                 "mmce.MixinRecipeCraftingContextPool" -> recipeContextPoolEnabled();
             case "astralsorcery.MixinTexturePreloader",
                  "astralsorcery.MixinBindableResourceLazyAllocation" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryTexturePreload;
             case "astralsorcery.MixinAstralSorceryConfig" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryConfigSave;
@@ -162,12 +187,12 @@ public final class MixinDecisions {
                  "minecraft.AccessorCreativeTabs" -> NovaEngCoreConfig.CLIENT.optimizeCreativeTabLookup;
             case "journeymap.MixinFileHandler" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy;
             case "konkrete.MixinLocalsCopy" ->
-                hasClassBytes("de.keksuccino.konkrete.localization.Locals")
-                    && NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
+                konkreteLoaded && NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
             case "journeymap.MixinJMChunkCache" ->
                 journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
             case "journeymap.MixinJMChunkStorage" ->
                 journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
+            case "journeymap.MixinUIManagerJeiOverlay" -> jeiLoaded;
             case "journeymap.MixinVanillaBlockSpriteProxy" ->
                 journeymapLoaded && (NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites
                     || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe);
@@ -185,10 +210,11 @@ public final class MixinDecisions {
             case "actinium.MixinGLStateManagerVertexArray",
                  "actinium.MixinImmediateCommandListVertexArray",
                  "actinium.MixinPassThroughGLStateManagerVertexArray" -> NovaEngCoreConfig.CLIENT.optimizeVaoBindings;
-            case "minecraft.MixinTileEntityRendererDistance" ->
-                NovaEngCoreConfig.CLIENT.optimizeTesrRenderDistance;
-            case "minecraft.MixinClippingHelperFrustumCapture" ->
-                NovaEngCoreConfig.CLIENT.optimizeTesrFrustumCulling;
+            case "minecraft.MixinTileEntityRendererDistance",
+                 "minecraft.MixinRenderGlobalTileEntityCulling" ->
+                NovaEngCoreConfig.CLIENT.optimizeTesrRenderDistance || NovaEngCoreConfig.CLIENT.optimizeTesrFrustumCulling;
+            case "minecraft.MixinSoundHandlerUpdateBatch", "minecraft.MixinSoundSystemWakeups" ->
+                NovaEngCoreConfig.CLIENT.optimizeSoundUpdateWakeups;
             case "minecraft.MixinInventoryChangeTrigger$Instance",
                  "minecraft.MixinInventoryChangeTrigger$Listeners",
                  "minecraft.MixinInventoryPlayer",
@@ -219,8 +245,8 @@ public final class MixinDecisions {
                 ctmLoaded && NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
             case "minecraft.MixinClassInheritanceMultiMapIterator" ->
                 NovaEngCoreConfig.CLIENT.optimizeEntityLookupIteration;
-            case "minecraft.MixinBlockStatePaletteLinear",
-                 "minecraft.MixinBlockStatePaletteHashMap" -> NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth;
+            case "reid.MixinSectionStorage", "reid.MixinReidSectionAccess",
+                 "reid.MixinAnvilSectionCodec" -> NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth;
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;
@@ -232,13 +258,5 @@ public final class MixinDecisions {
 
     private static boolean isPresent(final String modId) {
         return CleanroomModDiscoverer.instance().isModPresent(modId);
-    }
-
-    private static boolean hasClassBytes(final String className) {
-        try {
-            return Launch.classLoader.getClassBytes(className) != null;
-        } catch (final IOException e) {
-            return false;
-        }
     }
 }

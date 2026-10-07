@@ -1,6 +1,10 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
+import github.kasuminova.novaeng.NovaEngCoreConfig;
+import github.kasuminova.novaeng.common.advancement.IndexedInventoryCriterion;
+import github.kasuminova.novaeng.common.advancement.InventoryEvaluation;
 import github.kasuminova.novaeng.common.advancement.ListenerInstanceSnapshot;
+import github.kasuminova.novaeng.common.performance.PerformanceMetrics;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
@@ -61,6 +65,9 @@ public abstract class MixinInventoryChangeTrigger$Listeners {
     private final ListenerInstanceSnapshot<ICriterionTrigger.Listener<InventoryChangeTrigger.Instance>,
         InventoryChangeTrigger.Instance> nova$snapshot = new ListenerInstanceSnapshot<>();
 
+    @Unique
+    private final InventoryEvaluation nova$inventoryView = new InventoryEvaluation();
+
     /**
      * Drops the snapshot so the next trigger rebuilds it from the set the listener was just added to.
      *
@@ -99,14 +106,38 @@ public abstract class MixinInventoryChangeTrigger$Listeners {
         }
 
         final int size = snapshot.size();
+        if (size == 0) {
+            return;
+        }
         ObjectArrayList<ICriterionTrigger.Listener<InventoryChangeTrigger.Instance>> matched = null;
-        for (int index = 0; index < size; index++) {
-            if (snapshot.instance(index).test(inventory)) {
-                if (matched == null) {
-                    matched = new ObjectArrayList<>(size);
+        final boolean indexed = NovaEngCoreConfig.PERFORMANCE.sharedInventoryView;
+        final InventoryEvaluation view = nova$inventoryView.inUse() ? new InventoryEvaluation() : nova$inventoryView;
+        try {
+            if (indexed) {
+                boolean countFull = false;
+                for (int i = 0; i < size && !countFull; i++) {
+                    final InventoryChangeTrigger.Instance criterion = snapshot.instance(i);
+                    if (criterion.getClass() == InventoryChangeTrigger.Instance.class) {
+                        countFull = ((IndexedInventoryCriterion) criterion).nova$needsFullSlotCount();
+                    }
                 }
-                matched.add(snapshot.listener(index));
+                view.prepare(inventory, countFull);
             }
+            for (int index = 0; index < size; index++) {
+                final InventoryChangeTrigger.Instance criterion = snapshot.instance(index);
+                PerformanceMetrics.add(PerformanceMetrics.Counter.INVENTORY_CRITERIA, 1);
+                final boolean accepted = indexed && criterion.getClass() == InventoryChangeTrigger.Instance.class
+                    ? ((IndexedInventoryCriterion) criterion).nova$testIndexed(view)
+                    : criterion.test(inventory);
+                if (accepted) {
+                    if (matched == null) {
+                        matched = new ObjectArrayList<>(size);
+                    }
+                    matched.add(snapshot.listener(index));
+                }
+            }
+        } finally {
+            view.clear();
         }
 
         if (matched == null) {

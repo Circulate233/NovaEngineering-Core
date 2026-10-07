@@ -30,6 +30,29 @@ class GenericAttributeStateImplTest {
     }
 
     @Test
+    void nestedFormatsRestoreTheirIndependentArrayFlagsAndOutsideScopeIsConservative() {
+        this.state.pushDrawFormat(true, false);
+        try {
+            assertFalse(this.state.shouldUploadColor(1, 1, 1, 1, 1));
+            assertTrue(this.state.shouldUploadSecondaryUv(2, 0, 0, 0, 1));
+            this.state.pushDrawFormat(false, true);
+            try {
+                assertTrue(this.state.shouldUploadColor(1, 1, 1, 1, 1));
+                assertFalse(this.state.shouldUploadSecondaryUv(2, 0, 0, 0, 1));
+                this.state.recordAttribute(1, 1, 1, 1, 1);
+            } finally {
+                this.state.finishDrawFormat(false, true);
+            }
+            assertFalse(this.state.shouldUploadColor(1, 1, 1, 1, 1));
+            assertTrue(this.state.shouldUploadSecondaryUv(2, 0, 0, 0, 1));
+        } finally {
+            this.state.finishDrawFormat(true, false);
+        }
+        assertTrue(this.state.shouldUploadColor(1, 1, 1, 1, 1));
+        assertTrue(this.state.shouldUploadSecondaryUv(2, 0, 0, 0, 1));
+    }
+
+    @Test
     void comparisonUsesExactRawFloatBits() {
         this.state.pushDrawFormat(false, false);
         this.state.shouldUploadColor(1, 0.0F, 0.0F, 0.0F, 1.0F);

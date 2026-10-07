@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
+import github.kasuminova.novaeng.common.advancement.IndexedInventoryCriterion;
+import github.kasuminova.novaeng.common.advancement.InventoryEvaluation;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -31,7 +33,7 @@ import java.util.Arrays;
  * nothing after that point can change the result.</p>
  */
 @Mixin(InventoryChangeTrigger.Instance.class)
-public class MixinInventoryChangeTrigger$Instance {
+public class MixinInventoryChangeTrigger$Instance implements IndexedInventoryCriterion {
 
     @Shadow
     @Final
@@ -48,6 +50,25 @@ public class MixinInventoryChangeTrigger$Instance {
     @Shadow
     @Final
     private MinMaxBounds occupied;
+
+    @Override
+    public boolean nova$needsFullSlotCount() {
+        return full != MinMaxBounds.UNBOUNDED;
+    }
+
+    @Override
+    public boolean nova$testIndexed(final InventoryEvaluation inventory) {
+        if (!full.test(inventory.full()) || !empty.test(inventory.empty())
+            || !occupied.test(inventory.occupied())) {
+            return false;
+        }
+        for (final ItemPredicate predicate : items) {
+            if (!inventory.matches(((AccessorItemPredicate) predicate).nova$getItem(), predicate)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Predicate indices per named item, and the indices of the predicates that accept any item. Built on the first

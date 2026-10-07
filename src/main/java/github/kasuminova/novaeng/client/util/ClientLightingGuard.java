@@ -2,12 +2,12 @@ package github.kasuminova.novaeng.client.util;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 
 public final class ClientLightingGuard {
 
     private static boolean lastEnabled;
     private static boolean renderRefreshPending;
-    private static Object lightmapWorld;
 
     private ClientLightingGuard() {
     }
@@ -31,15 +31,11 @@ public final class ClientLightingGuard {
 
     public static boolean shouldUploadLightmap() {
         final Minecraft minecraft = Minecraft.getMinecraft();
-        final Object world = minecraft == null ? null : minecraft.world;
+        final World world = minecraft == null ? null : minecraft.world;
         if (!isActive() || world == null) {
-            lightmapWorld = null;
+            ClientWorldMemos.LIGHTMAP.clear();
             return true;
         }
-        if (world != lightmapWorld) {
-            lightmapWorld = world;
-            return true;
-        }
-        return false;
+        return ClientWorldMemos.LIGHTMAP.select(world);
     }
 }
