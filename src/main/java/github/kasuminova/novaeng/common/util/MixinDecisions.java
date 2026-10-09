@@ -192,7 +192,6 @@ public final class MixinDecisions {
                 journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
             case "journeymap.MixinJMChunkStorage" ->
                 journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
-            case "journeymap.MixinUIManagerJeiOverlay" -> jeiLoaded;
             case "journeymap.MixinVanillaBlockSpriteProxy" ->
                 journeymapLoaded && (NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites
                     || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe);

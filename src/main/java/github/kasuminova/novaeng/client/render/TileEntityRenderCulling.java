@@ -111,7 +111,15 @@ public final class TileEntityRenderCulling {
         }
     }
 
-    public static TileEntitySpecialRenderer<TileEntity> consumePreparedRenderer(
+    public static void clearRenderer() {
+        final Pass pass = current();
+        if (pass != null) {
+            pass.preparedRendererTile = null;
+            pass.preparedRenderer = null;
+        }
+    }
+
+    public static <T extends TileEntity> TileEntitySpecialRenderer<T> consumePreparedRenderer(
         final TileEntityRendererDispatcher dispatcher, final TileEntity tile
     ) {
         final Pass pass = current();
@@ -119,9 +127,10 @@ public final class TileEntityRenderCulling {
             final TileEntitySpecialRenderer<TileEntity> renderer = pass.preparedRenderer;
             pass.preparedRendererTile = null;
             pass.preparedRenderer = null;
-            return renderer;
+            //noinspection unchecked
+            return (TileEntitySpecialRenderer<T>) renderer;
         }
-        return dispatcher.getRenderer(tile);
+        return tile != null && !tile.isInvalid() ? dispatcher.getRenderer(tile.getClass()) : null;
     }
 
     private static Pass current() {

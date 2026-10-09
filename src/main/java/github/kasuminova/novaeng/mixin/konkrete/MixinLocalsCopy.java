@@ -31,8 +31,8 @@ import java.nio.charset.StandardCharsets;
 public abstract class MixinLocalsCopy {
 
     @Overwrite(remap = false)
-    private static void copyLocalsFileToDir(final ResourceLocation file, final String language,
-                                            final String saveDirWithoutFilename) {
+    public static void copyLocalsFileToDir(final ResourceLocation file, final String language,
+                                           final String saveDirWithoutFilename) {
         final File lang = new File(saveDirWithoutFilename + "/" + language + ".local");
         if (lang.exists()) {
             lang.delete();

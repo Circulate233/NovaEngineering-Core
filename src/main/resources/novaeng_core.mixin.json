@@ -210,7 +210,6 @@
     "jei.MixinStackHelper",
     "jetif.MixinCompatFluxNetworks",
     "journeymap.MixinFileHandler",
-    "journeymap.MixinUIManagerJeiOverlay",
     "journeymap.MixinVanillaBlockSpriteProxy",
     "konkrete.MixinLocalsCopy",
     "legendarytooltips.MixinTooltipDecor",

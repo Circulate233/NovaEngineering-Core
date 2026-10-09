@@ -2,7 +2,6 @@ package github.kasuminova.novaeng.mixin.actinium;
 
 import com.dhj.actinium.render.terrain.ActiniumWorldRenderer;
 import com.dhj.actinium.render.terrain.TileEntityGlStateGuard;
-import com.llamalad7.mixinextras.sugar.Local;
 import github.kasuminova.novaeng.client.render.TileEntityBatchScopes;
 import github.kasuminova.novaeng.client.render.TileEntityBatchScopes.State;
 import github.kasuminova.novaeng.client.render.TileEntityRenderCulling;
@@ -152,7 +151,7 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
     }
 
     @Redirect(
-        method = "renderBlockEntityListInternal(Ljava/util/List;Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;Z)V",
+        method = "renderBlockEntityList(Ljava/util/List;Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)V",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;render(Lnet/minecraft/tileentity/TileEntity;FI)V",
             remap = true),
@@ -162,10 +161,8 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
     private void nova$openBatchBeforeFirstRender(final TileEntityRendererDispatcher dispatcher,
                                                  final TileEntity tileentityIn,
                                                  final float partialTicks,
-                                                 final int destroyStage,
-                                                 @Local(argsOnly = true) final boolean globalRendererList) {
-        // The section builder has already classified entries in the global list.
-        if (!globalRendererList && TileEntityRenderCulling.shouldSkip(tileentityIn)) {
+                                                 final int destroyStage) {
+        if (TileEntityRenderCulling.shouldSkip(tileentityIn)) {
             return;
         }
         final State state = TileEntityBatchScopes.current();
