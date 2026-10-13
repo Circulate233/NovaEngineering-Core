@@ -44,6 +44,11 @@ public class NovaEngCoreConfig {
     @SuppressWarnings("CanBeFinal")
     public static class Performance {
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeFerriteChunkNbt")
+        @Config.Comment("Losslessly compact decoded section arrays while asynchronous chunks wait for completion. Restore complete NBT before entity loading and Forge ChunkDataEvent.Load; preserve mod tags and pending-save data.")
+        public boolean optimizeFerriteChunkNbt = true;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Create entity class indexes only when that chunk section is queried.")
         public boolean lazyEntityClassIndexes = true;
         @Config.RequiresMcRestart
@@ -147,6 +152,21 @@ public class NovaEngCoreConfig {
     @SuppressWarnings("CanBeFinal")
     public static class Client {
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeFerritePredicates")
+        @Config.Comment("Canonicalize multipart model predicates by property/value and by their sorted And/Or inputs, following FerriteCore's predicate cache.")
+        public boolean optimizeFerritePredicates = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeFerriteMultipartModels")
+        @Config.Comment("Reuse baked multipart models with identical selectors and child models in the same order. Disable VintageFix mixin.model_optimizations.dedup_multipart when enabling this.")
+        public boolean optimizeFerriteMultipartModels = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeFerriteModelResourceLocation")
+        @Config.Comment("Bypass ModelResourceLocation's toString/parse constructor round trip for ordinary ResourceLocations.")
+        public boolean optimizeFerriteModelResourceLocation = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("EnableNovaEngTitle")
         public boolean enableNovaEngTitle = true;
 
@@ -175,6 +195,10 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeNuclearcraftNcpfExport")
         @Config.Comment("Skip NuclearCraft's unused generated NCPF export.")
         public boolean optimizeNuclearcraftNcpfExport = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeNuclearcraftTilePackets")
+        public boolean optimizeNuclearcraftTilePackets = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeEnderIoXmlFactory")
@@ -357,12 +381,12 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeChiselCtmConnectionOffsets")
-        @Config.Comment("Chisel's CTM resolves the neighbouring block of a face through Dir.applyConnection, which is pos.add(offset), and CTMLogic.buildConnectionMap asks all eight directions of that face - each one with the same position and facing, so each one computing the same neighbour and allocating a BlockPos for it. Remember the last answer per thread so the repeat asks reuse it. While sections are being meshed this was the largest single allocation site in the client, about 30% of everything allocated.")
+        @Config.Comment("Reuse repeated neighbouring positions while Chisel CTM builds connection maps.")
         public boolean optimizeChiselCtmConnectionOffsets = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeEntityLookupIteration")
-        @Config.Comment("ClassInheritanceMultiMap.getByClass returns an anonymous Iterable whose iterator() takes an iterator from the section's list and wraps it in a filter - three throwaway objects per call, on the path every World.getEntitiesWithinAABB takes. Walk the list by index with the same isInstance test instead, which allocates one object instead of three. This is an overwrite with no runtime fallback, so the setting only takes effect when the mixin is applied.")
+        @Config.Comment("Use indexed entity lists for vanilla chunk AABB queries and for ClassInheritanceMultiMap type lookups, avoiding short-lived iterator wrappers on the entity query path.")
         public boolean optimizeEntityLookupIteration = true;
 
         @Config.RequiresMcRestart

@@ -3,10 +3,13 @@ package github.kasuminova.novaeng.mixin.minecraft;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
+import github.kasuminova.novaeng.client.model.CacheCapacityProbe;
+import github.kasuminova.novaeng.client.model.MultipartModelCache;
+import github.kasuminova.novaeng.client.model.PredicateCache;
+import github.kasuminova.novaeng.client.model.async.ModelBookshelfBakeCache;
 import github.kasuminova.novaeng.client.resource.DirectoryExistenceCache;
 import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndex;
 import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndexImpl;
-import github.kasuminova.novaeng.client.model.async.ModelBookshelfBakeCache;
 import net.minecraft.client.renderer.block.model.ModelManager;
 import net.minecraft.client.resources.IResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,13 +24,10 @@ public abstract class MixinModelManagerResourceGeneration {
     private void nova$withResourceGeneration(final IResourceManager resourceManager,
                                              final Operation<Void> original) {
         ModelBookshelfBakeCache.clear();
+        PredicateCache.clear();
+        MultipartModelCache.clear();
         final boolean metadata = NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
         final boolean existence = NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
-        if (!metadata && !existence) {
-            original.call(resourceManager);
-            return;
-        }
-
         final ModelJsonMetadataIndex metadataIndex = metadata ? ModelJsonMetadataIndexImpl.instance() : null;
         final DirectoryExistenceCache existenceCache = existence ? DirectoryExistenceCache.instance() : null;
         if (metadataIndex != null) {
@@ -39,6 +39,8 @@ public abstract class MixinModelManagerResourceGeneration {
         try {
             original.call(resourceManager);
         } finally {
+            CacheCapacityProbe.report();
+            MultipartModelCache.clear();
             try {
                 if (existenceCache != null) {
                     existenceCache.end();

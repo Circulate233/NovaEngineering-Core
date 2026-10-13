@@ -1,8 +1,7 @@
 package github.kasuminova.novaeng.client.resource;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
@@ -117,35 +116,35 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
     private static Metadata parse(final InputStream stream,
                                   final ResourceLocation location,
                                   final Generation generation) {
-        final JsonObject json;
-        try {
-            final JsonElement root = JsonParser.parseReader(
-                new InputStreamReader(stream, StandardCharsets.UTF_8));
-            if (root == null || !root.isJsonObject()) {
-                logFailure(generation, location,
-                    new IllegalStateException("Model JSON root is not an object"));
-                return EMPTY;
-            }
-            json = root.getAsJsonObject();
-        } catch (final RuntimeException failure) {
-            logFailure(generation, location, failure);
-            return EMPTY;
-        }
-
         String libNineType = null;
         boolean uvlMarker = false;
-        try {
-            if (json.has("9s")) {
-                libNineType = json.get("9s").getAsString();
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+                throw new IllegalStateException("Model JSON root is not an object");
             }
-        } catch (final RuntimeException failure) {
-            logFailure(generation, location, failure);
-        }
-        try {
-            if (json.has("ae2_uvl_marker")) {
-                uvlMarker = json.get("ae2_uvl_marker").getAsBoolean();
+            reader.beginObject();
+            while (reader.hasNext()) {
+                final String name = reader.nextName();
+                if ("9s".equals(name)) {
+                    final JsonToken token = reader.peek();
+                    if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
+                        libNineType = reader.nextString();
+                    } else {
+                        reader.skipValue();
+                    }
+                } else if ("ae2_uvl_marker".equals(name)) {
+                    final JsonToken token = reader.peek();
+                    if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
+                        uvlMarker = Boolean.parseBoolean(reader.nextString());
+                    } else {
+                        reader.skipValue();
+                    }
+                } else {
+                    reader.skipValue();
+                }
             }
-        } catch (final RuntimeException failure) {
+            reader.endObject();
+        } catch (final IOException | RuntimeException failure) {
             logFailure(generation, location, failure);
         }
         return new Metadata(libNineType, uvlMarker);

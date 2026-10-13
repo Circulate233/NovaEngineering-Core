@@ -240,6 +240,11 @@ sourceSets {
             srcDir generatedTagsSourceDir
         }
     }
+    test {
+        // Exercise the actual 1.12.2 NBT types and transformed constructor, not substitutes.
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.compileClasspath
+    }
 }
 
 if (!propertyBool('enable_shadow')) {

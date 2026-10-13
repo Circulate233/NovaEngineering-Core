@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng;
 
+import github.kasuminova.novaeng.common.asm.ModelResourceLocationConstructorPatch;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraftforge.common.config.Config;
@@ -48,7 +49,9 @@ public class NovaEngCoreMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public void preApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) {
-
+        if (mixinClassName.equals(MIXIN_ROOT + "minecraft.MixinModelResourceLocationFastPath")) {
+            ModelResourceLocationConstructorPatch.apply(targetClass);
+        }
     }
 
     @Override

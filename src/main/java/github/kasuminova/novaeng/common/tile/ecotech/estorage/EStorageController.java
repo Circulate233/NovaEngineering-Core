@@ -67,11 +67,13 @@ public class EStorageController extends EPartController<EStoragePart> {
     protected boolean onSyncTick() {
         if (world.getTotalWorldTime() % 5 == 0) {
             getCellDrives().forEach(EStorageCellDrive::updateWriteState);
-            this.energyCellsMax.forEach(cell -> {
-                if (cell.shouldRecalculateCap()) {
-                    cell.recalculateCapacity();
-                }
-            });
+            synchronized (this.energyCellsMax) {
+                this.energyCellsMax.forEach(cell -> {
+                    if (cell.shouldRecalculateCap()) {
+                        cell.recalculateCapacity();
+                    }
+                });
+            }
         }
         return false;
     }
@@ -79,8 +81,10 @@ public class EStorageController extends EPartController<EStoragePart> {
     @Override
     protected void onAddPart(final EStoragePart part) {
         if (part instanceof EStorageEnergyCell energyCell) {
-            energyCellsMax.add(energyCell);
-            energyCellsMin.add(energyCell);
+            synchronized (energyCellsMax) {
+                energyCellsMax.add(energyCell);
+                energyCellsMin.add(energyCell);
+            }
         } else if (part instanceof EStorageMEChannel c) {
             this.channel = c;
         }
@@ -88,8 +92,10 @@ public class EStorageController extends EPartController<EStoragePart> {
 
     protected void clearParts() {
         super.clearParts();
-        this.energyCellsMax.clear();
-        this.energyCellsMin.clear();
+        synchronized (this.energyCellsMax) {
+            this.energyCellsMax.clear();
+            this.energyCellsMin.clear();
+        }
         this.channel = null;
     }
 
@@ -97,29 +103,33 @@ public class EStorageController extends EPartController<EStoragePart> {
         double toInject = amt;
 
         if (mode == Actionable.SIMULATE) {
-            for (final EStorageEnergyCell cell : energyCellsMin) {
-                double prev = toInject;
-                toInject -= (toInject - cell.injectPower(toInject, mode));
-                if (toInject <= 0 || prev == toInject) {
-                    break;
+            synchronized (energyCellsMax) {
+                for (final EStorageEnergyCell cell : energyCellsMin) {
+                    double prev = toInject;
+                    toInject -= (toInject - cell.injectPower(toInject, mode));
+                    if (toInject <= 0 || prev == toInject) {
+                        break;
+                    }
                 }
             }
             return toInject;
         }
 
-        List<EStorageEnergyCell> toReInsert = new LinkedList<>();
-        EStorageEnergyCell cell;
-        while ((cell = energyCellsMin.poll()) != null) {
-            double prev = toInject;
-            toInject -= (toInject - cell.injectPower(toInject, mode));
-            toReInsert.add(cell);
-            if (toInject <= 0 || prev < toInject) {
-                break;
+        synchronized (energyCellsMax) {
+            List<EStorageEnergyCell> toReInsert = new LinkedList<>();
+            EStorageEnergyCell cell;
+            while ((cell = energyCellsMin.poll()) != null) {
+                double prev = toInject;
+                toInject -= (toInject - cell.injectPower(toInject, mode));
+                toReInsert.add(cell);
+                if (toInject <= 0 || prev < toInject) {
+                    break;
+                }
             }
-        }
 
-        if (!toReInsert.isEmpty()) {
-            energyCellsMin.addAll(toReInsert);
+            if (!toReInsert.isEmpty()) {
+                energyCellsMin.addAll(toReInsert);
+            }
         }
 
         return toInject;
@@ -129,29 +139,33 @@ public class EStorageController extends EPartController<EStoragePart> {
         double extracted = 0;
 
         if (mode == Actionable.SIMULATE) {
-            for (final EStorageEnergyCell cell : energyCellsMax) {
-                double prev = extracted;
-                extracted += cell.extractPower(amt - extracted, mode);
-                if (extracted >= amt || prev >= extracted) {
-                    break;
+            synchronized (energyCellsMax) {
+                for (final EStorageEnergyCell cell : energyCellsMax) {
+                    double prev = extracted;
+                    extracted += cell.extractPower(amt - extracted, mode);
+                    if (extracted >= amt || prev >= extracted) {
+                        break;
+                    }
                 }
             }
             return extracted;
         }
 
-        EStorageEnergyCell cell;
-        List<EStorageEnergyCell> toReInsert = new LinkedList<>();
-        while ((cell = energyCellsMax.poll()) != null) {
-            double prev = extracted;
-            extracted += cell.extractPower(amt - extracted, mode);
-            toReInsert.add(cell);
-            if (extracted >= amt || prev == extracted) {
-                break;
+        synchronized (energyCellsMax) {
+            EStorageEnergyCell cell;
+            List<EStorageEnergyCell> toReInsert = new LinkedList<>();
+            while ((cell = energyCellsMax.poll()) != null) {
+                double prev = extracted;
+                extracted += cell.extractPower(amt - extracted, mode);
+                toReInsert.add(cell);
+                if (extracted >= amt || prev == extracted) {
+                    break;
+                }
             }
-        }
 
-        if (!toReInsert.isEmpty()) {
-            energyCellsMax.addAll(toReInsert);
+            if (!toReInsert.isEmpty()) {
+                energyCellsMax.addAll(toReInsert);
+            }
         }
 
         return extracted;
@@ -186,23 +200,27 @@ public class EStorageController extends EPartController<EStoragePart> {
     }
 
     public double getEnergyStored() {
-        double energyStored = 0;
-        for (final EStorageEnergyCell cell : energyCellsMax) {
-            double stored = cell.getEnergyStored();
-            if (stored <= 0.000001) {
-                break;
+        synchronized (energyCellsMax) {
+            double energyStored = 0;
+            for (final EStorageEnergyCell cell : energyCellsMax) {
+                double stored = cell.getEnergyStored();
+                if (stored <= 0.000001) {
+                    break;
+                }
+                energyStored += stored;
             }
-            energyStored += stored;
+            return energyStored;
         }
-        return energyStored;
     }
 
     public double getMaxEnergyStore() {
-        double maxEnergyStore = 0;
-        for (final EStorageEnergyCell energyCell : energyCellsMax) {
-            maxEnergyStore += energyCell.getMaxEnergyStore();
+        synchronized (energyCellsMax) {
+            double maxEnergyStore = 0;
+            for (final EStorageEnergyCell energyCell : energyCellsMax) {
+                maxEnergyStore += energyCell.getMaxEnergyStore();
+            }
+            return maxEnergyStore;
         }
-        return maxEnergyStore;
     }
 
     @Override

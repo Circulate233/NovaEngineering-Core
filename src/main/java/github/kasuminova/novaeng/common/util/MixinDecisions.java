@@ -152,6 +152,8 @@ public final class MixinDecisions {
             case "mmce.MixinTileNotificationGeneration", "mmce.MixinTaskExecutorNotifications" ->
                 NovaEngCoreConfig.PERFORMANCE.coalesceMmceNotifications;
             case "minecraft.MixinClassInheritanceMultiMapLazy" -> NovaEngCoreConfig.PERFORMANCE.lazyEntityClassIndexes;
+            case "minecraft.MixinChunkEntityQuery", "minecraft.MixinClassInheritanceMultiMapIterator" ->
+                NovaEngCoreConfig.CLIENT.optimizeEntityLookupIteration;
             case "mmce.MixinRecipeCraftingContextMemory",
                  "mmce.MixinRecipeCraftingContextPool" -> recipeContextPoolEnabled();
             case "astralsorcery.MixinTexturePreloader",
@@ -164,6 +166,7 @@ public final class MixinDecisions {
             case "bibliocraft.MixinPaintingUtil" -> NovaEngCoreConfig.CLIENT.optimizeBiblioCraftPaintingCache;
             case "biomesoplenty.MixinTrailManager" -> NovaEngCoreConfig.CLIENT.optimizeBopRemoteTrails;
             case "nco.MixinNCPFWriter" -> NovaEngCoreConfig.CLIENT.optimizeNuclearcraftNcpfExport;
+            case "nco.MixinITileGui" -> NovaEngCoreConfig.CLIENT.optimizeNuclearcraftTilePackets;
             case "minecraft.MixinAbstractTexture",
                  "minecraft.forge.MixinCloudRenderer" -> NovaEngCoreConfig.CLIENT.optimizeCloudColorUpload;
             case "ic2.MixinBlockStateContainer",
@@ -178,6 +181,13 @@ public final class MixinDecisions {
                 codeChickenLibLoaded && NovaEngCoreConfig.CLIENT.optimizeCodeChickenErrorStateLog;
             case "minecraft.MixinResourceLocation" ->
                 NovaEngCoreConfig.CLIENT.optimizeResourceLocationStableValue;
+            case "minecraft.MixinModelResourceLocationFastPath" ->
+                NovaEngCoreConfig.CLIENT.optimizeFerriteModelResourceLocation;
+            case "minecraft.MixinConditionPropertyValueCanonicalization",
+                 "minecraft.MixinConditionAndCanonicalization",
+                 "minecraft.MixinConditionOrCanonicalization" -> NovaEngCoreConfig.CLIENT.optimizeFerritePredicates;
+            case "minecraft.forge.MixinChunkIOProviderNbt" -> NovaEngCoreConfig.PERFORMANCE.optimizeFerriteChunkNbt;
+            case "minecraft.MixinMultipartModelBuilder" -> NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
             case "librarianlib.MixinSavingFieldCache" ->
                 librarianLibLoaded && NovaEngCoreConfig.CLIENT.optimizeLibrarianLibFieldScan;
             case "jei.MixinElementSearch" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
@@ -199,6 +209,11 @@ public final class MixinDecisions {
             case "zenscript.MixinTypeRegistry",
                  "zenscript.MixinJavaMethod" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
             case "minecraft.MixinFallbackResourceManager" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
+            case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
+                || NovaEngCoreConfig.CLIENT.optimizeResourceExistence
+                || NovaEngCoreConfig.CLIENT.optimizeFerritePredicates
+                || NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
+            case "libnine.MixinL9Models" -> libNineLoaded && NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "actinium.MixinChunk",
                  "actinium.MixinChunkProviderClient",
                  "actinium.MixinEntityGatherer",
@@ -239,11 +254,11 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.CLIENT.optimizeMekanismObjQuads;
             case "mekanism.MixinModuleHelperModuleCache" ->
                 NovaEngCoreConfig.CLIENT.optimizeMekanismModuleLookup;
-            case "ctm.MixinTextureCTMConnectToCache" -> ctmLoaded;
-            case "ctm.MixinDirConnectionPosCache" ->
+            case "ctm.MixinTextureCTMConnectToCache",
+                 "ctm.MixinAbstractCtmModelCache",
+                 "ctm.MixinRenderContextListSerialization", "minecraft.MixinMinecraftCtmPreload" -> ctmLoaded;
+            case "ctm.MixinCtmLogicConnectionPosCache", "ctm.MixinDirConnectionPosCache" ->
                 ctmLoaded && NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
-            case "minecraft.MixinClassInheritanceMultiMapIterator" ->
-                NovaEngCoreConfig.CLIENT.optimizeEntityLookupIteration;
             case "reid.MixinSectionStorage", "reid.MixinReidSectionAccess",
                  "reid.MixinAnvilSectionCodec" -> NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth;
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;

@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Keep the existing per-section index, but do not prepopulate every historical query class.
- */
 @Mixin(value = ClassInheritanceMultiMap.class, priority = 500)
 public abstract class MixinClassInheritanceMultiMapLazy<T> {
     @Shadow
@@ -31,12 +28,6 @@ public abstract class MixinClassInheritanceMultiMapLazy<T> {
     @Final
     @Mutable
     private Set<Class<?>> knownKeys;
-    @Shadow
-    @Final
-    private Class<T> baseClass;
-    @Shadow
-    @Final
-    private List<T> values;
 
     @Redirect(method = "<init>", at = @At(value = "FIELD",
         target = "Lnet/minecraft/util/ClassInheritanceMultiMap;ALL_KNOWN:Ljava/util/Set;",
@@ -47,7 +38,6 @@ public abstract class MixinClassInheritanceMultiMapLazy<T> {
 
     @Inject(method = "<init>", at = @At("RETURN"), require = 1)
     private void nova$compactEmptyIndex(final Class<T> baseClassIn, final CallbackInfo ci) {
-        // Runs after Stellar's constructor replacement. Only the base mapping exists at this point.
         final Map<Class<?>, List<T>> compact = new Reference2ObjectOpenHashMap<>(2);
         compact.putAll(map);
         map = compact;
