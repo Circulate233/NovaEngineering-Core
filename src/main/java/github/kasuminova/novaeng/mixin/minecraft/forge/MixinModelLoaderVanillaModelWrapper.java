@@ -23,6 +23,7 @@ import java.util.Map;
 @Mixin(targets = "net.minecraftforge.client.model.ModelLoader$VanillaModelWrapper", remap = false)
 public abstract class MixinModelLoaderVanillaModelWrapper {
 
+    @SuppressWarnings("target") // javac hides the synthetic outer-instance field from annotation processors.
     @Shadow
     @Final
     ModelLoader this$0;

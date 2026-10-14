@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,11 +36,13 @@ public abstract class MixinJMChunkCache {
     @Shadow
     private JMChunkStorage storage;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Drain pending writes with one iterator while retaining conditional removal of each snapshot.
+     */
     @Overwrite(remap = false)
     private void drainPendingWrites() {
-        final Iterator<Entry<Long, JMChunkSnapshot>> iterator = this.pendingWrites.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Entry<Long, JMChunkSnapshot> next = iterator.next();
+        for (Entry<Long, JMChunkSnapshot> next : this.pendingWrites.entrySet()) {
             if (this.pendingWrites.remove(next.getKey(), next.getValue())) {
                 final JMChunkStorage stor = this.storage;
                 if (stor != null) {

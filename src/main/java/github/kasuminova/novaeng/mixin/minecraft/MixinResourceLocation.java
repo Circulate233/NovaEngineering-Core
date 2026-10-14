@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import net.minecraft.util.ResourceLocation;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,11 +10,9 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class MixinResourceLocation {
 
     @Shadow
-    @Final
     protected String namespace;
 
     @Shadow
-    @Final
     protected String path;
 
     @Unique
@@ -24,11 +21,19 @@ public abstract class MixinResourceLocation {
     @Unique
     private volatile int nova$stableHash;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Cache the string representation of this immutable resource location.
+     */
     @Overwrite
     public String toString() {
         return nova$stableValue();
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Reuse the hash of the immutable namespace and path on repeated lookups.
+     */
     @Overwrite
     public int hashCode() {
         int hash = this.nova$stableHash;

@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.mixin.electroblobs;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import electroblob.wizardry.block.BlockBookshelf;
 import electroblob.wizardry.client.model.ModelBookshelf;
 import github.kasuminova.novaeng.client.model.async.ModelBookshelfBakeCache;
@@ -18,9 +20,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 /** Builds each Wizardry bookshelf variant off-thread and publishes only complete results. */
 @Mixin(value = ModelBookshelf.class, remap = false)
 public abstract class MixinModelBookshelfConcurrent {
@@ -33,6 +32,10 @@ public abstract class MixinModelBookshelfConcurrent {
     @Shadow
     private String variant;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Publish complete bookshelf model arrays through the concurrent bake cache.
+     */
     @Overwrite(remap = false)
     protected IBakedModel[][] getBakedBookModels(final VertexFormat format,
                                                   final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) throws Exception {

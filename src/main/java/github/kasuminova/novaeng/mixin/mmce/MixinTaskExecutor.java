@@ -26,7 +26,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 
-@Mixin(TaskExecutor.class)
+@Mixin(value = TaskExecutor.class, remap = false)
 public abstract class MixinTaskExecutor implements ITaskExecutor {
 
     @Unique
@@ -70,7 +70,6 @@ public abstract class MixinTaskExecutor implements ITaskExecutor {
     }
 
     @Unique
-    @SuppressWarnings("unchecked")
     private static Long2ObjectMap<ExecuteGroup> nova$groupMap(final Long2ObjectMap<ExecuteGroup> groups) {
         try {
             return (Long2ObjectMap<ExecuteGroup>) NOVA_GROUP_MAP.invoke(groups);
@@ -120,6 +119,10 @@ public abstract class MixinTaskExecutor implements ITaskExecutor {
         return queue;
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Submit queued work and walk execute-group storage directly to avoid temporary entry allocations.
+     */
     @Overwrite
     private synchronized void submitTask() {
         ActionExecutor executor;

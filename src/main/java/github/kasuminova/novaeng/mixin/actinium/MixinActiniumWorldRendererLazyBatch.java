@@ -32,7 +32,7 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
         method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;preDrawBatch()V",
-            remap = true),
+            remap = false),
         remap = false,
         require = 1
     )
@@ -78,7 +78,7 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;drawBatch(I)V",
             ordinal = 0,
-            remap = true),
+            remap = false),
         remap = false,
         require = 1
     )
@@ -91,7 +91,7 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;drawBatch(I)V",
             ordinal = 1,
-            remap = true),
+            remap = false),
         remap = false,
         require = 1
     )

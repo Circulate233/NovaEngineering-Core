@@ -34,7 +34,7 @@ public abstract class MixinFaceBakeryAllocations {
      */
     @Redirect(method = "fillVertexData([IILnet/minecraft/util/EnumFacing;Lnet/minecraft/client/renderer/block/model/BlockFaceUV;[FLnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraftforge/common/model/ITransformation;Lnet/minecraft/client/renderer/block/model/BlockPartRotation;Z)V",
         at = @At(value = "NEW", target = "org/lwjgl/util/vector/Vector3f"),
-        require = 1)
+        remap = false, require = 1)
     private Vector3f nova$reuseVertex(final float x, final float y, final float z) {
         final Vector3f vertex = NOVA_VERTEX.get();
         vertex.set(x, y, z);
@@ -54,7 +54,7 @@ public abstract class MixinFaceBakeryAllocations {
 
     @Redirect(method = "rotateVertex(Lorg/lwjgl/util/vector/Vector3f;Lnet/minecraft/util/EnumFacing;ILnet/minecraftforge/common/model/ITransformation;)I",
         at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/model/ITransformation;getMatrix()Ljavax/vecmath/Matrix4f;", remap = false),
-        require = 1)
+        remap = false, require = 1)
     private Matrix4f nova$readModelMatrix(final ITransformation transformation) {
         return ModelTransformAccess.readOnlyMatrix(transformation);
     }

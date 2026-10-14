@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    uses: FormlessDragon/.github/.github/workflows/release.yml@main
+    uses: FormlessDragon/.github/.github/workflows/release-mdg.yml@main
     secrets: inherit
     permissions:
       contents: write

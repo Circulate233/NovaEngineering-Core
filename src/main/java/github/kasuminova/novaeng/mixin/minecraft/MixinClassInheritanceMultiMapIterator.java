@@ -34,11 +34,15 @@ public abstract class MixinClassInheritanceMultiMapIterator<T> {
         map = new Reference2ObjectOpenHashMap<>();
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Sets;newIdentityHashSet()Ljava/util/Set;"))
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Sets;newIdentityHashSet()Ljava/util/Set;", remap = false))
     public Set<?> nova$redSet() {
         return new ReferenceOpenHashSet<>();
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Filter the stored class list without allocating Guava filtering wrappers.
+     */
     @Overwrite
     public <S> Iterable<S> getByClass(final Class<S> clazz) {
         final Class<?> key = this.initializeClassLookup(clazz);

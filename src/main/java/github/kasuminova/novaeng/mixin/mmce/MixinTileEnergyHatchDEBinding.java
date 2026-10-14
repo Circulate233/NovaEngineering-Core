@@ -23,6 +23,9 @@ public abstract class MixinTileEnergyHatchDEBinding extends TileColorableMachine
      * Deliberately empty: the hatch used to scan for a DE core from its own tick. The core is now bound through
      * {@link DECoreBindingIndex}, which listens to the circulation-networks tile entity lifecycle events, so the scan
      * must not run. The visibility has to match the target method, else Mixin only warns and silently upgrades it.
+     *
+     * @author NovaEngineering contributors
+     * @reason Replace per-tick core scans with lifecycle-driven bindings from DECoreBindingIndex.
      */
     @Overwrite
     protected void findCore() {

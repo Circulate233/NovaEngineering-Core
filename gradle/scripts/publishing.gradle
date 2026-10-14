@@ -33,15 +33,13 @@ setDefaultProperty('jitpack_group', false, '')
 setDefaultProperty('jitpack_artifact_id', false, '')
 setDefaultProperty('jitpack_version', false, '')
 
-def publishMainJarTask = propertyBool('enable_shadow') ? 'remapShadowJar' : 'remapJar'
-
 def configureMavenJavaPublication = { MavenPublication publication, String groupId, String artifactId, String publicationVersion ->
     def scmUrl = propertyString('maven_scm_url')
     def scmConnectionUrl = scmUrl.endsWith('.git') ? scmUrl : "${scmUrl}.git"
 
     publication.from components.java
-    publication.artifact(tasks.named(publishMainJarTask)) {
-        classifier = null
+    publication.artifact(tasks.named('jar')) {
+        classifier = 'dev'
     }
     publication.setGroupId(groupId)
     publication.setArtifactId(artifactId)

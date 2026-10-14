@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.codechickenlib;
 
+import codechicken.lib.model.loader.blockstate.CCBlockStateLoader;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.stellarcore.client.resource.ClasspathAssetIndex;
 import net.minecraft.client.resources.IResourceManager;
@@ -9,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "codechicken.lib.model.loader.blockstate.CCBlockStateLoader", remap = false)
+@Mixin(value = CCBlockStateLoader.class, remap = false)
 public abstract class MixinCCBlockStateLoader {
 
     /**

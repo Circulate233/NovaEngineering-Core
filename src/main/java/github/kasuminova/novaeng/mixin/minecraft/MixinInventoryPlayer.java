@@ -11,15 +11,24 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(InventoryPlayer.class)
 public abstract class MixinInventoryPlayer {
 
-    @Shadow @Final public NonNullList<ItemStack> mainInventory;
+    @Shadow
+    public NonNullList<ItemStack> mainInventory;
     @Shadow @Final public NonNullList<ItemStack> armorInventory;
     @Shadow @Final public NonNullList<ItemStack> offHandInventory;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Return the fixed vanilla slot count without traversing the inventory lists.
+     */
     @Overwrite
     public int getSizeInventory() {
         return 41;
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Index directly into the matching inventory list instead of traversing all lists.
+     */
     @Overwrite
     public ItemStack getStackInSlot(final int index) {
         if (index < 36) {
@@ -29,7 +38,7 @@ public abstract class MixinInventoryPlayer {
             return this.armorInventory.get(index - 36);
         }
         if (index == 40) {
-            return this.offHandInventory.get(0);
+            return this.offHandInventory.getFirst();
         }
         return ItemStack.EMPTY;
     }

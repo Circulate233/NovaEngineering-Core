@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.IModelState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.function.Function;
 
 /** Publishes the current bake texture getter to repaired asynchronous model implementations. */
-@Mixin(targets = "net.minecraftforge.client.model.ModelLoader", remap = false)
+@Mixin(value = ModelLoader.class, remap = false)
 public abstract class MixinModelLoaderTextureContext {
 
     @WrapOperation(

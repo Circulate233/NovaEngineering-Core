@@ -35,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * guard and answer with the original call, so the cost of that drift is the exception coming back, not a guard placed
  * on the wrong target.
  */
+@SuppressWarnings("unresolvable-target") // Anonymous enum body exists in bytecode but is invisible to javac's model.
 @Mixin(targets = "net.minecraftforge.fml.common.network.FMLOutboundHandler$OutboundTarget$3", remap = false)
 public abstract class MixinFMLOutboundHandlerReply {
 

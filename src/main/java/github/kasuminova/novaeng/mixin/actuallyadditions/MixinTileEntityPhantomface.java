@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TileEntityPhantomface.class)
+@Mixin(value = TileEntityPhantomface.class, remap = false)
 public abstract class MixinTileEntityPhantomface extends TileEntityInventoryBase {
 
     @Shadow public BlockPos boundPosition;

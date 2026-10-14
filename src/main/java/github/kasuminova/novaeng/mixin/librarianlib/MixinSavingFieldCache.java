@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.librarianlib;
 
+import com.teamwizardry.librarianlib.features.saving.SavingFieldCache;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import kotlin.Metadata;
 import kotlin.jvm.JvmClassMappingKt;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.Collection;
 import java.util.Collections;
 
-@Mixin(targets = "com.teamwizardry.librarianlib.features.saving.SavingFieldCache", remap = false)
+@Mixin(value = SavingFieldCache.class, remap = false)
 public abstract class MixinSavingFieldCache {
 
     /**

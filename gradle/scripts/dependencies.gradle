@@ -1,6 +1,10 @@
 apply from: 'gradle/scripts/helpers.gradle'
 
 repositories {
+    maven {
+        name = 'CleanroomMC'
+        url = 'https://maven.cleanroommc.com'
+    }
     flatDir {
         dirs('lib')
     }/*
@@ -30,16 +34,19 @@ repositories {
     mavenLocal() // Must be last for caching to work
 }
 
+configurations.named('mcpAccessTransformerScan').configure {
+    exclude group: 'curse.maven', module: 'RandomTweaker-514170'
+}
+
 dependencies {
     contain 'com.github.luben:zstd-jni:1.5.7-4'
-    // Unimined's Minecraft libraries are not inherited by the standalone JUnit source set.
-    // Match Cleanroom 0.6.13-alpha; these are test dependencies, not bundled networking libraries.
     testImplementation 'io.netty:netty-codec-base:4.2.15.Final'
     testImplementation 'io.netty:netty-transport:4.2.15.Final'
 
     compileOnly 'com.cleanroommc:sponge-mixin:0.20.13+mixin.0.8.7'
     annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
-    annotationProcessor 'com.google.guava:guava:32.0.1-android'
+    // Mixin's mapping keys require the JRE HashBiMap implementation to retain all SRG entries.
+    annotationProcessor 'com.google.guava:guava:32.1.3-jre'
     annotationProcessor 'com.google.code.gson:gson:2.8.9'
     compileOnly 'org.jetbrains:annotations:24.1.0'
     annotationProcessor 'org.jetbrains:annotations:24.1.0'

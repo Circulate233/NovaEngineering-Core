@@ -25,6 +25,10 @@ public abstract class MixinConditionAndCanonicalization {
     @Unique
     private final BlockStatePredicateCache nova$predicateCache = new BlockStatePredicateCache();
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Cache and canonicalise conjunction predicates for each block state container.
+     */
     @Overwrite
     public Predicate<IBlockState> getPredicate(final BlockStateContainer blockState) {
         return nova$predicateCache.getOrCompute(blockState, () -> {

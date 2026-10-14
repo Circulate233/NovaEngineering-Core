@@ -31,6 +31,10 @@ public abstract class MixinTextureCTMConnectToCache {
     @Unique
     private Reference2ObjectOpenHashMap<IBlockState, Object2ByteMap<IBlockState>[]> nova$connectionsByDirection;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Cache connections by source state and direction without allocating composite lookup keys.
+     */
     @Overwrite(remap = false)
     public boolean connectTo(final CTMLogic logic, final IBlockState from, final IBlockState to,
                              final EnumFacing dir) {

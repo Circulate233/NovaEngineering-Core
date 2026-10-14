@@ -13,9 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
  */
 @Mixin(value = BlockStateContainer.class, priority = 1001)
 public abstract class MixinReidSectionAccess implements ReidSectionAccess {
+    @SuppressWarnings("target") // Added by REID before this mixin is applied.
     @Shadow(remap = false)
     @Dynamic(mixin = MixinBlockStateContainer.class)
     private int[] temporaryPalette;
+    @SuppressWarnings("target") // Added by REID before this mixin is applied.
     @Shadow(remap = false)
     @Dynamic(mixin = MixinBlockStateContainer.class)
     private NibbleArray add2;

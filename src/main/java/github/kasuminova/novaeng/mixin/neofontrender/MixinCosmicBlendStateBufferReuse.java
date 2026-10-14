@@ -2,12 +2,14 @@ package github.kasuminova.novaeng.mixin.neofontrender;
 
 import github.kasuminova.novaeng.client.font.FontGlStateScratch;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+@Pseudo
 @Mixin(targets = "neofontrender.core.font.cosmic.CosmicTextRenderer$PremultipliedBlendState", remap = false)
 public abstract class MixinCosmicBlendStateBufferReuse {
     @Redirect(
