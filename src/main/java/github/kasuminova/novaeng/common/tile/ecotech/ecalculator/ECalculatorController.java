@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.common.tile.ecotech.ecalculator;
 
-import appeng.api.util.WorldCoord;
-import appeng.me.cluster.implementations.CraftingCPUCluster;
+import ae2.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.helper.IDynamicPatternInfo;
 import github.kasuminova.mmce.common.util.DynamicPattern;
 import github.kasuminova.novaeng.NovaEngineeringCore;
@@ -221,7 +220,7 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
             return;
         }
 
-        WorldCoord pos = new WorldCoord(getPos());
+        BlockPos pos = getPos();
         this.virtualCPU = new CraftingCPUCluster(pos, pos);
         ECPUCluster eCluster = ECPUCluster.from(this.virtualCPU);
         eCluster.novaeng_ec$setVirtualCPUOwner(this);

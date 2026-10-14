@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.tile.ecotech.estorage;
 
-import appeng.api.config.Actionable;
+import ae2.api.config.Actionable;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageEnergyCell;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.EnergyCellStatus;
 import lombok.Getter;

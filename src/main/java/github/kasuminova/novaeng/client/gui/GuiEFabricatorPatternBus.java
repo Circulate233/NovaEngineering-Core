@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.gui;
 
-import appeng.client.gui.AEBaseGui;
+import ae2.client.gui.AEBaseGui;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternBus;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -9,13 +9,13 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiEFabricatorPatternBus extends AEBaseGui {
+public class GuiEFabricatorPatternBus extends AEBaseGui<ContainerEFabricatorPatternBus> {
 
     public static final ResourceLocation GUI_TEXTURE =
         new ResourceLocation(Tags.MOD_ID, "textures/gui/efabricator_pattern_bus.png");
 
     public GuiEFabricatorPatternBus(final EFabricatorPatternBus owner, final EntityPlayer player) {
-        super(new ContainerEFabricatorPatternBus(owner, player));
+        super(new ContainerEFabricatorPatternBus(owner, player), player.inventory);
         this.xSize = 230;
         this.ySize = 232;
         this.guiLeft = (this.width - this.xSize) / 2;
@@ -29,7 +29,8 @@ public class GuiEFabricatorPatternBus extends AEBaseGui {
     }
 
     @Override
-    public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
+    public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY,
+                       final float partialTicks) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(GUI_TEXTURE);
         this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);

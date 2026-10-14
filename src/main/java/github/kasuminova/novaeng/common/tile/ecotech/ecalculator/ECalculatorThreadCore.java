@@ -1,13 +1,13 @@
 package github.kasuminova.novaeng.common.tile.ecotech.ecalculator;
 
-import appeng.api.util.WorldCoord;
-import appeng.me.cluster.implementations.CraftingCPUCluster;
+import ae2.me.cluster.implementations.CraftingCPUCluster;
 import github.kasuminova.mmce.common.util.Sides;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -153,7 +153,7 @@ public class ECalculatorThreadCore extends ECalculatorPart {
         for (int i = 0; i < clustersTag.tagCount(); i++) {
             NBTTagCompound clusterTag = clustersTag.getCompoundTagAt(i);
 
-            WorldCoord coord = new WorldCoord(getPos());
+            BlockPos coord = getPos();
             CraftingCPUCluster cluster = new CraftingCPUCluster(coord, coord);
             ECPUCluster eCluster = ECPUCluster.from(cluster);
 
