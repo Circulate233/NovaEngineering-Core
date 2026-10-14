@@ -3,9 +3,11 @@ package github.kasuminova.novaeng.mixin.customloadingscreen;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+@Pseudo
 @Mixin(targets = "alexiil.mc.mod.load.render.MinecraftDisplayerRenderer", remap = false)
 public abstract class MixinMinecraftDisplayerRenderer {
 

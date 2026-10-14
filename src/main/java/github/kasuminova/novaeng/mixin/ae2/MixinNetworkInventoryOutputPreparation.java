@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.ae2;
 
+import appeng.tile.inventory.AppEngNetworkInventory;
 import appeng.util.item.AEItemStack;
 import github.kasuminova.novaeng.common.performance.AeOutputPreparation;
 import github.kasuminova.novaeng.common.performance.AeOutputTarget;
@@ -8,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(targets = "appeng.tile.inventory.AppEngNetworkInventory", remap = false)
+@Mixin(value = AppEngNetworkInventory.class, remap = false)
 public abstract class MixinNetworkInventoryOutputPreparation implements AeOutputTarget {
     @Redirect(method = "insertItem", at = @At(value = "INVOKE",
         target = "Lappeng/util/item/AEItemStack;fromItemStack(Lnet/minecraft/item/ItemStack;)Lappeng/util/item/AEItemStack;"), require = 1)

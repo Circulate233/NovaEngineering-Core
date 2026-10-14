@@ -23,7 +23,7 @@ public class MixinNetworkManagerBandwidth {
     }
 
     @ModifyArg(method = "setCompressionThreshold", at = @At(value = "INVOKE",
-        target = "Lio/netty/channel/ChannelPipeline;addBefore(Ljava/lang/String;Ljava/lang/String;Lio/netty/channel/ChannelHandler;)Lio/netty/channel/ChannelPipeline;"), index = 0)
+        target = "Lio/netty/channel/ChannelPipeline;addBefore(Ljava/lang/String;Ljava/lang/String;Lio/netty/channel/ChannelHandler;)Lio/netty/channel/ChannelPipeline;", remap = false), index = 0)
     private String novaeng$compressionOutsideAggregation(String original) {
         return NovaBandwidth.compressionAnchor((NetworkManager) (Object) this, original);
     }

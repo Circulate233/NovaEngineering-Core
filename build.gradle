@@ -5,9 +5,9 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
-    id 'com.gradleup.shadow' version '9.4.0'
-    id 'xyz.wagyourtail.unimined' version '1.4.37-kappa'
-    id 'com.diffplug.spotless' version '8.4.0'
+    id 'com.gradleup.shadow' version '9.6.1'
+    id 'net.neoforged.moddev.mcpforge' version '2.0.185-legacy'
+    id 'com.diffplug.spotless' version '8.10.4'
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.plugin.lombok" version '2.4.20'
     id "org.jetbrains.kotlin.kapt" version '2.4.20'
@@ -52,6 +52,7 @@ assertProperty 'mod_name'
 
 assertSubProperties 'use_lombok_ap', 'lombok_version'
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
+assertSubProperties 'use_mixins', 'mixin_configs'
 assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
 assertSubProperties 'use_asset_mover', 'asset_mover_version'
 
@@ -82,48 +83,34 @@ java {
 configurations {
     contain
     implementation.extendsFrom(contain)
-    modCompileOnly
-    compileOnly.extendsFrom(modCompileOnly)
-    modRuntimeOnly
-    runtimeOnly.extendsFrom(modRuntimeOnly)
 }
 
-String remapTaskName = propertyBool('enable_shadow') ? "remapShadowJar" : "remapJar"
+String reobfTaskName = 'reobfJar'
+boolean useMixins = propertyBool('use_mixins')
+def mixinConfigs = propertyStringList('mixin_configs', ',')
 
-def devMappingsJar = layout.projectDirectory.file(".gradle/unimined/local/mappings/srg2mcp.jar")
-def devMappingsSrg = layout.projectDirectory.file(".gradle/unimined/local/mappings/srg2mcp.tsrg")
-def devMappingsCsvDir = layout.buildDirectory.dir("dev/mcp-csv")
-def prepareDevMappings = tasks.register("prepareDevMappings", Copy) {
-    from({ zipTree(devMappingsJar.asFile) }) {
-        include "fields.csv", "methods.csv"
-    }
-    into(devMappingsCsvDir)
-}
-
-tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
-    dependsOn(prepareDevMappings)
-}
-
-unimined.minecraft {
-    version "1.12.2"
-
-    mappings {
-        mcp("stable", "39-1.12")
+mcpForge {
+    if (propertyBool('use_access_transformer')) {
+        accessTransformers.from(propertyStringList('access_transformer_locations', ',').collect {
+            "src/main/resources/${it.trim()}"
+        })
     }
 
-    cleanroom {
-        if (propertyBool('use_access_transformer')) {
-            accessTransformer "${rootProject.projectDir}/src/main/resources/${propertyString('access_transformer_locations')}"
-        }
-        loader "0.6.13-alpha"
-        runs.auth.username = minecraft_username
-        runs.all {
-            systemProperty("crl.dev.mixin", "${mod_id}.mixin.json")
-            systemProperty("net.minecraftforge.gradle.GradleStart.srg.notch-srg", devMappingsSrg.asFile.absolutePath)
-            systemProperty("net.minecraftforge.gradle.GradleStart.csvDir", devMappingsCsvDir.get().asFile.absolutePath)
+    enable {
+        cleanroomVersion = '0.6.13-alpha'
+        mcpMappings = 'de.oceanlabs.mcp:mcp_stable:39-1.12@zip'
+        obfuscateJar = !propertyBool('enable_shadow')
+    }
+
+    runs {
+        configureEach {
+            programArguments.addAll('--username', propertyString('minecraft_username'))
+            if (useMixins) {
+                systemProperty('crl.dev.mixin', mixinConfigs.join(','))
+            }
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
-                jvmArgs += extraArgs.split { "\\s+" }.toList()
+                extraArgs.trim().split(/\s+/).each { jvmArgument(it) }
             }
             if (propertyBool('enable_foundation_debug')) {
                 systemProperty("foundation.dump", "true")
@@ -131,31 +118,54 @@ unimined.minecraft {
             }
             systemProperty('mixin.debug.export', 'true')
             systemProperty('fml.ignorePatchDiscrepancies', 'true')
-            jvmArgs('-Xmx4G')
+            jvmArgument('-Xmx4G')
             if (propertyBool('is_coremod')) {
                 systemProperty("fml.coreMods.load", propertyString('coremod_plugin_class_name'))
             }
-            return
+        }
+        client {
+            client()
+            disableIdeRun()
+        }
+        server {
+            server()
+            disableIdeRun()
+            systemProperty 'fml.queryResult', 'confirm'
         }
     }
 
-    defaultRemapJar = false
-
-    String jarTaskName = propertyBool('enable_shadow') ? "shadowJar" : "jar"
-
-    remap(tasks.named(jarTaskName).get()) {
-        mixinRemap {
-            enableBaseMixin()
-            enableMixinExtra()
-        }
-    }
     mods {
-        remap(configurations.modCompileOnly)
-        remap(configurations.modRuntimeOnly)
+        create(propertyString('mod_id')) {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+if (propertyBool('enable_shadow')) {
+    def reobfShadowJar = obfuscation.reobfuscate(tasks.named('shadowJar'), sourceSets.main)
+    reobfTaskName = reobfShadowJar.name
+    tasks.named('assemble').configure {
+        dependsOn reobfShadowJar
+    }
+}
+
+if (useMixins) {
+    mixin {
+        mixinConfigs.each { config(it) }
+        String refmap = propertyString('mixin_refmap')
+        if (!refmap.isBlank()) {
+            add(refmap)
+        }
+        messages([
+            MIXIN_SOFT_TARGET_NOT_FOUND: 'warning'
+        ])
     }
 }
 
 dependencies {
+    if (useMixins) {
+        annotationProcessor 'com.cleanroommc:cleanmix:0.7.2'
+    }
     if (propertyBool('use_lombok_ap')) {
         compileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
         annotationProcessor "org.projectlombok:lombok:${propertyString('lombok_version')}"
@@ -266,6 +276,7 @@ tasks.matching { it.name.toLowerCase().contains('kotlin') }.configureEach {
 
 jar {
     archiveClassifier = 'dev'
+    destinationDirectory = layout.buildDirectory.dir('libs')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     if (configurations.contain.size() > 0) {
         into('/') {
@@ -293,7 +304,7 @@ jar {
             attributes(attribute_map)
         }
     }
-    finalizedBy(tasks.named(remapTaskName).get())
+    finalizedBy(tasks.named(reobfTaskName).get())
 }
 
 
@@ -303,7 +314,8 @@ shadowJar {
 }
 
 
-tasks.named(remapTaskName).configure {
+tasks.named(reobfTaskName).configure {
+    archiveClassifier = ''
     doFirst {
         logging.captureStandardOutput LogLevel.INFO
     }
@@ -319,8 +331,8 @@ idea {
     project {
         settings {
             runConfigurations {
-                "0. Apply Spotless"(Gradle) {
-                    taskNames = ["spotlessApply"]
+                "0. Create Artifacts"(Gradle) {
+                    taskNames = ["createMinecraftArtifacts"]
                 }
                 "1. Run Client"(Gradle) {
                     taskNames = ["runClient"]
@@ -330,6 +342,9 @@ idea {
                 }
                 "3. Build Mod"(Gradle) {
                     taskNames = ["build"]
+                }
+                "4. Apply Spotless"(Gradle) {
+                    taskNames = ["spotlessApply"]
                 }
             }
             compiler.javac {
@@ -362,6 +377,14 @@ test {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    options.docEncoding = 'UTF-8'
+    options.addStringOption('sourcepath', '')
+    options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 apply from: 'gradle/scripts/publishing.gradle'

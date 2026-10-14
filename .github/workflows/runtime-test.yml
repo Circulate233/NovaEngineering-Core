@@ -14,5 +14,5 @@ permissions:
 
 jobs:
   runtime-test:
-    uses: FormlessDragon/.github/.github/workflows/runtime-test.yml@main
+    uses: FormlessDragon/.github/.github/workflows/runtime-test-mdg.yml@main
     secrets: inherit

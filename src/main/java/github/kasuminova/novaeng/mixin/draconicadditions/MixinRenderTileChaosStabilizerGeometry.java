@@ -11,6 +11,7 @@ import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.client.render.CclModelGeometryCache;
 import net.minecraft.client.renderer.GlStateManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  *
  * @see github.kasuminova.novaeng.mixin.draconicevolution.MixinRenderTileReactorCoreGeometry
  */
+@Pseudo
 @Mixin(targets = "net.foxmcloud.draconicadditions.client.render.tile.RenderTileChaosStabilizerCore",
     remap = false)
 public abstract class MixinRenderTileChaosStabilizerGeometry {

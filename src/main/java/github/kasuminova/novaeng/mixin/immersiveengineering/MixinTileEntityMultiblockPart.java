@@ -17,7 +17,9 @@ public abstract class MixinTileEntityMultiblockPart<T extends TileEntityMultiblo
 
     @Shadow
     public int[] offset;
-    @Shadow
+    // IE ships this int field under the SRG name; the development dependency exposes it as pos.
+    @SuppressWarnings("target")
+    @Shadow(remap = false)
     public int field_174879_c;
     @Unique
     private T n_te;

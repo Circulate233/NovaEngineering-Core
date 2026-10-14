@@ -2,11 +2,13 @@ package github.kasuminova.novaeng.mixin.neofontrender;
 
 import github.kasuminova.novaeng.client.font.FontGlStateScratch;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.nio.FloatBuffer;
 
+@Pseudo
 @Mixin(targets = "neofontrender.core.font.support.FontRenderTuning", remap = false)
 public abstract class MixinFontRenderTuningBufferReuse {
     @Redirect(

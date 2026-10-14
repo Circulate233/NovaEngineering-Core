@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TileEntityBlock.class)
 public class MixinTileEntityBlock extends TileEntity {
 
-    @Shadow
+    @Shadow(remap = false)
     private byte loadState;
 
     @Inject(method = "validate", at = @At(value = "INVOKE", target = "Lic2/core/block/TileEntityBlock;getWorld()Lnet/minecraft/world/World;"), cancellable = true)

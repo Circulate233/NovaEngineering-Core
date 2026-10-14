@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Pseudo;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,9 +28,14 @@ import java.nio.charset.StandardCharsets;
  * writer is kept as it was, including the fact that a failure to open the source reports through
  * {@code printStackTrace} and leaves whatever was already created closed.</p>
  */
+@Pseudo
 @Mixin(targets = "de.keksuccino.konkrete.localization.Locals", remap = false)
 public abstract class MixinLocalsCopy {
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Stream localisation lines to the output instead of repeatedly copying the whole file.
+     */
     @Overwrite(remap = false)
     public static void copyLocalsFileToDir(final ResourceLocation file, final String language,
                                            final String saveDirWithoutFilename) {

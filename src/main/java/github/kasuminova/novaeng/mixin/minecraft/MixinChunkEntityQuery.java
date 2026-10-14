@@ -21,6 +21,10 @@ public abstract class MixinChunkEntityQuery {
     @Final
     private ClassInheritanceMultiMap<Entity>[] entityLists;
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Walk entity lists by index to avoid per-section iterator allocations during bounds queries.
+     */
     @Overwrite
     public void getEntitiesWithinAABBForEntity(final Entity excluded,
                                                final AxisAlignedBB bounds,

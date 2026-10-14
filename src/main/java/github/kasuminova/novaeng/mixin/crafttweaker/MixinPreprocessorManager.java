@@ -26,6 +26,10 @@ public abstract class MixinPreprocessorManager {
         throw new AssertionError();
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Skip non-directive lines early and register recognised preprocessors by script group.
+     */
     @Overwrite(remap = false)
     private IPreprocessor checkLine(final ScriptFile scriptFile, final String line, final int lineIndex) {
         final String trimmed = line.trim();
@@ -49,6 +53,10 @@ public abstract class MixinPreprocessorManager {
         return preprocessor;
     }
 
+    /**
+     * @author NovaEngineering contributors
+     * @reason Execute a snapshot so post-actions can modify the registered preprocessor list safely.
+     */
     @Overwrite(remap = false)
     private void executePostActions(final ScriptFile scriptFile) {
         final List<IPreprocessor> preprocessors = preprocessorActionsPerFile.get(scriptFile.getGroupName());

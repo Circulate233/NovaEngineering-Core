@@ -12,42 +12,39 @@ dependencies.add(cleanroomInstaller.name, "com.cleanroommc:cleanroom:${cleanroom
     transitive = false
 }
 
-def productionJarTaskName = propertyBool('enable_shadow') ? 'remapShadowJar' : 'remapJar'
+def productionJarTaskName = propertyBool('enable_shadow') ? 'reobfShadowJar' : 'reobfJar'
 def productionJarTask = tasks.named(productionJarTaskName)
-def minecraftConfig = unimined.minecrafts.get(sourceSets.main)
-def productionNamespace = minecraftConfig.mcPatcher.prodNamespace
-
 def runtimeTestProductionMods = configurations.maybeCreate('runtimeTestProductionMods')
 runtimeTestProductionMods.canBeConsumed = false
 runtimeTestProductionMods.canBeResolved = true
 runtimeTestProductionMods.transitive = false
-
-[configurations.modImplementation, configurations.modRuntimeOnly].each { sourceConfiguration ->
-    sourceConfiguration.dependencies.each { dependency ->
-        if (!(dependency instanceof ModuleDependency)) {
-            return
-        }
-        def productionNotation = [
-            group: dependency.group,
-            name: dependency.name,
-            version: dependency.version
-        ]
-        if (!dependency.artifacts.empty) {
-            def requestedArtifact = dependency.artifacts.iterator().next()
-            if (requestedArtifact.classifier != null) {
-                productionNotation.classifier = requestedArtifact.classifier
-            }
-            if (requestedArtifact.extension != null) {
-                productionNotation.ext = requestedArtifact.extension
-            }
-        }
-        def productionDependency = project.dependencies.create(
-            productionNotation
-        )
-        productionDependency.transitive = false
-        runtimeTestProductionMods.dependencies.add(productionDependency)
-    }
+runtimeTestProductionMods.extendsFrom(
+    configurations.modImplementation,
+    configurations.modRuntimeOnly,
+    configurations.modApi
+)
+def mappingsAttribute = Attribute.of(
+    'com.gtnewhorizons.retrofuturagradle.obfuscation',
+    String
+)
+runtimeTestProductionMods.attributes {
+    attribute(mappingsAttribute, 'srg')
+    attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'java-runtime'))
 }
+
+def modularMachineryDependency = configurations.modImplementation.dependencies.find {
+    it.name == 'ModularMachinery-CE'
+}
+def modularMachineryDevJarName = "${modularMachineryDependency.name}-${modularMachineryDependency.version}-dev.jar"
+def remapJarType = productionJarTask.get().class.superclass
+def runtimeTestReobfModularMachinery = tasks.register('runtimeTestReobfModularMachinery', remapJarType) {
+    input = layout.projectDirectory.file("lib/${modularMachineryDevJarName}")
+    libraries.from(sourceSets.main.compileClasspath)
+    obfuscation.configureNamedToSrgOperation(remapOperation)
+    archiveFileName = "${modularMachineryDependency.name}-${modularMachineryDependency.version}.jar"
+    destinationDirectory = layout.buildDirectory.dir('runtime-test/remapped-mods')
+}
+
 def runtimeTestModsDir = providers.gradleProperty('runtimeTestModsDir')
     .map { file(it) }
     .orElse(layout.buildDirectory.dir('runtime-test/instance/mods'))
@@ -56,175 +53,41 @@ def runtimeTestMinecraftDir = providers.gradleProperty('runtimeTestMinecraftDir'
     .orElse(layout.buildDirectory.dir('runtime-test/minecraft'))
 def runtimeTestSupportDir = layout.buildDirectory.dir('runtime-test/support')
 def runtimeTestClientModsDir = layout.buildDirectory.dir('runtime-test/client-mods')
-def runtimeRemappedDir = layout.buildDirectory.dir('runtime-test/remapped-mods')
-def runtimeFallbackClasspathDir = layout.buildDirectory.dir(
-    'runtime-test/fallback-classpath'
-)
 def runtimeMcpRemapMarker = layout.buildDirectory.file(
     'runtime-test/runtime-mcp-remap.marker'
 )
 
-def runtimeProductionFiles = []
-def runtimeFallbackArtifacts = []
-def namespaceAttribute = Attribute.of(
-    'com.gtnewhorizons.retrofuturagradle.obfuscation',
-    String
-)
-
-def resolveProductionArtifact = { artifact ->
-    def moduleId = artifact.variant.owner
-    if (!(moduleId instanceof ModuleComponentIdentifier)) {
-        throw new GradleException(
-            "Runtime test artifact is not an external module: ${artifact.file}"
-        )
-    }
-
-    def productionDependency = project.dependencies.create([
-        group: moduleId.group,
-        name: moduleId.module,
-        version: moduleId.version
-    ])
-    productionDependency.transitive = false
-    def productionConfiguration = configurations.detachedConfiguration(
-        productionDependency
-    )
-    productionConfiguration.transitive = false
-    productionConfiguration.attributes {
-        attribute(namespaceAttribute, 'srg')
-    }
-    def candidates = productionConfiguration.incoming.artifactView {
-        lenient true
-    }.artifacts.findAll { candidate ->
-        candidate.file.name.endsWith('.jar')
-            && !candidate.file.name.endsWith('-dev.jar')
-            && !candidate.file.name.endsWith('-sources.jar')
-    }
-    if (candidates.isEmpty()) {
-        return null
-    }
-    if (candidates.size() > 1) {
-        throw new GradleException(
-            "Multiple production artifacts resolved for ${moduleId}: " +
-                candidates.collect { it.file.name }.join(', ')
-        )
-    }
-    candidates.iterator().next().file
-}
-
-def runtimeTestTasksRequested = gradle.startParameter.taskNames.any {
-    it.toLowerCase().contains('runtimetest')
-}
-
-def runtimeFallbackTasks = []
-
-// tiny-remapper 只在插件类加载器里可见，构建脚本看不到，所以从补丁 jar 里取工具类。
-def fallbackRemapClass = {
-    minecraftConfig.class.classLoader.loadClass(
-        'github.kasuminova.gradle.remap.FallbackModRemap'
-    )
-}
-
-if (runtimeTestTasksRequested) {
-    runtimeTestProductionMods.incoming.artifactView {}.artifacts.each { artifact ->
-        if (!artifact.file.name.endsWith('.jar')
-            || artifact.file.name.endsWith('-sources.jar')) {
-            return
-        }
-
-        def artifactNamespace = artifact.variant.attributes.getAttribute(namespaceAttribute)
-        def isMcpArtifact = artifactNamespace == 'mcp'
-        def isDevArtifact = artifact.file.name.endsWith('-dev.jar')
-        if (!isMcpArtifact && !isDevArtifact) {
-            runtimeProductionFiles.add(artifact.file)
-            return
-        }
-
-        def productionFile = resolveProductionArtifact(artifact)
-        if (productionFile == null) {
-            runtimeFallbackArtifacts.add(artifact)
-        } else {
-            runtimeProductionFiles.add(productionFile)
-        }
-    }
-
-    if (!runtimeFallbackArtifacts.isEmpty()) {
-        def fallbackJobs = new LinkedHashMap()
-        runtimeFallbackArtifacts.each { artifact ->
-            fallbackJobs.put(
-                artifact.file,
-                new File(
-                    runtimeRemappedDir.get().asFile,
-                    artifact.file.name.replaceFirst('-dev(?=\\.jar$)', '')
-                )
-            )
-        }
-        def remapTask = tasks.register('runtimeTestRemapFallbackMods') {
-            group = 'unimined'
-            description = '把只有 dev 形态的 mod 依赖反混淆到生产命名空间：类路径索引只建一次。'
-            inputs.files(fallbackJobs.keySet())
-            inputs.property(
-                'namespaces',
-                "${minecraftConfig.mappings.checkedNs('mcp').name}->" +
-                    "${productionNamespace.name}"
-            )
-            outputs.files(fallbackJobs.values())
-            doFirst {
-                fallbackJobs.keySet().each { inputJar ->
-                    logger.lifecycle(
-                        "[RuntimeTest] Remapping ${inputJar.name} from mcp to " +
-                            "${productionNamespace.name}"
-                    )
-                }
-            }
-            doLast {
-                fallbackRemapClass().remapAll(
-                    minecraftConfig,
-                    logger,
-                    fallbackJobs,
-                    runtimeFallbackClasspathDir.get().asFile
-                )
-            }
-        }
-        runtimeFallbackTasks.add(remapTask)
-    }
-}
-
 def runtimeMcpRemapTask = tasks.register('runtimeTestRemapMcp') {
-    dependsOn(runtimeFallbackTasks)
-    inputs.files(runtimeFallbackTasks.collect { remapTask ->
-        remapTask.map { it.outputs.files.files }
-    })
-    inputs.files(runtimeProductionFiles)
-    inputs.property('runtimeRemapSchema', 'runtime-production-variants-v2')
+    dependsOn runtimeTestReobfModularMachinery
+    inputs.files(runtimeTestProductionMods)
+    inputs.file(runtimeTestReobfModularMachinery.flatMap { it.archiveFile })
+    inputs.property('runtimeRemapSchema', 'moddevgradle-mcp-runtime-classpath-v1')
     outputs.file(runtimeMcpRemapMarker)
     doLast {
-        def remappedFiles = runtimeFallbackTasks.collectMany { remapTask ->
-            remapTask.get().outputs.files.files
+        def files = runtimeTestProductionMods.files.findAll {
+            it.name.endsWith('.jar') && !it.name.endsWith('-sources.jar') && it.name != modularMachineryDevJarName
         }
-        runtimeMcpRemapMarker.get().asFile.text = (
-            runtimeProductionFiles.collect { it.name } +
-                remappedFiles.collect { it.name }
-        ).sort().join('\n') + '\n'
-        if (remappedFiles.isEmpty()) {
-            project.delete(runtimeRemappedDir)
+        files += runtimeTestReobfModularMachinery.get().archiveFile.get().asFile
+        runtimeMcpRemapMarker.get().asFile.with {
+            parentFile.mkdirs()
+            text = files.collect { it.name }.sort().join('\n') + '\n'
         }
         logger.lifecycle(
-            "[RuntimeTest] Production variants: ${runtimeProductionFiles.size()}, " +
-                "fallback remaps: ${remappedFiles.size()}"
+            "[RuntimeTest] ModDevGradle supplied ${files.size()} runtime mod variant(s)"
         )
     }
 }
-
-
 
 tasks.register('stageRuntimeTestMods', Sync) {
     dependsOn productionJarTask
-    dependsOn(runtimeMcpRemapTask)
+    dependsOn runtimeMcpRemapTask
     from(productionJarTask.flatMap { it.archiveFile })
-    from(runtimeProductionFiles)
-    runtimeFallbackTasks.each { remapTask ->
-        from(remapTask.map { it.outputs.files.files })
+    from(runtimeTestProductionMods) {
+        include '*.jar'
+        exclude '*-sources.jar'
+        exclude modularMachineryDevJarName
     }
+    from(runtimeTestReobfModularMachinery.flatMap { it.archiveFile })
     into(runtimeTestModsDir)
     include '*.jar'
     duplicatesStrategy = DuplicatesStrategy.FAIL
@@ -279,8 +142,8 @@ tasks.register('installRuntimeTestClient', JavaExec) {
 
 tasks.register('printRuntimeTestPaths') {
     doLast {
-        println "runtimeTestModsDir=${runtimeTestModsDir.get().absolutePath}"
-        println "runtimeTestMinecraftDir=${runtimeTestMinecraftDir.get().absolutePath}"
+        println "runtimeTestModsDir=${runtimeTestModsDir.get().asFile.absolutePath}"
+        println "runtimeTestMinecraftDir=${runtimeTestMinecraftDir.get().asFile.absolutePath}"
     }
 }
 
