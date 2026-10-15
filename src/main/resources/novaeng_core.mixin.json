@@ -235,7 +235,6 @@
     "minecraft.MixinFaceBakeryAllocations",
     "minecraft.MixinFallbackResourceManager",
     "minecraft.MixinFontRenderer",
-    "minecraft.MixinGuiScreen",
     "minecraft.MixinItemColors",
     "minecraft.MixinItemStackLegacyRedirect",
     "minecraft.MixinMinecraftCtmPreload",

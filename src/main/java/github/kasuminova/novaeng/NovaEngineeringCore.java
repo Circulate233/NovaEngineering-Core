@@ -57,7 +57,9 @@ import org.apache.logging.log4j.Logger;
         "required-after:theoneprobe;" +
         "required-after:appliedenergistics2@[v0.56.4,);" +
         "required-after:ae2fc@[2.6.3-r,);" +
-        "required-after-client:lumenized@[1.0.2,);",
+        "required-after-client:lumenized@[1.0.2,);" +
+        "after:astralsorcery"
+    ,
     acceptedMinecraftVersions = "[1.12, 1.13)",
     acceptableRemoteVersions = "[1.21.7, 1.24.0)"
 )
