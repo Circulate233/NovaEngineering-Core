@@ -67,11 +67,11 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                                                       final List<ComponentRequirement<?, ?>> additionalRequirements,
                                                       final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers,
                                                       final List<String> recipeTooltips) {
-        int ids = InfusionRecipeRegistry.recipes.size() + InfusionRecipeRegistry.mtRecipes.size();
+        List<AbstractInfusionRecipe> infusionRecipes = new ArrayList<>(InfusionRecipeRegistry.recipes);
+        infusionRecipes.addAll(InfusionRecipeRegistry.mtRecipes);
 
         List<MachineRecipe> recipes = new ArrayList<>();
-        for (int id = 0; id < ids; id++) {
-            AbstractInfusionRecipe infusionRecipe = InfusionRecipeRegistry.getRecipe(id);
+        for (final AbstractInfusionRecipe infusionRecipe : infusionRecipes) {
             if (infusionRecipe == null) {
                 continue;
             }
