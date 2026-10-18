@@ -141,6 +141,16 @@ mcpForge {
     }
 }
 
+tasks.named('runClient') {
+    dependsOn 'syncDevResourcesToClasses'
+    dependsOn 'syncDevClassesToResources'
+}
+
+tasks.named('runServer') {
+    dependsOn 'syncDevResourcesToClasses'
+    dependsOn 'syncDevClassesToResources'
+}
+
 if (propertyBool('enable_shadow')) {
     def reobfShadowJar = obfuscation.reobfuscate(tasks.named('shadowJar'), sourceSets.main)
     reobfTaskName = reobfShadowJar.name
