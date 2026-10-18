@@ -105,9 +105,6 @@ mcpForge {
     runs {
         configureEach {
             programArguments.addAll('--username', propertyString('minecraft_username'))
-            if (useMixins) {
-                systemProperty('crl.dev.mixin', mixinConfigs.join(','))
-            }
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
                 extraArgs.trim().split(/\s+/).each { jvmArgument(it) }
@@ -175,7 +172,7 @@ if (useMixins) {
 dependencies {
     if (useMixins) {
         annotationProcessor 'com.cleanroommc:mixinextras-common:0.5.5'
-        annotationProcessor 'com.cleanroommc:cleanmix:0.7.2'
+        annotationProcessor 'com.cleanroommc:cleanmix:0.7.4'
     }
     if (propertyBool('use_lombok_ap')) {
         compileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"
