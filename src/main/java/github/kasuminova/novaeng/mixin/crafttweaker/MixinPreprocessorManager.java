@@ -27,7 +27,7 @@ public abstract class MixinPreprocessorManager {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Skip non-directive lines early and register recognised preprocessors by script group.
      */
     @Overwrite(remap = false)
@@ -54,7 +54,7 @@ public abstract class MixinPreprocessorManager {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Execute a snapshot so post-actions can modify the registered preprocessor list safely.
      */
     @Overwrite(remap = false)

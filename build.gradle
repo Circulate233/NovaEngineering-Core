@@ -105,6 +105,12 @@ mcpForge {
     runs {
         configureEach {
             programArguments.addAll('--username', propertyString('minecraft_username'))
+            systemProperty('net.minecraftforge.gradle.GradleStart.srg.srg-mcp',
+                    layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.srg').get().asFile.absolutePath)
+            systemProperty('net.minecraftforge.gradle.GradleStart.srg.notch-srg',
+                    layout.buildDirectory.file('moddev/artifacts/notchToIntermediate.srg').get().asFile.absolutePath)
+            systemProperty('net.minecraftforge.gradle.GradleStart.csvDir',
+                    new File(gradle.gradleUserHomeDir, 'caches/minecraft/de/oceanlabs/mcp/mcp_stable/39').absolutePath)
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
                 extraArgs.trim().split(/\s+/).each { jvmArgument(it) }
@@ -138,16 +144,6 @@ mcpForge {
     }
 }
 
-tasks.named('runClient') {
-    dependsOn 'syncDevResourcesToClasses'
-    dependsOn 'syncDevClassesToResources'
-}
-
-tasks.named('runServer') {
-    dependsOn 'syncDevResourcesToClasses'
-    dependsOn 'syncDevClassesToResources'
-}
-
 if (propertyBool('enable_shadow')) {
     def reobfShadowJar = obfuscation.reobfuscate(tasks.named('shadowJar'), sourceSets.main)
     reobfTaskName = reobfShadowJar.name
@@ -170,6 +166,11 @@ if (useMixins) {
 }
 
 dependencies {
+    constraints {
+        implementation('com.cleanroommc:cleanmix:0.7.4') {
+            because 'The mod and annotation processor classpaths use CleanMix 0.7.4'
+        }
+    }
     if (useMixins) {
         annotationProcessor 'com.cleanroommc:mixinextras-common:0.5.5'
         annotationProcessor 'com.cleanroommc:cleanmix:0.7.4'

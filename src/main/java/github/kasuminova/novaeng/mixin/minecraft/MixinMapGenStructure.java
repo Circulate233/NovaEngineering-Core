@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+import javax.annotation.Nullable;
+
 /**
  * Iterates the known structure starts from a cached array instead of probing the backing open
  * hash map on every query.
@@ -52,6 +54,7 @@ public abstract class MixinMapGenStructure {
      * @author circulation
      * @reason Walk the cached array instead of the backing map.
      */
+    @Nullable
     @Overwrite
     protected StructureStart getStructureAt(final BlockPos pos) {
         for (final StructureStart start : nova$starts()) {

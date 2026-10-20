@@ -17,7 +17,7 @@ public abstract class MixinInventoryPlayer {
     @Shadow @Final public NonNullList<ItemStack> offHandInventory;
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Return the fixed vanilla slot count without traversing the inventory lists.
      */
     @Overwrite
@@ -26,7 +26,7 @@ public abstract class MixinInventoryPlayer {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Index directly into the matching inventory list instead of traversing all lists.
      */
     @Overwrite

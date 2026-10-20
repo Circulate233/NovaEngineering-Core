@@ -40,7 +40,7 @@ public abstract class MixinClassInheritanceMultiMapIterator<T> {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Filter the stored class list without allocating Guava filtering wrappers.
      */
     @Overwrite

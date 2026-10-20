@@ -37,7 +37,7 @@ public abstract class MixinJMChunkCache {
     private JMChunkStorage storage;
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Drain pending writes with one iterator while retaining conditional removal of each snapshot.
      */
     @Overwrite(remap = false)

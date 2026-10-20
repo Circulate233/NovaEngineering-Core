@@ -33,7 +33,7 @@ public abstract class MixinModelBookshelfConcurrent {
     private String variant;
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Publish complete bookshelf model arrays through the concurrent bake cache.
      */
     @Overwrite(remap = false)

@@ -22,7 +22,7 @@ public abstract class MixinResourceLocation {
     private volatile int nova$stableHash;
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Cache the string representation of this immutable resource location.
      */
     @Overwrite
@@ -31,7 +31,7 @@ public abstract class MixinResourceLocation {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Reuse the hash of the immutable namespace and path on repeated lookups.
      */
     @Overwrite
