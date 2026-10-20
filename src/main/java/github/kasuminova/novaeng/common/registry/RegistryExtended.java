@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.block.BlockExtendedFacing;
 import github.kasuminova.novaeng.common.block.BlockExtendedOre;
 import github.kasuminova.novaeng.common.block.BlockExtendedSubstrate;
 import github.kasuminova.novaeng.common.entity.EntityExtendedArrow;
+import github.kasuminova.novaeng.common.entity.EntityManaPoolOutputItem;
 import github.kasuminova.novaeng.common.item.ItemBasic;
 import github.kasuminova.novaeng.common.item.ItemBlockExtended;
 import github.kasuminova.novaeng.common.item.ItemExtendedArrow;
@@ -107,6 +108,12 @@ public final class RegistryExtended {
                 Tags.MOD_ID, "extended_arrow"),
             EntityExtendedArrow.class,
             "extended_arrow", 64, NovaEngineeringCore.instance, 1, 1, true);
+
+        EntityRegistry.registerModEntity(
+            new ResourceLocation(
+                Tags.MOD_ID, "mana_pool_output_item"),
+            EntityManaPoolOutputItem.class,
+            "mana_pool_output_item", 65, NovaEngineeringCore.instance, 1, 1, true);
 
         RegistryItems.registerItem(new ItemExtendedFood("pie_apple",
             12, 0.3F, 32, List.of(ItemExtendedFood.speed(30, 2))));

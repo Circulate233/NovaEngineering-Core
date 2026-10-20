@@ -39,6 +39,7 @@
     "betterp2p.MixinServerUnlinkP2PHandler",
     "biomesoplenty.MixinTrailManager",
     "botania.MixinTileRedStringContainer",
+    "botania.MixinTilePoolManaBatch",
     "botania.MixinTileRuneAltar",
     "botania_r.MixinSubTileDandelifeon",
     "botania_r.MixinSubTileEntropinnyum",
