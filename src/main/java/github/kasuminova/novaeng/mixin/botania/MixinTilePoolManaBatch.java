@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import ink.ikx.rt.impl.mods.botania.event.PoolTradeEvent;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import vazkii.botania.api.internal.VanillaPacketDispatcher;
 import vazkii.botania.api.item.IManaDissolvable;
 import vazkii.botania.api.mana.IKeyLocked;
@@ -34,8 +36,9 @@ import vazkii.botania.common.core.handler.ModSounds;
 /**
  * Runs pool item handling as a single server-side batch every 20 ticks.
  *
- * <p>Both tick processing and collision processing are overwritten so entity
- * handling happens only in the scheduled batch.</p>
+ * <p>Tick processing handles all entities in a batch, while a block collision
+ * is allowed to perform an immediate infusion batch so newly dropped inputs
+ * do not wait for the next scheduled batch.</p>
  */
 @Mixin(value = TilePool.class, remap = false, priority = 1100)
 public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPool, IKeyLocked, ISparkAttachable, IThrottledPacket, ITickable {
@@ -64,6 +67,11 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
 
     @Shadow
     public abstract int getCurrentMana();
+
+    @ModifyConstant(method = "getCurrentMana", constant = @Constant(intValue = 1000000))
+    private int novaeng$creativePoolManaLimit(int original) {
+        return Integer.MAX_VALUE;
+    }
 
     @Shadow
     public abstract void recieveMana(int mana);
@@ -122,9 +130,15 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
             novaeng$processingBatch = true;
             try {
                 for (EntityItem item : items) {
+                    if (item == null || item.isDead || item.getItem().isEmpty()) {
+                        continue;
+                    }
                     this.collideEntityItem(item);
                 }
                 for (EntityItem item : items) {
+                    if (item == null || item.isDead || item.getItem().isEmpty()) {
+                        continue;
+                    }
                     novaeng$processManaItem(item);
                 }
             } finally {
@@ -154,12 +168,39 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
      */
     @Overwrite
     public boolean collideEntityItem(EntityItem item) {
-        if (this.world.isRemote || !novaeng$processingBatch || item == null || item.isDead
-            || item instanceof EntityManaPoolOutputItem || item.getItem().isEmpty()) {
+        if (this.world.isRemote || item == null || item.isDead
+            || item instanceof EntityManaPoolOutputItem) {
+            return false;
+        }
+        if (item.getItem().isEmpty()) {
+            item.setDead();
+            return false;
+        }
+
+        if (!novaeng$processingBatch) {
+            novaeng$processingBatch = true;
+            try {
+                return novaeng$processRecipes(item);
+            } finally {
+                novaeng$processingBatch = false;
+            }
+        }
+
+        return novaeng$processRecipes(item);
+    }
+
+    @Unique
+    private boolean novaeng$processRecipes(EntityItem item) {
+        if (item.isDead) {
             return false;
         }
 
         ItemStack stack = item.getItem();
+        if (stack.isEmpty()) {
+            item.setDead();
+            return false;
+        }
+
         if (stack.getItem() instanceof IManaDissolvable dissolvable) {
             dissolvable.onDissolveTick(this, stack, item);
         }
@@ -169,7 +210,8 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
         }
 
         boolean craftedAny = false;
-        while (!item.isDead) {
+        int craftedCount = 0;
+        while (!item.isDead && craftedCount < Integer.MAX_VALUE) {
             stack = item.getItem();
             if (stack.isEmpty()) {
                 break;
@@ -200,6 +242,9 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
 
             this.recieveMana(-event.getMana());
             stack.shrink(1);
+            if (stack.isEmpty()) {
+                item.setDead();
+            }
             ItemStack output = event.getOutput();
             EntityItem outputItem = new EntityManaPoolOutputItem(
                 this.world,
@@ -212,6 +257,11 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
             this.world.spawnEntity(outputItem);
             novaeng$craftingFanciness();
             craftedAny = true;
+            craftedCount++;
+        }
+
+        if (!item.isDead && item.getItem().isEmpty()) {
+            item.setDead();
         }
 
         return craftedAny;
@@ -233,13 +283,13 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
         }
 
         ItemStack stack = item.getItem();
-        if (stack.isEmpty() || !(stack.getItem() instanceof IManaItem mana)) {
+        if (stack.isEmpty() || !(stack.getItem() instanceof IManaItem manaI)) {
             return;
         }
 
         boolean canTransfer = this.outputting
-            ? mana.canReceiveManaFromPool(stack, this)
-            : mana.canExportManaToPool(stack, this);
+            ? manaI.canReceiveManaFromPool(stack, this)
+            : manaI.canExportManaToPool(stack, this);
         if (!canTransfer) {
             return;
         }
@@ -247,17 +297,17 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
         boolean didSomething = false;
         if (this.outputting) {
             if (this.canSpare) {
-                int manaVal = Math.min(this.getCurrentMana(), mana.getMaxMana(stack) - mana.getMana(stack));
+                int manaVal = Math.min(this.getCurrentMana(), manaI.getMaxMana(stack) - manaI.getMana(stack));
                 if (manaVal > 0) {
-                    mana.addMana(stack, manaVal);
+                    manaI.addMana(stack, manaVal);
                     this.recieveMana(-manaVal);
                     didSomething = true;
                 }
             }
         } else if (this.canAccept) {
-            int manaVal = Math.min(this.manaCap - this.getCurrentMana(), mana.getMana(stack));
+            int manaVal = Math.min(this.manaCap - this.getCurrentMana(), manaI.getMana(stack));
             if (manaVal > 0) {
-                mana.addMana(stack, -manaVal);
+                manaI.addMana(stack, -manaVal);
                 this.recieveMana(manaVal);
                 didSomething = true;
             }
@@ -270,4 +320,5 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
             this.isDoingTransfer = this.outputting;
         }
     }
+
 }
