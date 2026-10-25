@@ -107,7 +107,7 @@ dependencies {
     modImplementation 'curse.maven:botania-225643:3330934'
     modImplementation 'curse.maven:astral-sorcery-241721:3044416'
     modImplementation 'curse.maven:baubles-227083:2518667'
-    modImplementation 'curse.maven:zenutil-401178:6895021'
+    modImplementation 'curse.maven:zenutil-401178:9057336'
     modImplementation 'curse.maven:scalingguis-319656:2716334'
     modCompileOnly 'curse.maven:matter-overdrive-community-edition-557428:4592069'
     modImplementation 'curse.maven:cofh-core-69162:2920433'
@@ -158,7 +158,7 @@ dependencies {
     compileOnly 'org.jetbrains.kotlin:kotlin-reflect:2.2.20'
     modImplementation("curse.maven:alfheim-lighting-engine-910715:6687458")
     modImplementation("curse.maven:red-core-873867:6147102")
-    modCompileOnly("curse.maven:stellarcore-1064321:9308850")
+    modImplementation("curse.maven:stellarcore-1064321:9308850")
     modImplementation("curse.maven:biomesoplenty-220318:3558882")
     modImplementation("curse.maven:journeymap-32274:8923612")
     modImplementation("curse.maven:ender-utilities-224320:2977010")
