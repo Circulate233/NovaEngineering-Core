@@ -60,7 +60,7 @@ dependencies {
     modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.716'
     modImplementation 'CraftTweaker2:ZenScript:4.1.20.716'
 
-    modCompileOnly 'curse.maven:fugue-1005815:8230893'
+    modImplementation 'curse.maven:fugue-1005815:8230893'
     modImplementation 'curse.maven:modularui-624243:7929464'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:5354477'
     modCompileOnly("curse.maven:component-model-hider-940949:4885858")
