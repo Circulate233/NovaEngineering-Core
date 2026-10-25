@@ -107,7 +107,7 @@ dependencies {
     modImplementation 'curse.maven:botania-225643:3330934'
     modImplementation 'curse.maven:astral-sorcery-241721:3044416'
     modImplementation 'curse.maven:baubles-227083:2518667'
-    modImplementation 'curse.maven:zenutil-401178:9057336'
+    modImplementation 'curse.maven:zenutil-401178:6895021'
     modImplementation 'curse.maven:scalingguis-319656:2716334'
     modCompileOnly 'curse.maven:matter-overdrive-community-edition-557428:4592069'
     modImplementation 'curse.maven:cofh-core-69162:2920433'
