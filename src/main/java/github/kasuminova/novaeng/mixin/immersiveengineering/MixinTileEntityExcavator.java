@@ -9,7 +9,9 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = TileEntityExcavator.class, priority = 1001)
 public class MixinTileEntityExcavator {
@@ -43,11 +45,12 @@ public class MixinTileEntityExcavator {
     }
 
     /**
-     * @author circulation
-     * @reason 彻底清理
+     * Keep the original method body so StellarCore can redirect its
+     * Block.onBlockHarvested call, then stop the excavation before it can
+     * return a harvested stack.
      */
-    @Overwrite(remap = false)
-    ItemStack digBlock(BlockPos pos) {
-        return ItemStack.EMPTY;
+    @Inject(method = "digBlock", at = @At("HEAD"), cancellable = true, remap = false)
+    private void nova$preventDigBlock(final BlockPos pos, final CallbackInfoReturnable<ItemStack> cir) {
+        cir.setReturnValue(ItemStack.EMPTY);
     }
 }
