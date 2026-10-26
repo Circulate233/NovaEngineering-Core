@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(NettyCompressionDecoder.class)
 public class MixinNettyDecompressionLimit {
-    @ModifyConstant(method = "decode", constant = @Constant(intValue = 2097152))
+    @ModifyConstant(method = "decode", constant = @Constant(intValue = 2097152), require = 0)
     private int novaeng$decompressedLimit(int original) {
         return NetworkLimits.decompressed();
     }

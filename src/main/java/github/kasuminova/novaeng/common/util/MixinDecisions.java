@@ -150,6 +150,10 @@ public final class MixinDecisions {
             case "minecraft.MixinClassInheritanceMultiMapLazy" -> NovaEngCoreConfig.PERFORMANCE.lazyEntityClassIndexes;
             case "minecraft.MixinChunkEntityQuery", "minecraft.MixinClassInheritanceMultiMapIterator" ->
                 NovaEngCoreConfig.CLIENT.optimizeEntityLookupIteration;
+            case "minecraft.MixinAxisAlignedBBIntercept" ->
+                NovaEngCoreConfig.PERFORMANCE.optimizeAxisAlignedBBIntercept;
+            case "minecraft.MixinVec3iHash" -> NovaEngCoreConfig.PERFORMANCE.optimizeVec3iHash;
+            case "minecraft.MixinNBTTagLongArrayBulkRead" -> NovaEngCoreConfig.PERFORMANCE.optimizeNbtLongArrayRead;
             case "mmce.MixinRecipeCraftingContextMemory",
                  "mmce.MixinRecipeCraftingContextPool" -> recipeContextPoolEnabled();
             case "astralsorcery.MixinTexturePreloader",
@@ -165,6 +169,7 @@ public final class MixinDecisions {
             case "nco.MixinITileGui" -> NovaEngCoreConfig.CLIENT.optimizeNuclearcraftTilePackets;
             case "minecraft.MixinAbstractTexture",
                  "minecraft.forge.MixinCloudRenderer" -> NovaEngCoreConfig.CLIENT.optimizeCloudColorUpload;
+            case "minecraft.MixinFramebufferBlit" -> NovaEngCoreConfig.CLIENT.optimizeFramebufferBlit;
             case "ic2.MixinBlockStateContainer",
                  "ic2.MixinIc2BlockStateInstance" -> NovaEngCoreConfig.CLIENT.optimizeIc2PropertyTables;
             case "cofh.MixinTransposerRecipeCategoryFill",

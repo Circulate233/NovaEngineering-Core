@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 public abstract class MixinLocalsCopy {
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Stream localisation lines to the output instead of repeatedly copying the whole file.
      */
     @Overwrite(remap = false)

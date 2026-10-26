@@ -105,9 +105,12 @@ mcpForge {
     runs {
         configureEach {
             programArguments.addAll('--username', propertyString('minecraft_username'))
-            if (useMixins) {
-                systemProperty('crl.dev.mixin', mixinConfigs.join(','))
-            }
+            systemProperty('net.minecraftforge.gradle.GradleStart.srg.srg-mcp',
+                    layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.srg').get().asFile.absolutePath)
+            systemProperty('net.minecraftforge.gradle.GradleStart.srg.notch-srg',
+                    layout.buildDirectory.file('moddev/artifacts/notchToIntermediate.srg').get().asFile.absolutePath)
+            systemProperty('net.minecraftforge.gradle.GradleStart.csvDir',
+                    new File(gradle.gradleUserHomeDir, 'caches/minecraft/de/oceanlabs/mcp/mcp_stable/39').absolutePath)
             def extraArgs = propertyString('extra_jvm_args')
             if (extraArgs != null && !extraArgs.trim().isEmpty()) {
                 extraArgs.trim().split(/\s+/).each { jvmArgument(it) }
@@ -163,8 +166,14 @@ if (useMixins) {
 }
 
 dependencies {
+    constraints {
+        implementation('com.cleanroommc:cleanmix:0.7.4') {
+            because 'The mod and annotation processor classpaths use CleanMix 0.7.4'
+        }
+    }
     if (useMixins) {
-        annotationProcessor 'com.cleanroommc:cleanmix:0.7.2'
+        annotationProcessor 'com.cleanroommc:mixinextras-common:0.5.5'
+        annotationProcessor 'com.cleanroommc:cleanmix:0.7.4'
     }
     if (propertyBool('use_lombok_ap')) {
         compileOnly "org.projectlombok:lombok:${propertyString('lombok_version')}"

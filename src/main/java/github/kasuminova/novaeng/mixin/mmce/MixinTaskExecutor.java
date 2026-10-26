@@ -120,7 +120,7 @@ public abstract class MixinTaskExecutor implements ITaskExecutor {
     }
 
     /**
-     * @author NovaEngineering contributors
+     * @author circulation
      * @reason Submit queued work and walk execute-group storage directly to avoid temporary entry allocations.
      */
     @Overwrite

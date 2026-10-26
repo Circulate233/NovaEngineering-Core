@@ -75,6 +75,22 @@ public class NovaEngCoreConfig {
         public boolean chunkBuildMemoryBudget = true;
         @Config.RangeInt(min = 16, max = 2048)
         public int chunkBuildMemoryBudgetMiB = 128;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAxisAlignedBBIntercept")
+        @Config.Comment("Compute AxisAlignedBB ray-trace candidates in primitive locals, avoiding the temporary Vec3d allocated for each tested face.")
+        public boolean optimizeAxisAlignedBBIntercept = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeVec3iHash")
+        @Config.Comment("Use an avalanche hash for Vec3i/BlockPos coordinates so dense position maps distribute across power-of-two buckets more evenly.")
+        public boolean optimizeVec3iHash = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeNbtLongArrayRead")
+        @Config.Comment("Bulk-read large NBTTagLongArray payloads from disk-backed DataInputStreams while retaining the vanilla loop for small and network-backed arrays.")
+        public boolean optimizeNbtLongArrayRead = true;
+
         @Config.Comment("Collect bounded tick and allocation-work counters. Also controllable with /nova_perf.")
         public boolean diagnostics = false;
     }
@@ -120,6 +136,11 @@ public class NovaEngCoreConfig {
         @Config.RequiresMcRestart
         @Config.Comment("Reuse Zstd history across outgoing batches. Disable on the sender for independently decompressible batches, for example for packet recording.")
         public boolean reuseCompressionContext = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCompressionBuffers")
+        @Config.Comment("Reuse the transient byte arrays used by vanilla Zlib compression handlers. The cache is capped so an oversized packet cannot pin a large buffer per connection.")
+        public boolean optimizeCompressionBuffers = true;
 
         @Config.RequiresMcRestart
         @Config.Comment("Replace repeated outgoing CustomPayload channel names with bounded connection-local indices. Definitions travel in-band; no capability negotiation is needed.")
@@ -219,6 +240,11 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeCloudColorUpload")
         @Config.Comment("Skip unchanged Forge cloud color texture uploads with exact GL lifetime tracking.")
         public boolean optimizeCloudColorUpload = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeFramebufferBlit")
+        @Config.Comment("Present the vanilla framebuffer with a hardware blit when the driver supports framebuffer blitting; retain the shader path for blending, unsupported drivers and compatibility-sensitive callers.")
+        public boolean optimizeFramebufferBlit = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeIc2PropertyTables")

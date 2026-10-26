@@ -19,8 +19,6 @@ public abstract class MixinPieceTrickExplode extends PieceTrick {
     @Unique
     private static final Double novaEngineering_Core$MAXPOWER = 5.0D;
     @Shadow
-    SpellParam position;
-    @Shadow
     SpellParam power;
 
     public MixinPieceTrickExplode(Spell spell) {
