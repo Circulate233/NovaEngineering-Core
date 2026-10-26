@@ -23,15 +23,26 @@ import java.util.Arrays;
  */
 @Mixin(value = VintageChunkBuildContext.class, remap = false)
 public abstract class MixinVintageScratchMemory implements FallbackScratchAccess {
-    @Unique private final ScratchRetention[] nova$retention =
+    @Unique
+    private final ScratchRetention[] nova$retention =
         new ScratchRetention[VintageChunkBuildContext.LAYERS.length];
-    @Unique private final int[] nova$usedBytes = new int[VintageChunkBuildContext.LAYERS.length];
+    @Unique
+    private final int[] nova$usedBytes = new int[VintageChunkBuildContext.LAYERS.length];
+    /**
+     * Actinium keeps these array objects for the lifetime of the build context. Cache them after the first access so
+     * the hot fallback paths do not repeatedly resolve the fields through {@link VintageRendererAccess}.
+     */
+    @Unique
+    private BufferBuilder[] nova$worldRenderers;
+    @Unique
+    private boolean[] nova$usedWorldRenderers;
 
     @Redirect(method = "convertVanillaDataToCeleritasData", at = @At(value = "INVOKE",
         target = "Lnet/minecraft/client/renderer/BufferBuilder;getByteBuffer()Ljava/nio/ByteBuffer;", remap = true), require = 1)
     private ByteBuffer nova$recordFallbackUse(final BufferBuilder builder) {
         final ByteBuffer bytes = builder.getByteBuffer();
-        final BufferBuilder[] worldRenderers = VintageRendererAccess.renderers((VintageChunkBuildContext) (Object) this);
+        nova$cacheRendererArrays((VintageChunkBuildContext) (Object) this);
+        final BufferBuilder[] worldRenderers = nova$worldRenderers;
         for (int i = 0; i < worldRenderers.length; i++) {
             if (worldRenderers[i] == builder) {
                 nova$usedBytes[i] = Math.max(nova$usedBytes[i], bytes.remaining());
@@ -44,11 +55,14 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
     @Override
     public void nova$finishFallbackTask() {
         final VintageChunkBuildContext context = (VintageChunkBuildContext) (Object) this;
-        final BufferBuilder[] worldRenderers = VintageRendererAccess.renderers(context);
-        final boolean[] usedWorldRenderers = VintageRendererAccess.used(context);
+        nova$cacheRendererArrays(context);
+        final BufferBuilder[] worldRenderers = nova$worldRenderers;
+        final boolean[] usedWorldRenderers = nova$usedWorldRenderers;
         for (int i = 0; i < worldRenderers.length; i++) {
             final BufferBuilder builder = worldRenderers[i];
-            if (builder == null) { continue; }
+            if (builder == null) {
+                continue;
+            }
             final int capacity = builder.getByteBuffer().capacity();
             // An exceptional build may still need Vintage.cleanup() to finishDrawing().
             final int used = usedWorldRenderers[i] ? capacity : nova$usedBytes[i];
@@ -58,7 +72,7 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
             }
             final boolean release = retention.endTask(used, capacity, 131072L * 4);
             if (NovaEngCoreConfig.PERFORMANCE.trimChunkBuildScratch && release && !usedWorldRenderers[i]) {
-                VintageRendererAccess.clearRenderer(context, i);
+                worldRenderers[i] = null;
             }
             nova$usedBytes[i] = 0;
         }
@@ -66,7 +80,19 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
 
     @Override
     public void nova$releaseFallback() {
-        VintageRendererAccess.releaseAll((VintageChunkBuildContext) (Object) this);
+        nova$cacheRendererArrays((VintageChunkBuildContext) (Object) this);
+        Arrays.fill(nova$worldRenderers, null);
+        Arrays.fill(nova$usedWorldRenderers, false);
         Arrays.fill(nova$usedBytes, 0);
+    }
+
+    @Unique
+    private void nova$cacheRendererArrays(final VintageChunkBuildContext context) {
+        if (nova$worldRenderers != null) {
+            return;
+        }
+        final BufferBuilder[] worldRenderers = VintageRendererAccess.renderers(context);
+        nova$usedWorldRenderers = VintageRendererAccess.used(context);
+        nova$worldRenderers = worldRenderers;
     }
 }

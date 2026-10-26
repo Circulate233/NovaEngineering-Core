@@ -3,8 +3,9 @@ package github.kasuminova.novaeng.common.util;
 import com.dhj.actinium.render.terrain.compile.VintageChunkBuildContext;
 import net.minecraft.client.renderer.BufferBuilder;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 /**
  * Reads and clears the per-layer vanilla buffers of Actinium's vintage build context.
@@ -13,8 +14,11 @@ import java.util.Arrays;
  * {@code ChunkBufferBuilder[] worldRenderers} from the change that routed the vanilla dispatcher through the
  * chunk renderer; {@code ChunkBufferBuilder extends BufferBuilder}, so the elements stay usable as
  * {@code BufferBuilder} either way. A {@code @Shadow} declaration is matched by name and descriptor, so one
- * hard-coded array type cannot serve both versions and the mixin fails to apply on the other one. Resolving the
- * field once per class keeps the same build working against either declaration.
+ * hard-coded array type cannot serve both versions and the mixin fails to apply on the other one.
+ *
+ * <p>Field access is performed through a {@link VarHandle} built with
+ * {@link MethodHandles.Lookup#unreflectVarHandle(Field)}: the declared type is discovered from the field itself
+ * rather than spelled out here, so the same build keeps working against either declaration.
  *
  * <p>Every write goes through the array's elements. Replacing the array itself would not work: a
  * {@code BufferBuilder[]} cannot be stored into a field declared as {@code ChunkBufferBuilder[]}.
@@ -24,8 +28,8 @@ public final class VintageRendererAccess {
     private static final String RENDERERS_FIELD = "worldRenderers";
     private static final String USED_FIELD = "usedWorldRenderers";
 
-    private static Field renderers;
-    private static Field used;
+    private static VarHandle renderers;
+    private static VarHandle used;
 
     private VintageRendererAccess() {
     }
@@ -40,35 +44,24 @@ public final class VintageRendererAccess {
         return read(used(), context, USED_FIELD);
     }
 
-    /** Returns one layer's buffer to the pool by clearing that slot. */
-    public static void clearRenderer(final VintageChunkBuildContext context, final int layer) {
-        renderers(context)[layer] = null;
-    }
-
-    /** Clears every layer's buffer and used flag, as the mixin does when a build's scratch is released. */
-    public static void releaseAll(final VintageChunkBuildContext context) {
-        Arrays.fill(renderers(context), null);
-        Arrays.fill(used(context), false);
-    }
-
-    private static Field renderers() {
+    private static VarHandle renderers() {
         return renderers == null ? renderers = find(RENDERERS_FIELD) : renderers;
     }
 
-    private static Field used() {
+    private static VarHandle used() {
         return used == null ? used = find(USED_FIELD) : used;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T read(final Field field, final VintageChunkBuildContext context, final String name) {
+    private static <T> T read(final VarHandle handle, final VintageChunkBuildContext context, final String name) {
         try {
-            return (T) field.get(context);
-        } catch (IllegalAccessException e) {
+            return (T) handle.get(context);
+        } catch (RuntimeException e) {
             throw new IllegalStateException("Unable to read " + name + " from a vintage build context", e);
         }
     }
 
-    private static Field find(final String name) {
+    private static VarHandle find(final String name) {
         final Field field;
         try {
             field = VintageChunkBuildContext.class.getDeclaredField(name);
@@ -76,7 +69,12 @@ public final class VintageRendererAccess {
             throw new IllegalStateException("Actinium's vintage build context has no " + name
                 + "; this NovaEngineering build does not match the installed Actinium version", e);
         }
-        field.setAccessible(true);
-        return field;
+        try {
+            return MethodHandles.privateLookupIn(VintageChunkBuildContext.class, MethodHandles.lookup())
+                                .unreflectVarHandle(field);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable to resolve " + name
+                + " on Actinium's vintage build context", e);
+        }
     }
 }
