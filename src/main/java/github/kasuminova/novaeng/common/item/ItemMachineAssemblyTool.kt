@@ -2,20 +2,21 @@
 
 package github.kasuminova.novaeng.common.item
 
-import appeng.api.networking.crafting.ICraftingGrid
-import appeng.util.item.AEItemStack
+import ae2.api.stacks.AEItemKey
+import ae2.container.implementations.ContainerCraftConfirm
+import ae2.container.interfaces.ICraftingGridContainer
+import ae2.core.gui.locator.GuiHostLocator
+import ae2.core.gui.locator.GuiHostLocators
+import ae2.helpers.WirelessTerminalGuiHost
 import com.brandon3055.draconicevolution.api.itemconfig.BooleanConfigField
 import com.brandon3055.draconicevolution.api.itemconfig.IConfigurableItem
 import com.brandon3055.draconicevolution.api.itemconfig.IItemConfigField
 import com.brandon3055.draconicevolution.api.itemconfig.IntegerConfigField
 import com.brandon3055.draconicevolution.api.itemconfig.ItemConfigFieldRegistry
 import com.brandon3055.draconicevolution.api.itemconfig.ToolConfigHelper
-import com.circulation.random_complement.common.interfaces.RCCraftingGridCache
-import com.circulation.random_complement.common.util.MEHandler
 import github.kasuminova.novaeng.NovaEngineeringCore
 import github.kasuminova.novaeng.common.CommonProxy
 import github.kasuminova.novaeng.common.util.AssemblyBlockArray
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager
 import hellfirepvp.modularmachinery.common.block.BlockController
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine
@@ -23,9 +24,11 @@ import hellfirepvp.modularmachinery.common.machine.MachineRegistry
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController
 import hellfirepvp.modularmachinery.common.util.BlockArrayCache
 import ink.ikx.mmce.common.utils.StructureIngredient
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ActionResult
 import net.minecraft.util.EnumActionResult
@@ -35,9 +38,9 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.util.text.translation.I18n
 import net.minecraft.world.World
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
-import java.util.ArrayDeque
 import kotlin.math.max
 import kotlin.math.min
 
@@ -144,21 +147,36 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool"), IConfigurab
                 val autoAECrafting = usingAE && isAutoAECrafting(stack)
                 val missing = NEWMachineAssemblyManager.checkAllItems(player, st, usingAE, autoAECrafting)
                 val q = missing.list
-                if (autoAECrafting && !q.isEmpty()) {
-                    MEHandler.getTerminalGuiObject(player)?.actionableNode?.grid?.let {
-                        val autoList = ArrayDeque<ItemStack>()
-                        val cgc: RCCraftingGridCache = it.getCache(ICraftingGrid::class.java)
-                        val list = cgc.`rc$getCraftableItems`()
-                        for (stacks in q) {
-                            for (item in stacks) {
-                                if (item.isEmpty) continue
-                                if (list.containsKey(AEItemStack.fromItemStack(item))) {
-                                    autoList.add(item)
-                                    break
+                val serverPlayer = player as? EntityPlayerMP
+                if (autoAECrafting && !q.isEmpty() && serverPlayer != null) {
+                    // 用原生 AE2 的合成确认队列：把「缺料且 AE 可合成」的条目交给
+                    // ContainerCraftConfirm，由它逐个确认、逐个推进，无需自建队列。
+                    val locator = findWirelessTerminalLocator(player)
+                    val host = locator?.locate(player, WirelessTerminalGuiHost::class.java)
+                    if (locator != null && host != null) {
+                        host.getActionableNode()?.grid()?.let {
+                            val craftables = it.getCraftingService().getCraftables(AEItemKey.filter())
+                            val toCraft = ObjectArrayList<ICraftingGridContainer.AutoCraftEntry>()
+                            for (stacks in q) {
+                                for (item in stacks) {
+                                    if (item.isEmpty) continue
+                                    val key = AEItemKey.of(item) ?: continue
+                                    if (craftables.contains(key)) {
+                                        toCraft.add(
+                                            ICraftingGridContainer.AutoCraftEntry(
+                                                key,
+                                                item.count.toLong(),
+                                                IntArrayList()
+                                            )
+                                        )
+                                        break
+                                    }
                                 }
                             }
+                            if (!toCraft.isEmpty()) {
+                                ContainerCraftConfirm.openWithCraftingList(host, serverPlayer, locator, toCraft)
+                            }
                         }
-                        AutoCraftingQueue.setQueueAndStrat(autoList, player)
                     }
                 }
                 if (q.isEmpty()
@@ -322,6 +340,31 @@ object ItemMachineAssemblyTool : ItemBasic("machine_assembly_tool"), IConfigurab
             }
             .max()
             .orElse(1)
+    }
+
+    /**
+     * 找到装着无线终端的位置。原生 AE2 打开子界面时要的是定位器（它自己会用定位器再定位一次宿主），
+     * 所以这里返回定位器而不是宿主。
+     */
+    private fun findWirelessTerminalLocator(player: EntityPlayer): GuiHostLocator? {
+        for (slot in 0 until player.inventory.sizeInventory) {
+            val locator = GuiHostLocators.forInventorySlot(slot)
+            if (locator.locate(player, WirelessTerminalGuiHost::class.java) != null) {
+                return locator
+            }
+        }
+
+        if (Loader.isModLoaded("baubles")) {
+            val handler = baubles.api.BaublesApi.getBaublesHandler(player)
+            for (slot in 0 until handler.slots) {
+                val locator = GuiHostLocators.forBaubleSlot(slot)
+                if (locator.locate(player, WirelessTerminalGuiHost::class.java) != null) {
+                    return locator
+                }
+            }
+        }
+
+        return null
     }
 
 }

@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.gui.widget.ecalculator;
 
-import appeng.api.storage.data.IAEItemStack;
+import ae2.api.stacks.GenericStack;
 import github.kasuminova.mmce.client.gui.util.MousePos;
 import github.kasuminova.mmce.client.gui.util.RenderPos;
 import github.kasuminova.mmce.client.gui.util.RenderSize;
@@ -277,11 +277,11 @@ public class MonitorPanel extends SizedRow {
                 setWidthHeight(WIDTH, HEIGHT);
                 setUseScissor(false);
                 setMargin(2, 0, 2, 0);
-                final IAEItemStack crafting = ecpuData.crafting();
+                final GenericStack crafting = ecpuData.crafting();
                 this.usedMemory = ecpuData.usedMemory();
                 this.parallelismPreSecond = ecpuData.parallelismPreSecond();
                 this.cpuUsage = ecpuData.cpuUsagePerSecond();
-                addWidget(new SlotItemVirtualJEI(crafting.createItemStack()).setAbsXY(ITEM_OFFSET_X, ITEM_OFFSET_Y));
+                addWidget(new SlotItemVirtualJEI(crafting.what().wrapForDisplayOrFilter()).setAbsXY(ITEM_OFFSET_X, ITEM_OFFSET_Y));
             }
 
             @Override

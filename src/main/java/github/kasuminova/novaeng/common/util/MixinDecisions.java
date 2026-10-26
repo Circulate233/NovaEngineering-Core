@@ -5,7 +5,7 @@ import github.kasuminova.novaeng.NovaEngCoreConfig;
 
 public final class MixinDecisions {
 
-    public static final boolean ae2Loaded = isPresent("appliedenergistics2");
+    public static final boolean ae2Loaded = isPresent("ae2");
     public static final boolean alfheimLoaded = isPresent("alfheim");
     public static final boolean actiniumLoaded = isPresent("actinium");
     public static final boolean arLoaded = isPresent("advancedrocketry");
@@ -13,7 +13,6 @@ public final class MixinDecisions {
     public static final boolean actuallyAdditionsLoaded = isPresent("actuallyadditions");
     public static final boolean astralSorceryLoaded = isPresent("astralsorcery");
     public static final boolean athenaeumLoaded = isPresent("athenaeum");
-    public static final boolean betterP2pLoaded = isPresent("betterp2p");
     public static final boolean baseLoaded = isPresent("base");
     public static final boolean biomesOPlentyLoaded = isPresent("biomesoplenty");
     public static final boolean bibliocraftLoaded = isPresent("bibliocraft");
@@ -48,7 +47,6 @@ public final class MixinDecisions {
     public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean mmceLoaded = isPresent("modularmachinery");
     public static final boolean modularRoutersLoaded = isPresent("modularrouters");
-    public static final boolean nae2Loaded = isPresent("nae2");
     public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
     public static final boolean packagedAstralLoaded = isPresent("packagedastral");
@@ -71,7 +69,7 @@ public final class MixinDecisions {
         return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.boundedRecipeContexts;
     }
 
-    public static boolean aeOutputPreparationEnabled() {
+    public static boolean aeOutputInsertionEnabled() {
         return mmceLoaded && ae2Loaded && NovaEngCoreConfig.PERFORMANCE.batchAe2Outputs;
     }
 
@@ -96,7 +94,6 @@ public final class MixinDecisions {
             case "actuallyadditions" -> actuallyAdditionsLoaded;
             case "astralsorcery" -> astralSorceryLoaded;
             case "athenaeum" -> athenaeumLoaded;
-            case "betterp2p" -> betterP2pLoaded;
             case "base" -> baseLoaded && NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
             case "biomesoplenty" -> biomesOPlentyLoaded && NovaEngCoreConfig.CLIENT.optimizeBopFog;
             case "bibliocraft" -> bibliocraftLoaded;
@@ -122,7 +119,6 @@ public final class MixinDecisions {
             case "ctm" -> ctmLoaded;
             case "mmce" -> mmceLoaded;
             case "modularrouters" -> modularRoutersLoaded;
-            case "nae2" -> nae2Loaded;
             case "neofontrender" -> neoFontRenderLoaded;
             case "revoui" -> neoFontRenderUiLoaded && actiniumLoaded;
             case "nco" -> nuclearcraftLoaded;
@@ -147,8 +143,7 @@ public final class MixinDecisions {
                  "actinium.MixinBuildOutputBudgetRelease", "actinium.MixinSortOutputBudgetRelease",
                  "actinium.MixinRenderSectionMemoryBudget" ->
                 NovaEngCoreConfig.PERFORMANCE.chunkBuildMemoryBudget;
-            case "mmce.InvokerItemOutputBus", "mmce.MixinItemOutputPreparation",
-                 "ae2.MixinNetworkInventoryOutputPreparation" -> aeOutputPreparationEnabled();
+            case "mmce.MixinItemOutputBusNetworkTarget" -> aeOutputInsertionEnabled();
             case "mmce.MixinTileNotificationGeneration", "mmce.MixinTaskExecutorNotifications" ->
                 NovaEngCoreConfig.PERFORMANCE.coalesceMmceNotifications;
             case "minecraft.MixinClassInheritanceMultiMapLazy" -> NovaEngCoreConfig.PERFORMANCE.lazyEntityClassIndexes;
@@ -269,7 +264,6 @@ public final class MixinDecisions {
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;
-            case "ae2.MixinItemListCapacity" -> NovaEngCoreConfig.SERVER.optimizeAe2ItemListCapacity;
             case "universaltweaks.MixinUTEntityDesync" -> NovaEngCoreConfig.SERVER.optimizeUniversalTweaksEntityBlacklist;
             default -> true;
         };

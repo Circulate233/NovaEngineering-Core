@@ -1,10 +1,9 @@
 package github.kasuminova.novaeng.common.tile.ecotech.ecalculator;
 
-import appeng.tile.inventory.AppEngInternalInventory;
-import appeng.util.helpers.ItemHandlerUtil;
-import appeng.util.inv.IAEAppEngInventory;
-import appeng.util.inv.InvOperation;
-import appeng.util.inv.filter.IAEItemFilter;
+import ae2.api.inventories.InternalInventory;
+import ae2.util.inv.AppEngInternalInventory;
+import ae2.util.inv.InternalInventoryHost;
+import ae2.util.inv.filter.IAEItemFilter;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.block.ecotech.ecalculator.prop.Levels;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
@@ -14,15 +13,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static appeng.helpers.ItemStackHelper.stackFromNBT;
-import static appeng.helpers.ItemStackHelper.stackWriteToNBT;
-
-public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngInventory {
+public class ECalculatorCellDrive extends ECalculatorPart implements InternalInventoryHost {
 
     protected final AppEngInternalInventory driveInv = new AppEngInternalInventory(this, 1);
     protected EnumFacing connectedSide = null;
@@ -32,7 +27,7 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
     }
 
     @Override
-    public void onChangeInventory(final IItemHandler inv, final int slot, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack) {
+    public void onChangeInventory(final AppEngInternalInventory inv, final int slot) {
         disconnectTransmitter();
         final ECalculatorController controller = getController();
         if (controller != null) {
@@ -40,6 +35,16 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
             controller.createVirtualCPU();
         }
         this.markForUpdateSync();
+    }
+
+    @Override
+    public void saveChangedInventory(final AppEngInternalInventory inv) {
+        markDirty();
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return world != null && world.isRemote;
     }
 
     public long getSuppliedBytes() {
@@ -134,7 +139,7 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
     @Override
     public <T> T getCapability(@Nonnull final Capability<T> capability, @Nullable final EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(driveInv);
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(driveInv.toItemHandler());
         }
         return super.getCapability(capability, facing);
     }
@@ -144,9 +149,9 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
         super.readCustomNBT(tag);
 
         final NBTTagCompound opt = tag.getCompoundTag("driveInv");
-        for (int x = 0; x < driveInv.getSlots(); x++) {
+        for (int x = 0; x < driveInv.size(); x++) {
             final NBTTagCompound item = opt.getCompoundTag("item" + x);
-            ItemHandlerUtil.setStackInSlot(driveInv, x, stackFromNBT(item));
+            driveInv.setItemDirect(x, item.hasKey("id", 8) ? new ItemStack(item) : ItemStack.EMPTY);
         }
         if (tag.hasKey("connectedSide")) {
             this.connectedSide = EnumFacing.values()[tag.getByte("connectedSide")];
@@ -164,11 +169,11 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
         super.writeCustomNBT(tag);
 
         final NBTTagCompound opt = new NBTTagCompound();
-        for (int x = 0; x < driveInv.getSlots(); x++) {
+        for (int x = 0; x < driveInv.size(); x++) {
             final NBTTagCompound itemNBT = new NBTTagCompound();
             final ItemStack is = driveInv.getStackInSlot(x);
             if (!is.isEmpty()) {
-                stackWriteToNBT(is, itemNBT);
+                is.writeToNBT(itemNBT);
             }
             opt.setTag("item" + x, itemNBT);
         }
@@ -177,11 +182,6 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
         if (this.connectedSide != null) {
             tag.setByte("connectedSide", (byte) this.connectedSide.ordinal());
         }
-    }
-
-    @Override
-    public void saveChanges() {
-        markDirty();
     }
 
     @Override
@@ -203,12 +203,7 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
         private static final CellInvFilter INSTANCE = new CellInvFilter();
 
         @Override
-        public boolean allowExtract(IItemHandler inv, int slot, int amount) {
-            return true;
-        }
-
-        @Override
-        public boolean allowInsert(IItemHandler inv, int slot, ItemStack stack) {
+        public boolean allowInsert(InternalInventory inv, int slot, ItemStack stack) {
             return !stack.isEmpty() && stack.getItem() instanceof ECalculatorCell;
         }
 

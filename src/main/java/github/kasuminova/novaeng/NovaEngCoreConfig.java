@@ -65,7 +65,7 @@ public class NovaEngCoreConfig {
         @Config.Comment("Avoid replaying MMCE comparator notifications for an already committed mutation.")
         public boolean coalesceMmceNotifications = true;
         @Config.RequiresMcRestart
-        @Config.Comment("Reuse supported AE interface insertion preparation within an MMCE output operation.")
+        @Config.Comment("Let an MMCE item output bus insert its products straight into the ME network of a target that exposes AE2 grid storage but no item handler of its own. The AE item key of each stack is reused for the rest of that output operation.")
         public boolean batchAe2Outputs = true;
         @Config.RequiresMcRestart
         @Config.Comment("Release oversized idle VintageFix scratch after two low-use 64-task windows. Actinium mesh scratch is controlled in actinium-options.json.")
@@ -460,11 +460,6 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeStructureLookup")
         @Config.Comment("Walk the known structure starts of a map generator from a cached array instead of probing its open hash map on every position query.")
         public boolean optimizeStructureLookup = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeAe2ItemListCapacity")
-        @Config.Comment("Start an AE2 item list with the capacity of the largest list seen so far instead of growing it from the default capacity, which removes a chain of rehashes from every item list built for a crafting job.")
-        public boolean optimizeAe2ItemListCapacity = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeBiomeIdLookup")

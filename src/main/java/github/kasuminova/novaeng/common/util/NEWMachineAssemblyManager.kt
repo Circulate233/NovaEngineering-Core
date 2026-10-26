@@ -1,19 +1,13 @@
 package github.kasuminova.novaeng.common.util
 
-import appeng.api.AEApi
-import appeng.api.config.Actionable
-import appeng.api.networking.storage.IStorageGrid
-import appeng.api.storage.IMEMonitor
-import appeng.api.storage.channels.IFluidStorageChannel
-import appeng.api.storage.channels.IItemStorageChannel
-import appeng.api.storage.data.IAEFluidStack
-import appeng.api.storage.data.IAEItemStack
-import appeng.api.storage.data.IAEStack
-import appeng.fluids.util.AEFluidStack
-import appeng.me.helpers.PlayerSource
-import appeng.util.item.AEItemStack
-import com.circulation.random_complement.common.util.MEHandler
-import com.glodblock.github.common.item.fake.FakeFluids
+import ae2.api.config.Actionable
+import ae2.api.networking.security.IActionHost
+import ae2.container.AEBaseContainer
+import ae2.api.stacks.AEFluidKey
+import ae2.api.stacks.GenericStack
+import ae2.api.stacks.AEItemKey
+import ae2.api.stacks.AEKey
+import ae2.me.helpers.PlayerSource
 import github.kasuminova.novaeng.NovaEngineeringCore
 import hellfirepvp.modularmachinery.ModularMachinery
 import hellfirepvp.modularmachinery.common.integration.ModIntegrationJEI
@@ -136,25 +130,16 @@ class NEWMachineAssemblyManager {
                 val fluidStackIngList = getFluidStackIngList(fluidIngredientList)
 
                 if (usingAE) {
-                    val obj = MEHandler.getTerminalGuiObject(player)
-                    obj?.actionableNode?.grid?.let {
-                        val storage = it.getCache<IStorageGrid>(IStorageGrid::class.java)
-                        val items: IMEMonitor<IAEItemStack?> = storage.getInventory(
-                            AEApi.instance().storage().getStorageChannel(IItemStorageChannel::class.java)
-                        )
-                        val fluids = storage.getInventory(
-                            AEApi.instance().storage().getStorageChannel(IFluidStorageChannel::class.java)
-                        )
-                        val playerSource = PlayerSource(player, obj)
+                    val host = (player.openContainer as? AEBaseContainer)?.target as? IActionHost
+                    host?.actionableNode?.grid()?.let { grid ->
+                        val storage = grid.storageService.inventory
+                        val playerSource = PlayerSource(player, host)
                         for (stacks in ReferenceArrayList(itemStackIngList)) {
                             for (item in ReferenceArrayList(stacks)) {
-                                val aeItem = items.extractItems(
-                                    AEItemStack.fromItemStack(item),
-                                    Actionable.SIMULATE,
-                                    playerSource
-                                )
-                                if (aeItem == null) continue
-                                val aeItemSize = aeItem.stackSize.toInt()
+                                val key = AEItemKey.of(item) ?: continue
+                                val aeItemSize = storage.extract(key, item.count.toLong(), Actionable.SIMULATE, playerSource)
+                                    .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+                                if (aeItemSize == 0) continue
                                 if (item.count <= aeItemSize) {
                                     itemStackIngList.remove(stacks)
                                     break
@@ -167,13 +152,10 @@ class NEWMachineAssemblyManager {
                         }
                         for (stacks in ReferenceArrayList(fluidStackIngList)) {
                             for (fluid in ReferenceArrayList(stacks)) {
-                                val aeFluid = fluids.extractItems(
-                                    AEFluidStack.fromFluidStack(fluid),
-                                    Actionable.SIMULATE,
-                                    playerSource
-                                )
-                                if (aeFluid == null) continue
-                                val aeFluidSize = aeFluid.stackSize.toInt()
+                                val key = AEFluidKey.of(fluid) ?: continue
+                                val aeFluidSize = storage.extract(key, fluid.amount.toLong(), Actionable.SIMULATE, playerSource)
+                                    .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+                                if (aeFluidSize == 0) continue
                                 if (fluid.amount <= aeFluidSize) {
                                     fluidStackIngList.remove(stacks)
                                     break
@@ -214,9 +196,8 @@ class NEWMachineAssemblyManager {
                     for (stacks in fluidStackIngList) {
                         val fs = ObjectArrayList<ItemStack>()
                         for (stack in stacks) {
-                            val i = FakeFluids.packFluid2Drops(stack)
-                            i.count = stack.amount
-                            fs.add(i)
+                            val key = AEFluidKey.of(stack) ?: continue
+                            fs.add(GenericStack.wrapInItemStack(key, stack.amount.toLong()))
                         }
                         list.add(fs)
                     }
@@ -316,18 +297,18 @@ class NEWMachineAssemblyManager {
     class Ingredient {
         val ingredient: Any
         val isItem: Boolean
-        val aeStack: IAEStack<*>?
+        val aeStack: AEKey?
 
         constructor(stack: ItemStack) {
             this.ingredient = stack
             this.isItem = true
-            this.aeStack = AEItemStack.fromItemStack(stack)
+            this.aeStack = AEItemKey.of(stack)
         }
 
         constructor(stack: FluidStack) {
             this.ingredient = stack
             this.isItem = false
-            this.aeStack = AEFluidStack.fromFluidStack(stack)
+            this.aeStack = AEFluidKey.of(stack)
         }
 
         override fun equals(other: Any?): Boolean {
@@ -343,13 +324,13 @@ class NEWMachineAssemblyManager {
         val itemStack: ItemStack
             get() = ingredient as ItemStack
 
-        val aEItemStack: IAEItemStack?
-            get() = aeStack as? IAEItemStack
+        val aeItemKey: AEItemKey?
+            get() = aeStack as? AEItemKey
 
         val fluidStack: FluidStack
             get() = ingredient as FluidStack
 
-        val aEFluidStack: IAEFluidStack?
-            get() = aeStack as? IAEFluidStack
+        val aeFluidKey: AEFluidKey?
+            get() = aeStack as? AEFluidKey
     }
 }
