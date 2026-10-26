@@ -4,10 +4,9 @@ import com.dhj.actinium.render.terrain.compile.VintageChunkBuildContext;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.client.memory.FallbackScratchAccess;
 import github.kasuminova.novaeng.client.memory.ScratchRetention;
+import github.kasuminova.novaeng.common.util.VintageRendererAccess;
 import net.minecraft.client.renderer.BufferBuilder;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -15,11 +14,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-/** Trims the legacy vanilla BufferBuilders retained by Actinium's Vintage build context. */
+/**
+ * Trims the legacy vanilla BufferBuilders retained by Actinium's Vintage build context.
+ *
+ * <p>The buffer array is reached through {@link VintageRendererAccess} instead of a {@code @Shadow} field: its
+ * declared element type changed between Actinium versions and a shadow is matched by name and descriptor, so one
+ * hard-coded type would stop this mixin from applying to the other version.
+ */
 @Mixin(value = VintageChunkBuildContext.class, remap = false)
 public abstract class MixinVintageScratchMemory implements FallbackScratchAccess {
-    @Shadow @Final private BufferBuilder[] worldRenderers;
-    @Shadow @Final private boolean[] usedWorldRenderers;
     @Unique private final ScratchRetention[] nova$retention =
         new ScratchRetention[VintageChunkBuildContext.LAYERS.length];
     @Unique private final int[] nova$usedBytes = new int[VintageChunkBuildContext.LAYERS.length];
@@ -28,6 +31,7 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
         target = "Lnet/minecraft/client/renderer/BufferBuilder;getByteBuffer()Ljava/nio/ByteBuffer;", remap = true), require = 1)
     private ByteBuffer nova$recordFallbackUse(final BufferBuilder builder) {
         final ByteBuffer bytes = builder.getByteBuffer();
+        final BufferBuilder[] worldRenderers = VintageRendererAccess.renderers((VintageChunkBuildContext) (Object) this);
         for (int i = 0; i < worldRenderers.length; i++) {
             if (worldRenderers[i] == builder) {
                 nova$usedBytes[i] = Math.max(nova$usedBytes[i], bytes.remaining());
@@ -39,6 +43,9 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
 
     @Override
     public void nova$finishFallbackTask() {
+        final VintageChunkBuildContext context = (VintageChunkBuildContext) (Object) this;
+        final BufferBuilder[] worldRenderers = VintageRendererAccess.renderers(context);
+        final boolean[] usedWorldRenderers = VintageRendererAccess.used(context);
         for (int i = 0; i < worldRenderers.length; i++) {
             final BufferBuilder builder = worldRenderers[i];
             if (builder == null) { continue; }
@@ -51,7 +58,7 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
             }
             final boolean release = retention.endTask(used, capacity, 131072L * 4);
             if (NovaEngCoreConfig.PERFORMANCE.trimChunkBuildScratch && release && !usedWorldRenderers[i]) {
-                worldRenderers[i] = null;
+                VintageRendererAccess.clearRenderer(context, i);
             }
             nova$usedBytes[i] = 0;
         }
@@ -59,8 +66,7 @@ public abstract class MixinVintageScratchMemory implements FallbackScratchAccess
 
     @Override
     public void nova$releaseFallback() {
-        Arrays.fill(worldRenderers, null);
-        Arrays.fill(usedWorldRenderers, false);
+        VintageRendererAccess.releaseAll((VintageChunkBuildContext) (Object) this);
         Arrays.fill(nova$usedBytes, 0);
     }
 }
