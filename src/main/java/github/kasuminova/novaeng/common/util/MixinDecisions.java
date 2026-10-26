@@ -55,6 +55,7 @@ public final class MixinDecisions {
     public static final boolean psiLoaded = isPresent("psi");
     public static final boolean rftoolsLoaded = isPresent("rftools");
     public static final boolean techgunsLoaded = isPresent("techguns");
+    public static final boolean tconEvoLoaded = isPresent("tconevo");
     public static final boolean threngLoaded = isPresent("threng");
     public static final boolean circulationNetworksLoaded = isPresent("circulation_networks");
     public static final boolean universalTweaksLoaded = isPresent("universaltweaks");
@@ -130,6 +131,7 @@ public final class MixinDecisions {
             case "psi" -> psiLoaded;
             case "rftools" -> rftoolsLoaded;
             case "techguns" -> techgunsLoaded;
+            case "tconevo" -> tconEvoLoaded;
             case "threng" -> threngLoaded;
             case "universaltweaks" -> universalTweaksLoaded;
             default -> true;

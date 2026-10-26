@@ -71,7 +71,6 @@ dependencies {
     modCompileOnly 'curse.maven:ingameime-vintage-1281907:8566984'
     modCompileOnly 'curse.maven:random-psideas-302313:3215550'
     modCompileOnly 'curse.maven:tinkers-antique-1242239:8666425'
-    modCompileOnly 'curse.maven:tinkers-evolution-384589:8349133'
     modCompileOnly 'curse.maven:tinkers-tool-leveling-250957:2630860'
     modCompileOnly 'curse.maven:zettai-grimoires-417570:3496150'
     modCompileOnly 'curse.maven:zettai-psi-537428:3662855'
@@ -169,4 +168,5 @@ dependencies {
     modCompileOnly 'curse.maven:vintagefix-871198:8895999'
     modCompileOnly 'curse.maven:universal-tweaks-705000:5138787'
     modCompileOnly("curse.maven:reid-629017:8029704")
+    modCompileOnly("curse.maven:tinkers-evolution-384589:9030702")
 }
