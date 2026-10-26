@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(TileEntityExcavator.class)
+@Mixin(value = TileEntityExcavator.class, priority = 1001)
 public class MixinTileEntityExcavator {
 
     @Redirect(
