@@ -94,7 +94,7 @@ dependencies {
     modImplementation 'curse.maven:the-one-probe-245211:2667280'
     modCompileOnly 'curse.maven:FTB-Library-237167:2985811'
     modCompileOnly 'curse.maven:FTBU-237102:3157548'
-    modImplementation 'com.github.FormlessDragon:Applied-Energistics-2-Supergiant:v1.0.14:dev'
+    modImplementation 'com.github.FormlessDragon:Applied-Energistics-2-Supergiant:v1.0.17:dev'
     modCompileOnly 'com.github.FormlessDragon:Applied-Mekanistics:v1.1.1:dev'
     modImplementation 'curse.maven:codechicken-lib-cre-1328922:6898525'
     modImplementation 'curse.maven:wanionlib-253043:4623135'

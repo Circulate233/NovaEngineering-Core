@@ -5,7 +5,7 @@ import github.kasuminova.novaeng.NovaEngCoreConfig;
 
 public final class MixinDecisions {
 
-    public static final boolean ae2Loaded = isPresent("appliedenergistics2");
+    public static final boolean ae2Loaded = isPresent("ae2");
     public static final boolean alfheimLoaded = isPresent("alfheim");
     public static final boolean actiniumLoaded = isPresent("actinium");
     public static final boolean arLoaded = isPresent("advancedrocketry");
@@ -69,7 +69,7 @@ public final class MixinDecisions {
         return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.boundedRecipeContexts;
     }
 
-    public static boolean aeOutputPreparationEnabled() {
+    public static boolean aeOutputInsertionEnabled() {
         return mmceLoaded && ae2Loaded && NovaEngCoreConfig.PERFORMANCE.batchAe2Outputs;
     }
 
@@ -143,8 +143,7 @@ public final class MixinDecisions {
                  "actinium.MixinBuildOutputBudgetRelease", "actinium.MixinSortOutputBudgetRelease",
                  "actinium.MixinRenderSectionMemoryBudget" ->
                 NovaEngCoreConfig.PERFORMANCE.chunkBuildMemoryBudget;
-            case "mmce.InvokerItemOutputBus", "mmce.MixinItemOutputPreparation",
-                 "ae2.MixinNetworkInventoryOutputPreparation" -> aeOutputPreparationEnabled();
+            case "mmce.MixinItemOutputBusNetworkTarget" -> aeOutputInsertionEnabled();
             case "mmce.MixinTileNotificationGeneration", "mmce.MixinTaskExecutorNotifications" ->
                 NovaEngCoreConfig.PERFORMANCE.coalesceMmceNotifications;
             case "minecraft.MixinClassInheritanceMultiMapLazy" -> NovaEngCoreConfig.PERFORMANCE.lazyEntityClassIndexes;
@@ -265,7 +264,6 @@ public final class MixinDecisions {
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;
-            case "ae2.MixinItemListCapacity" -> NovaEngCoreConfig.SERVER.optimizeAe2ItemListCapacity;
             case "universaltweaks.MixinUTEntityDesync" -> NovaEngCoreConfig.SERVER.optimizeUniversalTweaksEntityBlacklist;
             default -> true;
         };
