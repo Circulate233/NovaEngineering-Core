@@ -100,7 +100,6 @@
     "minecraft.MixinMapGenStructure",
     "minecraft.MixinNBTTagLongArrayBulkRead",
     "minecraft.MixinNettyCompressionEncoderBandwidth",
-    "minecraft.MixinNettyDecompressionLimit",
     "minecraft.MixinNettyFrameDecoderLimit",
     "minecraft.MixinNettyFrameEncoderLimit",
     "minecraft.MixinNettyPacketDecoder",
@@ -271,6 +270,7 @@
     "astralsorcery.InvokerPerkEffectHelper",
     "astralsorcery.MixinPlayerProgress",
     "draconicevolution.MixinEntityChaosGuardian",
+    "minecraft.MixinNettyDecompressionLimit",
     "tconevo.MixinEntityMagicMissileServer",
     "immersiveengineering.MixinTileEntityExcavator"
   ]
