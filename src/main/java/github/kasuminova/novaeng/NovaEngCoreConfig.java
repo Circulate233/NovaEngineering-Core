@@ -91,6 +91,11 @@ public class NovaEngCoreConfig {
         @Config.Comment("Bulk-read large NBTTagLongArray payloads from disk-backed DataInputStreams while retaining the vanilla loop for small and network-backed arrays.")
         public boolean optimizeNbtLongArrayRead = true;
 
+        @Config.RequiresMcRestart
+        @Config.Name("CacheEnumValuesArrays")
+        @Config.Comment("Reuse the clone that the compiler-generated Enum.values() performs, so repeated calls stop allocating a new array. Applied only to enums whose returned array is never written by this modpack.")
+        public boolean cacheEnumValuesArrays = true;
+
         @Config.Comment("Collect bounded tick and allocation-work counters. Also controllable with /nova_perf.")
         public boolean diagnostics = false;
     }
@@ -371,11 +376,6 @@ public class NovaEngCoreConfig {
         public boolean optimizeCustomLoadingScreen = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeLibrarianLibFieldScan")
-        @Config.Comment("Skip the kotlin-reflect property walk LibrarianLib performs on every registered class while building its save field cache, for classes that were not compiled by Kotlin and therefore have no Kotlin properties.")
-        public boolean optimizeLibrarianLibFieldScan = true;
-
-        @Config.RequiresMcRestart
         @Config.Name("OptimizeCodeChickenBlockstateScan")
         @Config.Comment("Answer CodeChicken Lib's per-block blockstate existence probes from StellarCore's classpath asset index instead of walking every resource pack and throwing a FileNotFoundException for each miss.")
         public boolean optimizeCodeChickenBlockstateScan = true;
@@ -475,6 +475,66 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeForgeEventDispatch")
         @Config.Comment("Replace EventBus#post so an event that cannot be canceled dispatches without asking every listener whether the event was canceled, and without allocating a callback handle per post; the generic-event filter is still applied. Applies on both sides.")
         public boolean optimizeForgeEventDispatch = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Skip empty ZenUtils world-task views while preserving pending-task merge timing and insertion order.")
+        public boolean optimizeZenUtilsTickWork = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse the parsed IC2 ender-chest configuration path, without caching configuration nodes or values.")
+        public boolean optimizeIc2TickConfigPath = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Use int[] dimension IDs only in the server tick loop, retaining Forge's periodic leak check and leaving its public Integer[] API unchanged.")
+        public boolean optimizeDimensionTickIds = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Replace StellarCore's chunk-tick stream with an eager, ordered snapshot backed by bounded reusable arrays. Outstanding iterators keep independent storage.")
+        public boolean optimizeChunkTickSnapshot = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse Advanced Rocketry's temperature geometry and pressure factors independently as live numerical inputs change, avoid empty atmosphere-blob wrappers and enum values() clones. No world-state or atmosphere-result caching.")
+        public boolean optimizeWorldgenAtmosphere = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Use primitive-key fastutil maps for private Advanced Rocketry atmosphere handlers and AE2 compass regions. Public signatures and region-coordinate packing remain unchanged.")
+        public boolean optimizeWorldgenIdMaps = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse CoFH World's immutable per-material replacement predicates; replacement checks, RNG calls and block notifications remain unchanged.")
+        public boolean optimizeWorldgenOrePredicates = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Build AE2 meteor filenames without Formatter on ASCII-digit locales and buffer compressed file input with bounded per-thread reusable storage. Reads still access disk every time; no NBT or missing-file caching.")
+        public boolean optimizeMeteorSpawnDataIo = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Use one immutable BlockPos for CoFH World's material check and successful placement, preserving RNG order and all block notifications.")
+        public boolean optimizeOrePlacementCoordinates = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Precompute CoFH cluster ellipsoid Z distances and use their exact float minimum to skip impossible X/Y branches. Float arithmetic, repeated placements, callbacks and random draws remain unchanged.")
+        public boolean optimizeOreVeinGeometry = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Memoize the seven immutable BlockStone metadata transitions per default-state identity. Changes to the default state invalidate the table.")
+        public boolean optimizeStoneMetadataStates = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Skip metadata decoding for non-target registry identities in BetterMeteorite's compass voxel scan. Target parsing, scan order and update submissions are unchanged.")
+        public boolean optimizeMeteorCompassMetadata = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Reuse vanilla ore ellipsoid Z distances and their exact minimum without merging duplicate attempts or changing random calls, predicates or notifications.")
+        public boolean optimizeVanillaOreGeometry = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Use independent mutable fastutil sets for attribute modifier snapshots. Attribute-value evaluation and its floating-point accumulation order are unchanged.")
+        public boolean optimizeAttributeModifierSnapshots = true;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Use fixed-arity random choices in vanilla Zoom and FuzzyZoom biome layers, retaining seeds and IntCache requests. Custom subclasses use their original method.")
+        public boolean optimizeBiomeZoomRandom = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeSpawnListResolution")

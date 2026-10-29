@@ -82,7 +82,7 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
             int level = buf.readByte();
             int usedTypes = buf.readShort();
             long usedBytes = buf.readLong();
-            dataList.add(new EStorageCellData(DriveStorageType.values()[type], DriveStorageLevel.values()[level], usedTypes, usedBytes));
+            dataList.add(new EStorageCellData(DriveStorageType.byOrdinal(type), DriveStorageLevel.byOrdinal(level), usedTypes, usedBytes));
         }
         energyData = new EStorageEnergyData(buf.readDouble(), buf.readDouble(), buf.readDouble());
     }

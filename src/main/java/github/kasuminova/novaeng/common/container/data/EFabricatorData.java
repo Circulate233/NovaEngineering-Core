@@ -27,7 +27,7 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
         int maxHotCoolant = buf.readInt();
         int energyStored = buf.readInt();
         long totalCrafted = buf.readLong();
-        Levels level = Levels.values()[buf.readByte()];
+        Levels level = Levels.VALUES[buf.readByte()];
         List<WorkerStatus> workers = new ArrayList<>(len);
         IntStream.range(0, len)
                  .mapToObj(i -> ByteBufUtils.readItemStack(buf))

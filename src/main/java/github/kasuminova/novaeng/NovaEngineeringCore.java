@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
+import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
@@ -32,9 +33,11 @@ import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.performance.RecipeContextPool;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
+import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.common.util.NovaBiomeIdCache;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Mod;
@@ -178,6 +181,10 @@ public class NovaEngineeringCore {
         // that outlived its world's unload would keep that world - and every chunk and
         // entity in it - for the rest of the process. Nothing survives a server stop.
         HyperNetCaches.clear();
+        AutoCraftingQueue.clearAll();
+        if (Mods.BM2.isPresent()) {
+            MMAltar.clearCache();
+        }
         if (MixinDecisions.recipeContextPoolEnabled()) {
             RecipeContextPool.reset();
         }

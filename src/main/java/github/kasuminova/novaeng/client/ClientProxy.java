@@ -281,7 +281,8 @@ public class ClientProxy extends CommonProxy {
     @Nullable
     @Override
     public Object getClientGuiElement(final int id, final EntityPlayer player, final World world, final int x, final int y, final int z) {
-        GuiType type = GuiType.getEntries().get(MathHelper.clamp(id, 0, GuiType.getEntries().size() - 1));
+        GuiType[] types = GuiType.VALUES;
+        GuiType type = types[MathHelper.clamp(id, 0, types.length - 1)];
         Class<? extends TileEntity> required = type.requiredTileEntity;
         TileEntity present = null;
         if (required != null) {

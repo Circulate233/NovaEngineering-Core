@@ -30,7 +30,7 @@ public class PktGeocentricDrillControl implements IMessage, IMessageHandler<PktG
 
     @Override
     public void fromBytes(final ByteBuf buf) {
-        type = Type.values()[buf.readByte()];
+        type = Type.VALUES[buf.readByte()];
         if (type == Type.SET_TARGET_DEPTH) {
             depth = buf.readShort();
         } else if (type == Type.ADD_ACCELERATE_ORE || type == Type.REMOVE_ACCELERATE_ORE) {
@@ -66,7 +66,9 @@ public class PktGeocentricDrillControl implements IMessage, IMessageHandler<PktG
     public enum Type {
         SET_TARGET_DEPTH,
         ADD_ACCELERATE_ORE,
-        REMOVE_ACCELERATE_ORE,
+        REMOVE_ACCELERATE_ORE;
+
+        public static final Type[] VALUES = values();
     }
 
 }

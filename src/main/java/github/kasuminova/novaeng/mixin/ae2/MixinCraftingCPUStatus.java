@@ -28,7 +28,7 @@ public class MixinCraftingCPUStatus implements ECPUStatus {
     @Inject(method = "<init>(Lnet/minecraft/nbt/NBTTagCompound;)V", at = @At("RETURN"))
     private void injectInit(final NBTTagCompound i, final CallbackInfo ci) {
         if (i.hasKey("ecLevel")) {
-            this.novaeng_ec$ecLevel = Levels.values()[i.getByte("ecLevel")];
+            this.novaeng_ec$ecLevel = Levels.BY_ORDINAL[i.getByte("ecLevel")];
         }
     }
 

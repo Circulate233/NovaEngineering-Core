@@ -2,63 +2,35 @@ package github.kasuminova.novaeng.common.util;
 
 import com.cleanroommc.discovery.CleanroomModDiscoverer;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
+import github.kasuminova.stellarcore.common.config.StellarCoreConfig;
 
 public final class MixinDecisions {
 
     public static final boolean ae2Loaded = isPresent("appliedenergistics2");
-    public static final boolean alfheimLoaded = isPresent("alfheim");
     public static final boolean actiniumLoaded = isPresent("actinium");
     public static final boolean arLoaded = isPresent("advancedrocketry");
+    public static final boolean enderioLoaded = isPresent("enderio");
+    public static final boolean threngLoaded = isPresent("threng");
     public static final boolean avaritiaLoaded = isPresent("avaritia");
-    public static final boolean actuallyAdditionsLoaded = isPresent("actuallyadditions");
     public static final boolean astralSorceryLoaded = isPresent("astralsorcery");
-    public static final boolean athenaeumLoaded = isPresent("athenaeum");
-    public static final boolean betterP2pLoaded = isPresent("betterp2p");
-    public static final boolean baseLoaded = isPresent("base");
-    public static final boolean biomesOPlentyLoaded = isPresent("biomesoplenty");
     public static final boolean bibliocraftLoaded = isPresent("bibliocraft");
     public static final boolean botaniaLoaded = isPresent("botania");
     public static final boolean cofhLoaded = isPresent("cofhcore");
-    public static final boolean codeChickenLibLoaded = isPresent("codechickenlib");
-    public static final boolean craftTweakerLoaded = isPresent("crafttweaker");
-    public static final boolean customLoadingScreenLoaded = isPresent("customloadingscreen");
+    public static final boolean cofhWorldLoaded = isPresent("cofhworld");
+    public static final boolean betterMeteoriteLoaded = isPresent("better_meteorite");
     public static final boolean deepMobLearningLoaded = isPresent("deepmoblearning");
     public static final boolean reidLoaded = isPresent("jeid") || isPresent("reid");
     public static final boolean draconicAdditionsLoaded = isPresent("draconicadditions");
     public static final boolean draconicEvolutionLoaded = isPresent("draconicevolution");
-    public static final boolean electroblobsLoaded = isPresent("ebwizardry");
-    public static final boolean enderioLoaded = isPresent("enderio");
-    public static final boolean extrabotanyLoaded = isPresent("extrabotany");
     public static final boolean ic2Loaded = isPresent("ic2");
     public static final boolean immersiveEngineeringLoaded = isPresent("immersiveengineering");
-    public static final boolean ingameImeLoaded = isPresent("ingameime");
-    public static final boolean jeiLoaded = isPresent("jei");
-    public static final boolean jetifLoaded = isPresent("jetif");
-    public static final boolean journeymapLoaded = isPresent("journeymap");
-    public static final boolean neoFontRenderLoaded = isPresent("neofontrender");
     public static final boolean neoFontRenderUiLoaded = isPresent("neofontrender_ui_enhancements");
-    public static final boolean legendaryTooltipsLoaded = isPresent("legendarytooltips");
-    public static final boolean konkreteLoaded = isPresent("konkrete");
-    public static final boolean librarianLibLoaded = isPresent("librarianlib");
-    public static final boolean libvulpesLoaded = isPresent("libvulpes");
-    public static final boolean lootOverhaulLoaded = isPresent("lootoverhaul");
-    public static final boolean libNineLoaded = isPresent("libnine");
-    public static final boolean metsLoaded = isPresent("mets");
-    public static final boolean mekanismLoaded = isPresent("mekanism");
     public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean mmceLoaded = isPresent("modularmachinery");
-    public static final boolean modularRoutersLoaded = isPresent("modularrouters");
-    public static final boolean nae2Loaded = isPresent("nae2");
-    public static final boolean nuclearcraftLoaded = isPresent("nuclearcraft");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
     public static final boolean packagedAstralLoaded = isPresent("packagedastral");
-    public static final boolean psiLoaded = isPresent("psi");
-    public static final boolean rftoolsLoaded = isPresent("rftools");
-    public static final boolean techgunsLoaded = isPresent("techguns");
-    public static final boolean tconEvoLoaded = isPresent("tconevo");
-    public static final boolean threngLoaded = isPresent("threng");
     public static final boolean circulationNetworksLoaded = isPresent("circulation_networks");
-    public static final boolean universalTweaksLoaded = isPresent("universaltweaks");
+    public static final boolean stellarCoreLoaded = isPresent("stellar_core");
 
     private MixinDecisions() {
     }
@@ -81,59 +53,19 @@ public final class MixinDecisions {
         if (split < 0) {
             return true;
         }
+        if (mixinName.startsWith("enumcache.")) {
+            return NovaEngCoreConfig.PERFORMANCE.cacheEnumValuesArrays;
+        }
         if (!isOptimizationEnabled(mixinName)) {
             return false;
         }
 
         return switch (mixinName.substring(0, split)) {
-            case "dme" -> deepMobLearningLoaded;
             case "reid" -> reidLoaded;
-            case "botania_r" -> botaniaLoaded && NovaEngCoreConfig.SERVER.bot;
-            case "ae2" -> ae2Loaded;
-            case "alfheim" -> alfheimLoaded;
-            case "actinium" -> actiniumLoaded;
-            case "ar" -> arLoaded;
-            case "avaritia" -> avaritiaLoaded;
-            case "actuallyadditions" -> actuallyAdditionsLoaded;
-            case "astralsorcery" -> astralSorceryLoaded;
-            case "athenaeum" -> athenaeumLoaded;
-            case "betterp2p" -> betterP2pLoaded;
-            case "base" -> baseLoaded && NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
-            case "biomesoplenty" -> biomesOPlentyLoaded && NovaEngCoreConfig.CLIENT.optimizeBopFog;
-            case "bibliocraft" -> bibliocraftLoaded;
-            case "botania" -> botaniaLoaded;
-            case "cofh" -> cofhLoaded;
-            case "crafttweaker" -> craftTweakerLoaded;
-            case "draconicadditions" -> draconicAdditionsLoaded;
-            case "draconicevolution" -> draconicEvolutionLoaded;
-            case "electroblobs" -> electroblobsLoaded;
-            case "enderio" -> enderioLoaded;
-            case "extrabotany" -> extrabotanyLoaded;
-            case "ic2" -> ic2Loaded;
-            case "immersiveengineering" -> immersiveEngineeringLoaded;
-            case "ingameime" -> ingameImeLoaded;
-            case "jei" -> jeiLoaded;
-            case "jetif" -> jetifLoaded;
-            case "legendarytooltips" -> legendaryTooltipsLoaded;
-            case "libvulpes" -> libvulpesLoaded;
-            case "lootoverhaul" -> lootOverhaulLoaded;
-            case "libnine" -> libNineLoaded;
-            case "mets" -> metsLoaded;
-            case "mekanism" -> mekanismLoaded;
-            case "ctm" -> ctmLoaded;
-            case "mmce" -> mmceLoaded;
-            case "modularrouters" -> modularRoutersLoaded;
-            case "nae2" -> nae2Loaded;
-            case "neofontrender" -> neoFontRenderLoaded;
+            case "botania_r" -> NovaEngCoreConfig.SERVER.bot;
+            case "base" -> NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
+            case "biomesoplenty" -> NovaEngCoreConfig.CLIENT.optimizeBopFog;
             case "revoui" -> neoFontRenderUiLoaded && actiniumLoaded;
-            case "nco" -> nuclearcraftLoaded;
-            case "packagedauto" -> packagedAutoLoaded;
-            case "psi" -> psiLoaded;
-            case "rftools" -> rftoolsLoaded;
-            case "techguns" -> techgunsLoaded;
-            case "tconevo" -> tconEvoLoaded;
-            case "threng" -> threngLoaded;
-            case "universaltweaks" -> universalTweaksLoaded;
             default -> true;
         };
     }
@@ -161,7 +93,7 @@ public final class MixinDecisions {
             case "minecraft.MixinVec3iHash" -> NovaEngCoreConfig.PERFORMANCE.optimizeVec3iHash;
             case "minecraft.MixinNBTTagLongArrayBulkRead" -> NovaEngCoreConfig.PERFORMANCE.optimizeNbtLongArrayRead;
             case "mmce.MixinRecipeCraftingContextMemory",
-                 "mmce.MixinRecipeCraftingContextPool" -> recipeContextPoolEnabled();
+                 "mmce.MixinRecipeCraftingContextPool" -> NovaEngCoreConfig.PERFORMANCE.boundedRecipeContexts;
             case "astralsorcery.MixinTexturePreloader",
                  "astralsorcery.MixinBindableResourceLazyAllocation" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryTexturePreload;
             case "astralsorcery.MixinAstralSorceryConfig" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryConfigSave;
@@ -176,16 +108,22 @@ public final class MixinDecisions {
             case "minecraft.MixinAbstractTexture",
                  "minecraft.forge.MixinCloudRenderer" -> NovaEngCoreConfig.CLIENT.optimizeCloudColorUpload;
             case "minecraft.MixinFramebufferBlit" -> NovaEngCoreConfig.CLIENT.optimizeFramebufferBlit;
-            case "ic2.MixinBlockStateContainer",
-                 "ic2.MixinIc2BlockStateInstance" -> NovaEngCoreConfig.CLIENT.optimizeIc2PropertyTables;
+            case "ic2.MixinBlockStateContainer" -> ic2Loaded && NovaEngCoreConfig.CLIENT.optimizeIc2PropertyTables;
+            case "ic2.MixinIc2BlockStateInstance" -> NovaEngCoreConfig.CLIENT.optimizeIc2PropertyTables;
+            case "bibliocraft.MixinModelManagerPaintingGeneration" -> bibliocraftLoaded;
+            case "ar.MixinTileForgePowerInput", "ar.MixinTileForgePowerOutput" -> arLoaded;
+            case "enderio.MixinNNList" -> enderioLoaded;
+            case "threng.MixinL9AspectInventory", "threng.MixinL9AspectSlot" -> threngLoaded;
+            case "immersiveengineering.MixinTileEntityPumpjack" -> immersiveEngineeringLoaded;
+            case "cofh.MixinTypeEntry" -> cofhLoaded;
             case "cofh.MixinTransposerRecipeCategoryFill",
-                 "cofh.MixinTransposerRecipeCategoryExtract" -> NovaEngCoreConfig.CLIENT.optimizeThermalTransposerRecipes;
+                 "cofh.MixinTransposerRecipeCategoryExtract" ->
+                cofhLoaded && NovaEngCoreConfig.CLIENT.optimizeThermalTransposerRecipes;
             case "customloadingscreen.MixinMinecraftDisplayerRenderer" ->
-                customLoadingScreenLoaded && NovaEngCoreConfig.CLIENT.optimizeCustomLoadingScreen;
-            case "codechickenlib.MixinCCBlockStateLoader" ->
-                codeChickenLibLoaded && NovaEngCoreConfig.CLIENT.optimizeCodeChickenBlockstateScan;
+                NovaEngCoreConfig.CLIENT.optimizeCustomLoadingScreen;
+            case "codechickenlib.MixinCCBlockStateLoader" -> NovaEngCoreConfig.CLIENT.optimizeCodeChickenBlockstateScan;
             case "codechickenlib.MixinModelBakeryErrorState" ->
-                codeChickenLibLoaded && NovaEngCoreConfig.CLIENT.optimizeCodeChickenErrorStateLog;
+                NovaEngCoreConfig.CLIENT.optimizeCodeChickenErrorStateLog;
             case "minecraft.MixinResourceLocation" ->
                 NovaEngCoreConfig.CLIENT.optimizeResourceLocationStableValue;
             case "minecraft.MixinModelResourceLocationFastPath" ->
@@ -195,36 +133,30 @@ public final class MixinDecisions {
                  "minecraft.MixinConditionOrCanonicalization" -> NovaEngCoreConfig.CLIENT.optimizeFerritePredicates;
             case "minecraft.forge.MixinChunkIOProviderNbt" -> NovaEngCoreConfig.PERFORMANCE.optimizeFerriteChunkNbt;
             case "minecraft.MixinMultipartModelBuilder" -> NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
-            case "librarianlib.MixinSavingFieldCache" ->
-                librarianLibLoaded && NovaEngCoreConfig.CLIENT.optimizeLibrarianLibFieldScan;
             case "jei.MixinElementSearch" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
             case "jei.MixinStackHelper" -> NovaEngCoreConfig.CLIENT.optimizeJeiStackUidCache;
             case "jei.MixinItemStackListFactory" -> NovaEngCoreConfig.CLIENT.optimizeJeiItemList;
             case "contenttweaker.MixinCreativeTabsResourceList",
                  "minecraft.AccessorCreativeTabs" -> NovaEngCoreConfig.CLIENT.optimizeCreativeTabLookup;
             case "journeymap.MixinFileHandler" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy;
-            case "konkrete.MixinLocalsCopy" ->
-                konkreteLoaded && NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
-            case "journeymap.MixinJMChunkCache" ->
-                journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
-            case "journeymap.MixinJMChunkStorage" ->
-                journeymapLoaded && NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
-            case "journeymap.MixinVanillaBlockSpriteProxy" ->
-                journeymapLoaded && (NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites
-                    || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe);
+            case "konkrete.MixinLocalsCopy" -> NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
+            case "journeymap.MixinJMChunkCache" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
+            case "journeymap.MixinJMChunkStorage" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
+            case "journeymap.MixinVanillaBlockSpriteProxy" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites
+                || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
             case "minecraft.forge.MixinEventBus" -> NovaEngCoreConfig.CLIENT.optimizeEventBusRegistration;
             case "zenscript.MixinTypeRegistry",
                  "zenscript.MixinJavaMethod" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
-            case "minecraft.MixinFallbackResourceManager" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
+            case "minecraft.MixinFallbackResourceManager", "libnine.MixinL9Models" ->
+                NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
                 || NovaEngCoreConfig.CLIENT.optimizeResourceExistence
                 || NovaEngCoreConfig.CLIENT.optimizeFerritePredicates
                 || NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
-            case "libnine.MixinL9Models" -> libNineLoaded && NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "actinium.MixinChunk",
                  "actinium.MixinChunkProviderClient",
-                 "actinium.MixinEntityGatherer",
-                 "actinium.MixinWorldClient" -> NovaEngCoreConfig.CLIENT.optimizeEntityGatherer;
+                 "actinium.MixinWorldClient" -> actiniumLoaded && NovaEngCoreConfig.CLIENT.optimizeEntityGatherer;
+            case "actinium.MixinEntityGatherer" -> NovaEngCoreConfig.CLIENT.optimizeEntityGatherer;
             case "actinium.MixinActiniumWorldRendererLazyBatch" -> NovaEngCoreConfig.CLIENT.optimizeTesrLazyBatch;
             case "actinium.MixinGLStateManagerGenericAttributes",
                  "actinium.MixinShaderManagerGenericAttributes" -> NovaEngCoreConfig.CLIENT.optimizeGenericAttributes;
@@ -250,6 +182,13 @@ public final class MixinDecisions {
                     && NovaEngCoreConfig.CLIENT.optimizeDraconicModelGeometry;
             case "minecraft.forge.MixinASMEventHandler",
                  "minecraft.forge.MixinEventBusPost" -> NovaEngCoreConfig.SERVER.optimizeForgeEventDispatch;
+            case "zenutils.MixinCatenationManager" -> NovaEngCoreConfig.SERVER.optimizeZenUtilsTickWork;
+            case "ic2.MixinConfigTickPath" -> NovaEngCoreConfig.SERVER.optimizeIc2TickConfigPath;
+            case "minecraft.MixinMinecraftServerDimensionIds", "minecraft.forge.AccessorDimensionManagerWorlds",
+                 "minecraft.forge.MixinDimensionManagerLeakCheck" -> NovaEngCoreConfig.SERVER.optimizeDimensionTickIds;
+            case "stellarcore.MixinPlayerChunkMapSnapshot" -> stellarCoreLoaded
+                && StellarCoreConfig.PERFORMANCE.forge.chunkManager
+                && NovaEngCoreConfig.SERVER.optimizeChunkTickSnapshot;
             case "minecraft.MixinWorldEntitySpawner" ->
                 NovaEngCoreConfig.SERVER.optimizeSpawnListResolution;
             case "minecraft.forge.MixinFMLOutboundHandlerReply" ->
@@ -261,13 +200,30 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.CLIENT.optimizeMekanismObjQuads;
             case "mekanism.MixinModuleHelperModuleCache" ->
                 NovaEngCoreConfig.CLIENT.optimizeMekanismModuleLookup;
-            case "ctm.MixinTextureCTMConnectToCache",
-                 "ctm.MixinAbstractCtmModelCache",
-                 "ctm.MixinRenderContextListSerialization", "minecraft.MixinMinecraftCtmPreload" -> ctmLoaded;
+            case "minecraft.MixinMinecraftCtmPreload" -> ctmLoaded;
             case "ctm.MixinCtmLogicConnectionPosCache", "ctm.MixinDirConnectionPosCache" ->
-                ctmLoaded && NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
+                NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
             case "reid.MixinSectionStorage", "reid.MixinReidSectionAccess",
                  "reid.MixinAnvilSectionCodec" -> NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth;
+            case "ar.MixinAtmosphereTemperature", "ar.MixinAtmosphereHandler", "ar.MixinAtmosphereTypes",
+                 "ar.MixinAtmosphereTemps" -> NovaEngCoreConfig.SERVER.optimizeWorldgenAtmosphere;
+            case "ae2.MixinCompassReaderRegions", "ar.MixinAtmosphereDimensionMap" ->
+                NovaEngCoreConfig.SERVER.optimizeWorldgenIdMaps;
+            case "cofh.MixinWeightedBlockPredicate", "cofh.MixinWorldGenPredicate" ->
+                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeWorldgenOrePredicates;
+            case "ae2.MixinMeteorDataNameEncoder", "ae2.MixinSpawnDataInput" ->
+                NovaEngCoreConfig.SERVER.optimizeMeteorSpawnDataIo;
+            case "cofh.MixinWorldGenSinglePosition" ->
+                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeOrePlacementCoordinates;
+            case "cofh.MixinWorldGenMinableClusterGeometry" ->
+                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeOreVeinGeometry;
+            case "minecraft.MixinBlockStoneMetadata" -> NovaEngCoreConfig.SERVER.optimizeStoneMetadataStates;
+            case "ae2.MixinBetterMeteoriteCompassMetadata" ->
+                ae2Loaded && betterMeteoriteLoaded && NovaEngCoreConfig.SERVER.optimizeMeteorCompassMetadata;
+            case "minecraft.MixinWorldGenMinableGeometry" -> NovaEngCoreConfig.SERVER.optimizeVanillaOreGeometry;
+            case "minecraft.MixinAttributeModifierSnapshot" ->
+                NovaEngCoreConfig.SERVER.optimizeAttributeModifierSnapshots;
+            case "minecraft.MixinGenLayerZoomRandom" -> NovaEngCoreConfig.SERVER.optimizeBiomeZoomRandom;
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;

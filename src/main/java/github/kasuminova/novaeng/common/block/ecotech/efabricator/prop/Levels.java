@@ -6,6 +6,8 @@ public enum Levels {
     L6(8, 8),
     L9(16, 16);
 
+    public static final Levels[] VALUES = values();
+
     private final int queueDepthMul;
     private final int energyUsageMul;
 

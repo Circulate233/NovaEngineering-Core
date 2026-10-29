@@ -95,7 +95,7 @@ public final class RegistryExtended {
 
     private static void declare(final String name, final int maxStack,
                                 final boolean glint, final boolean beaconPayment) {
-        ItemBasic.Companion.declare(
+        ItemBasic.declare(
             name, maxStack, glint, beaconPayment);
     }
 
@@ -158,7 +158,7 @@ public final class RegistryExtended {
     }
 
     private static void oreDict(final String oreName, final String itemPath) {
-        final Item item = ItemBasic.Companion.getItem(itemPath);
+        final Item item = ItemBasic.getItem(itemPath);
         if (item != null) {
             OreDictionary.registerOre(oreName, new ItemStack(item));
         }

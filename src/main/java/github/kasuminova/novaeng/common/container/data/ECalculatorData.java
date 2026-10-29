@@ -78,7 +78,7 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         List<ThreadCoreData> threadCores = new ArrayList<>();
         if (threadCoreSize > 0) {
             for (byte i = 0; i < threadCoreSize; i++) {
-                Levels type = Levels.values()[buf.readByte()];
+                Levels type = Levels.byOrdinal(buf.readByte());
                 int threads = buf.readByte();
                 int hyperThreads = buf.readByte();
                 int maxThreads = buf.readByte();

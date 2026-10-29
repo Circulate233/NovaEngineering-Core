@@ -149,7 +149,7 @@ public class ECalculatorCellDrive extends ECalculatorPart implements IAEAppEngIn
             ItemHandlerUtil.setStackInSlot(driveInv, x, stackFromNBT(item));
         }
         if (tag.hasKey("connectedSide")) {
-            this.connectedSide = EnumFacing.values()[tag.getByte("connectedSide")];
+            this.connectedSide = EnumFacing.VALUES[tag.getByte("connectedSide")];
         } else {
             this.connectedSide = null;
         }

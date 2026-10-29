@@ -8,9 +8,7 @@ plugins {
     id 'com.gradleup.shadow' version '9.6.1'
     id 'net.neoforged.moddev.mcpforge' version '2.0.185-legacy'
     id 'com.diffplug.spotless' version '8.10.4'
-    id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.plugin.lombok" version '2.4.20'
-    id "org.jetbrains.kotlin.kapt" version '2.4.20'
+    id 'net.minecraftforge.accesstransformers' version '5.0.3'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
@@ -160,7 +158,8 @@ if (useMixins) {
             add(refmap)
         }
         messages([
-            MIXIN_SOFT_TARGET_NOT_FOUND: 'warning'
+            MIXIN_SOFT_TARGET_NOT_FOUND: 'warning',
+            TARGET_ELEMENT_NOT_FOUND: 'disabled'
         ])
     }
 }
@@ -190,7 +189,6 @@ dependencies {
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'it.unimi.dsi:fastutil:8.5.18'
     testImplementation 'org.ow2.asm:asm-tree:9.9.1'
     testImplementation 'org.ow2.asm:asm-analysis:9.9.1'
@@ -276,10 +274,6 @@ compileJava {
 }
 
 tasks.matching { it.name == 'sourcesJar' }.configureEach {
-    dependsOn(generateTagsSource)
-}
-
-tasks.matching { it.name.toLowerCase().contains('kotlin') }.configureEach {
     dependsOn(generateTagsSource)
 }
 
@@ -384,6 +378,20 @@ test {
     }
 }
 
+tasks.register('benchmarkSpawning', JavaExec) {
+    group = 'verification'
+    description = 'Compare vanilla spawning bookkeeping with the primitive candidates and bounded entity counter'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'github.kasuminova.novaeng.common.performance.SpawnPerformanceBenchmark'
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    })
+    def mode = providers.gradleProperty('spawnBenchmarkMode').getOrElse('all')
+    def reportName = mode == 'worldgen3' ? 'worldgen-scan-and-veins.csv' : mode == 'worldgen2' ? 'worldgen-algorithms.csv' : mode == 'worldgen' ? 'worldgen-hotspots.csv' : mode == 'ticks' ? 'tick-hotspots.csv' : mode == 'reuse' ? 'spawning-reuse.csv' : 'spawning.csv'
+    args layout.buildDirectory.file("reports/benchmarks/${reportName}").get().asFile.absolutePath, mode
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
@@ -401,6 +409,46 @@ apply from: 'gradle/scripts/extra.gradle'
 repositories {
     mavenCentral()
 }
-kapt {
-    keepJavacAnnotationProcessors = true
+
+// ART 把每个库展开成 `--lib <path>`，依赖变多会超出 Windows 32767 字符命令行上限。
+// 改用 `--cfg` 从文件传库列表，命令行长度与依赖数量无关。
+def reobfTask = tasks.named(reobfTaskName).get()
+def copyActionIndex = reobfTask.actions.findIndexOf {
+    it.class.name == 'org.gradle.api.internal.project.taskfactory.StandardTaskAction'
 }
+if (copyActionIndex < 0) {
+    throw new GradleException("找不到 ${reobfTaskName} 的 @TaskAction，ART 参数文件注入无法生效")
+}
+reobfTask.actions[copyActionIndex] = { task ->
+    def operation = task.remapOperation
+    def inputFile = task.input.get().asFile
+    def outputFile = task.archiveFile.get().asFile
+
+    List<String> args = ['--input', inputFile.absolutePath, '--output', outputFile.absolutePath]
+    operation.mappings.files.each { f -> args.addAll(['--names', f.absolutePath]) }
+
+    def cfgDir = new File(project.layout.buildDirectory.get().asFile, 'tmp/reobf')
+    cfgDir.mkdirs()
+    def cfg = new File(cfgDir, 'libraries.cfg')
+    def text = new StringBuilder()
+    task.libraries.files.each { f -> text.append('--lib\n').append(f.absolutePath).append('\n') }
+    cfg.text = text.toString()
+    args.addAll(['--cfg', cfg.absolutePath, '--disable-abstract-param', '--strip-sigs'])
+
+    def logStream = operation.logFile.present
+        ? new FileOutputStream(operation.logFile.get().asFile)
+        : null
+    try {
+        task.execOperations.javaexec { spec ->
+            spec.classpath = operation.toolClasspath
+            spec.mainClass.set('net.neoforged.art.Main')
+            spec.args = args
+            if (logStream != null) {
+                spec.standardOutput = logStream
+                spec.errorOutput = logStream
+            }
+        }.assertNormalExitValue()
+    } finally {
+        logStream?.close()
+    }
+} as Action
