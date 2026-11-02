@@ -5,8 +5,8 @@ import com.teamwizardry.librarianlib.features.network.PacketHandler;
 import com.teamwizardry.librarianlib.features.saving.AbstractSaveHandler;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
-import github.kasuminova.novaeng.common.util.collection.Object2IntBiMap;
-import github.kasuminova.novaeng.common.util.collection.Object2IntHashBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntHashBiMap;
 
 import kotlin.jvm.internal.Intrinsics;
 
@@ -23,8 +23,8 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(value = PacketHandler.class, remap = false)
 public abstract class MixinPacketHandlerPrimitiveBiMap {
     @Unique
-    private static final Object2IntBiMap<Class<?>> nova$discriminators =
-        new Object2IntHashBiMap<>();
+    private static final Reference2IntBiMap<Class<?>> nova$discriminators =
+        new Reference2IntHashBiMap<>();
 
     @Shadow
     @Final

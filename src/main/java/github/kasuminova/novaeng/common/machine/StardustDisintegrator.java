@@ -35,9 +35,14 @@ public class StardustDisintegrator implements MachineSpecial {
         World world = ctrl.getWorld();
         EnumFacing facing = ctrl.getControllerRotation();
 
-        if (CRYSTALS_POS_PRESET.stream()
-                               .map(pos -> ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))
-                               .anyMatch(crystalPos -> !world.canSeeSky(crystalPos))) {
+        boolean obstructed = false;
+        for (BlockPos pos : CRYSTALS_POS_PRESET) {
+            if (!world.canSeeSky(ctrlPos.add(MiscUtils.rotateYCCWNorthUntil(pos, facing)))) {
+                obstructed = true;
+                break;
+            }
+        }
+        if (obstructed) {
             ctrl.getCustomDataTag().removeTag("canSeeSky");
         } else {
             ctrl.getCustomDataTag().setBoolean("canSeeSky", true);

@@ -104,7 +104,9 @@ public class ECalculatorThreadCore extends ECalculatorPart {
         if (cpus.isEmpty()) {
             return 0L;
         }
-        return cpus.stream().mapToLong(CraftingCPUCluster::getAvailableStorage).sum();
+        long total = 0;
+        for (CraftingCPUCluster cpu : cpus) total += cpu.getAvailableStorage();
+        return total;
     }
 
     @Nonnull

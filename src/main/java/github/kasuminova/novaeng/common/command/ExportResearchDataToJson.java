@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ExportResearchDataToJson extends CommandBase {
     public static final ExportResearchDataToJson INSTANCE = new ExportResearchDataToJson();
@@ -44,9 +43,9 @@ public class ExportResearchDataToJson extends CommandBase {
     public void execute(@Nonnull final MinecraftServer server,
                         @Nonnull final ICommandSender sender,
                         @Nonnull final String[] args) {
-        List<SimpleResearchData> dataList = RegistryHyperNet.getAllResearchCognitionData().stream()
-                                                            .map(SimpleResearchData::of)
-                                                            .collect(Collectors.toList());
+        List<SimpleResearchData> dataList = new java.util.ArrayList<>();
+        for (var data : RegistryHyperNet.getAllResearchCognitionData())
+            dataList.add(SimpleResearchData.of(data));
         String jsonString = GSON.toJson(new ToSerialize(dataList));
 
         try {

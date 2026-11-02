@@ -42,29 +42,26 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     protected static int getInstalledSlots(final TileItemHandler inv, final AssemblySlotManager slotManager, final String invName, Predicate<SlotConditionItemHandler> slotFilter) {
-        int[] installedSlots = {0};
-        inv.getAvailableSlotsStream()
-           .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
-           .filter(slotFilter)
-           .filter(SlotConditionItemHandler::isInstalled)
-           .forEach(slot -> installedSlots[0]++);
-        return installedSlots[0];
+        int installedSlots = 0;
+        for (var slotIterator = inv.availableSlotIterator(); slotIterator.hasNext(); ) {
+            final int slotID = slotIterator.nextInt();
+            SlotConditionItemHandler slot = slotManager.getSlot(invName, slotID);
+            if (slotFilter.test(slot) && slot.isInstalled()) installedSlots++;
+        }
+        return installedSlots;
     }
 
     protected static void addUninstalledDependenciesTip(final TileItemHandler inv, final AssemblySlotManager slotManager, final String invName, List<String> tip) {
-        inv.getAvailableSlotsStream()
-           .mapToObj(slotID -> slotManager.getSlot(invName, slotID))
-           .filter(SlotConditionItemHandler::isInstalled)
-           .forEach(slot -> {
-               slot.getDependencies().stream()
-                   .filter(dependency -> !dependency.isInstalled())
-                   .map(dependency -> dependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
-                   .forEach(tip::add);
-               slot.getSoftDependencies().stream()
-                   .filter(softDependency -> !softDependency.isInstalled())
-                   .map(softDependency -> softDependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled"))
-                   .forEach(tip::add);
-           });
+        for (var slotIterator = inv.availableSlotIterator(); slotIterator.hasNext(); ) {
+            final int slotID = slotIterator.nextInt();
+            final SlotConditionItemHandler slot = slotManager.getSlot(invName, slotID);
+            if (!slot.isInstalled()) continue;
+            final String suffix = I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled");
+            for (var dependency : slot.getDependencies())
+                if (!dependency.isInstalled()) tip.add(dependency.getSlotDescription() + suffix);
+            for (var dependency : slot.getSoftDependencies())
+                if (!dependency.isInstalled()) tip.add(dependency.getSlotDescription() + suffix);
+        }
     }
 
     protected static void addUninstalledDependenciesTip(final TileItemHandler cpu, final AssemblySlotManager slotManager, final TileItemHandler calculateCard, final TileItemHandler extension, final TileItemHandler power, final List<String> errorTips) {

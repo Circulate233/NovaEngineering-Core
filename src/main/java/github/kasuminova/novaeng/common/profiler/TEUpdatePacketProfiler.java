@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class TEUpdatePacketProfiler {
     public static final ConcurrentHashMap<Class<?>, Tuple<Long, Long>> TE_UPDATE_PACKET_TOTAL_SIZE = new ConcurrentHashMap<>();
@@ -44,11 +43,10 @@ public class TEUpdatePacketProfiler {
 
         List<String> messages = new LinkedList<>();
 
-        @SuppressWarnings("SimplifyStreamApiCallChains")
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted = TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet().stream()
-                                                                                                                  .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                                                                                                                  .limit(limit)
-                                                                                                                  .collect(Collectors.toList());
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted =
+            new LinkedList<>(TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
+        teSorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
+        if (teSorted.size() > limit) teSorted.subList(limit, teSorted.size()).clear();
 
         messages.add("SPacketUpdateTileEntity stat:");
         for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : teSorted) {

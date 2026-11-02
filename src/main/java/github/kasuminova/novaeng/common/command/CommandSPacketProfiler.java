@@ -64,7 +64,8 @@ public class CommandSPacketProfiler extends CommandBase {
                         @Nonnull final ICommandSender sender,
                         @Nonnull final String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("full")) {
-            SPacketProfiler.getFullProfilerMessages().stream().map(TextComponentString::new).forEach(sender::sendMessage);
+            for (String message : SPacketProfiler.getFullProfilerMessages())
+                sender.sendMessage(new TextComponentString(message));
             return;
         }
         if (args.length > 0 && args[0].equalsIgnoreCase("collectClient")) {
@@ -88,7 +89,8 @@ public class CommandSPacketProfiler extends CommandBase {
             CPacketProfilerDataProcessor.INSTANCE.create(sender, limit, target);
             return;
         }
-        SPacketProfiler.getProfilerMessages().stream().map(TextComponentString::new).forEach(sender::sendMessage);
+        for (String message : SPacketProfiler.getProfilerMessages())
+            sender.sendMessage(new TextComponentString(message));
     }
 
 }

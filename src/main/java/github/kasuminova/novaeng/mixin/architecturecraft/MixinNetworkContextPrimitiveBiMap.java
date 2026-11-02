@@ -10,8 +10,8 @@ import com.elytradev.architecturecraft.repackage.com.elytradev.concrete.network.
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Multiset;
 
-import github.kasuminova.novaeng.common.util.collection.Object2IntBiMap;
-import github.kasuminova.novaeng.common.util.collection.Object2IntHashBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntHashBiMap;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -39,7 +40,6 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 @Mixin(value = NetworkContext.class, remap = false)
 public abstract class MixinNetworkContextPrimitiveBiMap {
@@ -73,8 +73,8 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
         require = 1)
     private void nova$primitiveTable(
         final NetworkContext owner, final BiMap<Class<? extends Message>, Integer> original) {
-        final Object2IntHashBiMap<Class<? extends Message>> replacement =
-            new Object2IntHashBiMap<>(16);
+        final Reference2IntHashBiMap<Class<? extends Message>> replacement =
+            new Reference2IntHashBiMap<>(16);
         replacement.putAll(original);
         packetIds = replacement;
     }
@@ -94,7 +94,7 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
             ConcreteLog.warn("{} was registered twice", clazz);
             return (NetworkContext) (Object) this;
         }
-        ((Object2IntBiMap<Class<? extends Message>>) packetIds)
+        ((Reference2IntBiMap<Class<? extends Message>>) packetIds)
             .putDiscard(clazz, nextPacketId++, false);
         List<WireField<?>> fields = new ObjectArrayList<>();
         for (Class<?> cursor = clazz;
@@ -127,7 +127,7 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
             throw new BadMessageException(m.getClass() + " is not registered");
         }
         PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
-        payload.writeByte(((Object2IntBiMap<?>) packetIds).getIntRequired(m.getClass()));
+        payload.writeByte(((Reference2IntBiMap<?>) packetIds).getIntRequired(m.getClass()));
         int bools = this.booleanCount.count(m.getClass()) + this.optionalCount.count(m.getClass());
         if (bools > 0) {
             BooleanList li = new BooleanArrayList(bools);
@@ -148,10 +148,17 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
                 payload.writeByte(by);
             }
         }
-        this.marshallers.get(m.getClass()).stream()
-                        .filter(it -> it.getType() != Boolean.TYPE)
-                        .forEach(it -> it.marshal(m, payload));
+        for (WireField<?> field : this.marshallers.get(m.getClass())) {
+            if (field.getType() != Boolean.TYPE) field.marshal(m, payload);
+        }
         return new FMLProxyPacket(payload, this.channel);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Unique
+    private static void nova$setBooleanField(final WireField<?> field, final Message message,
+                                             final boolean value) {
+        ((WireField<Boolean>) field).set(message, value);
     }
 
     /**
@@ -162,11 +169,11 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
     private Message readPacket(Side side, ByteBuf payload) {
         Message m;
         short id = payload.readUnsignedByte();
-        if (!((Object2IntBiMap<?>) packetIds).containsValue(id)) {
+        if (!((Reference2IntBiMap<?>) packetIds).containsValue(id)) {
             throw new IllegalArgumentException("Unknown packet id " + id);
         }
         Class<? extends Message> clazz =
-            ((Object2IntBiMap<Class<? extends Message>>) packetIds).inverse().get(id);
+            ((Reference2IntBiMap<Class<? extends Message>>) packetIds).inverse().get(id);
         try {
             m = this.instantiateMessage(clazz);
         } catch (Throwable t) {
@@ -180,37 +187,37 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
             new ObjectOpenHashSet<>(this.marshallers.get(m.getClass()).size());
         int bools = this.booleanCount.count(m.getClass()) + this.optionalCount.count(m.getClass());
         if (bools > 0) {
-            List<Consumer<Boolean>> li = new ObjectArrayList<>(bools);
+            List<WireField<?>> flagFields = new ObjectArrayList<>(bools);
             for (WireField<?> wf : this.marshallers.get(m.getClass())) {
                 if (wf.getType() == Boolean.TYPE) {
-                    li.add(b -> ((WireField<Boolean>) wf).set(m, b));
+                    flagFields.add(wf);
                     present.add(wf);
                     continue;
                 }
                 if (wf.isOptional()) {
-                    li.add(
-                        b -> {
-                            if (b) {
-                                present.add(wf);
-                            }
-                        });
-                    continue;
+                    flagFields.add(wf);
+                } else {
+                    present.add(wf);
                 }
-                present.add(wf);
             }
             for (int i = 0; i < (bools + 7) / 8; ++i) {
                 short by = payload.readUnsignedByte();
-                for (int j = i * 8; j < Math.min(li.size(), i + 8); ++j) {
+                for (int j = i * 8; j < Math.min(flagFields.size(), i + 8); ++j) {
                     boolean val = (by & 1 << j - i) != 0;
-                    li.get(j).accept(val);
+                    final WireField<?> field = flagFields.get(j);
+                    if (field.getType() == Boolean.TYPE) {
+                        nova$setBooleanField(field, m, val);
+                    } else if (val) {
+                        present.add(field);
+                    }
                 }
             }
         } else {
             present.addAll(this.marshallers.get(m.getClass()));
         }
-        this.marshallers.get(m.getClass()).stream()
-                        .filter(it -> it.getType() != Boolean.TYPE && present.contains(it))
-                        .forEach(it -> it.unmarshal(m, payload));
+        for (WireField<?> field : this.marshallers.get(m.getClass())) {
+            if (field.getType() != Boolean.TYPE && present.contains(field)) field.unmarshal(m, payload);
+        }
         return m;
     }
 }

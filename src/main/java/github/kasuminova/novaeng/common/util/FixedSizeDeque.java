@@ -34,7 +34,11 @@ public class FixedSizeDeque<E> implements Iterable<E> {
         if (index < 0 || index >= deque.size()) {
             throw new IndexOutOfBoundsException();
         }
-        return deque.stream().skip(index).findFirst().orElse(null);
+        int current = 0;
+        for (E element : deque) {
+            if (current++ == index) return element;
+        }
+        return null;
     }
 
     public E getFirst() {

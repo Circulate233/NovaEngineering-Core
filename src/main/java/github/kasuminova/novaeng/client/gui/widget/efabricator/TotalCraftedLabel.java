@@ -6,17 +6,17 @@ import github.kasuminova.mmce.client.gui.widget.event.GuiEvent;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUpdateEvent;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
 import net.minecraft.client.resources.I18n;
 
-import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.Deque;
 
 public class TotalCraftedLabel extends Row {
 
     private final MultiLineLabel label;
-    private final Deque<Double> history = new ArrayDeque<>();
+    private final DoubleArrayFIFOQueue history = new DoubleArrayFIFOQueue(11);
     private long value = 0;
+    private double historyTotal;
 
     public TotalCraftedLabel() {
         this.label = new MultiLineLabel(Collections.singletonList(
@@ -37,18 +37,19 @@ public class TotalCraftedLabel extends Row {
 
     public void onValueUpdate(final long newValue) {
         if (history.size() >= 10) {
-            history.pollLast();
+            historyTotal -= history.dequeueLastDouble();
         }
 
         int added = (int) (newValue - value);
         if (value != 0 && added > 0) {
             double craftPerTick = ((added * (20F / EFabricatorEventHandler.UPDATE_INTERVAL)) / 20F);
-            history.push(craftPerTick);
-            double avgCraftPerTick = history.stream().mapToDouble(Double::doubleValue).average().orElse(0D);
+            history.enqueueFirst(craftPerTick);
+            historyTotal += craftPerTick;
+            double avgCraftPerTick = averageHistory();
             updateLabel(newValue, avgCraftPerTick);
         } else {
-            history.push(0D);
-            double avgCraftPerTick = history.stream().mapToDouble(Double::doubleValue).average().orElse(0D);
+            history.enqueueFirst(0D);
+            double avgCraftPerTick = averageHistory();
             if (avgCraftPerTick > 0) {
                 updateLabel(newValue, avgCraftPerTick);
             } else {
@@ -67,6 +68,11 @@ public class TotalCraftedLabel extends Row {
                 avgCraftPerTick <= 0.1 ? "<0.1" : NovaEngUtils.formatDouble(avgCraftPerTick, 1)
             )
         ));
+    }
+
+    private double averageHistory() {
+        if (history.isEmpty()) return 0D;
+        return historyTotal / history.size();
     }
 
 }

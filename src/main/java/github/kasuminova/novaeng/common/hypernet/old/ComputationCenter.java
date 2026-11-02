@@ -307,7 +307,9 @@ public class ComputationCenter {
 
     @ZenGetter("connectedMachineryCount")
     public int getConnectedMachineryCount() {
-        return nodes.values().stream().mapToInt(Map::size).sum();
+        int count = 0;
+        for (Map<?, ?> nodeMap : nodes.values()) count += nodeMap.size();
+        return count;
     }
 
     @ZenGetter("type")

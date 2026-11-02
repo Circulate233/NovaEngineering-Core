@@ -3,7 +3,7 @@ package github.kasuminova.novaeng.mixin.artisanworktables;
 import com.codetaylor.mc.artisanworktables.modules.worktables.tile.MutuallyExclusiveStackHandlerWrapper;
 import com.google.common.collect.BiMap;
 
-import github.kasuminova.novaeng.common.util.collection.Object2IntHashBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntHashBiMap;
 import github.kasuminova.novaeng.common.util.collection.PrimitiveBiMaps;
 
 import net.minecraft.item.Item;
@@ -37,7 +37,7 @@ public abstract class MixinMutuallyExclusiveStackHandlerPrimitiveBiMap {
         require = 1)
     private void nova$primitiveTable(
         final MutuallyExclusiveStackHandlerWrapper owner, final BiMap<Item, Integer> original) {
-        final Object2IntHashBiMap<Item> replacement = new Object2IntHashBiMap<>(handler.getSlots());
+        final Reference2IntHashBiMap<Item> replacement = new Reference2IntHashBiMap<>(handler.getSlots());
         replacement.putAll(original);
         indexMap = replacement;
     }

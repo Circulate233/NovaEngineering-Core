@@ -123,19 +123,20 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
     }
 
     protected void recalculateParallelism() {
-        this.parallelism = getParallelProcs().stream()
-                                             .mapToInt(ECalculatorParallelProc::getParallelism).sum();
+        int parallelism = 0;
+        for (ECalculatorParallelProc proc : getParallelProcs()) parallelism += proc.getParallelism();
+        this.parallelism = parallelism;
 
         // Update accelerators
-        getThreadCores().forEach(threadCore -> threadCore.getCpus().stream()
-                                                         .map(ECPUCluster::from)
-                                                         .forEach(ecpuCluster -> ecpuCluster.novaeng_ec$setAccelerators(this.parallelism))
-        );
+        for (ECalculatorThreadCore threadCore : getThreadCores())
+            for (CraftingCPUCluster cpu : threadCore.getCpus())
+                ECPUCluster.from(cpu).novaeng_ec$setAccelerators(this.parallelism);
     }
 
     protected void recalculateTotalBytes() {
-        this.totalBytes = getCellDrives().stream()
-                                         .mapToLong(ECalculatorCellDrive::getSuppliedBytes).sum();
+        long totalBytes = 0;
+        for (ECalculatorCellDrive drive : getCellDrives()) totalBytes += drive.getSuppliedBytes();
+        this.totalBytes = totalBytes;
     }
 
     public long getTotalBytes() {
@@ -144,7 +145,9 @@ public class ECalculatorController extends EPartController<ECalculatorPart> {
 
     public long getAvailableBytes() {
         List<ECalculatorThreadCore> threadCores = getThreadCores();
-        return totalBytes - threadCores.stream().mapToLong(ECalculatorThreadCore::getUsedStorage).sum();
+        long usedStorage = 0;
+        for (ECalculatorThreadCore threadCore : threadCores) usedStorage += threadCore.getUsedStorage();
+        return totalBytes - usedStorage;
     }
 
     public long getUsedBytes() {

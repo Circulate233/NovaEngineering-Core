@@ -5,7 +5,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -24,22 +24,24 @@ public final class JeiItemListCollector {
     private static final int MAX_PARALLELISM = 8;
 
     public static List<CreativeTabs> displayedTabs(final CreativeTabs[] tabs) {
-        return Arrays.stream(tabs)
-                     .filter(tab -> tab != CreativeTabs.HOTBAR)
-                     .collect(Collectors.toList());
+        final ArrayList<CreativeTabs> displayed = new ArrayList<>(tabs.length);
+        for (final CreativeTabs tab : tabs) {
+            if (tab != CreativeTabs.HOTBAR) displayed.add(tab);
+        }
+        return displayed;
     }
 
     public static List<NonNullList<ItemStack>> collect(final List<CreativeTabs> tabs) {
         final int parallelism = Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() - 1, MAX_PARALLELISM));
         if (parallelism <= 1 || tabs.size() <= 1) {
-            return tabs.stream().map(JeiItemListCollector::collectTab).collect(Collectors.toList());
+            return collectSerial(tabs);
         }
 
         final ForkJoinPool pool = new ForkJoinPool(parallelism);
         try {
             return pool.submit(() -> tabs.parallelStream()
-                                         .map(JeiItemListCollector::collectTab)
-                                         .collect(Collectors.toList()))
+                                          .map(JeiItemListCollector::collectTab)
+                                          .collect(Collectors.toList()))
                        .get();
         } catch (final InterruptedException interrupted) {
             Thread.currentThread().interrupt();
@@ -48,7 +50,13 @@ public final class JeiItemListCollector {
         } finally {
             pool.shutdown();
         }
-        return tabs.stream().map(JeiItemListCollector::collectTab).collect(Collectors.toList());
+        return collectSerial(tabs);
+    }
+
+    private static List<NonNullList<ItemStack>> collectSerial(final List<CreativeTabs> tabs) {
+        final ArrayList<NonNullList<ItemStack>> result = new ArrayList<>(tabs.size());
+        for (final CreativeTabs tab : tabs) result.add(collectTab(tab));
+        return result;
     }
 
     private static NonNullList<ItemStack> collectTab(final CreativeTabs tab) {

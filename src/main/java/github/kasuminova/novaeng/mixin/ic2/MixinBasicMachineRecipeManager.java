@@ -19,6 +19,12 @@ public abstract class MixinBasicMachineRecipeManager {
 
     @Redirect(method = "addRecipe(Lic2/api/recipe/IRecipeInput;Ljava/util/Collection;Lnet/minecraft/nbt/NBTTagCompound;Z)Z", at = @At(value = "INVOKE", target = "Lic2/core/recipe/BasicMachineRecipeManager;displayError(Ljava/lang/String;)V"))
     private void new$displayError(BasicMachineRecipeManager basicMachineRecipeManager, String msg, @Local(name = "input") IRecipeInput input, @Local(name = "output") Collection<ItemStack> output) {
-        this.displayError("Input ItemStack " + input.getInputs().stream().map(ItemStack::getDisplayName).toList() + " ,output ItemStack " + output.stream().map(ItemStack::getDisplayName).toList() + " is invalid.");
+        this.displayError("Input ItemStack " + displayNames(input.getInputs()) + " ,output ItemStack " + displayNames(output) + " is invalid.");
+    }
+
+    private static java.util.List<String> displayNames(final java.util.Collection<ItemStack> stacks) {
+        final java.util.List<String> names = new java.util.ArrayList<>(stacks.size());
+        for (ItemStack stack : stacks) names.add(stack.getDisplayName());
+        return names;
     }
 }

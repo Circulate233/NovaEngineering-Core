@@ -75,7 +75,14 @@ public class NetNodeImpl extends NetNode {
         }
 
         for (ResearchCognitionData researchCognitionData : researchRequired) {
-            if (nodes.stream().noneMatch(database -> database.hasResearchCognition(researchCognitionData))) {
+            boolean found = false;
+            for (Database database : nodes) {
+                if (database.hasResearchCognition(researchCognitionData)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
                 event.setFailed("缺失研究：" + researchCognitionData.getTranslatedName() + "！");
                 break;
             }

@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class NCOBasicRecipeConverter {
 
@@ -90,9 +89,10 @@ public class NCOBasicRecipeConverter {
         List<MachineRecipe> machineRecipes = new LinkedList<>();
 
         for (BasicRecipe basicRecipe : recipeList) {
-            LinkedList<ItemStack> inputList = basicRecipe.getItemIngredients().stream()
-                                                         .flatMap(ingredient -> ingredient.getInputStackHashingList().stream())
-                                                         .collect(Collectors.toCollection(LinkedList::new));
+            LinkedList<ItemStack> inputList = new LinkedList<>();
+            for (IItemIngredient ingredient : basicRecipe.getItemIngredients()) {
+                inputList.addAll(ingredient.getInputStackHashingList());
+            }
             if (inputList.isEmpty() || !inputFilter.test(inputList)) {
                 continue;
             }
@@ -100,19 +100,21 @@ public class NCOBasicRecipeConverter {
             MachineRecipe recipe = recipeSupplier.apply(inputList.getFirst());
 
             // Item Input
-            basicRecipe.getItemIngredients().stream()
-                       .filter(ingredient -> !(ingredient instanceof EmptyItemIngredient))
-                       .forEach(ingredient -> addItemIngredient(modifiers, ingredient, recipe, ingredient.getStack(), IOType.INPUT));
+            for (IItemIngredient ingredient : basicRecipe.getItemIngredients()) {
+                if (!(ingredient instanceof EmptyItemIngredient))
+                    addItemIngredient(modifiers, ingredient, recipe, ingredient.getStack(), IOType.INPUT);
+            }
             // Item Output
-            basicRecipe.getItemProducts().stream()
-                       .filter(itemProduct -> !(itemProduct instanceof EmptyItemIngredient))
-                       .forEach(itemProduct -> addItemIngredient(modifiers, itemProduct, recipe, itemProduct.getStack(), IOType.OUTPUT));
+            for (IItemIngredient itemProduct : basicRecipe.getItemProducts()) {
+                if (!(itemProduct instanceof EmptyItemIngredient))
+                    addItemIngredient(modifiers, itemProduct, recipe, itemProduct.getStack(), IOType.OUTPUT);
+            }
             // Fluid Input
-            basicRecipe.getFluidIngredients()
-                       .forEach(fluidIngredient -> addFluidIngredient(modifiers, fluidIngredient, recipe, IOType.INPUT));
+            for (IFluidIngredient fluidIngredient : basicRecipe.getFluidIngredients())
+                addFluidIngredient(modifiers, fluidIngredient, recipe, IOType.INPUT);
             // Fluid Output
-            basicRecipe.getFluidProducts()
-                       .forEach(fluidProduct -> addFluidIngredient(modifiers, fluidProduct, recipe, IOType.OUTPUT));
+            for (IFluidIngredient fluidProduct : basicRecipe.getFluidProducts())
+                addFluidIngredient(modifiers, fluidProduct, recipe, IOType.OUTPUT);
 
             recipe.addRequirement(new RequirementEnergy(IOType.INPUT, Math.round(RecipeModifier.applyModifiers(
                 modifiers, RequirementTypesMM.REQUIREMENT_ENERGY, IOType.INPUT, baseEnergyUsage, false)))

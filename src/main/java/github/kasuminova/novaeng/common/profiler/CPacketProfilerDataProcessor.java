@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -128,12 +127,8 @@ public class CPacketProfilerDataProcessor {
         Map<String, CPacketProfilerData.PacketData> mergedPackets;
         Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets;
 
-        mergedPackets = result.mergedPackets().entrySet().stream()
-                              .sorted(Map.Entry.comparingByValue())
-                              .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
-        mergedTileEntityPackets = result.mergedTileEntityPackets().entrySet().stream()
-                                        .sorted(Map.Entry.comparingByValue())
-                                        .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
+        mergedPackets = sortByValue(result.mergedPackets());
+        mergedTileEntityPackets = sortByValue(result.mergedTileEntityPackets());
 
         List<ITextComponent> messages = new ObjectArrayList<>();
 
@@ -148,6 +143,16 @@ public class CPacketProfilerDataProcessor {
 
         messages.forEach(message -> sender.sendMessage(message));
         reset();
+    }
+
+    private static Map<String, CPacketProfilerData.PacketData> sortByValue(
+        final Map<String, CPacketProfilerData.PacketData> source) {
+        final List<Map.Entry<String, CPacketProfilerData.PacketData>> entries = new ObjectArrayList<>(source.entrySet());
+        entries.sort(Map.Entry.comparingByValue());
+        final Map<String, CPacketProfilerData.PacketData> sorted = new Object2ObjectLinkedOpenHashMap<>(entries.size());
+        for (Map.Entry<String, CPacketProfilerData.PacketData> entry : entries)
+            sorted.put(entry.getKey(), entry.getValue());
+        return sorted;
     }
 
     private void reset() {
@@ -165,22 +170,28 @@ public class CPacketProfilerDataProcessor {
 
     @Nonnull
     private ProcessedData getProcessedData(final long elapsedTime, final int receivedPlayers, final int players) {
-        Map<GameProfile, CPacketProfilerData> sorted = receivedData.entrySet().stream()
-                                                                   .sorted(Map.Entry.comparingByValue())
-                                                                   .collect(Object2ObjectLinkedOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
-
-        double totalBandwidthPerSecond = sorted.values().stream()
-                                               .mapToDouble(CPacketProfilerData::getNetworkBandwidthPerSecond)
-                                               .sum();
-
-        GameProfile maxPlayer = sorted.entrySet().stream()
-                                      .max(Comparator.comparingDouble(entry -> entry.getValue().getNetworkBandwidthPerSecond()))
-                                      .map(Map.Entry::getKey)
-                                      .orElse(null);
-        double maxBandwidthPerSecond = sorted.values().stream()
-                                             .mapToDouble(CPacketProfilerData::getNetworkBandwidthPerSecond)
-                                             .max()
-                                             .orElse(0);
+        final List<Map.Entry<GameProfile, CPacketProfilerData>> entries = new ObjectArrayList<>(receivedData.entrySet());
+        entries.sort(Map.Entry.comparingByValue());
+        final Map<GameProfile, CPacketProfilerData> sorted = new Object2ObjectLinkedOpenHashMap<>(entries.size());
+        double totalBandwidthPerSecond = 0;
+        double maxBandwidthPerSecond = 0;
+        GameProfile maxPlayer = null;
+        boolean hasMaxPlayer = false;
+        boolean hasMaxBandwidth = false;
+        for (Map.Entry<GameProfile, CPacketProfilerData> entry : entries) {
+            final double bandwidth = entry.getValue().getNetworkBandwidthPerSecond();
+            sorted.put(entry.getKey(), entry.getValue());
+            totalBandwidthPerSecond += bandwidth;
+            if (!hasMaxPlayer || Double.compare(bandwidth, maxBandwidthPerSecond) > 0) {
+                maxBandwidthPerSecond = bandwidth;
+                maxPlayer = entry.getKey();
+                hasMaxPlayer = true;
+            }
+            if (!hasMaxBandwidth || Double.compare(bandwidth, maxBandwidthPerSecond) > 0) {
+                maxBandwidthPerSecond = bandwidth;
+                hasMaxBandwidth = true;
+            }
+        }
 
         Map<String, CPacketProfilerData.PacketData> mergedPackets = new Object2ObjectOpenHashMap<>();
         Map<String, CPacketProfilerData.PacketData> mergedTileEntityPackets = new Object2ObjectOpenHashMap<>();

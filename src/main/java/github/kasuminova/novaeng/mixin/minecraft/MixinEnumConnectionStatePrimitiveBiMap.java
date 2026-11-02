@@ -3,9 +3,10 @@ package github.kasuminova.novaeng.mixin.minecraft;
 import com.google.common.collect.BiMap;
 
 import github.kasuminova.novaeng.common.util.PacketIdAccess;
-import github.kasuminova.novaeng.common.util.collection.Int2ObjectHashBiMap;
-import github.kasuminova.novaeng.common.util.collection.PrimitiveBiMaps;
+import github.kasuminova.novaeng.common.util.collection.Int2ReferenceBiMap;
+import github.kasuminova.novaeng.common.util.collection.Int2ReferenceHashBiMap;
 
+import github.kasuminova.novaeng.common.util.collection.PrimitiveBiMaps;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.Packet;
@@ -33,7 +34,7 @@ public abstract class MixinEnumConnectionStatePrimitiveBiMap implements PacketId
         final EnumPacketDirection direction, final Class<? extends Packet<?>> packetClass) {
         BiMap<Integer, Class<? extends Packet<?>>> map = directionMaps.get(direction);
         if (map == null) {
-            map = new Int2ObjectHashBiMap<>();
+            map = new Int2ReferenceHashBiMap<>();
             directionMaps.put(direction, map);
         }
         if (map.containsValue(packetClass)) {
@@ -42,7 +43,7 @@ public abstract class MixinEnumConnectionStatePrimitiveBiMap implements PacketId
                     + " packet "
                     + packetClass
                     + " is already known to ID "
-                    + PrimitiveBiMaps.getIntValue(map.inverse(), packetClass);
+                    + ((Int2ReferenceBiMap<Class<? extends Packet<?>>>) map).inverse().getIntRequired(packetClass);
             LogManager.getLogger().fatal(message);
             throw new IllegalArgumentException(message);
         }
@@ -52,8 +53,8 @@ public abstract class MixinEnumConnectionStatePrimitiveBiMap implements PacketId
 
     @Override
     public int nova$getPacketId(final EnumPacketDirection direction, final Packet<?> packet) {
-        return PrimitiveBiMaps.getIntValueOrDefault(
-            directionMaps.get(direction).inverse(), packet.getClass(), -1);
+        return ((Int2ReferenceBiMap<Class<? extends Packet<?>>>) directionMaps.get(direction))
+            .inverse().getIntOrDefault(packet.getClass(), -1);
     }
 
     /**

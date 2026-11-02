@@ -543,7 +543,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public int getEnergyStored() {
-        return this.getWorkers().stream().mapToInt(EFabricatorWorker::getEnergyCache).sum();
+        int total = 0;
+        for (EFabricatorWorker worker : this.getWorkers()) total += worker.getEnergyCache();
+        return total;
     }
 
     public void consumeCoolant(final int amount) {

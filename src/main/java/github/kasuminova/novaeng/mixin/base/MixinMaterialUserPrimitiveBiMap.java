@@ -9,11 +9,11 @@ import com.teamacronymcoders.base.materialsystem.materialparts.MaterialPart;
 import com.teamacronymcoders.base.materialsystem.materialparts.MaterialPartSave;
 import com.teamacronymcoders.base.savesystem.SaveLoader;
 
-import github.kasuminova.novaeng.common.util.collection.Int2ObjectBiMap;
-import github.kasuminova.novaeng.common.util.collection.Int2ObjectHashBiMap;
+import github.kasuminova.novaeng.common.util.collection.Int2ReferenceBiMap;
+import github.kasuminova.novaeng.common.util.collection.Int2ReferenceHashBiMap;
 import github.kasuminova.novaeng.common.util.collection.PrimitiveBiMaps;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
@@ -37,7 +37,7 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
     private int nextId;
     @Shadow
     @Final
-    private IBaseMod mod;
+    private IBaseMod<?> mod;
 
     @Redirect(
         method = {"<init>"},
@@ -50,13 +50,13 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
         require = 1)
     private void nova$primitiveTable(
         final MaterialUser owner, final BiMap<Integer, MaterialPart> original) {
-        final Int2ObjectHashBiMap<MaterialPart> replacement = new Int2ObjectHashBiMap<>(16);
+        final Int2ReferenceHashBiMap<MaterialPart> replacement = new Int2ReferenceHashBiMap<>(16);
         replacement.putAll(original);
         materialPartBiMap = replacement;
     }
 
     @Shadow
-    public abstract void logError(String message);
+    public abstract void logError(String errorMessage);
 
     /**
      * @author NovaEngineering
@@ -75,7 +75,7 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
      */
     @Overwrite
     public int getMaterialPartId(final MaterialPart part) {
-        return PrimitiveBiMaps.getIntValue(materialPartBiMap.inverse(), part);
+        return ((Int2ReferenceBiMap<MaterialPart>) materialPartBiMap).inverse().getIntRequired(part);
     }
 
     /**
@@ -122,8 +122,8 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
             save = MaterialPartSave.of(nameMapping);
         } else {
             final var mappings = new Object2IntOpenHashMap<String>(materialPartBiMap.size());
-            for (Int2ObjectMap.Entry<MaterialPart> entry :
-                ((Int2ObjectBiMap<MaterialPart>) materialPartBiMap).int2ObjectEntrySet()) {
+            for (Int2ReferenceMap.Entry<MaterialPart> entry :
+                ((Int2ReferenceBiMap<MaterialPart>) materialPartBiMap).int2ReferenceEntrySet()) {
                 final String name = entry.getValue().getUnlocalizedName();
                 if (mappings.containsKey(name))
                     throw new IllegalStateException("Duplicate key " + name);

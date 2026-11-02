@@ -97,8 +97,12 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     private static int getMaxDynamicPatternSize() {
         final var machines = new ObjectArrayList<>(MachineRegistry.getLoadedMachines());
         machines.addAll(NEWMachineAssemblyManager.getAllDynamicMachines());
-        return machines.parallelStream().mapToInt(machine -> machine.getDynamicPatterns().values().stream()
-                                                                    .mapToInt(DynamicPattern::getMaxSize).max().orElse(1)).max().orElse(1);
+        return machines.parallelStream().mapToInt(machine -> {
+            int maxSize = 1;
+            for (DynamicPattern pattern : machine.getDynamicPatterns().values())
+                maxSize = Math.max(maxSize, pattern.getMaxSize());
+            return maxSize;
+        }).max().orElse(1);
     }
 
     public BooleanConfigField getUsingAEConfig() {

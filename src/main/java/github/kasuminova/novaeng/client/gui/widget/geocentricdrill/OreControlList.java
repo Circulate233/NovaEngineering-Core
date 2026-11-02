@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class OreControlList extends IngredientList {
 
@@ -43,12 +42,12 @@ public class OreControlList extends IngredientList {
     public OreControlList setStackList(final Map<String, ItemStack> oreList, final Set<String> accelerateOres) {
         getWidgets().clear();
 
-        Map<String, ItemStack> accelerateOreList = oreList.entrySet().stream()
-                                                          .filter(entry -> accelerateOres.contains(entry.getKey()))
-                                                          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
-        Map<String, ItemStack> defaultOreList = oreList.entrySet().stream()
-                                                       .filter(entry -> !accelerateOres.contains(entry.getKey()))
-                                                       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, Object2ObjectLinkedOpenHashMap::new));
+        Map<String, ItemStack> accelerateOreList = new Object2ObjectLinkedOpenHashMap<>();
+        Map<String, ItemStack> defaultOreList = new Object2ObjectLinkedOpenHashMap<>();
+        for (Map.Entry<String, ItemStack> entry : oreList.entrySet()) {
+            if (accelerateOres.contains(entry.getKey())) accelerateOreList.put(entry.getKey(), entry.getValue());
+            else defaultOreList.put(entry.getKey(), entry.getValue());
+        }
 
         Map<String, ItemStack> merged = new Object2ObjectLinkedOpenHashMap<>();
         merged.putAll(accelerateOreList);

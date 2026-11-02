@@ -5,7 +5,6 @@ import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +16,8 @@ public class EPartMap<P extends EPart<?>> {
 
     public P addPart(final P part) {
         parts.computeIfAbsent(part.getClass(), k -> new ObjectArrayList<>()).add(part);
-        ClassUtils.getAllSuperClasses(part.getClass(), EPart.class).stream()
-                  .map(clazz -> parts.computeIfAbsent(clazz, k -> new ObjectArrayList<>()))
-                  .forEach(partList -> partList.add(part));
+        for (Class<?> clazz : ClassUtils.getAllSuperClasses(part.getClass(), EPart.class))
+            parts.computeIfAbsent(clazz, k -> new ObjectArrayList<>()).add(part);
         return part;
     }
 
@@ -28,7 +26,8 @@ public class EPartMap<P extends EPart<?>> {
     }
 
     public void forEachPart(final Consumer<P> consumer) {
-        parts.values().stream().flatMap(Collection::stream).forEach(consumer);
+        for (List<P> partList : parts.values())
+            for (P part : partList) consumer.accept(part);
     }
 
     public void assemble(final EPartController<P> controller) {

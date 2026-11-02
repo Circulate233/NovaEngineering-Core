@@ -4,8 +4,8 @@ import com.google.common.collect.HashBiMap;
 import com.teamwizardry.librarianlib.features.saving.serializers.builtin.core.NamedDynamicRegistryManager.NamedDynamicRegistry;
 
 import github.kasuminova.novaeng.common.util.NamedDynamicIdAccess;
-import github.kasuminova.novaeng.common.util.collection.Object2IntBiMap;
-import github.kasuminova.novaeng.common.util.collection.Object2IntHashBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntBiMap;
+import github.kasuminova.novaeng.common.util.collection.Reference2IntHashBiMap;
 
 import kotlin.jvm.internal.Intrinsics;
 
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(value = NamedDynamicRegistry.class, remap = false)
 public abstract class MixinNamedDynamicRegistryPrimitiveBiMap implements NamedDynamicIdAccess {
     @Unique
-    private final Object2IntBiMap<Class<?>> nova$ids = new Object2IntHashBiMap<>();
+    private final Reference2IntBiMap<Class<?>> nova$ids = new Reference2IntHashBiMap<>();
     @Shadow
     @Final
     private HashBiMap<Class<?>, String> map;

@@ -139,17 +139,18 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
     }
 
     protected void scanInvModules(TileItemHandler moduleInv) {
-        moduleInv.getAvailableSlotsStream().forEach(slot -> {
+        for (var slotIterator = moduleInv.availableSlotIterator(); slotIterator.hasNext(); ) {
+            final int slot = slotIterator.nextInt();
             if (!slotManager.getSlot(moduleInv.getInvName(), slot).isAvailable()) {
-                return;
+                continue;
             }
             ItemStack stackInSlot = moduleInv.getStackInSlot(slot);
             if (stackInSlot.isEmpty()) {
-                return;
+                continue;
             }
             ServerModuleBase<?> module = ServerModuleRegistry.getModule(stackInSlot);
             if (module == null) {
-                return;
+                continue;
             }
 
             ServerModule moduleInstance = module.createInstance(this, stackInSlot);
@@ -162,7 +163,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
             if (moduleInstance instanceof Calculable) {
                 addCalculable((Calculable) moduleInstance);
             }
-        });
+        }
     }
 
     public void addExtension(@Nonnull final Extension extension) {

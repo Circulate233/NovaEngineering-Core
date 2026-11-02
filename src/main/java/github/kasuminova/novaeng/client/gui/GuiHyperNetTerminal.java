@@ -125,7 +125,9 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
     }
 
     public static boolean hasDatabaseSpace(final List<Database.Status> databases) {
-        return databases.stream().anyMatch(Database.Status::hasDatabaseSpace);
+        for (Database.Status database : databases)
+            if (database.hasDatabaseSpace()) return true;
+        return false;
     }
 
     public static void renderItemStackToGUI(final Minecraft mc,
@@ -266,11 +268,12 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         }
         List<ResearchCognitionData> missingDependencies = getMissingResearches(data);
         if (!missingDependencies.isEmpty()) {
-            errorTip.add(I18n.format("gui.terminal_controller.screen.info.start.error.dependencies",
-                missingDependencies.stream()
-                                   .map(ResearchCognitionData::getTranslatedName)
-                                   .collect(Collectors.joining(TextFormatting.RESET + ", "))
-            ));
+            final StringBuilder dependencyNames = new StringBuilder();
+            for (ResearchCognitionData dependency : missingDependencies) {
+                if (dependencyNames.length() > 0) dependencyNames.append(TextFormatting.RESET).append(", ");
+                dependencyNames.append(dependency.getTranslatedName());
+            }
+            errorTip.add(I18n.format("gui.terminal_controller.screen.info.start.error.dependencies", dependencyNames));
         }
 
         List<Database.Status> databases = PktTerminalGuiData.getDatabases();
@@ -300,17 +303,17 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         }
 
         if (isMouseOver(316, 143, 316 + 16, 143 + 16, mouseX - guiLeft, mouseY - guiTop)) {
-            drawHoveringText(hoveredTip.stream()
-                                       .flatMap(s -> fontRenderer.listFormattedStringToWidth(s, width / 3).stream())
-                                       .collect(Collectors.toList()),
-                (guiLeft + 316) - (width / 3), 143 + 16 + 20);
+            final List<String> lines = new ArrayList<>();
+            for (String tip : hoveredTip) lines.addAll(fontRenderer.listFormattedStringToWidth(tip, width / 3));
+            drawHoveringText(lines, (guiLeft + 316) - (width / 3), 143 + 16 + 20);
         }
     }
 
     protected List<ResearchCognitionData> getMissingResearches(ResearchCognitionData data) {
-        return data.getDependencies().stream()
-                   .filter(dependency -> !unlockedData.contains(dependency))
-                   .collect(Collectors.toList());
+        final List<ResearchCognitionData> missing = new ArrayList<>();
+        for (ResearchCognitionData dependency : data.getDependencies())
+            if (!unlockedData.contains(dependency)) missing.add(dependency);
+        return missing;
     }
 
     protected void drawButtonOverlay(int textureX, int textureY) {
@@ -333,15 +336,9 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
 
         List<String> lines;
         if (current.available() && (current.locked() || showLockedResearchDesc)) {
-            lines = data.getDescriptions()
-                        .stream()
-                        .flatMap(desc -> fontRenderer.listFormattedStringToWidth(desc, (int) (SCREEN_TEXT_MAX_WIDTH / FONT_SCALE)).stream())
-                        .collect(Collectors.toList());
+            lines = wrapDescriptions(data.getDescriptions());
         } else if (!current.locked()) {
-            lines = data.getUnlockedDescriptions()
-                        .stream()
-                        .flatMap(desc -> fontRenderer.listFormattedStringToWidth(desc, (int) (SCREEN_TEXT_MAX_WIDTH / FONT_SCALE)).stream())
-                        .collect(Collectors.toList());
+            lines = wrapDescriptions(data.getUnlockedDescriptions());
         } else {
             lines = Arrays.asList(
                 I18n.format("gui.terminal_controller.screen.info.unavailable.0"),
@@ -367,10 +364,12 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         if (data.getDependencies().isEmpty()) {
             dependencies = I18n.format("gui.terminal_controller.screen.info.dependencies.none");
         } else {
-            dependencies = data.getDependencies()
-                               .stream()
-                               .map(ResearchCognitionData::getTranslatedName)
-                               .collect(Collectors.joining(TextFormatting.RESET + ", "));
+            final StringBuilder names = new StringBuilder();
+            for (ResearchCognitionData dependency : data.getDependencies()) {
+                if (names.length() > 0) names.append(TextFormatting.RESET).append(", ");
+                names.append(dependency.getTranslatedName());
+            }
+            dependencies = names.toString();
         }
         fontRenderer.drawStringWithShadow(
             I18n.format("gui.terminal_controller.screen.info.dependencies") + dependencies,
@@ -405,6 +404,14 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
         }
 
         GlStateManager.popMatrix();
+    }
+
+    private List<String> wrapDescriptions(final List<String> descriptions) {
+        final List<String> lines = new ArrayList<>();
+        final int maxWidth = (int) (SCREEN_TEXT_MAX_WIDTH / FONT_SCALE);
+        for (String description : descriptions)
+            lines.addAll(fontRenderer.listFormattedStringToWidth(description, maxWidth));
+        return lines;
     }
 
     protected void drawNetworkAndControllerStatus() {
@@ -534,7 +541,9 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
                 setCurrent(context);
             }
         });
-        unlockedData.stream().sorted(comparator).forEach(data -> {
+        final List<ResearchCognitionData> sortedUnlocked = new ArrayList<>(unlockedData);
+        sortedUnlocked.sort(comparator);
+        sortedUnlocked.forEach(data -> {
             ResearchDataContext context = new ResearchDataContext(data, false, true, -1D);
             tmp.put(data.getTranslatedName(), context);
             if (context.equals(current)) {
@@ -760,17 +769,12 @@ public class GuiHyperNetTerminal extends GuiContainerBase<ContainerHyperNetTermi
     private void updateFilteredData() {
         lockedData.clear();
         unavailableData.clear();
-        RegistryHyperNet.getAllResearchCognitionData().stream()
-                        .filter(data -> !researchingData.containsKey(data))
-                        .filter(data -> !unlockedData.contains(data))
-                        .forEach(data -> {
-                            List<ResearchCognitionData> dependencies = data.getDependencies();
-                            if (dependencies.isEmpty() || unlockedData.containsAll(dependencies)) {
-                                lockedData.add(data);
-                            } else if (!data.isHideByDefault()) {
-                                unavailableData.add(data);
-                            }
-                        });
+        for (ResearchCognitionData data : RegistryHyperNet.getAllResearchCognitionData()) {
+            if (researchingData.containsKey(data) || unlockedData.contains(data)) continue;
+            List<ResearchCognitionData> dependencies = data.getDependencies();
+            if (dependencies.isEmpty() || unlockedData.containsAll(dependencies)) lockedData.add(data);
+            else if (!data.isHideByDefault()) unavailableData.add(data);
+        }
     }
 
     private boolean canStartResearch(ResearchCognitionData data) {

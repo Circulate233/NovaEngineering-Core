@@ -82,7 +82,7 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
      * @reason Keep free entity indexes primitive when constructing the job's range.
      */
     @Overwrite
-    public ArrayRange getArrayRange() {
+    public @NonNull ArrayRange getArrayRange() {
         return InvokerArrayRange.nova$createRange(
             0, indexCounter, new IntOpenHashSet((IntList) freeIndexes));
     }
@@ -144,7 +144,7 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
                 args[argIndex] = this.intPool.get(intArrIndex)[index];
                 ++intArrIndex;
             } else if (flattenedScalarType == FlattenedScalarType.FLOAT) {
-                args[argIndex] = Float.valueOf(this.floatPool.get(floatArrIndex)[index]);
+                args[argIndex] = this.floatPool.get(floatArrIndex)[index];
                 ++floatArrIndex;
             } else if (flattenedScalarType == FlattenedScalarType.BOOL) {
                 args[argIndex] = this.booleanPool.get(booleanArrIndex)[index];
@@ -173,7 +173,7 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
                 this.intPool.get(intArrIndex)[index] = (Integer) args[argIndex];
                 ++intArrIndex;
             } else if (flattenedScalarType == FlattenedScalarType.FLOAT) {
-                this.floatPool.get(floatArrIndex)[index] = ((Float) args[argIndex]).floatValue();
+                this.floatPool.get(floatArrIndex)[index] = (Float) args[argIndex];
                 ++floatArrIndex;
             } else if (flattenedScalarType == FlattenedScalarType.BOOL) {
                 this.booleanPool.get(booleanArrIndex)[index] = (Boolean) args[argIndex];
@@ -203,12 +203,14 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
         }
         ((Int2IntBiMap) entityDataIndexes).putDiscard(entityID, index, false);
         for (Class<? extends CleanComponent> clazz : this.components) {
-            CleanComponent component =
-                Objects.requireNonNull(
-                    components.stream()
-                              .filter(c -> c.getClass().equals(clazz))
-                              .findFirst()
-                              .orElse(null));
+            CleanComponent component = null;
+            for (CleanComponent candidate : components) {
+                if (candidate.getClass() == clazz) {
+                    component = candidate;
+                    break;
+                }
+            }
+            Objects.requireNonNull(component);
             Object[] args = this.componentRegistry.flattenComponent(component);
             HeapPool.ComDataLocation location = this.componentDataLocations.get(clazz);
             int argIndex = 0;
@@ -221,7 +223,7 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
                     ++intArrIndex;
                 } else if (flattenedScalarType == FlattenedScalarType.FLOAT) {
                     this.floatPool.get(floatArrIndex)[index] =
-                        ((Float) args[argIndex]).floatValue();
+                        (Float) args[argIndex];
                     ++floatArrIndex;
                 } else if (flattenedScalarType == FlattenedScalarType.BOOL) {
                     this.booleanPool.get(booleanArrIndex)[index] = (Boolean) args[argIndex];
@@ -265,7 +267,7 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
      * @reason Access entity indexes through primitive operations while retaining pool behavior.
      */
     @Overwrite
-    public Optional<Integer> getEntityID(int index) {
+    public @NonNull Optional<Integer> getEntityID(int index) {
         return Optional.ofNullable(((Int2IntBiMap) entityDataIndexes).inverse().getBoxed(index));
     }
 }

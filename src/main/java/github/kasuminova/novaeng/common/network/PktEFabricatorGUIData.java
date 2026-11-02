@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabricatorGUIData, IMessage> {
 
@@ -34,14 +35,19 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
             controller.getEnergyStored(),
             controller.getTotalCrafted(),
             controller.getLevel(),
-            controller.getWorkers().stream()
-                      .map(EFabricatorWorker::getQueue)
-                      .map(queue -> {
-                          EFabricatorWorker.CraftWork peek = queue.peek();
-                          return new EFabricatorData.WorkerStatus(peek != null ? peek.getOutput() : ItemStack.EMPTY, queue.size());
-                      })
-                      .collect(Collectors.toList())
+            workerStatuses(controller.getWorkers())
         );
+    }
+
+    private static List<EFabricatorData.WorkerStatus> workerStatuses(final List<EFabricatorWorker> workers) {
+        final List<EFabricatorData.WorkerStatus> statuses = new ObjectArrayList<>(workers.size());
+        for (EFabricatorWorker worker : workers) {
+            final var queue = worker.getQueue();
+            final EFabricatorWorker.CraftWork peek = queue.peek();
+            statuses.add(new EFabricatorData.WorkerStatus(
+                peek != null ? peek.getOutput() : ItemStack.EMPTY, queue.size()));
+        }
+        return statuses;
     }
 
     public PktEFabricatorGUIData() {

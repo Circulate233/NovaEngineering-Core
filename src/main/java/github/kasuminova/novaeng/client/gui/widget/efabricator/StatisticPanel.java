@@ -218,9 +218,8 @@ public class StatisticPanel extends SizedRow {
                 if (data.overclocked()) {
                     queueDepth = data.level().applyOverclockQueueDepth(queueDepth);
                 }
-                int works = data.workers().stream()
-                                .mapToInt(EFabricatorData.WorkerStatus::queueLength)
-                                .sum();
+                int works = 0;
+                for (EFabricatorData.WorkerStatus worker : data.workers()) works += worker.queueLength();
 
                 queueStatisticsBar.setMaxProgress(length * queueDepth)
                                   .setProgress(works);

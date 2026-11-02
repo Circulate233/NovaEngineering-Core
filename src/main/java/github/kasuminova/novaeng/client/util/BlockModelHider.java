@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class BlockModelHider {
 
@@ -34,10 +34,10 @@ public class BlockModelHider {
             return;
         }
 
-        MultiblockWorldSavedData.addDisableModel(ctrlPos, posList.stream()
-                                                                 .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
-                                                                 .map(pos -> pos.add(ctrlPos))
-                                                                 .collect(Collectors.toList()));
+        final List<BlockPos> hiddenPositions = new ArrayList<>(posList.size());
+        for (BlockPos pos : posList)
+            hiddenPositions.add(MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()).add(ctrlPos));
+        MultiblockWorldSavedData.addDisableModel(ctrlPos, hiddenPositions);
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -50,10 +50,10 @@ public class BlockModelHider {
             return;
         }
 
-        MultiblockWorldSavedData.addDisableModel(ctrlPos, posList.stream()
-                                                                 .map(pos -> MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()))
-                                                                 .map(pos -> pos.add(ctrlPos))
-                                                                 .collect(Collectors.toList()));
+        final List<BlockPos> hiddenPositions = new ArrayList<>(posList.size());
+        for (BlockPos pos : posList)
+            hiddenPositions.add(MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()).add(ctrlPos));
+        MultiblockWorldSavedData.addDisableModel(ctrlPos, hiddenPositions);
     }
 
 }

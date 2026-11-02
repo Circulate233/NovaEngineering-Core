@@ -177,14 +177,22 @@ public class MonitorPanel extends SizedRow {
                 ECalculatorData data = ecGui.getData();
                 long totalStorage = data.totalStorage();
                 long usedExtraStorage = data.usedExtraStorage();
-                long usedTotalMemory = data.ecpuList().stream().mapToLong(ecpuData -> ecpuData.usedMemory() - ecpuData.usedExtraMemory()).sum();
+                long usedTotalMemory = 0;
+                for (ECalculatorData.ECPUData ecpuData : data.ecpuList())
+                    usedTotalMemory += ecpuData.usedMemory() - ecpuData.usedExtraMemory();
                 this.totalStorage = totalStorage;
                 this.usedMemory = usedTotalMemory;
                 this.usedExtraStorage = usedExtraStorage;
-                this.hyperThreads = (int) data.ecpuList().stream().filter(ecpuData -> ecpuData.usedExtraMemory() > 0).count();
+                this.hyperThreads = 0;
+                for (ECalculatorData.ECPUData ecpuData : data.ecpuList())
+                    if (ecpuData.usedExtraMemory() > 0) this.hyperThreads++;
                 this.threads = data.ecpuList().size() - hyperThreads;
-                this.maxThreads = data.threadCores().stream().mapToInt(ECalculatorData.ThreadCoreData::maxThreads).sum();
-                this.maxHyperThreads = data.threadCores().stream().mapToInt(ECalculatorData.ThreadCoreData::maxHyperThreads).sum();
+                this.maxThreads = 0;
+                this.maxHyperThreads = 0;
+                for (ECalculatorData.ThreadCoreData core : data.threadCores()) {
+                    this.maxThreads += core.maxThreads();
+                    this.maxHyperThreads += core.maxHyperThreads();
+                }
                 this.cpuUsage = data.cpuUsagePerSecond();
                 this.energyUsage = 0;
                 this.totalParallelism = data.accelerators();

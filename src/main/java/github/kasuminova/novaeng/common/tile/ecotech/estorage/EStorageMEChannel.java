@@ -34,8 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class EStorageMEChannel extends EStoragePart implements ICellContainer, IActionHost, IGridProxyable, IAEPowerStorage {
 
@@ -58,10 +57,12 @@ public class EStorageMEChannel extends EStoragePart implements ICellContainer, I
     @SuppressWarnings("rawtypes")
     public List<IMEInventoryHandler> getCellArray(final IStorageChannel<?> channel) {
         if (partController != null) {
-            return partController.getCellDrives().stream()
-                                 .map(drive -> drive.getHandler(channel))
-                                 .filter(Objects::nonNull)
-                                 .collect(Collectors.toList());
+            final List<IMEInventoryHandler> handlers = new ArrayList<>();
+            for (EStorageCellDrive drive : partController.getCellDrives()) {
+                final IMEInventoryHandler handler = drive.getHandler(channel);
+                if (handler != null) handlers.add(handler);
+            }
+            return handlers;
         }
         return Collections.emptyList();
     }
