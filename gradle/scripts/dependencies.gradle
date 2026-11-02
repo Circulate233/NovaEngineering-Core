@@ -65,9 +65,7 @@ dependencies {
     }
 
     modImplementation "com.cleanroommc:cleanmix:0.7.4"
-    modImplementation 'CraftTweaker2:CraftTweaker2-API:4.1.20.716'
-    modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.716'
-    modImplementation 'CraftTweaker2:ZenScript:4.1.20.716'
+    modImplementation "curse.maven:crafttweaker-239197:9357132"
 
     modImplementation 'curse.maven:fugue-1005815:8878028'
     modImplementation 'curse.maven:modularui-624243:7929464'
