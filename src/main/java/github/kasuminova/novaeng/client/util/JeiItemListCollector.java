@@ -32,7 +32,7 @@ public final class JeiItemListCollector {
     }
 
     public static List<NonNullList<ItemStack>> collect(final List<CreativeTabs> tabs) {
-        final int parallelism = Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() - 1, MAX_PARALLELISM));
+        final int parallelism = Math.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, MAX_PARALLELISM);
         if (parallelism <= 1 || tabs.size() <= 1) {
             return collectSerial(tabs);
         }

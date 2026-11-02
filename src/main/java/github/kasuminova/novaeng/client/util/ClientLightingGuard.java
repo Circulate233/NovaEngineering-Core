@@ -1,11 +1,13 @@
 package github.kasuminova.novaeng.client.util;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
+import github.kasuminova.novaeng.common.util.MixinDecisions;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.apiimpl.IrisApiV0Impl;
 import net.coderbot.iris.config.IrisConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 
 public final class ClientLightingGuard {
 
@@ -19,6 +21,11 @@ public final class ClientLightingGuard {
         if (!NovaEngCoreConfig.CLIENT.enableFullbright) {
             return false;
         }
+        return !MixinDecisions.actiniumLoaded || isIrisShadersEnabled();
+    }
+
+    @Optional.Method(modid = "actinium")
+    public static boolean isIrisShadersEnabled() {
         if (!Iris.enabled) {
             return true;
         }
