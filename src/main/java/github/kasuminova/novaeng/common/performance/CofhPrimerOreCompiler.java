@@ -2,12 +2,16 @@ package github.kasuminova.novaeng.common.performance;
 
 import cofh.cofhworld.data.numbers.ConstantProvider;
 import cofh.cofhworld.data.numbers.INumberProvider;
+import cofh.cofhworld.init.WorldHandler;
+import cofh.cofhworld.init.WorldProps;
 import cofh.cofhworld.util.random.WeightedBlock;
 import cofh.cofhworld.world.IConfigurableFeatureGenerator.GenRestriction;
 import cofh.cofhworld.world.distribution.Distribution;
 import cofh.cofhworld.world.generator.WorldGenMinableCluster;
 import github.kasuminova.novaeng.mixin.cofh.AccessorPrimerOreCluster;
 import github.kasuminova.novaeng.mixin.cofh.AccessorPrimerOreDistribution;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -19,6 +23,21 @@ import java.util.List;
 public final class CofhPrimerOreCompiler {
 
     private CofhPrimerOreCompiler() {
+    }
+
+    /** Only called after CoFH World has been confirmed present. */
+    public static List<PrimerOreRule> compileRules(final World world) {
+        if (WorldProps.disableFeatureGeneration) return ObjectLists.emptyList();
+        final var features = WorldHandler.getFeatures();
+        if (features == null) return ObjectLists.emptyList();
+        final ObjectArrayList<PrimerOreRule> rules = new ObjectArrayList<>();
+        for (final var feature : features) {
+            if (feature instanceof PrimerOreFeature compilable) {
+                final PrimerOreRule rule = compilable.nova$compilePrimerOre(world);
+                if (rule != null) rules.add(rule);
+            }
+        }
+        return rules;
     }
 
     public static PrimerOreRule compile(final Distribution distribution, final World world, final WorldGenerator generator,

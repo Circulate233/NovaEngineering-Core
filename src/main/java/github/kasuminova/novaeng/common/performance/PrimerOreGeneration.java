@@ -1,7 +1,5 @@
 package github.kasuminova.novaeng.common.performance;
 
-import cofh.cofhworld.init.WorldHandler;
-import cofh.cofhworld.init.WorldProps;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -90,13 +88,9 @@ public final class PrimerOreGeneration {
             final EventType type = EventType.valueOf(rule.name);
             rules.add(new Entry(rule, identifier("vanilla", rule.name), type, new WorldGenMinable(rule.output(0), rule.size)));
         }
-        if (!WorldProps.disableFeatureGeneration && Loader.isModLoaded("cofhworld")
-            && WorldHandler.getFeatures() != null) {
-            for (final var feature : WorldHandler.getFeatures()) {
-                if (feature instanceof PrimerOreFeature compilable) {
-                    final PrimerOreRule rule = compilable.nova$compilePrimerOre(world);
-                    if (rule != null) rules.add(new Entry(rule, identifier("cofh", rule.name), null, null));
-                }
+        if (Loader.isModLoaded("cofhworld")) {
+            for (final PrimerOreRule rule : CofhPrimerOreCompiler.compileRules(world)) {
+                rules.add(new Entry(rule, identifier("cofh", rule.name), null, null));
             }
         }
         plan = new Plan(rules.toArray(new Entry[0]));
