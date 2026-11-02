@@ -154,7 +154,7 @@ public class ECalculatorCellDrive extends ECalculatorPart implements InternalInv
             driveInv.setItemDirect(x, item.hasKey("id", 8) ? new ItemStack(item) : ItemStack.EMPTY);
         }
         if (tag.hasKey("connectedSide")) {
-            this.connectedSide = EnumFacing.values()[tag.getByte("connectedSide")];
+            this.connectedSide = EnumFacing.VALUES[tag.getByte("connectedSide")];
         } else {
             this.connectedSide = null;
         }

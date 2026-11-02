@@ -32,7 +32,7 @@ public abstract class ECalculatorPart extends AbstractEPart<ECalculatorControlle
         super.readCustomNBT(compound);
 
         if (compound.hasKey("controllerLevel")) {
-            this.controllerLevel = Levels.values()[compound.getByte("controllerLevel")];
+            this.controllerLevel = Levels.BY_ORDINAL[compound.getByte("controllerLevel")];
         } else {
             this.controllerLevel = null;
         }

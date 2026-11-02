@@ -37,7 +37,7 @@ public class PktEFabricatorPatternSearchGUIAction implements IMessage, IMessageH
 
     @Override
     public void fromBytes(final ByteBuf buf) {
-        this.action = Action.values()[buf.readByte()];
+        this.action = Action.VALUES[buf.readByte()];
         if (this.action == Action.PICKUP_PATTERN) {
             this.pos = BlockPos.fromLong(buf.readLong());
             this.slot = buf.readByte();
@@ -107,7 +107,9 @@ public class PktEFabricatorPatternSearchGUIAction implements IMessage, IMessageH
 
     public enum Action {
         PICKUP_PATTERN,
-        PUT_PATTERN,
+        PUT_PATTERN;
+
+        public static final Action[] VALUES = values();
     }
 
 }

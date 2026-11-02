@@ -28,7 +28,7 @@ public class PktEFabricatorGUIAction implements IMessage, IMessageHandler<PktEFa
 
     @Override
     public void fromBytes(final ByteBuf buf) {
-        this.action = Action.values()[buf.readByte()];
+        this.action = Action.VALUES[buf.readByte()];
     }
 
     @Override
@@ -90,7 +90,9 @@ public class PktEFabricatorGUIAction implements IMessage, IMessageHandler<PktEFa
         ENABLE_ACTIVE_COOLANT,
         DISABLE_ACTIVE_COOLANT,
 
-        SWITCH_GUI,
+        SWITCH_GUI;
+
+        public static final Action[] VALUES = values();
     }
 
 }

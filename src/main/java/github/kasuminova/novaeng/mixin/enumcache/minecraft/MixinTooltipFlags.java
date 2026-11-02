@@ -1,0 +1,24 @@
+package github.kasuminova.novaeng.mixin.enumcache.minecraft;
+
+import net.minecraft.client.util.ITooltipFlag;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+
+@Mixin(value = ITooltipFlag.TooltipFlags.class, remap = false)
+public abstract class MixinTooltipFlags {
+
+    @Shadow
+    @Final
+    private static ITooltipFlag.TooltipFlags[] $VALUES;
+
+    /**
+     * @author circulation
+     * @reason Return $VALUES instead of its clone.
+     */
+    @Overwrite(remap = false)
+    public static ITooltipFlag.TooltipFlags[] values() {
+        return $VALUES;
+    }
+}

@@ -144,7 +144,7 @@ public class RegistryItems {
             ITEMS_TO_REGISTER.add(ItemHorologiumCompass.INSTANCE);
         }
 
-        ITEMS_TO_REGISTER.addAll(ItemBasic.Companion.getAllItem());
+        ITEMS_TO_REGISTER.addAll(ItemBasic.getAllItem());
         ITEMS_TO_REGISTER.add(ItemMachineAssemblyTool.INSTANCE);
 
         RegistryExtended.registerItems();
