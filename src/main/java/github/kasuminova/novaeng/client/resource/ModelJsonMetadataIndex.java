@@ -12,7 +12,7 @@ import net.minecraft.util.ResourceLocation;
 public interface ModelJsonMetadataIndex {
 
     /**
-     * Starts a fresh metadata generation and rejects nested reload ownership.
+     * Starts a metadata generation, retaining the current generation for nested reload calls.
      */
     void begin();
 

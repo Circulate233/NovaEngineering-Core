@@ -1,7 +1,5 @@
 package github.kasuminova.novaeng.mixin.minecraft.forge;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import github.kasuminova.novaeng.client.model.async.ModelTextureGetterContext;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -12,6 +10,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.IModelState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.function.Function;
 
@@ -19,7 +18,7 @@ import java.util.function.Function;
 @Mixin(value = ModelLoader.class, remap = false)
 public abstract class MixinModelLoaderTextureContext {
 
-    @WrapOperation(
+    @Redirect(
         method = "setupModelRegistry",
         at = @At(
             value = "INVOKE",
@@ -29,9 +28,8 @@ public abstract class MixinModelLoaderTextureContext {
     private IBakedModel nova$withTextureGetter(final IModel model,
                                                 final IModelState state,
                                                 final VertexFormat format,
-                                                final Function<ResourceLocation, TextureAtlasSprite> getter,
-                                                final Operation<IBakedModel> original) {
+                                               final Function<ResourceLocation, TextureAtlasSprite> getter) {
         return ModelTextureGetterContext.with(getter,
-            () -> original.call(model, state, format, getter));
+            () -> model.bake(state, format, getter));
     }
 }

@@ -9,6 +9,7 @@ import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
+import github.kasuminova.novaeng.mixin.minecraft.AccessorEntityRenderer;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -25,7 +26,6 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("MethodMayBeStatic")
 public class ClientEventHandler {
     public static final ClientEventHandler INSTANCE = new ClientEventHandler();
 
@@ -72,6 +72,9 @@ public class ClientEventHandler {
 
         if (ClientLightingGuard.consumeRenderRefresh()) {
             final Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.entityRenderer != null) {
+                ((AccessorEntityRenderer) minecraft.entityRenderer).nova$setLightmapUpdateNeeded(true);
+            }
             if (minecraft.world != null && minecraft.renderGlobal != null) {
                 minecraft.renderGlobal.loadRenderers();
             }

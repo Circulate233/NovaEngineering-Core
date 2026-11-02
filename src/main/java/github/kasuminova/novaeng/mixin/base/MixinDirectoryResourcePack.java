@@ -2,12 +2,12 @@ package github.kasuminova.novaeng.mixin.base;
 
 import com.teamacronymcoders.base.util.files.DirectoryResourcePack;
 import github.kasuminova.novaeng.client.resource.DirectoryExistenceCache;
+import net.minecraft.client.resources.AbstractResourcePack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * Answers directory backed resource probes from the reload scoped existence cache.
@@ -22,24 +22,15 @@ import java.util.Map;
  * by name and therefore produces no refmap entry to translate between them.</p>
  */
 @Mixin(DirectoryResourcePack.class)
-public class MixinDirectoryResourcePack {
+public abstract class MixinDirectoryResourcePack extends AbstractResourcePack {
+
+    protected MixinDirectoryResourcePack(final File resourcePackFile) {
+        super(resourcePackFile);
+    }
 
     @Redirect(method = "hasResourceName", at = @At(value = "INVOKE",
         target = "Ljava/io/File;exists()Z", remap = false), require = 1)
     private boolean nova$cachedExists(final File file) {
-        final Map<String, Boolean> generation = DirectoryExistenceCache.instance().active();
-        if (generation == null) {
-            return file.exists();
-        }
-
-        final String key = file.getAbsolutePath();
-        final Boolean known = generation.get(key);
-        if (known != null) {
-            return known;
-        }
-
-        final boolean exists = file.exists();
-        generation.put(key, exists);
-        return exists;
+        return DirectoryExistenceCache.instance().exists(this.resourcePackFile, file);
     }
 }

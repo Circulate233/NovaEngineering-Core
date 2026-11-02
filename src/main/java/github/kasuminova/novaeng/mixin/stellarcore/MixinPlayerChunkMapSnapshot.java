@@ -1,8 +1,6 @@
 package github.kasuminova.novaeng.mixin.stellarcore;
 
 import com.google.common.base.Predicate;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import github.kasuminova.novaeng.common.performance.TickSnapshotPool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.management.PlayerChunkMap;
@@ -16,22 +14,22 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
-@Mixin(value = PlayerChunkMap.class, priority = 900)
+@Mixin(PlayerChunkMap.class)
 public abstract class MixinPlayerChunkMapSnapshot {
 
     @Unique
-    private static final java.util.function.Predicate<PlayerChunkMapEntry> nova$tickableChunk = entry -> {
+    private static final Function<PlayerChunkMapEntry, Chunk> nova$tickableChunk = entry -> {
         final Chunk chunk = entry.getChunk();
         return chunk != null && ((!chunk.isLightPopulated() && chunk.isTerrainPopulated())
-            || !chunk.wasTicked() || entry.hasPlayerMatchingInRange(128.0, MixinPlayerChunkMapSnapshot.NOT_SPECTATOR));
+            || !chunk.wasTicked() || entry.hasPlayerMatchingInRange(128.0, MixinPlayerChunkMapSnapshot.NOT_SPECTATOR))
+            ? chunk : null;
     };
-    @Unique
-    private static final Function<PlayerChunkMapEntry, Chunk> nova$chunkValue = PlayerChunkMapEntry::getChunk;
     @Shadow
     @Final
     private static Predicate<EntityPlayerMP> NOT_SPECTATOR;
@@ -46,9 +44,8 @@ public abstract class MixinPlayerChunkMapSnapshot {
         this.nova$chunkSnapshots = new TickSnapshotPool<>();
     }
 
-    // Wrap the completed method so StellarCore's cancellable HEAD injector cannot replace the snapshot path.
-    @WrapMethod(method = "getChunkIterator()Ljava/util/Iterator;")
-    private Iterator<Chunk> nova$chunkTickSnapshot(final Operation<Iterator<Chunk>> original) {
-        return this.nova$chunkSnapshots.select(this.entries, nova$tickableChunk, nova$chunkValue);
+    @Inject(method = "getChunkIterator()Ljava/util/Iterator;", at = @At("HEAD"), cancellable = true, require = 1)
+    private void nova$chunkTickSnapshot(final CallbackInfoReturnable<Iterator<Chunk>> cir) {
+        cir.setReturnValue(this.nova$chunkSnapshots.selectNonNull(this.entries, nova$tickableChunk));
     }
 }

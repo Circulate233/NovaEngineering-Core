@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonToken;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.FileNotFoundException;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * Generation-scoped JSON metadata index keyed by resource location and source-pack identity.
@@ -38,7 +40,14 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
     private final AtomicInteger depth = new AtomicInteger();
     private final AtomicReference<Generation> activeGeneration = new AtomicReference<>();
 
+    private final Supplier<IResourceManager> resources;
+
     private ModelJsonMetadataIndexImpl() {
+        this(() -> Minecraft.getMinecraft().getResourceManager());
+    }
+
+    ModelJsonMetadataIndexImpl(final Supplier<IResourceManager> resources) {
+        this.resources = resources;
     }
 
     /**
@@ -85,13 +94,84 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
         }
     }
 
+    private static Metadata parse(final InputStream stream,
+                                  final ResourceLocation location,
+                                  final Generation generation) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            return readMetadata(reader);
+        } catch (final IOException | RuntimeException failure) {
+            logFailure(generation, location, failure);
+            return EMPTY;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    static Metadata readMetadata(final JsonReader reader) throws IOException {
+        String libNineType = null;
+        boolean uvlMarker = false;
+        boolean validUvlMarker = true;
+        reader.setLenient(true);
+        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+            throw new IOException("Model JSON root is not an object");
+        }
+        reader.beginObject();
+        while (reader.hasNext()) {
+            final String name = reader.nextName();
+            if ("9s".equals(name)) {
+                libNineType = readLibNineType(reader);
+            } else if ("ae2_uvl_marker".equals(name)) {
+                final JsonToken token = reader.peek();
+                if (token == JsonToken.BOOLEAN) {
+                    uvlMarker = reader.nextBoolean();
+                } else if (token == JsonToken.STRING) {
+                    uvlMarker = Boolean.parseBoolean(reader.nextString());
+                } else if (token == JsonToken.NULL) {
+                    reader.nextNull();
+                } else {
+                    reader.skipValue();
+                    validUvlMarker = false;
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        reader.setLenient(false);
+        if (reader.peek() != JsonToken.END_DOCUMENT) {
+            throw new IOException("Model JSON has trailing content");
+        }
+        return new Metadata(libNineType, validUvlMarker && uvlMarker);
+    }
+
+    private static String readLibNineType(final JsonReader reader) throws IOException {
+        final JsonToken token = reader.peek();
+        if (token == JsonToken.STRING || token == JsonToken.NUMBER) {
+            return reader.nextString();
+        }
+        if (token == JsonToken.BOOLEAN) {
+            return Boolean.toString(reader.nextBoolean());
+        }
+        if (token == JsonToken.BEGIN_ARRAY) {
+            reader.beginArray();
+            String value = reader.hasNext() ? readLibNineType(reader) : null;
+            while (reader.hasNext()) {
+                reader.skipValue();
+                value = null;
+            }
+            reader.endArray();
+            return value;
+        }
+        reader.skipValue();
+        return null;
+    }
+
     private Metadata lookup(final ResourceLocation location) {
         final Generation generation = this.activeGeneration.get();
         if (generation == null) {
             return EMPTY;
         }
 
-        try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(location)) {
+        try (IResource resource = this.resources.get().getResource(location)) {
             final InputStream stream = resource.getInputStream();
             if (!(stream instanceof SourcedResourceStream sourced) || !sourced.isCacheableSource()) {
                 return parse(stream, location, generation);
@@ -111,43 +191,6 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
             logFailure(generation, location, failure);
             return EMPTY;
         }
-    }
-
-    private static Metadata parse(final InputStream stream,
-                                  final ResourceLocation location,
-                                  final Generation generation) {
-        String libNineType = null;
-        boolean uvlMarker = false;
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            if (reader.peek() != JsonToken.BEGIN_OBJECT) {
-                throw new IllegalStateException("Model JSON root is not an object");
-            }
-            reader.beginObject();
-            while (reader.hasNext()) {
-                final String name = reader.nextName();
-                if ("9s".equals(name)) {
-                    final JsonToken token = reader.peek();
-                    if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
-                        libNineType = reader.nextString();
-                    } else {
-                        reader.skipValue();
-                    }
-                } else if ("ae2_uvl_marker".equals(name)) {
-                    final JsonToken token = reader.peek();
-                    if (token == JsonToken.STRING || token == JsonToken.NUMBER || token == JsonToken.BOOLEAN) {
-                        uvlMarker = Boolean.parseBoolean(reader.nextString());
-                    } else {
-                        reader.skipValue();
-                    }
-                } else {
-                    reader.skipValue();
-                }
-            }
-            reader.endObject();
-        } catch (final IOException | RuntimeException failure) {
-            logFailure(generation, location, failure);
-        }
-        return new Metadata(libNineType, uvlMarker);
     }
 
     private static void logFailure(final Generation generation,
@@ -194,6 +237,6 @@ public final class ModelJsonMetadataIndexImpl implements ModelJsonMetadataIndex 
             }
         }
 
-    private record Metadata(String libNineType, boolean uvlMarker) {
+    record Metadata(String libNineType, boolean uvlMarker) {
     }
 }

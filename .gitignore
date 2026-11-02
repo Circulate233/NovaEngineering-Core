@@ -25,7 +25,9 @@ gradle-app.setting
 .classpath
 
 # IDEA config
-.idea
+.idea/*
+!.idea/
+!.idea/gradle.xml
 .kotlin
 *.iml
 *.ipr

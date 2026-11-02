@@ -8,13 +8,13 @@ import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.util.IOInventory;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class TileModularServerAssembler extends TileCustomController {
@@ -22,7 +22,7 @@ public class TileModularServerAssembler extends TileCustomController {
 
     protected ModularServer server = null;
 
-    protected Set<ContainerModularServerAssembler> openedContainer = new HashSet<>();
+    protected Set<ContainerModularServerAssembler> openedContainer = new ObjectOpenHashSet<>();
 
     public TileModularServerAssembler() {
         this.serverInventory = (IOInventory) new IOInventory(this, new int[0], new int[0]).setMiscSlots(0);

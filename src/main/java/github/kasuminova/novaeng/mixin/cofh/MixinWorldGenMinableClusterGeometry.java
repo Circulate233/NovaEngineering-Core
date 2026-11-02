@@ -1,10 +1,13 @@
 package github.kasuminova.novaeng.mixin.cofh;
 
+import cofh.cofhworld.data.numbers.ConstantProvider;
 import cofh.cofhworld.data.numbers.INumberProvider;
 import cofh.cofhworld.util.random.WeightedBlock;
 import cofh.cofhworld.world.generator.WorldGen;
 import cofh.cofhworld.world.generator.WorldGenMinableCluster;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.performance.OreGeometryScratch;
+import github.kasuminova.novaeng.common.performance.WorldOreGeneration;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -38,13 +41,17 @@ public abstract class MixinWorldGenMinableClusterGeometry {
      * @author circulation
      * @reason Reuse each ellipsoid's Z distances and their exact minimum to prune impossible branches without changing visits or RNG calls.
      */
-    @Overwrite
+    @Overwrite(remap = true)
     public boolean generate(final World world, final Random random, final BlockPos position) {
         final int x = position.getX();
         final int y = position.getY();
         final int z = position.getZ();
         final int blocks = MathHelper.clamp(this.genClusterSize.intValue(world, random,
-            new INumberProvider.DataHolder(position)), 1, 42);
+            this.genClusterSize.getClass() == ConstantProvider.class
+                ? null : new INumberProvider.DataHolder(position)), 1, 42);
+        if (NovaEngCoreConfig.SERVER.unifiedOreGeneration) {
+            return WorldOreGeneration.cofh(world, random, position, blocks, this.genBlock, this.cluster);
+        }
         if (blocks < 4) {
             return this.generateTiny(world, random, blocks, x, y, z);
         }

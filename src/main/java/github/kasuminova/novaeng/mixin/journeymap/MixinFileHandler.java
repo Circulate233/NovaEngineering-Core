@@ -1,7 +1,5 @@
 package github.kasuminova.novaeng.mixin.journeymap;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import journeymap.client.io.FileHandler;
 import net.minecraft.util.ResourceLocation;
@@ -9,6 +7,9 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,33 +32,43 @@ public abstract class MixinFileHandler {
     @Unique
     private static final String NOVA$MARKER_PREFIX = ".novaeng-copy-marker-";
 
-    @WrapMethod(method = "copyResources(Ljava/io/File;Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;Z)Z",
-        remap = false, require = 1)
-    private static boolean nova$skipUnchangedCopy(final File directory,
-                                                  final ResourceLocation resourceLocation,
-                                                  final String destDirName,
-                                                  final boolean overwrite,
-                                                  final Operation<Boolean> original) {
-        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy || directory == null || destDirName == null) {
-            return original.call(directory, resourceLocation, destDirName, overwrite);
+    @Inject(method = "copyResources(Ljava/io/File;Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;Z)Z",
+        at = @At("HEAD"), cancellable = true, remap = false, require = 1)
+    private static void nova$skipUnchangedCopy(final File targetDirectory,
+                                               final ResourceLocation location,
+                                               final String setName,
+                                               final boolean overwrite,
+                                               final CallbackInfoReturnable<Boolean> cir) {
+        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy || targetDirectory == null || setName == null) {
+            return;
         }
 
-        final String fingerprint = nova$fingerprint(resourceLocation);
+        final String fingerprint = nova$fingerprint(location);
         if (fingerprint == null) {
-            return original.call(directory, resourceLocation, destDirName, overwrite);
+            return;
         }
 
-        final File destination = new File(directory, destDirName);
-        final File marker = new File(directory, NOVA$MARKER_PREFIX + destDirName);
+        final File destination = new File(targetDirectory, setName);
+        final File marker = new File(targetDirectory, NOVA$MARKER_PREFIX + setName);
         if (destination.isDirectory() && fingerprint.equals(nova$readMarker(marker))) {
-            return true;
+            cir.setReturnValue(true);
         }
+    }
 
-        final boolean copied = original.call(directory, resourceLocation, destDirName, overwrite);
-        if (copied) {
-            nova$writeMarker(marker, fingerprint);
+    @Inject(method = "copyResources(Ljava/io/File;Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;Z)Z",
+        at = @At("RETURN"), remap = false, require = 1)
+    private static void nova$recordCopiedResources(final File targetDirectory,
+                                                   final ResourceLocation location,
+                                                   final String setName,
+                                                   final boolean overwrite,
+                                                   final CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue() && NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy
+            && targetDirectory != null && setName != null) {
+            final String fingerprint = nova$fingerprint(location);
+            if (fingerprint != null && new File(targetDirectory, setName).isDirectory()) {
+                nova$writeMarker(new File(targetDirectory, NOVA$MARKER_PREFIX + setName), fingerprint);
+            }
         }
-        return copied;
     }
 
     /**

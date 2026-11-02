@@ -28,7 +28,6 @@ import com.circulation.random_complement.client.buttonsetting.IntelligentBlockin
 import com.circulation.random_complement.common.interfaces.RCIConfigurableObject;
 import com.glodblock.github.coremod.CoreModHooks;
 import com.glodblock.github.integration.mek.FCGasItems;
-import com.glodblock.github.inventory.FluidConvertingInventoryCrafting;
 import com.glodblock.github.loader.FCItems;
 import com.glodblock.github.util.FluidCraftingPatternDetails;
 import com.glodblock.github.util.ModAndClassUtil;
@@ -45,6 +44,7 @@ import lombok.val;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,6 +53,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
+import thelm.packagingprovider.util.MixinHooks;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -60,9 +61,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 @Mixin(value = CraftingCPUCluster.class, remap = false, priority = 0)
 public abstract class MixinCraftingCPUClusterTwo {
@@ -110,6 +109,20 @@ public abstract class MixinCraftingCPUClusterTwo {
         return sum;
     }
 
+    @Unique
+    private static long n$getCraftingAmount(IAEItemStack stack) {
+        ItemStack definition = stack.getDefinition();
+        if (definition != null && !definition.isEmpty()) {
+            if (definition.getItem() == FCItems.FLUID_DROP) {
+                return (long) Math.max((double) stack.getStackSize() / 1000.0d, 1.0d);
+            }
+            if (ModAndClassUtil.GAS && definition.getItem() == FCGasItems.GAS_DROP) {
+                return (long) Math.max((double) stack.getStackSize() / 4000.0d, 1.0d);
+            }
+        }
+        return stack.getStackSize();
+    }
+
     @Shadow
     protected abstract void postChange(IAEItemStack diff, IActionSource src);
 
@@ -154,7 +167,7 @@ public abstract class MixinCraftingCPUClusterTwo {
                 long max = 0;
                 val list = (key.isCraftable() || key instanceof FluidCraftingPatternDetails) ? key.getCondensedOutputs() : key.getCondensedInputs();
                 for (IAEItemStack stack1 : list) {
-                    long size = stack1.getStackSize();
+                    long size = n$getCraftingAmount(stack1);
                     if (size > max) max = size;
                 }
 
@@ -176,12 +189,19 @@ public abstract class MixinCraftingCPUClusterTwo {
                         InventoryCrafting ic = null;
                         didPatternCraft = false;
 
-                        if (!this.visitedMediums.containsKey(key) || this.visitedMediums.get(key).isEmpty()) {
-                            this.visitedMediums.put(key, cc.getMediums(key).stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new)));
+                        Queue<ICraftingMedium> mediums = this.visitedMediums.get(key);
+                        if (mediums == null || mediums.isEmpty()) {
+                            mediums = new ArrayDeque<>();
+                            for (ICraftingMedium availableMedium : cc.getMediums(key)) {
+                                if (availableMedium != null) {
+                                    mediums.add(availableMedium);
+                                }
+                            }
+                            this.visitedMediums.put(key, mediums);
                         }
 
-                        while (!this.visitedMediums.get(key).isEmpty()) {
-                            ICraftingMedium m = this.visitedMediums.get(key).poll();
+                        while (!mediums.isEmpty()) {
+                            ICraftingMedium m = mediums.poll();
                             if (value.getValue() > 0L && m != null && !m.isBusy()) {
                                 MediumType mediumType = this.r$specialMediumTreatment(m, key);
                                 if (ic == null) {
@@ -204,7 +224,10 @@ public abstract class MixinCraftingCPUClusterTwo {
                                     }
 
                                     val l = key.isCraftable() ? 3 : 10;
-                                    ic = new FluidConvertingInventoryCrafting(new ContainerNull(), l, l);
+                                    ic = CoreModHooks.wrapCraftingBuffer(new ContainerNull(), l, l);
+                                    if (!key.isCraftable() && Loader.isModLoaded("packagingprovider")) {
+                                        ic = MixinHooks.INSTANCE.getCraftingInventory(input.length);
+                                    }
 
                                     boolean found = false;
 

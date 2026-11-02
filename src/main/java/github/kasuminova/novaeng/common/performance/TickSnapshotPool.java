@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.RandomAccess;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -27,6 +28,37 @@ public final class TickSnapshotPool<T> {
                         array = Arrays.copyOf(array, Math.max(16, array.length * 2));
                     }
                     array[size++] = value.apply(entry);
+                }
+            }
+        } catch (final RuntimeException | Error failure) {
+            this.recycle(array, size);
+            throw failure;
+        }
+        if (size == 0) {
+            this.recycle(array, size);
+            return ObjectIterators.emptyIterator();
+        }
+        return new SnapshotIterator<>(this, array, size);
+    }
+
+    public <E> Iterator<T> selectNonNull(final List<E> entries,
+                                         final Function<? super E, ? extends T> value) {
+        Object[] array = this.borrow(entries.size());
+        int size = 0;
+        try {
+            if (entries instanceof RandomAccess) {
+                for (int index = 0, count = entries.size(); index < count; index++) {
+                    final T selected = value.apply(entries.get(index));
+                    if (selected != null) {
+                        array[size++] = selected;
+                    }
+                }
+            } else {
+                for (final E entry : entries) {
+                    final T selected = value.apply(entry);
+                    if (selected != null) {
+                        array[size++] = selected;
+                    }
                 }
             }
         } catch (final RuntimeException | Error failure) {

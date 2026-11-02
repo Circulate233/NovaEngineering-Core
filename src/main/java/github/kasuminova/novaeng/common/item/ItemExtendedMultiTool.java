@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -17,7 +18,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,7 +39,7 @@ public class ItemExtendedMultiTool extends ItemTool {
     private static final UUID LUCK_UUID = UUID.fromString("5743bf7d-e4a2-4b53-a302-f5a469ac6b96");
 
     static {
-        final Set<String> classes = new HashSet<>();
+        final Set<String> classes = new ObjectOpenHashSet<>();
         Collections.addAll(classes, "sword", "pickaxe", "shovel", "axe", "wrench");
         TOOL_CLASSES = Collections.unmodifiableSet(classes);
     }

@@ -12,10 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Answers LibNine model-type probes from the shared generation-scoped JSON metadata index.
  */
-@Mixin(value = L9Models.class, priority = 2000, remap = false)
+@Mixin(value = L9Models.class, remap = false)
 public abstract class MixinL9Models {
 
-    @Inject(method = "isOfType", at = @At("HEAD"), cancellable = true,
+    // Keep HEAD hooks, including StellarCore's type cache, ahead of the JSON fallback.
+    @Inject(method = "isOfType(Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;)Z",
+        at = @At(value = "INVOKE", target = "Lio/github/phantamanta44/libnine/util/helper/ResourceUtils;getAsJson(Lnet/minecraft/util/ResourceLocation;)Lcom/google/gson/JsonElement;"), cancellable = true,
         remap = false, require = 1)
     private static void nova$readSharedModelType(final ResourceLocation resource,
                                                  final String type,

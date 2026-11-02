@@ -28,6 +28,7 @@ import github.kasuminova.novaeng.common.handler.HyperNetMachineEventHandler;
 import github.kasuminova.novaeng.common.handler.IEHandler;
 import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler;
 import github.kasuminova.novaeng.common.handler.OreHandler;
+import github.kasuminova.novaeng.common.handler.PrimerOreEvents;
 import github.kasuminova.novaeng.common.handler.RegistryRemapHandler;
 import github.kasuminova.novaeng.common.handler.WorldCacheCleanupHandler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
@@ -119,6 +120,7 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(WorldCacheCleanupHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(PrimerOreEvents.INSTANCE);
         MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler.INSTANCE);
         if (Loader.isModLoaded("ftbquests")) {
             MinecraftForge.EVENT_BUS.register(FTBHandler.INSTANCE);

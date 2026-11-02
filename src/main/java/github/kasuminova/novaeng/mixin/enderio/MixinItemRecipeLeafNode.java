@@ -18,6 +18,9 @@ public class MixinItemRecipeLeafNode<REC> {
         target = "Lcom/enderio/core/common/util/NNList;contains(Ljava/lang/Object;)Z", remap = false),
         remap = false, require = 1)
     private boolean nova$contains(final NNList<REC> list, final Object recipe) {
+        if (!list.isEmpty() && list.getLast() == recipe) {
+            return true;
+        }
         final Set<Object> mirror = nova$mirror(list);
         return mirror != null ? mirror.contains(recipe) : list.contains(recipe);
     }

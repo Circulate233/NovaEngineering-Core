@@ -2,7 +2,6 @@ package github.kasuminova.novaeng.common.util;
 
 import com.cleanroommc.discovery.CleanroomModDiscoverer;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
-import github.kasuminova.stellarcore.common.config.StellarCoreConfig;
 
 public final class MixinDecisions {
 
@@ -17,7 +16,6 @@ public final class MixinDecisions {
     public static final boolean botaniaLoaded = isPresent("botania");
     public static final boolean cofhLoaded = isPresent("cofhcore");
     public static final boolean cofhWorldLoaded = isPresent("cofhworld");
-    public static final boolean betterMeteoriteLoaded = isPresent("better_meteorite");
     public static final boolean deepMobLearningLoaded = isPresent("deepmoblearning");
     public static final boolean reidLoaded = isPresent("jeid") || isPresent("reid");
     public static final boolean draconicAdditionsLoaded = isPresent("draconicadditions");
@@ -49,6 +47,90 @@ public final class MixinDecisions {
     }
 
     public static boolean shouldApply(final String mixinName) {
+        if (mixinName.equals("ae2.MixinMeteorWriteBatch"))
+            return ae2Loaded && NovaEngCoreConfig.SERVER.optimizeMeteorSpawnDataIo && NovaEngCoreConfig.SERVER.batchMeteorSpawnWrites;
+        final Boolean worldgenAuxiliary = switch (mixinName) {
+            case "artemislib.MixinAttachAttributes" -> isPresent("artemislib");
+            case "astralsorcery.MixinAttributeOwner" -> astralSorceryLoaded;
+            case "mekanism.MixinWorldgenFactories" -> isPresent("mekanism");
+            case "actuallyadditions.MixinLushCaveAllocation" -> isPresent("actuallyadditions");
+            case "cofh.MixinFlatBedrock" -> cofhWorldLoaded;
+            case "circulation.MixinPocketHostEmpty" -> circulationNetworksLoaded;
+            case "wizardry.MixinStructurePlacementChoices" -> isPresent("ebwizardry");
+            case "chisel.MixinBasaltScan" -> isPresent("chisel");
+            case "bettermineshafts.MixinBiomeTypes" -> isPresent("bettermineshafts");
+            case "biomesoplenty.MixinGenerationStages", "biomesoplenty.MixinGeneratorStageRevision" ->
+                isPresent("biomesoplenty");
+            case "tconstruct.MixinIslandList", "tconstruct.MixinIslandQueries" -> isPresent("tconstruct");
+            case "minecraft.MixinLeafBlockKind", "minecraft.MixinPathStateMemo",
+                 "minecraft.MixinPathNodeClassification", "minecraft.MixinWorldCollisionReads",
+                 "minecraft.MixinWorldEmptyLightListener", "minecraft.MixinLazyAttributeOperations" -> true;
+            case "minecraft.MixinBiomeCacheLastEntry", "minecraft.MixinLowerStringMapNames" -> true;
+            default -> null;
+        };
+        if (worldgenAuxiliary != null) return NovaEngCoreConfig.SERVER.optimizeWorldgenAuxiliaries && worldgenAuxiliary;
+        if (mixinName.equals("actuallyadditions.MixinWorldgenOreFactory"))
+            return isPresent("actuallyadditions");
+        if (mixinName.equals("bettermeteor.MixinCompassTargetScan"))
+            return NovaEngCoreConfig.SERVER.optimizeMeteorCompassTargetScan && ae2Loaded && isPresent("better_meteorite");
+        if (mixinName.equals("kirino.InvokerArrayRange"))
+            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+        if (mixinName.equals("architecturecraft.InvokerMessageSide"))
+            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && isPresent("architecturecraft");
+        if ((mixinName.equals("minecraft.forge.AccessorFluidRegistryIds") || mixinName.equals("minecraft.forge.InvokerFluidRegistryDelegate")))
+            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+        if (mixinName.endsWith("PrimitiveBiMap")) {
+            if (!NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps) return false;
+            final String owner = mixinName.substring(0, mixinName.indexOf('.'));
+            return switch (owner) {
+                case "minecraft", "kirino" -> true;
+                case "cofh" -> cofhLoaded;
+                case "libvulpes" -> isPresent("libvulpes");
+                default -> isPresent(owner);
+            };
+        }
+
+        final Boolean startupEnabled = switch (mixinName) {
+            case "minecraft.MixinDynamicTextureUploadBinding" -> actiniumLoaded
+                && NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
+            case "journeymap.MixinThemeTexturePreload", "journeymap.MixinWidgetTexturePreload" ->
+                isPresent("journeymap");
+            case "techguns.MixinTemplateInputBuffer" -> isPresent("techguns");
+            case "immersiveengineering.MixinManualRecipeDisplay" -> immersiveEngineeringLoaded;
+            case "minecraft.forge.MixinForgelinConstructionAdapter" -> isPresent("forgelin_continuous");
+            case "jeresources.MixinEnchantmentWrapper", "jeresources.InvokerEnchantmentWrapper" ->
+                isPresent("jeresources");
+            case "neofontrender.MixinSpellcheckLazy", "neofontrender.MixinChatHistoryLazy" -> neoFontRenderUiLoaded;
+            case "actinium.MixinShaderTextCache" -> actiniumLoaded;
+            case "ic2.MixinIc2LazyDummies" -> ic2Loaded;
+            case "solcarrot.MixinFoodCatalogLazy" -> isPresent("solcarrot");
+            case "ingameinfoxml.MixinLazyTagFactories" -> isPresent("ingameinfoxml");
+            case "geckolib3.MixinGeckoConverter" -> isPresent("geckolib3");
+            case "jecharacters.MixinPinyinAcceleratedNode" -> isPresent("jecharacters");
+            case "codechickenlib.MixinCclFactoryProbe" -> isPresent("codechickenlib");
+            case "ar.MixinWavefrontSyntax" -> arLoaded;
+            case "zenutils.MixinBytecodeClassAliases" -> isPresent("zenutils");
+            case "universaltweaks.MixinUtStartupCrafting" -> isPresent("universaltweaks");
+            case "cofh.MixinCoFHStartupCrafting" -> cofhLoaded;
+            case "cofh.MixinThermalStartupScope" -> cofhLoaded && isPresent("thermalexpansion");
+            case "mekanism.MixinMekanismStartupScope" -> isPresent("mekanism") && isPresent("universaltweaks");
+            case "avaritia.MixinAvaritiaFactoryProbe" -> avaritiaLoaded;
+            case "enderio.MixinTriItemLookupAccess" -> enderioLoaded;
+            case "tconstruct.AccessorTinkerMeltingRegistry", "tconstruct.MixinTinkerMeltingRegistry",
+                 "tconstruct.MixinMaterialMeltingInputs" -> isPresent("tconstruct");
+            // Primitive registration applies the same lazy field policy directly in its overwrite.
+            case "librarianlib.MixinLibrarianPacketPrewarm" -> isPresent("librarianlib")
+                && !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+            case "librarianlib.MixinLibrarianFieldCache", "librarianlib.MixinLibrarianTilePrewarm" ->
+                isPresent("librarianlib");
+            case "kirino.MixinKirinoScanning", "minecraft.forge.MixinOreRecipeRevision",
+                 "minecraft.forge.MixinOreIngredientInputs", "minecraft.MixinIngredientRecipeRevision",
+                 "minecraft.MixinLocaleParsing" -> true;
+            default -> null;
+        };
+        if (startupEnabled != null) {
+            return NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork && startupEnabled;
+        }
         final int split = mixinName.indexOf('.');
         if (split < 0) {
             return true;
@@ -75,6 +157,14 @@ public final class MixinDecisions {
             return NovaEngCoreConfig.CLIENT.diagObjModelProbe;
         }
         return switch (mixinName) {
+            case "taiga.MixinDescendingOre" -> isPresent("taiga");
+            case "chisel.MixinBasaltNotifications" -> isPresent("chisel");
+            case "minecraft.MixinChunkPrimerImport", "minecraft.AccessorSectionCounts" -> reidLoaded
+                && NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth && NovaEngCoreConfig.SERVER.bulkChunkPrimerImport;
+            case "minecraft.MixinObserverPaletteLinear", "minecraft.MixinObserverPaletteHashMap",
+                 "minecraft.AccessorObserverPalette",
+                 "minecraft.MixinWorldObserverNotifications" -> NovaEngCoreConfig.SERVER.optimizeObserverNotifications;
+            case "minecraft.MixinWorldSetBlockReads" -> NovaEngCoreConfig.SERVER.optimizeSetBlockStateReads;
             case "actinium.MixinBuildContextMemory", "actinium.MixinVintageScratchMemory" ->
                 NovaEngCoreConfig.PERFORMANCE.trimChunkBuildScratch || NovaEngCoreConfig.PERFORMANCE.chunkBuildMemoryBudget;
             case "actinium.MixinChunkJobMemoryBudget", "actinium.MixinChunkOutputBudget",
@@ -96,10 +186,16 @@ public final class MixinDecisions {
                  "mmce.MixinRecipeCraftingContextPool" -> NovaEngCoreConfig.PERFORMANCE.boundedRecipeContexts;
             case "astralsorcery.MixinTexturePreloader",
                  "astralsorcery.MixinBindableResourceLazyAllocation" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryTexturePreload;
+            case "astralsorcery.MixinCraftingRecipeHelper",
+                 "astralsorcery.MixinItemComparator" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryRecipeLookup;
             case "astralsorcery.MixinAstralSorceryConfig" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryConfigSave;
             case "astralsorcery.MixinTileAccelerationBlacklist" ->
                 NovaEngCoreConfig.SERVER.optimizeHorologiumAccelerationBlacklist;
             case "enderio.MixinRecipeFactoryXmlInputFactory" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoXmlFactory;
+            case "enderio.MixinAlloyRecipeManager" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoAlloyIndex;
+            case "minecraft.MixinShapelessRecipeAllocation" ->
+                NovaEngCoreConfig.CLIENT.optimizeShapelessRecipeAllocation;
+            case "minecraft.MixinMipmapTraversal" -> actiniumLoaded && NovaEngCoreConfig.CLIENT.optimizeMipmapTraversal;
             case "botania.MixinRenderTileTinyPotatoLazyCosmetics" -> NovaEngCoreConfig.CLIENT.optimizeBotaniaTinyPotato;
             case "bibliocraft.MixinPaintingUtil" -> NovaEngCoreConfig.CLIENT.optimizeBiblioCraftPaintingCache;
             case "biomesoplenty.MixinTrailManager" -> NovaEngCoreConfig.CLIENT.optimizeBopRemoteTrails;
@@ -126,6 +222,10 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.CLIENT.optimizeCodeChickenErrorStateLog;
             case "minecraft.MixinResourceLocation" ->
                 NovaEngCoreConfig.CLIENT.optimizeResourceLocationStableValue;
+            case "minecraft.forge.MixinForgeRegistryIdLookup" ->
+                !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && (NovaEngCoreConfig.CLIENT.optimizeFrozenRegistryIdLookup || NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork);
+            case "minecraft.forge.MixinForgeRegistryIterator" ->
+                !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && NovaEngCoreConfig.CLIENT.optimizeFrozenRegistryIdLookup;
             case "minecraft.MixinModelResourceLocationFastPath" ->
                 NovaEngCoreConfig.CLIENT.optimizeFerriteModelResourceLocation;
             case "minecraft.MixinConditionPropertyValueCanonicalization",
@@ -135,10 +235,43 @@ public final class MixinDecisions {
             case "minecraft.MixinMultipartModelBuilder" -> NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
             case "jei.MixinElementSearch" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
             case "jei.MixinStackHelper" -> NovaEngCoreConfig.CLIENT.optimizeJeiStackUidCache;
+            case "jei.MixinRecipeRegistryId" -> NovaEngCoreConfig.CLIENT.optimizeJeiRecipeId;
+            case "jei.MixinRecipeMapDeduplication", "jei.MixinItemStackIngredientHash" ->
+                NovaEngCoreConfig.CLIENT.optimizeJeiRecipeIndex;
+            case "jei.MixinRecipeHandlerSelection" -> NovaEngCoreConfig.CLIENT.optimizeJeiRecipeHandlerSelection;
+            case "mantle.MixinRecipeItemCombination" -> isPresent("mantle")
+                && NovaEngCoreConfig.CLIENT.optimizeMantleRecipeCombinations;
+            case "environmentaltech.MixinTargetableRegistry" -> isPresent("environmentaltech")
+                && NovaEngCoreConfig.CLIENT.optimizeEnvironmentalTechTargets;
+            case "actinium.MixinQuadTreeConstruction" -> actiniumLoaded
+                && NovaEngCoreConfig.CLIENT.optimizeActiniumQuadTreeConstruction;
+            case "minecraft.forge.MixinVanillaModelTextureLocations",
+                 "minecraft.forge.MixinVanillaModelMatrixCheck" -> NovaEngCoreConfig.CLIENT.optimizeModelBakeInputs;
+            case "minecraft.forge.MixinCraftingHelperJarScan" -> NovaEngCoreConfig.CLIENT.optimizeForgeRecipeJarScan;
+            case "stellarcore.MixinClasspathIndexWorker" ->
+                stellarCoreLoaded && NovaEngCoreConfig.CLIENT.optimizeClasspathIndexWorker;
+            case "mmce.MixinBlockArrayIngredients" ->
+                mmceLoaded && NovaEngCoreConfig.CLIENT.optimizeMmcePreviewIngredients;
+            case "mmce.MixinBlockStateDescriptorHash" -> mmceLoaded
+                && NovaEngCoreConfig.CLIENT.optimizeMmceBlockStateDescriptorHash;
+            case "nuclearcraft.MixinValidFluidInputs" -> isPresent("nuclearcraft")
+                && NovaEngCoreConfig.CLIENT.optimizeNuclearCraftValidFluids;
+            case "neofontrender.MixinDoubleMeta" ->
+                neoFontRenderUiLoaded && NovaEngCoreConfig.CLIENT.optimizeSpellingDictionaryRegions;
+            case "stellarcore.MixinNBTTagBackingMapEquality" ->
+                NovaEngCoreConfig.PERFORMANCE.optimizeStellarNbtMapEquality;
+            case "alfheim.MixinDeduplicatedLongQueue" -> NovaEngCoreConfig.SERVER.optimizeAlfheimDeduplicationSets;
+            case "alfheim.MixinLightingEngine" -> NovaEngCoreConfig.SERVER.optimizeAlfheimChunkLookup;
+            case "alfheim.MixinLightingNeighborData" -> isPresent("alfheim")
+                && NovaEngCoreConfig.SERVER.optimizeAlfheimNeighborData;
+            case "rtg.MixinChunkGeneratorBiomeWeights" -> NovaEngCoreConfig.SERVER.optimizeRtgBiomeWeights;
+            case "rtg.MixinSpacedCellularNoiseBounds" -> NovaEngCoreConfig.SERVER.optimizeRtgCellularBounds;
             case "jei.MixinItemStackListFactory" -> NovaEngCoreConfig.CLIENT.optimizeJeiItemList;
             case "contenttweaker.MixinCreativeTabsResourceList",
                  "minecraft.AccessorCreativeTabs" -> NovaEngCoreConfig.CLIENT.optimizeCreativeTabLookup;
             case "journeymap.MixinFileHandler" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapThemeCopy;
+            case "journeymap.MixinTextureCacheArchiveNames" -> isPresent("journeymap")
+                && NovaEngCoreConfig.CLIENT.optimizeJourneymapArchiveNames;
             case "konkrete.MixinLocalsCopy" -> NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
             case "journeymap.MixinJMChunkCache" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
             case "journeymap.MixinJMChunkStorage" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
@@ -146,10 +279,29 @@ public final class MixinDecisions {
                 || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
             case "minecraft.forge.MixinEventBus" -> NovaEngCoreConfig.CLIENT.optimizeEventBusRegistration;
             case "zenscript.MixinTypeRegistry",
-                 "zenscript.MixinJavaMethod" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
-            case "minecraft.MixinFallbackResourceManager", "libnine.MixinL9Models" ->
+                 "zenscript.MixinJavaMethod",
+                 "zenutils.MixinClasspathBytesPath",
+                 "zenscript.MixinZenTypeNativeMethods" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
+            case "zenutils.MixinLogOptionPosition", "crafttweaker.MixinCraftTweakerScriptPosition" ->
+                NovaEngCoreConfig.CLIENT.optimizeZenUtilsLogPosition;
+            case "crafttweaker.MixinRecipeOutputRemoval" -> isPresent("crafttweaker")
+                && NovaEngCoreConfig.CLIENT.optimizeCraftTweakerOutputRemoval;
+            case "onlyoneitem.MixinMatchItemHandler" -> isPresent("only_one_item")
+                && NovaEngCoreConfig.CLIENT.optimizeOnlyOneItemMatching;
+            case "thermaldynamics.MixinModelHelperFaceFilter" -> isPresent("thermaldynamics")
+                && NovaEngCoreConfig.CLIENT.optimizeThermalDynamicsFaceMerge;
+            case "librarianlib.MixinSavedJavaFields" -> isPresent("librarianlib")
+                && NovaEngCoreConfig.CLIENT.optimizeLibrarianJavaSavedFields;
+            case "neofontrender.MixinJiebaDictionarySplit" -> neoFontRenderUiLoaded
+                && NovaEngCoreConfig.CLIENT.optimizeJiebaDictionarySplit;
+            case "neofontrender.MixinJiebaDictionaryCharacters" -> neoFontRenderUiLoaded
+                && NovaEngCoreConfig.CLIENT.optimizeJiebaDictionaryCharacters;
+            case "minecraft.MixinTextureMapUploadBinding", "actinium.MixinGLStateManagerUploadBinding" ->
+                actiniumLoaded && NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
+            case "minecraft.MixinFallbackResourceManager", "libnine.MixinL9Models", "ae2.MixinUVLModelLoader" ->
                 NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
+                || NovaEngCoreConfig.CLIENT.optimizeModelBakeInputs
                 || NovaEngCoreConfig.CLIENT.optimizeResourceExistence
                 || NovaEngCoreConfig.CLIENT.optimizeFerritePredicates
                 || NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
@@ -186,8 +338,7 @@ public final class MixinDecisions {
             case "ic2.MixinConfigTickPath" -> NovaEngCoreConfig.SERVER.optimizeIc2TickConfigPath;
             case "minecraft.MixinMinecraftServerDimensionIds", "minecraft.forge.AccessorDimensionManagerWorlds",
                  "minecraft.forge.MixinDimensionManagerLeakCheck" -> NovaEngCoreConfig.SERVER.optimizeDimensionTickIds;
-            case "stellarcore.MixinPlayerChunkMapSnapshot" -> stellarCoreLoaded
-                && StellarCoreConfig.PERFORMANCE.forge.chunkManager
+            case "stellarcore.MixinPlayerChunkMapSnapshot" -> !stellarCoreLoaded
                 && NovaEngCoreConfig.SERVER.optimizeChunkTickSnapshot;
             case "minecraft.MixinWorldEntitySpawner" ->
                 NovaEngCoreConfig.SERVER.optimizeSpawnListResolution;
@@ -200,6 +351,7 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.CLIENT.optimizeMekanismObjQuads;
             case "mekanism.MixinModuleHelperModuleCache" ->
                 NovaEngCoreConfig.CLIENT.optimizeMekanismModuleLookup;
+            case "mekanism.MixinSawmillLogRecipes" -> NovaEngCoreConfig.CLIENT.optimizeMekanismSawmillRegistration;
             case "minecraft.MixinMinecraftCtmPreload" -> ctmLoaded;
             case "ctm.MixinCtmLogicConnectionPosCache", "ctm.MixinDirConnectionPosCache" ->
                 NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
@@ -210,21 +362,27 @@ public final class MixinDecisions {
             case "ae2.MixinCompassReaderRegions", "ar.MixinAtmosphereDimensionMap" ->
                 NovaEngCoreConfig.SERVER.optimizeWorldgenIdMaps;
             case "cofh.MixinWeightedBlockPredicate", "cofh.MixinWorldGenPredicate" ->
-                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeWorldgenOrePredicates;
+                cofhLoaded && cofhWorldLoaded && (NovaEngCoreConfig.SERVER.optimizeWorldgenOrePredicates
+                    || NovaEngCoreConfig.SERVER.unifiedOreGeneration);
             case "ae2.MixinMeteorDataNameEncoder", "ae2.MixinSpawnDataInput" ->
                 NovaEngCoreConfig.SERVER.optimizeMeteorSpawnDataIo;
-            case "cofh.MixinWorldGenSinglePosition" ->
-                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeOrePlacementCoordinates;
             case "cofh.MixinWorldGenMinableClusterGeometry" ->
-                cofhLoaded && cofhWorldLoaded && NovaEngCoreConfig.SERVER.optimizeOreVeinGeometry;
+                cofhLoaded && cofhWorldLoaded && (NovaEngCoreConfig.SERVER.optimizeOreVeinGeometry
+                    || NovaEngCoreConfig.SERVER.unifiedOreGeneration);
+            case "minecraft.MixinOverworldPrimerOres", "rtg.MixinRtgPrimerOres", "cofh.AccessorPrimerOreCluster",
+                 "cofh.AccessorPrimerOreDistribution", "cofh.MixinUniformPrimerOres", "cofh.MixinGaussianPrimerOres",
+                 "cofh.MixinPrimerOreReload" -> NovaEngCoreConfig.SERVER.generateOresInTerrain;
             case "minecraft.MixinBlockStoneMetadata" -> NovaEngCoreConfig.SERVER.optimizeStoneMetadataStates;
-            case "ae2.MixinBetterMeteoriteCompassMetadata" ->
-                ae2Loaded && betterMeteoriteLoaded && NovaEngCoreConfig.SERVER.optimizeMeteorCompassMetadata;
-            case "minecraft.MixinWorldGenMinableGeometry" -> NovaEngCoreConfig.SERVER.optimizeVanillaOreGeometry;
+            case "minecraft.MixinBlockLeavesPropagation" -> NovaEngCoreConfig.SERVER.optimizeLeafDecayPropagation;
+            case "minecraft.MixinWorldGenMinableGeometry" ->
+                NovaEngCoreConfig.SERVER.optimizeVanillaOreGeometry || NovaEngCoreConfig.SERVER.unifiedOreGeneration;
             case "minecraft.MixinAttributeModifierSnapshot" ->
                 NovaEngCoreConfig.SERVER.optimizeAttributeModifierSnapshots;
             case "minecraft.MixinGenLayerZoomRandom" -> NovaEngCoreConfig.SERVER.optimizeBiomeZoomRandom;
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
+            case "minecraft.MixinStateImplementationProperties" ->
+                NovaEngCoreConfig.SERVER.optimizeBlockStateProperties;
+            case "minecraft.MixinEntityDataManagerLookup" -> NovaEngCoreConfig.SERVER.optimizeEntityDataManagerLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;
             case "ae2.MixinItemListCapacity" -> NovaEngCoreConfig.SERVER.optimizeAe2ItemListCapacity;

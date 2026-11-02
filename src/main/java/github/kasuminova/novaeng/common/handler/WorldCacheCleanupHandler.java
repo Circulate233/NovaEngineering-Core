@@ -3,11 +3,13 @@ package github.kasuminova.novaeng.common.handler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.machine.MMAltar;
+import github.kasuminova.novaeng.common.performance.MeteorWriteBatch;
 import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 /**
  * Drops the static caches that are keyed by a {@link World}, or by a tile entity that
@@ -31,11 +33,22 @@ public final class WorldCacheCleanupHandler {
     }
 
     @SubscribeEvent
+    public void flushMeteorWrites(final TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) MeteorWriteBatch.flushReady();
+    }
+
+    @SubscribeEvent
+    public void flushMeteorWrites(final WorldEvent.Save event) {
+        if (!event.getWorld().isRemote) MeteorWriteBatch.flushAll();
+    }
+
+    @SubscribeEvent
     public void onWorldUnload(final WorldEvent.Unload event) {
         final World world = event.getWorld();
         if (world == null) {
             return;
         }
+        if (!world.isRemote) MeteorWriteBatch.flushAll();
         HyperNetCaches.removeWorld(world);
         DreamEnergyCore.removeWorld(world);
         AutoCraftingQueue.removeWorld(world);

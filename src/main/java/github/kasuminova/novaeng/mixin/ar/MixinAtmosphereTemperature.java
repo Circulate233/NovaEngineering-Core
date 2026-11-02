@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.mixin.ar;
 
-import github.kasuminova.novaeng.common.performance.AtmosphereTemperatureCache;
+import github.kasuminova.novaeng.common.performance.ThreadConfinedTemperatureCache;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,8 +11,7 @@ import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 public abstract class MixinAtmosphereTemperature {
 
     @Unique
-    private static final ThreadLocal<AtmosphereTemperatureCache> nova$temperature =
-        ThreadLocal.withInitial(AtmosphereTemperatureCache::new);
+    private static final ThreadConfinedTemperatureCache nova$temperature = new ThreadConfinedTemperatureCache();
 
     /**
      * @author circulation
@@ -20,6 +19,6 @@ public abstract class MixinAtmosphereTemperature {
      */
     @Overwrite
     public static int getAverageTemperature(final StellarBody star, final int orbitalDistance, final int atmPressure) {
-        return nova$temperature.get().get(star.getTemperature(), star.getSize(), orbitalDistance, atmPressure);
+        return nova$temperature.get(star.getTemperature(), star.getSize(), orbitalDistance, atmPressure);
     }
 }

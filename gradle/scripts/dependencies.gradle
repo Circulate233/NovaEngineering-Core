@@ -36,6 +36,8 @@ repositories {
 
 configurations.named('mcpAccessTransformerScan').configure {
     exclude group: 'curse.maven', module: 'RandomTweaker-514170'
+    // This release advertises loliasm_at.cfg but does not ship it; no dependency AT is needed for the public pool API.
+    exclude group: 'curse.maven', module: 'chibi-460609'
 }
 
 dependencies {
@@ -50,6 +52,13 @@ dependencies {
     annotationProcessor 'com.google.code.gson:gson:2.8.9'
     compileOnly 'org.jetbrains:annotations:24.1.0'
     annotationProcessor 'org.jetbrains:annotations:24.1.0'
+    // Exact library versions embedded by NeoFontRender UI Enhancements at runtime.
+    compileOnly 'com.huaban:jieba-analysis:1.0.2'
+    compileOnly 'net.sf.jazzy:jazzy:0.5.2-rtext-1.4.1-2'
+    // Exact parser artifacts embedded by the installed Actinium build.
+    compileOnly 'org.antlr:antlr4-runtime:4.13.2'
+    compileOnly name: 'glsl-transformation-lib', version: '0.2.0-32.g7dd88a4-GTNH'
+    modCompileOnly name: 'neofontrender-ui-enhancements', version: '0.8.7'
 
     if (propertyBool('enable_lwjglx')) {
         compileOnly "com.cleanroommc:lwjglx:1.0.0"
@@ -60,32 +69,33 @@ dependencies {
     modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.716'
     modImplementation 'CraftTweaker2:ZenScript:4.1.20.716'
 
-    modImplementation 'curse.maven:fugue-1005815:8230893'
+    modImplementation 'curse.maven:fugue-1005815:8878028'
     modImplementation 'curse.maven:modularui-624243:7929464'
-    modCompileOnly 'curse.maven:electroblobs-wizardry-265642:5354477'
     modCompileOnly("curse.maven:component-model-hider-940949:4885858")
     modCompileOnly("curse.maven:resource-loader-226447:2477566")
     modCompileOnly 'curse.maven:base-246996:3440963'
+    modCompileOnly 'curse.maven:onlyoneitem-1321528:8876561'
     modCompileOnly 'curse.maven:bibliocraft-228027:3647708'
     modCompileOnly 'curse.maven:cooking-for-blockheads-231484:2862651'
-    modCompileOnly 'curse.maven:ingameime-vintage-1281907:8566984'
     modCompileOnly 'curse.maven:random-psideas-302313:3215550'
     modCompileOnly 'curse.maven:tinkers-antique-1242239:8666425'
     modCompileOnly 'curse.maven:tinkers-tool-leveling-250957:2630860'
     modCompileOnly 'curse.maven:zettai-grimoires-417570:3496150'
     modCompileOnly 'curse.maven:zettai-psi-537428:3662855'
-    modImplementation("curse.maven:circulation-flow-networks-1519385:8699343")
+    modImplementation("curse.maven:circulation-flow-networks-1519385:9351136") {
+        accessTransformers.configure(it) {
+            config = project.file('accesstransformers/circulation-networks.cfg')
+        }
+    }
     modImplementation name: 'ModularMachinery-CE', version: '2.3.3', classifier: 'dev'
-    modCompileOnly 'curse.maven:extended-crafting-terminals-for-applied-1157825:6503414'
     modImplementation 'curse.maven:lumenized-1234162:6734060'
     modImplementation 'curse.maven:mantle-74924:2713386'
     modImplementation 'curse.maven:tinkers-construct-74072:2902483'
-    modCompileOnly 'curse.maven:not-enough-energistics-515565:5234732'
     modCompileOnly 'curse.maven:psi-241665:3085917'
     modCompileOnly 'curse.maven:psio-339394:3077697'
     modCompileOnly 'curse.maven:RandomTweaker-514170:5528753'
     modCompileOnly 'curse.maven:jetif-303122:2919936'
-    modCompileOnly('mezz:jei:4.35.1') {
+    modCompileOnly('curse.maven:had-enough-items-557549:9167450') {
         accessTransformers.configure(it) {
             config = project.file('accesstransformers/had-enough-items.cfg')
         }
@@ -95,7 +105,7 @@ dependencies {
     modCompileOnly 'curse.maven:FTBU-237102:3157548'
     modImplementation 'curse.maven:ae2-extended-life-570458:6302098'
     modCompileOnly 'curse.maven:better-meteorite-1264853:6525827'
-    modImplementation 'curse.maven:ae2fluidcraft-rework-unofficial-1404390:7336029'
+    modImplementation 'curse.maven:ae2fluidcraft-rework-unofficial-1404390:7742544'
     modCompileOnly('curse.maven:MekanismEnergistics-1027681:5775101') {
         accessTransformers.configure(it) {
             config = project.file('accesstransformers/mekanism-energistics.cfg')
@@ -115,10 +125,11 @@ dependencies {
     modCompileOnly 'curse.maven:mekanism-ce-unofficial-840735:7163564'
     modImplementation 'curse.maven:RedstoneFlux-270789:2920436'
     modCompileOnly 'curse.maven:geckolib-388172:4020277'
+    modCompileOnly 'curse.maven:chibi-460609:8957115'
     modCompileOnly 'curse.maven:botania-225643:3330934'
     modCompileOnly 'curse.maven:baubles-227083:2518667'
-    modImplementation 'curse.maven:zenutil-401178:6895021'
-    modCompileOnly 'curse.maven:scalingguis-319656:2716334'
+    modImplementation 'curse.maven:zenutil-401178:9057336'
+    modCompileOnly 'curse.maven:scalingguis-319656:5150678'
     modCompileOnly 'curse.maven:matter-overdrive-community-edition-557428:4592069'
     modCompileOnly 'curse.maven:cofh-core-69162:2920433'
     modCompileOnly 'curse.maven:cofh-world-271384:2920434'
@@ -144,25 +155,28 @@ dependencies {
     modCompileOnly 'curse.maven:extended-crafting-nomifactory-edition-398267:5778512'
     modCompileOnly 'curse.maven:techguns-244201:2958103'
     modCompileOnly 'curse.maven:legendary-tooltips-532127:5734973'
-    modCompileOnly 'curse.maven:betterer-p2p-943734:4928154'
     modCompileOnly 'curse.maven:nuclearcraft-overhauled-336895:6605808'
     modCompileOnly 'curse.maven:loot-overhaul-299389:2711740'
     modCompileOnly 'curse.maven:BloodMagic-224791:2822288'
     modCompileOnly 'curse.maven:guide-api-228832:2645992'
     modCompileOnly 'curse.maven:patchouli-306770:3162874'
     modCompileOnly 'curse.maven:libvulpes-236541:3801015'
-    modCompileOnly 'curse.maven:random-complement-1198138:7340975'
+    modCompileOnly 'curse.maven:random-complement-1198138:9009274'
     modCompileOnly 'curse.maven:actually-additions-228404:3117927'
+    modCompileOnly 'curse.maven:artemislib-313590:2741812'
     modImplementation 'curse.maven:brandons-core-231382:3408276'
     modImplementation('curse.maven:draconic-evolution-223565:3431261') {
         accessTransformers.configure(it) {
             config = project.file('accesstransformers/draconic-evolution.cfg')
         }
     }
-    modCompileOnly 'curse.maven:packagedauto-308380:6932932'
-    modCompileOnly 'curse.maven:packagedastral-811828:7063119'
-    modCompileOnly("curse.maven:alfheim-lighting-engine-910715:6687458")
-    modCompileOnly("curse.maven:red-core-873867:6147102")
+    modCompileOnly 'curse.maven:packagedastral-811828:7762599'
+    modCompileOnly("curse.maven:alfheim-lighting-engine-910715:6687458") {
+        accessTransformers.configure(it) {
+            config = project.file('accesstransformers/alfheim.cfg')
+        }
+    }
+    modCompileOnly("curse.maven:red-core-873867:7455761")
     modImplementation("curse.maven:stellarcore-1064321:9308850")
     modCompileOnly("curse.maven:biomesoplenty-220318:3558882") {
         accessTransformers.configure(it) {
@@ -174,18 +188,37 @@ dependencies {
             config = project.file('accesstransformers/ender-utilities.cfg')
         }
     }
-    modCompileOnly("curse.maven:actinium-1650442:9041604")
+    modCompileOnly("curse.maven:actinium-1-12-2-optimization-1650442:9242705")
     modCompileOnly("curse.maven:chisel-235279:2915375")
-    modCompileOnly 'curse.maven:librarianlib-continuous-1058274:6617935'
+    modCompileOnly("curse.maven:taiga-replant-replant-971802:5086860")
+    modCompileOnly('curse.maven:librarianlib-continuous-1058274:6617935') {
+        accessTransformers.configure(it) {
+            config = project.file('accesstransformers/librarianlib.cfg')
+        }
+    }
+    modCompileOnly 'curse.maven:forgelin-continuous-456403:8248535'
     modCompileOnly 'curse.maven:contenttweaker-237065:3331364'
     modCompileOnly 'curse.maven:vintagefix-871198:8895999'
     modCompileOnly 'curse.maven:universal-tweaks-705000:5138787'
     modCompileOnly("curse.maven:reid-629017:8029704")
     modCompileOnly("curse.maven:tinkers-evolution-384589:9030702")
 
+    modCompileOnly('curse.maven:astral-sorcery-241721:3044416') {
+        accessTransformers.configure(it) {
+            config = project.file('accesstransformers/astral-sorcery.cfg')
+        }
+    }
     modCompileOnly 'curse.maven:ae2-crafting-tree-legacy-1121489:5814089'
     modCompileOnly 'curse.maven:applecore-224472:2969118'
-    modCompileOnly 'curse.maven:architecturecraft-tridev-277631:4344128'
+    modCompileOnly 'curse.maven:spice-of-life-carrot-edition-277616:2959847'
+    modCompileOnly 'curse.maven:just-enough-resources-jer-240630:4440935'
+    modCompileOnly('curse.maven:architecturecraft-tridev-277631:4344128') {
+        accessTransformers.configure(it) {
+            config = project.file('accesstransformers/architecturecraft.cfg')
+        }
+    }
+    modCompileOnly 'curse.maven:ore-visual-detector-568579:5343175'
+    modCompileOnly 'curse.maven:better-meteorite-1264853:6525827'
     modCompileOnly 'curse.maven:aroma1997core-223735:2914062'
     modCompileOnly 'curse.maven:astral-additions-427469:3862324'
     modCompileOnly 'curse.maven:athenaeum-284350:3063275'
@@ -193,10 +226,10 @@ dependencies {
     modCompileOnly 'curse.maven:better-loading-screen-229302:6771073'
     modCompileOnly 'curse.maven:betterer-p2p-943734:7231397'
     modCompileOnly 'curse.maven:celeritas-extra-1451214:9182637'
-    modCompileOnly 'curse.maven:circulation-flow-networks-1519385:9269267'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:8320066'
     modCompileOnly 'curse.maven:ender-core-ceu-1530852:8734025'
     modCompileOnly 'curse.maven:environmental-tech-245453:2691536'
+    modCompileOnly 'curse.maven:valkyrielib-245480:2691542'
     modCompileOnly 'curse.maven:extended-crafting-terminals-for-applied-1157825:6895322'
     modCompileOnly 'curse.maven:fancymenu-367706:4503123'
     modCompileOnly 'curse.maven:farming-for-blockheads-261924:2733508'
@@ -234,7 +267,6 @@ dependencies {
     modCompileOnly 'curse.maven:yabba-255177:2819161'
     modCompileOnly 'curse.maven:ymadditions-1217367:9239835'
     modCompileOnly 'curse.maven:yungs-better-mineshafts-forge-389665:3247154'
-    modCompileOnly 'curse.maven:zenutil-401178:9057336'
     modCompileOnly 'curse.maven:zerocore-247921:3194743'
 
     modCompileOnly('curse.maven:advanced-rocketry-236542:4671856') {
@@ -250,11 +282,6 @@ dependencies {
     modCompileOnly('curse.maven:armourers-workshop-229523:3101995') {
         accessTransformers.configure(it) {
             config = project.file('accesstransformers/armourers-workshop.cfg')
-        }
-    }
-    modCompileOnly('curse.maven:astral-sorcery-241721:3044416') {
-        accessTransformers.configure(it) {
-            config = project.file('accesstransformers/astral-sorcery.cfg')
         }
     }
     modCompileOnly('curse.maven:ctm-267602:2915363') {

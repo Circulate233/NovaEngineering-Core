@@ -2,12 +2,11 @@ package github.kasuminova.novaeng.client.resource;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.function.Supplier;
 
 /**
  * Keeps BiblioCraft's jar-painting directory result for one model reload generation.
  *
- * <p>This is deliberately narrower than a resource-pack index. The wrapped BiblioCraft method
+ * <p>This is deliberately narrower than a resource-pack index. The BiblioCraft method
  * still performs the original lookup and error handling on a cache miss; only its returned array,
  * including a {@code null} negative result, is remembered. Resource-pack enumeration and the
  * later image-size reads remain in BiblioCraft's original {@code updateCustomArtDatas} method.</p>
@@ -43,32 +42,38 @@ public final class BiblioCraftPaintingCache {
     }
 
     /**
-     * Returns the cached jar scan when a reload generation is active, otherwise delegates live.
-     *
-     * <p>The supplier is intentionally not wrapped in a catch block. Unchecked failures from the
-     * production method retain their original propagation semantics, while a normal {@code null}
-     * return is recorded as a negative result for this generation.</p>
-     *
-     * @param loader original BiblioCraft jar scan
-     * @return the original array, or its original {@code null} result
+     * Returns whether a result has already been recorded in the current reload generation.
      */
-    public static String[] getOrCompute(final Supplier<String[]> loader) {
+    public static boolean hasCachedResult() {
+        final Deque<Generation> generations = GENERATIONS.get();
+        return generations != null && !generations.isEmpty() && generations.peek().initialized;
+    }
+
+    /**
+     * Returns the recorded result for the current reload generation.
+     */
+    public static String[] getCachedResult() {
         final Deque<Generation> generations = GENERATIONS.get();
         if (generations == null || generations.isEmpty()) {
-            return loader.get();
+            return null;
         }
+        return generations.peek().paintings;
+    }
 
+    /**
+     * Records the original result for the current reload generation.
+     */
+    public static void cacheResult(final String[] paintings) {
+        final Deque<Generation> generations = GENERATIONS.get();
+        if (generations == null || generations.isEmpty()) {
+            return;
+        }
         final Generation generation = generations.peek();
-        if (generation.initialized) {
-            return generation.paintings;
-        }
-
         synchronized (generation) {
             if (!generation.initialized) {
-                generation.paintings = loader.get();
+                generation.paintings = paintings;
                 generation.initialized = true;
             }
-            return generation.paintings;
         }
     }
 

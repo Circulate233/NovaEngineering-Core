@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng;
 
+import github.kasuminova.novaeng.common.performance.WorldgenNotificationMode;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -43,6 +44,21 @@ public class NovaEngCoreConfig {
 
     @SuppressWarnings("CanBeFinal")
     public static class Performance {
+        @Config.RequiresMcRestart
+        @Config.Name("PrimitiveBiMaps")
+        @Config.Comment("Use primitive bidirectional ID maps and primitive call sites in supported mods.")
+        public boolean primitiveBiMaps = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeStartupWork")
+        @Config.Comment("Reuse startup indexes and immutable parsing metadata, and initialize deferred client data when it is first needed.")
+        public boolean optimizeStartupWork = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeStellarNbtMapEquality")
+        @Config.Comment("Reuse fastutil entries while comparing StellarCore NBT maps, preserving lookup order and value equality direction.")
+        public boolean optimizeStellarNbtMapEquality = true;
+
         @Config.RequiresMcRestart
         @Config.Name("OptimizeFerriteChunkNbt")
         @Config.Comment("Losslessly compact decoded section arrays while asynchronous chunks wait for completion. Restore complete NBT before entity loading and Forge ChunkDataEvent.Load; preserve mod tags and pending-save data.")
@@ -95,9 +111,6 @@ public class NovaEngCoreConfig {
         @Config.Name("CacheEnumValuesArrays")
         @Config.Comment("Reuse the clone that the compiler-generated Enum.values() performs, so repeated calls stop allocating a new array. Applied only to enums whose returned array is never written by this modpack.")
         public boolean cacheEnumValuesArrays = true;
-
-        @Config.Comment("Collect bounded tick and allocation-work counters. Also controllable with /nova_perf.")
-        public boolean diagnostics = false;
     }
 
     @SuppressWarnings("CanBeFinal")
@@ -208,6 +221,11 @@ public class NovaEngCoreConfig {
         public boolean optimizeAstralSorceryTexturePreload = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeAstralSorceryRecipeLookup")
+        @Config.Comment("Keep Astral Sorcery's recipe output scan ordered, but remove per-recipe comparator sets and varargs arrays.")
+        public boolean optimizeAstralSorceryRecipeLookup = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeAstralSorceryConfigSave")
         @Config.Comment("Skip unchanged Astral Sorcery configuration writes.")
         public boolean optimizeAstralSorceryConfigSave = true;
@@ -230,6 +248,101 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeEnderIoXmlFactory")
         @Config.Comment("Reuse Ender IO's single-threaded XML input factory while keeping readers per document.")
         public boolean optimizeEnderIoXmlFactory = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEnderIoAlloyIndex")
+        @Config.Comment("Deduplicate item identities before building Ender IO alloy recipe permutations.")
+        public boolean optimizeEnderIoAlloyIndex = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeShapelessRecipeAllocation")
+        @Config.Comment("Allocate only the matcher inputs selected by the recipe's immutable simplicity flag. Keeps Forge's original matching algorithms.")
+        public boolean optimizeShapelessRecipeAllocation = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMipmapTraversal")
+        @Config.Comment("Generate mipmap pixels in row order while preserving the active color blender and supplied mip levels.")
+        public boolean optimizeMipmapTraversal = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMekanismSawmillRegistration")
+        @Config.Comment("Register log recipes sequentially instead of dispatching workers that contend for the same crafting lock. Applies on both sides.")
+        public boolean optimizeMekanismSawmillRegistration = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMmcePreviewIngredients")
+        @Config.Comment("Index preview ingredient groups by their first item while retaining the original matching and merge order.")
+        public boolean optimizeMmcePreviewIngredients = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMmceBlockStateDescriptorHash")
+        @Config.Comment("Disperse singleton vanilla-state descriptor hashes in MMCE's canonical pool. Keeps state equality, descriptor contents and pool lifecycle.")
+        public boolean optimizeMmceBlockStateDescriptorHash = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeNuclearCraftValidFluids")
+        @Config.Comment("Index standard NuclearCraft fluid inputs only while building the allowed-fluid sets. Keeps custom matchers, overridden handlers and exception filters on the original scan.")
+        public boolean optimizeNuclearCraftValidFluids = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJourneymapArchiveNames")
+        @Config.Comment("Check PNG suffixes and texture-directory prefixes before allocating archive-entry path substrings during JourneyMap texture discovery.")
+        public boolean optimizeJourneymapArchiveNames = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeSpellingDictionaryRegions")
+        @Config.Comment("Match Jazzy phonetic dictionary regions without creating a substring for each comparison.")
+        public boolean optimizeSpellingDictionaryRegions = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeForgeRecipeJarScan")
+        @Config.Comment("Read factory entries directly and reject absent recipe roots before mounting ZIP filesystems. Keeps existing recipe callbacks and traversal order. Applies on both sides.")
+        public boolean optimizeForgeRecipeJarScan = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeClasspathIndexWorker")
+        @Config.Comment("Avoid submitting and joining jar scans from the same fixed pool that initializes namespace indexes. Reuses the existing workers.")
+        public boolean optimizeClasspathIndexWorker = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeModelBakeInputs")
+        @Config.Comment("Reuse parsed texture identifiers and avoid the integer-check scratch matrix during model baking. Preserves texture lookups and culling results.")
+        public boolean optimizeModelBakeInputs = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMantleRecipeCombinations")
+        @Config.Comment("Use ordered index bits for small Mantle recipe combinations and allocate result lists only when matched. Applies on both sides.")
+        public boolean optimizeMantleRecipeCombinations = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEnvironmentalTechTargets")
+        @Config.Comment("Index standard item and ore weights during large targeted-list builds. Preserves matching order and custom matcher fallbacks. Applies on both sides.")
+        public boolean optimizeEnvironmentalTechTargets = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeCraftTweakerOutputRemoval")
+        @Config.Comment("Skip impossible prefixes of large standard-item recipe removal batches while preserving the original matching loop. Applies on both sides.")
+        public boolean optimizeCraftTweakerOutputRemoval = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeOnlyOneItemMatching")
+        @Config.Comment("Skip blacklist lookups when OnlyOneItem has no replacement for the item and metadata. Keeps live rules and custom registry-key behavior.")
+        public boolean optimizeOnlyOneItemMatching = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeThermalDynamicsFaceMerge")
+        @Config.Comment("Avoid pair scans and temporary reversals when Thermal Dynamics' existing face-merging condition cannot pass. Keeps degenerate faces and custom vertex callbacks on the original path.")
+        public boolean optimizeThermalDynamicsFaceMerge = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeLibrarianJavaSavedFields")
+        @Config.Comment("Skip redundant Kotlin property discovery for ordinary Java classes whose instance fields are all explicitly saved by LibrarianLib. Keeps other property and accessor discovery unchanged.")
+        public boolean optimizeLibrarianJavaSavedFields = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeActiniumQuadTreeConstruction")
+        @Config.Comment("Create atlas quadtree children when an entry first reaches the node, avoiding construction of empty subtrees. Preserves lookup order and depth limits.")
+        public boolean optimizeActiniumQuadTreeConstruction = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeBotaniaTinyPotato")
@@ -295,6 +408,26 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeZenScriptCompilation")
         @Config.Comment("Use a fastutil type table and cached method metadata while compiling scripts. Applies on both sides.")
         public boolean optimizeZenScriptCompilation = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeZenUtilsLogPosition")
+        @Config.Comment("Resolve script stack positions only when ZenUtils log filters need them. Applies on both sides.")
+        public boolean optimizeZenUtilsLogPosition = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJiebaDictionarySplit")
+        @Config.Comment("Compile Jieba's dictionary separator once instead of once per line while Revo UI loads it.")
+        public boolean optimizeJiebaDictionarySplit = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJiebaDictionaryCharacters")
+        @Config.Comment("Reuse character keys while constructing the Jieba dictionary. Keeps its canonical-character map and trie updates.")
+        public boolean optimizeJiebaDictionaryCharacters = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAtlasUploadBinding")
+        @Config.Comment("Reuse the physical texture binding within one atlas sprite upload while GLSM's splash-time cache is disabled.")
+        public boolean optimizeAtlasUploadBinding = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeEntityGatherer")
@@ -366,6 +499,21 @@ public class NovaEngCoreConfig {
         public boolean optimizeJeiStackUidCache = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiRecipeId")
+        @Config.Comment("Flatten HEI ingredient maps once per recipe ID while preserving hash order.")
+        public boolean optimizeJeiRecipeId = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiRecipeIndex")
+        @Config.Comment("Combine local recipe-ID membership checks with insertion and read cached item hashes without boxing. Preserves ingredient callbacks and recipe ordering.")
+        public boolean optimizeJeiRecipeIndex = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeJeiRecipeHandlerSelection")
+        @Config.Comment("Cache HEI's original handler selection by recipe class and category within each recipe registry.")
+        public boolean optimizeJeiRecipeHandlerSelection = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeJeiItemList")
         @Config.Comment("Fill the creative tabs of JEI's item list concurrently instead of one after another. Each tab walks the whole item registry on its own, so this is the bulk of the item list build. Disable if a mod misbehaves when its creative tab code runs on another thread.")
         public boolean optimizeJeiItemList = true;
@@ -422,8 +570,13 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeResourceLocationStableValue")
-        @Config.Comment("Serve ResourceLocation.toString() and hashCode() from one lazily built stable string instead of concatenating (and re-hashing) namespace and path on every call. Costs one extra reference per instance and keeps one string per location alive; disable to restore the vanilla behaviour.")
+        @Config.Comment("Cache ResourceLocation string and hash results, and skip repeated lowercase conversion of its canonical default namespace.")
         public boolean optimizeResourceLocationStableValue = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeFrozenRegistryIdLookup")
+        @Config.Comment("Use bounded dense ID lookups while Forge registries are frozen. Preserves iterator order and invalidates on registry mutations and freeze transitions. Applies on both sides.")
+        public boolean optimizeFrozenRegistryIdLookup = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeMekanismModuleLookup")
@@ -439,6 +592,83 @@ public class NovaEngCoreConfig {
 
     @SuppressWarnings("CanBeFinal")
     public static class Server {
+        @Config.RequiresMcRestart
+        @Config.Name("BatchMeteorSpawnWrites")
+        @Config.Comment("Enabled by default. Coalesce changed meteor region writes until an AE2 queue drain exits (including exceptions). Flushes at save/unload/server stop and retries failed writes at server tick end. Disable to use synchronous writes.")
+        public boolean batchMeteorSpawnWrites = true;
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeWorldgenAuxiliaries")
+        @Config.Comment("Reuse generation helpers and stable attribute/biome metadata. Keeps world-dependent callbacks live.")
+        public boolean optimizeWorldgenAuxiliaries = true;
+
+        @Config.Name("WorldgenOreNotifications")
+        @Config.Comment("SILENT_ROCK is the default: skip neighbor and observer notifications for non-tile rock replacements during ore generation. Chunk lifecycle callbacks and lighting still run. OBSERVERS_ONLY retains observer notifications; PRESERVE restores the original notification flags.")
+        public WorldgenNotificationMode worldgenOreNotifications = WorldgenNotificationMode.SILENT_ROCK;
+
+        @Config.RequiresMcRestart
+        @Config.Name("BulkChunkPrimerImport")
+        @Config.Comment("Build supported ChunkPrimer sections through reusable short ID buffers before normal constructor-tail lighting callbacks. Custom state getters and Chunk/primer subclasses use the original loop.")
+        public boolean bulkChunkPrimerImport = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeObserverNotifications")
+        @Config.Comment("Skip observer state reads for local palettes containing only empty callbacks. Keeps neighbor chunk loading, real callbacks, and their ordering.")
+        public boolean optimizeObserverNotifications = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeSetBlockStateReads")
+        @Config.Comment("Read the previous state from the chunk already resolved by setBlockState on standard server worlds, retaining the original path for snapshots and custom worlds.")
+        public boolean optimizeSetBlockStateReads = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("ReserveChunkPaletteCapacity")
+        @Config.Comment("Grow full local section palettes through 4, 6 and 8 bits to avoid repeated repacking. Network-specified widths are unchanged; partially filled palettes may retain extra capacity.")
+        public boolean reserveChunkPaletteCapacity = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("UnifiedOreGeneration")
+        @Config.Comment("Route standard vanilla and CoFH veins through one deduplicated scanner. Sample the largest overlapping ellipsoid per group for speed, slightly reducing ore volume. Changes vein shapes, random consumption and repeated callback counts.")
+        public boolean unifiedOreGeneration = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("GenerateOresInTerrain")
+        @Config.Comment("Generate supported vanilla and CoFH ores in new Overworld/RTG terrain before lighting. Changes ore positions and generation timing; persisted chunk markers prevent duplicate decoration.")
+        public boolean generateOresInTerrain = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAlfheimDeduplicationSets")
+        @Config.Comment("Start Alfheim queues small, defer FIFO shrinking to pass boundaries, and shrink deduplication tables after sustained sparse passes. Insertion and deduplication order are unchanged.")
+        public boolean optimizeAlfheimDeduplicationSets = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAlfheimChunkLookup")
+        @Config.Comment("Reuse an Alfheim lighting pass's most recently loaded chunk for adjacent light probes, while clearing the lookup at each sky or block light phase.")
+        public boolean optimizeAlfheimChunkLookup = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeAlfheimNeighborData")
+        @Config.Comment("Reuse decoded coordinates and the current section for Alfheim neighbor probes; boundary chunks and custom chunks retain their original lookup path.")
+        public boolean optimizeAlfheimNeighborData = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeLeafDecayPropagation")
+        @Config.Comment("Propagate leaf support through four queue layers, retaining block probes, Forge callbacks and decay decisions.")
+        public boolean optimizeLeafDecayPropagation = true;
+
+        @Config.Name("OptimizeMeteorCompassTargetScan")
+        @Config.Comment("Filter BetterMeteorite compass targets before decoding block metadata and cache immutable state matches per thread. Keeps the configured target identities and submitted compass updates.")
+        public boolean optimizeMeteorCompassTargetScan = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeRtgBiomeWeights")
+        @Config.Comment("Skip zero RTG biome samples without changing float accumulation or terrain evaluation order.")
+        public boolean optimizeRtgBiomeWeights = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeRtgCellularBounds")
+        @Config.Comment("Skip RTG cellular regions whose exact square-distance lower bound cannot replace either nearest point.")
+        public boolean optimizeRtgCellularBounds = true;
+
         @Config.RequiresMcRestart
         @Config.Name("ForceChunkHandler")
         public boolean forceChunkHandler = true;
@@ -501,16 +731,12 @@ public class NovaEngCoreConfig {
         public boolean optimizeWorldgenIdMaps = true;
 
         @Config.RequiresMcRestart
-        @Config.Comment("Reuse CoFH World's immutable per-material replacement predicates; replacement checks, RNG calls and block notifications remain unchanged.")
+        @Config.Comment("Reuse CoFH World's immutable per-material replacement predicates and read each candidate state once; replacement checks, RNG calls and block notifications remain unchanged.")
         public boolean optimizeWorldgenOrePredicates = true;
 
         @Config.RequiresMcRestart
         @Config.Comment("Build AE2 meteor filenames without Formatter on ASCII-digit locales and buffer compressed file input with bounded per-thread reusable storage. Reads still access disk every time; no NBT or missing-file caching.")
         public boolean optimizeMeteorSpawnDataIo = true;
-
-        @Config.RequiresMcRestart
-        @Config.Comment("Use one immutable BlockPos for CoFH World's material check and successful placement, preserving RNG order and all block notifications.")
-        public boolean optimizeOrePlacementCoordinates = true;
 
         @Config.RequiresMcRestart
         @Config.Comment("Precompute CoFH cluster ellipsoid Z distances and use their exact float minimum to skip impossible X/Y branches. Float arithmetic, repeated placements, callbacks and random draws remain unchanged.")
@@ -519,10 +745,6 @@ public class NovaEngCoreConfig {
         @Config.RequiresMcRestart
         @Config.Comment("Memoize the seven immutable BlockStone metadata transitions per default-state identity. Changes to the default state invalidate the table.")
         public boolean optimizeStoneMetadataStates = true;
-
-        @Config.RequiresMcRestart
-        @Config.Comment("Skip metadata decoding for non-target registry identities in BetterMeteorite's compass voxel scan. Target parsing, scan order and update submissions are unchanged.")
-        public boolean optimizeMeteorCompassMetadata = true;
 
         @Config.RequiresMcRestart
         @Config.Comment("Reuse vanilla ore ellipsoid Z distances and their exact minimum without merging duplicate attempts or changing random calls, predicates or notifications.")
@@ -552,8 +774,18 @@ public class NovaEngCoreConfig {
         public boolean optimizeMekanismNetworkTargets = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeBlockStateProperties")
+        @Config.Comment("Cache material and light-method dispatch metadata. Default context light methods directly use state getters; custom methods and mutable light values remain live.")
+        public boolean optimizeBlockStateProperties = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEntityDataManagerLookup")
+        @Config.Comment("Keep a small locked direct-mapped cache for frequently read entity data parameters while preserving the original read lock and map fallback.")
+        public boolean optimizeEntityDataManagerLookup = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeChunkPaletteGrowth")
-        @Config.Comment("Bulk-decode supported REID sections at the Anvil boundary, choosing the final palette width once. Ordinary palette growth and network decoding remain vanilla. The configuration name is retained for compatibility.")
+        @Config.Comment("Bulk-decode REID sections and preserve local palette IDs during growth, with a translating fallback for unusual palettes and global IDs. Network packing remains compatible.")
         public boolean optimizeChunkPaletteGrowth = true;
 
         @Config.RequiresMcRestart

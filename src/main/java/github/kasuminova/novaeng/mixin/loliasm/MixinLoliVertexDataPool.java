@@ -1,74 +1,80 @@
 package github.kasuminova.novaeng.mixin.loliasm;
 
-import it.unimi.dsi.fastutil.ints.IntArrays;
+import github.kasuminova.novaeng.common.performance.StripedIntArrayPool;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import zone.rong.loliasm.LoliLogger;
+import zone.rong.loliasm.bakedquad.LoliVertexDataPool;
 
-/**
- * 消除 LoliASM 顶点数据池在模型烘焙期的同步开销与扩容开销。
- *
- * <p>原实现每次调用都对池加锁，但模型烘焙在主线程串行执行，锁不存在竞争，
- * 三百余万次加锁反而阻碍了 JIT 内联。另外池容量固定从 8192 起步，
- * 增长到四十余万唯一项需要反复重哈希。此处只消除这两项开销，其余语义保持不变。
- */
-@Pseudo
-@Mixin(targets = "zone.rong.loliasm.bakedquad.LoliVertexDataPool", remap = false)
-public class MixinLoliVertexDataPool {
-
+@Mixin(value = LoliVertexDataPool.class, remap = false)
+public abstract class MixinLoliVertexDataPool {
     @Shadow
     private static ObjectOpenCustomHashSet<int[]> POOL;
-
     @Shadow
     private static int deduplicatedCount;
+    @Shadow
+    private static int uniqueCount;
 
-    /**
-     * 最终唯一顶点数据约四十万项，按此规模一次性分配可避免约七次重哈希。
-     */
     @Unique
-    private static final int NOVA$CAPACITY = 1 << 19;
+    private static volatile StripedIntArrayPool nova$pool = new StripedIntArrayPool(64, 1 << 19);
 
     /**
      * @author circulation
-     * @reason 按实测的唯一项规模重新分配池，避免加载期反复重哈希。
+     * @reason Intern parallel baking results with one content hash and independent shard locks.
      */
-    @Inject(method = "<clinit>", at = @At("TAIL"), remap = false, require = 1)
-    private static void nova$preallocate(final CallbackInfo ci) {
-        POOL = new ObjectOpenCustomHashSet<>(NOVA$CAPACITY, IntArrays.HASH_STRATEGY);
+    @Overwrite
+    public static int[] canonicalize(final int[] value) {
+        final StripedIntArrayPool pool = nova$pool;
+        return pool == null ? value : pool.canonicalize(value);
     }
 
     /**
      * @author circulation
-     * @reason 模型烘焙为单线程，同步块无收益且阻碍 JIT 内联。
+     * @reason Preserve unpacked-quad bypass while using the concurrent pool.
      */
-    @Overwrite(remap = false)
-    public static int[] canonicalize(final int[] arr) {
-        if (POOL == null) {
-            return arr;
+    @Overwrite
+    public static int[] canonicalize(final int[] value, final BakedQuad quad) {
+        return quad instanceof UnpackedBakedQuad ? value : canonicalize(value);
+    }
+
+    /**
+     * @author circulation
+     * @reason Complete accepted insertions before publishing final counts and releasing the pool.
+     */
+    @Overwrite
+    public static synchronized void invalidate() {
+        final StripedIntArrayPool pool = nova$pool;
+        if (pool != null) {
+            final StripedIntArrayPool.Statistics statistics = pool.close();
+            deduplicatedCount = (int) statistics.processed();
+            uniqueCount = statistics.unique();
+            POOL = null;
+            nova$pool = null;
+            LoliLogger.instance.warn("Clearing LoliVertexDataPool");
         }
-        deduplicatedCount++;
-        return POOL.addOrGet(arr);
     }
 
     /**
      * @author circulation
-     * @reason 同上；已解包的四边形无需进入池中。
+     * @reason Aggregate per-shard counters when queried instead of contending on one counter for every quad.
      */
-    @Overwrite(remap = false)
-    public static int[] canonicalize(final int[] arr, final BakedQuad quad) {
-        if (POOL == null || quad instanceof UnpackedBakedQuad) {
-            return arr;
-        }
-        deduplicatedCount++;
-        return POOL.addOrGet(arr);
+    @Overwrite
+    public static int getDeduplicatedCount() {
+        final StripedIntArrayPool pool = nova$pool;
+        return pool == null ? deduplicatedCount : (int) pool.processedCount();
     }
 
+    @Redirect(method = "onDebugList", at = @At(value = "FIELD",
+        target = "Lzone/rong/loliasm/bakedquad/LoliVertexDataPool;deduplicatedCount:I", opcode = Opcodes.GETSTATIC), require = 2)
+    private static int nova$debugProcessedCount() {
+        return getDeduplicatedCount();
+    }
 }
