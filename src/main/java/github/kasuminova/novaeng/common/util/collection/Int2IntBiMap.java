@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.util.collection;
 
 import com.google.common.collect.BiMap;
+import org.jetbrains.annotations.NotNull;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -23,6 +24,7 @@ public interface Int2IntBiMap extends BiMap<Integer, Integer> {
 
     int put(int key, int value);
 
+    @SuppressWarnings("unused")
     int forcePut(int key, int value);
 
     void putDiscard(int key, int value, boolean force);
@@ -31,15 +33,19 @@ public interface Int2IntBiMap extends BiMap<Integer, Integer> {
 
     long modificationVersion();
 
+    @SuppressWarnings("unused")
     void forEachIntInt(IntIntConsumer consumer);
 
     @Override
+    @NotNull
     Int2IntBiMap inverse();
 
     @Override
+    @NotNull
     IntSet keySet();
 
     @Override
+    @NotNull
     IntSet values();
 
     ObjectSet<Int2IntMap.Entry> int2IntEntrySet();

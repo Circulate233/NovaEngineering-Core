@@ -14,6 +14,7 @@
 
 package github.kasuminova.novaeng.common.util.collection;
 
+import org.jetbrains.annotations.NotNull;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.ints.AbstractIntSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -31,10 +32,12 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -49,6 +52,8 @@ import java.util.function.ObjIntConsumer;
  * Primitive specialization of Guava 33.6.0 HashBiMap. Bucket chains, cached hashes,
  * insertion order and forward/inverse replacement rules follow the original implementation.
  */
+// Backed views intentionally retain their map; fastutil supplies the inherited Cloneable marker.
+@SuppressWarnings({"ReturnOfInnerClass", "CloneableClassInSecureContext"})
 public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     implements Object2IntBiMap<K>, Serializable {
     private final Inverse inverse = new Inverse();
@@ -103,6 +108,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         return result;
     }
 
+    @SuppressWarnings("unused")
     public static <K> Object2IntHashBiMap<K> immutableCopyOf(
         final Map<? extends K, ? extends Integer> source) {
         final Object2IntHashBiMap<K> result = copyOf(source);
@@ -151,7 +157,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     private Node<K> findValueBoxed(final Object value) {
         return value == null
             ? findValue(0, true)
-            : value instanceof Integer number ? findValue(number.intValue(), false) : null;
+            : value instanceof Integer number ? findValue(number, false) : null;
     }
 
     private Node<K> seekValue(final int number, final boolean isNull, final int hash) {
@@ -306,6 +312,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @Override
+    @NotNull
     public Int2ObjectBiMap<K> inverse() {
         return inverse;
     }
@@ -354,11 +361,11 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
     private Integer putBoxed(final K key, final Integer value, final boolean force) {
         final Node<K> previous =
-            putForward(key, value == null ? 0 : value.intValue(), value == null, force);
+            putForward(key, value == null ? 0 : value, value == null, force);
         if (previous == null) return null;
         if (value == null
             ? previous.nullValue
-            : !previous.nullValue && previous.value == value.intValue()) return value;
+            : !previous.nullValue && previous.value == value) return value;
         return boxedValue(previous);
     }
 
@@ -434,7 +441,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @Override
-    public void putAll(final Map<? extends K, ? extends Integer> source) {
+    public void putAll(final @NotNull Map<? extends K, ? extends Integer> source) {
         checkMutable();
         if (source instanceof Object2IntHashBiMap<?> nativeMap) {
             @SuppressWarnings("unchecked") final Object2IntHashBiMap<K> typed = (Object2IntHashBiMap<K>) nativeMap;
@@ -495,7 +502,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @Override
-    public Integer computeIfAbsent(final K key, Function<? super K, ? extends Integer> function) {
+    public Integer computeIfAbsent(final K key, @NotNull Function<? super K, ? extends Integer> function) {
         checkMutable();
         Objects.requireNonNull(function);
         Integer value = get(key);
@@ -505,7 +512,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
     @Override
     public Integer computeIfPresent(
-        final K key, BiFunction<? super K, ? super Integer, ? extends Integer> function) {
+        final K key, @NotNull BiFunction<? super K, ? super Integer, ? extends Integer> function) {
         checkMutable();
         Objects.requireNonNull(function);
         final Integer old = get(key);
@@ -518,7 +525,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
     @Override
     public Integer compute(
-        final K key, BiFunction<? super K, ? super Integer, ? extends Integer> function) {
+        final K key, @NotNull BiFunction<? super K, ? super Integer, ? extends Integer> function) {
         checkMutable();
         Objects.requireNonNull(function);
         final Integer value = function.apply(key, get(key));
@@ -531,8 +538,8 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     @Override
     public Integer merge(
         final K key,
-        Integer value,
-        BiFunction<? super Integer, ? super Integer, ? extends Integer> function) {
+        @NotNull Integer value,
+        @NotNull BiFunction<? super Integer, ? super Integer, ? extends Integer> function) {
         checkMutable();
         Objects.requireNonNull(function);
         Objects.requireNonNull(value);
@@ -551,6 +558,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @Override
+    @NotNull
     public ObjectSet<K> keySet() {
         if (keyView == null) {
             final ObjectSet<K> view =
@@ -580,8 +588,9 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
                     }
 
                     @Override
+                    @NotNull
                     public ObjectIterator<K> iterator() {
-                        return new Cursor<>() {
+                        return new Cursor<K>() {
                             @Override
                             K output(final Node<K> node) {
                                 return boxedKey(node);
@@ -595,6 +604,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @Override
+    @NotNull
     public IntSet values() {
         if (valueView == null) {
             final IntSet view = new IntValueSet();
@@ -605,6 +615,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
+    @NotNull
     public ObjectSet<Map.Entry<K, Integer>> entrySet() {
         return (ObjectSet) object2IntEntrySet();
     }
@@ -641,8 +652,9 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
                     }
 
                     @Override
+                    @NotNull
                     public ObjectIterator<Object2IntMap.Entry<K>> iterator() {
-                        return new Cursor<>() {
+                        return new Cursor<Object2IntMap.Entry<K>>() {
                             @Override
                             Object2IntMap.Entry<K> output(final Node<K> node) {
                                 return new ForwardEntry(node, this);
@@ -655,6 +667,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         return entries;
     }
 
+    @Serial
     private void writeObject(final ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
         stream.writeInt(size);
@@ -666,6 +679,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
     }
 
     @SuppressWarnings("unchecked")
+    @Serial
     private void readObject(final ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
@@ -719,6 +733,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @NotNull
         public Object2IntBiMap<K> inverse() {
             return Object2IntHashBiMap.this;
         }
@@ -762,7 +777,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
         private K putBoxed(final Integer key, final K value, final boolean force) {
             final Node<K> previous =
-                putInverse(value, key == null ? 0 : key.intValue(), key == null, force);
+                putInverse(value, key == null ? 0 : key, key == null, force);
             if (previous == null) return null;
             if (Objects.equals(value, previous.key)) return value;
             return boxedKey(previous);
@@ -881,7 +896,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
         @Override
         public K computeIfAbsent(
-            final Integer key, Function<? super Integer, ? extends K> function) {
+            final Integer key, @NotNull Function<? super Integer, ? extends K> function) {
             checkMutable();
             Objects.requireNonNull(function);
             K value = get(key);
@@ -891,7 +906,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
         @Override
         public K computeIfPresent(
-            final Integer key, BiFunction<? super Integer, ? super K, ? extends K> function) {
+            final Integer key, @NotNull BiFunction<? super Integer, ? super K, ? extends K> function) {
             checkMutable();
             Objects.requireNonNull(function);
             final K old = get(key);
@@ -904,7 +919,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
 
         @Override
         public K compute(
-            final Integer key, BiFunction<? super Integer, ? super K, ? extends K> function) {
+            final Integer key, @NotNull BiFunction<? super Integer, ? super K, ? extends K> function) {
             checkMutable();
             Objects.requireNonNull(function);
             final K value = function.apply(key, get(key));
@@ -917,8 +932,8 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         @Override
         public K merge(
             final Integer key,
-            K value,
-            BiFunction<? super K, ? super K, ? extends K> function) {
+            @NotNull K value,
+            @NotNull BiFunction<? super K, ? super K, ? extends K> function) {
             checkMutable();
             Objects.requireNonNull(function);
             Objects.requireNonNull(value);
@@ -937,17 +952,20 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @NotNull
         public IntSet keySet() {
             return Object2IntHashBiMap.this.values();
         }
 
         @Override
+        @NotNull
         public ObjectSet<K> values() {
             return Object2IntHashBiMap.this.keySet();
         }
 
         @Override
         @SuppressWarnings({"unchecked", "rawtypes"})
+        @NotNull
         public ObjectSet<Map.Entry<Integer, K>> entrySet() {
             return (ObjectSet) int2ObjectEntrySet();
         }
@@ -984,8 +1002,9 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
                         }
 
                         @Override
+                        @NotNull
                         public ObjectIterator<Int2ObjectMap.Entry<K>> iterator() {
-                            return new Cursor<>() {
+                            return new Cursor<Int2ObjectMap.Entry<K>>() {
                                 @Override
                                 Int2ObjectMap.Entry<K> output(final Node<K> node) {
                                     return new InverseEntry(node, this);
@@ -1057,6 +1076,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public boolean contains(final Object value) {
             return findValueBoxed(value) != null;
         }
@@ -1071,6 +1091,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public boolean remove(final Object value) {
             checkMutable();
             final Node<K> node = findValueBoxed(value);
@@ -1080,6 +1101,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @NotNull
         public IntIterator iterator() {
             return new IntIterator() {
                 private Node<K> nextNode = first, toRemove;
@@ -1109,6 +1131,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
                 }
 
                 @Override
+                @SuppressWarnings("deprecation")
                 public Integer next() {
                     return boxedValue(advance());
                 }
@@ -1137,10 +1160,10 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
-        public boolean removeAll(final Collection<?> values) {
+        public boolean removeAll(final @NotNull Collection<?> values) {
             checkMutable();
             boolean changed = false;
-            final IntIterator iterator = iterator();
+            final Iterator<Integer> iterator = iterator();
             while (iterator.hasNext())
                 if (values.contains(iterator.next())) {
                     iterator.remove();
@@ -1150,10 +1173,10 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
-        public boolean retainAll(final Collection<?> values) {
+        public boolean retainAll(final @NotNull Collection<?> values) {
             checkMutable();
             boolean changed = false;
-            final IntIterator iterator = iterator();
+            final Iterator<Integer> iterator = iterator();
             while (iterator.hasNext())
                 if (!values.contains(iterator.next())) {
                     iterator.remove();
@@ -1173,21 +1196,19 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
-        public Object[] toArray() {
+        public Object @NotNull [] toArray() {
             final Object[] array = new Object[size];
             int index = 0;
-            final IntIterator iterator = iterator();
-            while (iterator.hasNext()) array[index++] = iterator.next();
+            for (final Integer value : this) array[index++] = value;
             return array;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T[] toArray(final T[] supplied) {
+        public <T> T @NotNull [] toArray(final T[] supplied) {
             final T[] result = supplied.length >= size ? supplied : Arrays.copyOf(supplied, size);
             int index = 0;
-            final IntIterator iterator = iterator();
-            while (iterator.hasNext()) result[index++] = (T) iterator.next();
+            for (final Integer value : this) result[index++] = (T) value;
             if (result.length > index) result[index] = null;
             return result;
         }
@@ -1209,10 +1230,9 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         @Override
         public String toString() {
             final StringBuilder result = new StringBuilder("[");
-            final IntIterator iterator = iterator();
-            while (iterator.hasNext()) {
+            for (final Integer value : this) {
                 if (result.length() > 1) result.append(", ");
-                result.append(iterator.next());
+                result.append(value);
             }
             return result.append(']').toString();
         }
@@ -1233,6 +1253,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public Integer getValue() {
             return boxedValue(node);
         }
@@ -1261,8 +1282,9 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public Integer setValue(final Integer value) {
-            final Node<K> previous = replace(value == null ? 0 : value.intValue(), value == null);
+            final Node<K> previous = replace(value == null ? 0 : value, value == null);
             if (previous == node) return value;
             return boxedValue(previous);
         }
@@ -1301,6 +1323,7 @@ public final class Object2IntHashBiMap<K> extends AbstractMap<K, Integer>
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public Integer getKey() {
             return boxedValue(node);
         }

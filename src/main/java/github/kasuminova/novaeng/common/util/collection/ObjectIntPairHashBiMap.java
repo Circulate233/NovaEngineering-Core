@@ -15,6 +15,8 @@
 package github.kasuminova.novaeng.common.util.collection;
 
 import com.google.common.collect.BiMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import org.jetbrains.annotations.NotNull;
 
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.AbstractObjectSet;
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -43,6 +46,8 @@ import java.util.function.Function;
  * Primitive specialization of Guava 33.6.0 HashBiMap. Bucket chains, cached hashes,
  * insertion order and forward/inverse replacement rules follow the original implementation.
  */
+// Backed views intentionally retain their map; fastutil supplies the inherited Cloneable marker.
+@SuppressWarnings({"ReturnOfInnerClass", "CloneableClassInSecureContext"})
 public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPair<K>, V>
     implements BiMap<ObjectIntPair<K>, V>, Serializable {
     private final Inverse inverse = new Inverse();
@@ -79,6 +84,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         return result;
     }
 
+    @SuppressWarnings("unused")
     public static <K, V> ObjectIntPairHashBiMap<K, V> immutableCopyOf(
         final Map<? extends ObjectIntPair<K>, ? extends V> source) {
         final ObjectIntPairHashBiMap<K, V> result = copyOf(source);
@@ -90,6 +96,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         return result;
     }
 
+    @SuppressWarnings("unused")
     public static <K, V> ObjectIntPairHashBiMap<K, V> forceCopyOf(
         final Map<? extends ObjectIntPair<K>, ? extends V> source) {
         final ObjectIntPairHashBiMap<K, V> result = new ObjectIntPairHashBiMap<>(source.size());
@@ -263,11 +270,13 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         return size;
     }
 
+    @SuppressWarnings("unused")
     public long modificationVersion() {
         return modifications;
     }
 
     @Override
+    @NotNull
     public BiMap<V, ObjectIntPair<K>> inverse() {
         return inverse;
     }
@@ -310,6 +319,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @Override
+    @SuppressWarnings("unused")
     public V forcePut(final ObjectIntPair<K> key, final V value) {
         return putBoxed(key, value, true);
     }
@@ -332,7 +342,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @Override
-    public void putAll(final Map<? extends ObjectIntPair<K>, ? extends V> source) {
+    public void putAll(final @NotNull Map<? extends ObjectIntPair<K>, ? extends V> source) {
         checkMutable();
         if (source instanceof ObjectIntPairHashBiMap<?, ?> nativeMap) {
             @SuppressWarnings("unchecked") final ObjectIntPairHashBiMap<K, V> typed = (ObjectIntPairHashBiMap<K, V>) nativeMap;
@@ -394,7 +404,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
 
     @Override
     public V computeIfAbsent(
-        final ObjectIntPair<K> key, Function<? super ObjectIntPair<K>, ? extends V> function) {
+        final ObjectIntPair<K> key, @NotNull Function<? super ObjectIntPair<K>, ? extends V> function) {
         checkMutable();
         Objects.requireNonNull(function);
         V value = get(key);
@@ -405,7 +415,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     @Override
     public V computeIfPresent(
         final ObjectIntPair<K> key,
-        BiFunction<? super ObjectIntPair<K>, ? super V, ? extends V> function) {
+        @NotNull BiFunction<? super ObjectIntPair<K>, ? super V, ? extends V> function) {
         checkMutable();
         Objects.requireNonNull(function);
         final V old = get(key);
@@ -419,7 +429,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     @Override
     public V compute(
         final ObjectIntPair<K> key,
-        BiFunction<? super ObjectIntPair<K>, ? super V, ? extends V> function) {
+        @NotNull BiFunction<? super ObjectIntPair<K>, ? super V, ? extends V> function) {
         checkMutable();
         Objects.requireNonNull(function);
         final V value = function.apply(key, get(key));
@@ -432,8 +442,8 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     @Override
     public V merge(
         final ObjectIntPair<K> key,
-        V value,
-        BiFunction<? super V, ? super V, ? extends V> function) {
+        @NotNull V value,
+        @NotNull BiFunction<? super V, ? super V, ? extends V> function) {
         checkMutable();
         Objects.requireNonNull(function);
         Objects.requireNonNull(value);
@@ -445,6 +455,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @Override
+    @NotNull
     public ObjectSet<ObjectIntPair<K>> keySet() {
         if (keyView == null) {
             final ObjectSet<ObjectIntPair<K>> view =
@@ -474,8 +485,9 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
                     }
 
                     @Override
+                    @NotNull
                     public ObjectIterator<ObjectIntPair<K>> iterator() {
-                        return new Cursor<>() {
+                        return new Cursor<ObjectIntPair<K>>() {
                             @Override
                             ObjectIntPair<K> output(final Node<K, V> node) {
                                 return boxedKey(node);
@@ -489,6 +501,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @Override
+    @NotNull
     public ObjectSet<V> values() {
         if (valueView == null) {
             final ObjectSet<V> view =
@@ -518,8 +531,9 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
                     }
 
                     @Override
+                    @NotNull
                     public ObjectIterator<V> iterator() {
-                        return new Cursor<>() {
+                        return new Cursor<V>() {
                             @Override
                             V output(final Node<K, V> node) {
                                 return boxedValue(node);
@@ -533,6 +547,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @Override
+    @NotNull
     public ObjectSet<Map.Entry<ObjectIntPair<K>, V>> entrySet() {
         if (entries == null) {
             final ObjectSet<Map.Entry<ObjectIntPair<K>, V>> view =
@@ -564,8 +579,9 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
                     }
 
                     @Override
+                    @NotNull
                     public ObjectIterator<Map.Entry<ObjectIntPair<K>, V>> iterator() {
-                        return new Cursor<>() {
+                        return new Cursor<Map.Entry<ObjectIntPair<K>, V>>() {
                             @Override
                             Map.Entry<ObjectIntPair<K>, V> output(final Node<K, V> node) {
                                 return new ForwardEntry(node, this);
@@ -615,6 +631,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         return put(node == null ? ObjectIntImmutablePair.of(left, right) : node.key, value);
     }
 
+    @CanIgnoreReturnValue
     public V forcePut(final K left, final int right, final V value) {
         final Node<K, V> node = findParts(left, right);
         if (node != null && Objects.equals(boxedValue(node), value)) {
@@ -624,12 +641,14 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         return forcePut(node == null ? ObjectIntImmutablePair.of(left, right) : node.key, value);
     }
 
+    @SuppressWarnings("unused")
     public int getIntKeyForValue(final Object value) {
         final Node<K, V> node = findValue(value);
         if (node == null) throw new NullPointerException("null integer mapping");
         return boxedKey(node).rightInt();
     }
 
+    @Serial
     private void writeObject(final ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
         stream.writeInt(size);
@@ -640,6 +659,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
     }
 
     @SuppressWarnings("unchecked")
+    @Serial
     private void readObject(final ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
@@ -679,11 +699,13 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
             return size;
         }
 
+        @SuppressWarnings("unused")
         public long modificationVersion() {
             return modifications;
         }
 
         @Override
+        @NotNull
         public BiMap<ObjectIntPair<K>, V> inverse() {
             return ObjectIntPairHashBiMap.this;
         }
@@ -721,6 +743,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         }
 
         @Override
+        @SuppressWarnings("unused")
         public ObjectIntPair<K> forcePut(final V key, final ObjectIntPair<K> value) {
             return putBoxed(key, value, true);
         }
@@ -801,7 +824,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
 
         @Override
         public ObjectIntPair<K> computeIfAbsent(
-            final V key, Function<? super V, ? extends ObjectIntPair<K>> function) {
+            final V key, @NotNull Function<? super V, ? extends ObjectIntPair<K>> function) {
             checkMutable();
             Objects.requireNonNull(function);
             ObjectIntPair<K> value = get(key);
@@ -812,7 +835,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         @Override
         public ObjectIntPair<K> computeIfPresent(
             final V key,
-            BiFunction<? super V, ? super ObjectIntPair<K>, ? extends ObjectIntPair<K>>
+            @NotNull BiFunction<? super V, ? super ObjectIntPair<K>, ? extends ObjectIntPair<K>>
                 function) {
             checkMutable();
             Objects.requireNonNull(function);
@@ -827,7 +850,7 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         @Override
         public ObjectIntPair<K> compute(
             final V key,
-            BiFunction<? super V, ? super ObjectIntPair<K>, ? extends ObjectIntPair<K>>
+            @NotNull BiFunction<? super V, ? super ObjectIntPair<K>, ? extends ObjectIntPair<K>>
                 function) {
             checkMutable();
             Objects.requireNonNull(function);
@@ -841,8 +864,8 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         @Override
         public ObjectIntPair<K> merge(
             final V key,
-            ObjectIntPair<K> value,
-            BiFunction<
+            @NotNull ObjectIntPair<K> value,
+            @NotNull BiFunction<
                 ? super ObjectIntPair<K>,
                 ? super ObjectIntPair<K>,
                 ? extends ObjectIntPair<K>>
@@ -858,16 +881,19 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
         }
 
         @Override
+        @NotNull
         public ObjectSet<V> keySet() {
             return ObjectIntPairHashBiMap.this.values();
         }
 
         @Override
+        @NotNull
         public ObjectSet<ObjectIntPair<K>> values() {
             return ObjectIntPairHashBiMap.this.keySet();
         }
 
         @Override
+        @NotNull
         public ObjectSet<Map.Entry<V, ObjectIntPair<K>>> entrySet() {
             if (inverseEntries == null) {
                 final ObjectSet<Map.Entry<V, ObjectIntPair<K>>> view =
@@ -899,8 +925,9 @@ public final class ObjectIntPairHashBiMap<K, V> extends AbstractMap<ObjectIntPai
                         }
 
                         @Override
+                        @NotNull
                         public ObjectIterator<Map.Entry<V, ObjectIntPair<K>>> iterator() {
-                            return new Cursor<>() {
+                            return new Cursor<Map.Entry<V, ObjectIntPair<K>>>() {
                                 @Override
                                 Map.Entry<V, ObjectIntPair<K>> output(final Node<K, V> node) {
                                     return new InverseEntry(node, this);

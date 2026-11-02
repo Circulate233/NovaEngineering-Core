@@ -38,6 +38,7 @@ public final class PrimitiveBiMaps {
         return (Integer) map.get(key);
     }
 
+    @SuppressWarnings("unused")
     public static int getInts(final Map map, final int key) {
         if (map instanceof Int2IntBiMap typed) return typed.getRequired(key);
         return (Integer) getIntKey(map, key);
@@ -56,7 +57,7 @@ public final class PrimitiveBiMaps {
 
     public static int getIntValueOrDefault(final Map map, final Object key, final int fallback) {
         if (map instanceof Object2IntBiMap<?> typed) return typed.getIntOrDefault(key, fallback);
-        return (Integer) map.getOrDefault(key, Integer.valueOf(fallback));
+        return (Integer) map.getOrDefault(key, fallback);
     }
 
     public static void putIntObject(final Map map, final int key, final Object value) {

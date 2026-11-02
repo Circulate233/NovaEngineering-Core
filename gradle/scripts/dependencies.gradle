@@ -65,7 +65,9 @@ dependencies {
     }
 
     modImplementation "com.cleanroommc:cleanmix:0.7.4"
-    modImplementation "curse.maven:crafttweaker-239197:9357132"
+    modImplementation 'CraftTweaker2:CraftTweaker2-API:4.1.20.718'
+    modImplementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.718'
+    modImplementation 'CraftTweaker2:ZenScript:4.1.20.718'
 
     modImplementation 'curse.maven:fugue-1005815:8878028'
     modImplementation 'curse.maven:modularui-624243:7929464'
@@ -126,7 +128,7 @@ dependencies {
     modCompileOnly 'curse.maven:chibi-460609:8957115'
     modCompileOnly 'curse.maven:botania-225643:3330934'
     modCompileOnly 'curse.maven:baubles-227083:2518667'
-    modImplementation 'curse.maven:zenutil-401178:9057336'
+    modImplementation 'curse.maven:zenutil-401178:9380480'
     modCompileOnly 'curse.maven:scalingguis-319656:5150678'
     modCompileOnly 'curse.maven:matter-overdrive-community-edition-557428:4592069'
     modCompileOnly 'curse.maven:cofh-core-69162:2920433'

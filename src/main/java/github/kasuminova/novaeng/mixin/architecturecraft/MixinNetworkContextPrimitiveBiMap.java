@@ -16,6 +16,8 @@ import github.kasuminova.novaeng.common.util.collection.Object2IntHashBiMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
+import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
@@ -78,7 +80,7 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
     }
 
     @Shadow
-    private Message instantiateMessage(Class<? extends Message> clazz) throws Throwable {
+    private Message instantiateMessage(Class<? extends Message> clazz) {
         throw new AssertionError();
     }
 
@@ -128,10 +130,10 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
         payload.writeByte(((Object2IntBiMap<?>) packetIds).getIntRequired(m.getClass()));
         int bools = this.booleanCount.count(m.getClass()) + this.optionalCount.count(m.getClass());
         if (bools > 0) {
-            List<Boolean> li = new ObjectArrayList<>(bools);
+            BooleanList li = new BooleanArrayList(bools);
             for (WireField<?> wf : this.marshallers.get(m.getClass())) {
                 if (wf.getType() == Boolean.TYPE) {
-                    li.add((Boolean) wf.get(m));
+                    li.add((boolean) wf.get(m));
                     continue;
                 }
                 if (!wf.isOptional()) continue;
@@ -140,7 +142,7 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
             for (int i = 0; i < (bools + 7) / 8; ++i) {
                 int by = 0;
                 for (int j = i * 8; j < Math.min(li.size(), i + 8); ++j) {
-                    if (!li.get(j)) continue;
+                    if (!li.getBoolean(j)) continue;
                     by |= 1 << j;
                 }
                 payload.writeByte(by);
@@ -188,7 +190,7 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
                 if (wf.isOptional()) {
                     li.add(
                         b -> {
-                            if (b.booleanValue()) {
+                            if (b) {
                                 present.add(wf);
                             }
                         });
