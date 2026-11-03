@@ -1,17 +1,11 @@
 package github.kasuminova.novaeng.common.performance;
 
 import WayofTime.bloodmagic.tile.TileAltar;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.crafting.ICraftingProvider;
-import appeng.api.networking.crafting.ICraftingProviderHelper;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.api.stacks.KeyCounter;
 import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager;
 import github.kasuminova.novaeng.common.util.TileItemHandler;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
@@ -131,17 +125,6 @@ class JavaOptimizationTest {
         final Field field = type.getDeclaredField(name);
         field.setAccessible(true);
         field.set(object, value);
-    }
-
-    private static ICraftingPatternDetails pattern(final String name) {
-        return (ICraftingPatternDetails) Proxy.newProxyInstance(JavaOptimizationTest.class.getClassLoader(),
-            new Class<?>[]{ICraftingPatternDetails.class}, (proxy, method, args) -> switch (method.getName()) {
-                case "isCraftable" -> true;
-                case "equals" -> proxy == args[0];
-                case "hashCode" -> System.identityHashCode(proxy);
-                case "toString" -> name;
-                default -> null;
-            });
     }
 
     static Object objectMethod(final Object proxy, final Method method, final Object[] args) {
@@ -267,100 +250,12 @@ class JavaOptimizationTest {
     }
 
     @Test
-    void queuesReleaseOnlyTheRequestedPlayerOrWorldAndEmptyExecutionReleasesEntry() throws Exception {
-        final Field mapField = AutoCraftingQueue.class.getDeclaredField("QUEUES");
-        mapField.setAccessible(true);
-        @SuppressWarnings("unchecked") final Map<EntityPlayer, AutoCraftingQueue> queues =
-            (Map<EntityPlayer, AutoCraftingQueue>) mapField.get(null);
-        AutoCraftingQueue.clearAll();
-        final WorldServer firstWorld = WorldgenTestBlocks.allocate(WorldServer.class);
-        final WorldServer secondWorld = WorldgenTestBlocks.allocate(WorldServer.class);
-        final EntityPlayerMP first = WorldgenTestBlocks.allocate(EntityPlayerMP.class);
-        final EntityPlayerMP second = WorldgenTestBlocks.allocate(EntityPlayerMP.class);
-        first.world = firstWorld;
-        second.world = secondWorld;
-        final Field entityId = Entity.class.getDeclaredField("entityId");
-        entityId.setAccessible(true);
-        entityId.setInt(first, 1);
-        entityId.setInt(second, 2);
-        final AutoCraftingQueue firstQueue = new AutoCraftingQueue();
-        final AutoCraftingQueue secondQueue = new AutoCraftingQueue();
-        final ArrayDeque<ItemStack> firstItems = new ArrayDeque<>(List.of(ItemStack.EMPTY));
-        final ArrayDeque<ItemStack> secondItems = new ArrayDeque<>(List.of(ItemStack.EMPTY));
-        set(AutoCraftingQueue.class, firstQueue, "queue", firstItems);
-        set(AutoCraftingQueue.class, secondQueue, "queue", secondItems);
-        queues.put(first, firstQueue);
-        queues.put(second, secondQueue);
-        try {
-            AutoCraftingQueue.removeWorld(firstWorld);
-            assertNull(AutoCraftingQueue.getQueue(first));
-            assertTrue(firstItems.isEmpty());
-            assertSame(secondQueue, AutoCraftingQueue.getQueue(second));
-            AutoCraftingQueue.removeQueue(second);
-            assertTrue(secondItems.isEmpty());
-            queues.put(first, firstQueue);
-            assertFalse(firstQueue.executionQueue(first));
-            assertTrue(queues.isEmpty());
-            queues.put(second, secondQueue);
-            secondQueue.clearQueue();
-            assertTrue(queues.isEmpty());
-        } finally {
-            AutoCraftingQueue.clearAll();
-        }
-    }
-
-    @Test
-    void patternSnapshotStaysStableWhenRegistrationReentersAndCountTracksRefresh() throws Exception {
-        final EFabricatorPatternBus bus = WorldgenTestBlocks.allocate(EFabricatorPatternBus.class);
-        final ObjectArrayList<ICraftingPatternDetails> details = new ObjectArrayList<>();
-        details.size(72);
-        set(EFabricatorPatternBus.class, bus, "details", details);
-        final AppEngInternalInventory inventory = new AppEngInternalInventory(null, 72);
-        set(EFabricatorPatternBus.class, bus, "patterns", inventory);
-        final ICraftingPatternDetails first = pattern("first");
-        final ICraftingPatternDetails second = pattern("second");
-        details.set(0, first);
-        details.set(1, second);
-        set(EFabricatorPatternBus.class, bus, "validPatterns", 2);
-        final List<ICraftingPatternDetails> publicSnapshot = bus.getDetails();
-        publicSnapshot.clear();
-        assertEquals(2, bus.getValidPatterns());
-        final Method refresh = EFabricatorPatternBus.class.getDeclaredMethod("refreshPattern", int.class);
-        refresh.setAccessible(true);
-        final Method provide = EFabricatorPatternBus.class.getDeclaredMethod("provideCrafting",
-            ICraftingProvider.class, ICraftingProviderHelper.class);
-        provide.setAccessible(true);
-        final List<ICraftingPatternDetails> registered = new ObjectArrayList<>();
-        final ICraftingProviderHelper tracker = (ICraftingProviderHelper) Proxy.newProxyInstance(
-            getClass().getClassLoader(), new Class<?>[]{ICraftingProviderHelper.class}, (proxy, method, args) -> {
-                if (method.getName().equals("addCraftingOption")) {
-                    registered.add((ICraftingPatternDetails) args[1]);
-                    if (registered.size() == 1) {
-                        refresh.invoke(bus, 1);
-                    }
-                }
-                return objectMethod(proxy, method, args);
-            });
-        provide.invoke(bus, null, tracker);
-        assertEquals(List.of(first, second), registered);
-        assertEquals(1, bus.getValidPatterns());
-        assertEquals(List.of(first), bus.getDetails());
-        registered.clear();
-        provide.invoke(bus, null, tracker);
-        assertEquals(List.of(first), registered);
-        refresh.invoke(bus, 0);
-        assertEquals(0, bus.getValidPatterns());
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     void workerAllowsSubUnitEnergyWithoutClampingExceptionOrConsumingWork() throws Exception {
         final var controller = WorldgenTestBlocks.allocate(
             EFabricatorController.class);
         controller.setParallelism(4);
-        controller.setOutputBuffer((IItemList<IAEItemStack>)
-            Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{IItemList.class},
-                JavaOptimizationTest::objectMethod));
+        controller.setOutputBuffer(new KeyCounter());
         final EFabricatorWorker worker = WorldgenTestBlocks.allocate(EFabricatorWorker.class);
         set(EFabricatorWorker.class, worker, "queue", new EFabricatorWorker.CraftingQueue());
         worker.setController(controller);

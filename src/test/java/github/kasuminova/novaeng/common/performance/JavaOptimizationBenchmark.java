@@ -1,10 +1,6 @@
 package github.kasuminova.novaeng.common.performance;
 
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.crafting.ICraftingProvider;
-import appeng.api.networking.crafting.ICraftingProviderHelper;
 import com.sun.management.ThreadMXBean;
-import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorPatternBus;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Items;
@@ -12,11 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -45,34 +37,6 @@ public final class JavaOptimizationBenchmark {
             values[i] = (byte) i;
         }
         compare(report, "drill_pow_256", () -> powers(values, false), () -> powers(values, true));
-        final EFabricatorPatternBus bus = WorldgenTestBlocks.allocate(EFabricatorPatternBus.class);
-        final ObjectArrayList<ICraftingPatternDetails> details = new ObjectArrayList<>();
-        details.size(72);
-        for (int i = 0; i < 72; i++) {
-            details.set(i, pattern());
-        }
-        JavaOptimizationTest.set(EFabricatorPatternBus.class, bus, "details", details);
-        JavaOptimizationTest.set(EFabricatorPatternBus.class, bus, "validPatterns", 72);
-        final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(EFabricatorPatternBus.class, MethodHandles.lookup());
-        final MethodHandle provide = lookup.findVirtual(EFabricatorPatternBus.class, "provideCrafting",
-            MethodType.methodType(void.class, ICraftingProvider.class, ICraftingProviderHelper.class));
-        final ICraftingProviderHelper tracker = (ICraftingProviderHelper) Proxy.newProxyInstance(
-            JavaOptimizationBenchmark.class.getClassLoader(), new Class<?>[]{ICraftingProviderHelper.class},
-            JavaOptimizationTest::objectMethod);
-        provide.invoke(bus, (ICraftingProvider) null, tracker);
-        compare(report, "pattern_register_72", () -> {
-            long count = 0;
-            for (final ICraftingPatternDetails detail : bus.getDetails()) {
-                if (detail.isCraftable()) {
-                    tracker.addCraftingOption(null, detail);
-                    count++;
-                }
-            }
-            return count;
-        }, () -> {
-            provide.invoke(bus, (ICraftingProvider) null, tracker);
-            return 72;
-        });
         Files.writeString(Path.of(args[0]), report);
         System.out.print(report);
         System.out.println("checksum=" + sink);
@@ -142,13 +106,6 @@ public final class JavaOptimizationBenchmark {
             }
         }
         return Double.doubleToLongBits(sum);
-    }
-
-    private static ICraftingPatternDetails pattern() {
-        return (ICraftingPatternDetails) Proxy.newProxyInstance(
-            JavaOptimizationBenchmark.class.getClassLoader(), new Class<?>[]{ICraftingPatternDetails.class},
-            (proxy, method, arguments) -> method.getName().equals("isCraftable") ? true
-                : JavaOptimizationTest.objectMethod(proxy, method, arguments));
     }
 
     private static void compare(final StringBuilder out, final String name, final Task original, final Task optimized) throws Throwable {

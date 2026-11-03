@@ -1,18 +1,15 @@
 package github.kasuminova.novaeng.common.util;
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.networking.storage.IStorageGrid;
-import appeng.api.storage.channels.IFluidStorageChannel;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEFluidStack;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IAEStack;
-import appeng.fluids.util.AEFluidStack;
-import appeng.me.helpers.PlayerSource;
-import appeng.util.item.AEItemStack;
-import com.circulation.random_complement.common.util.MEHandler;
-import com.glodblock.github.common.item.fake.FakeFluids;
+import ae2.api.config.Actionable;
+import ae2.api.networking.security.IActionHost;
+import ae2.api.storage.MEStorage;
+import ae2.container.AEBaseContainer;
+import ae2.api.stacks.AEFluidKey;
+import ae2.api.stacks.GenericStack;
+import ae2.api.stacks.AEItemKey;
+import ae2.api.stacks.AEKey;
+import ae2.me.helpers.PlayerSource;
+import com.google.common.primitives.Ints;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.integration.ModIntegrationJEI;
@@ -116,43 +113,47 @@ public final class NEWMachineAssemblyManager {
         final var items = getItemStackIngList(itemIngredients);
         final var fluids = getFluidStackIngList(fluidIngredients);
         if (usingAE) {
-            final var terminal = MEHandler.getTerminalGuiObject(player);
+            final IActionHost terminal = player.openContainer instanceof AEBaseContainer c ? (IActionHost) c.getTarget() : null;
             if (terminal != null && terminal.getActionableNode() != null) {
-                final var grid = terminal.getActionableNode().getGrid();
+                final var grid = terminal.getActionableNode().grid();
                 if (grid != null) {
-                    final IStorageGrid storage = grid.getCache(IStorageGrid.class);
-                    final var itemInventory = storage.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
-                    final var fluidInventory = storage.getInventory(AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class));
+                    final MEStorage storage = grid.getStorageService().getInventory();
                     final var source = new PlayerSource(player, terminal);
                     for (final var stacks : new ReferenceArrayList<>(items)) {
                         for (final var stack : stacks) {
-                            final var extracted = itemInventory.extractItems(AEItemStack.fromItemStack(stack), Actionable.SIMULATE, source);
-                            if (extracted == null) {
+                            var key = AEItemKey.of(stack);
+                            if (key == null) {
                                 continue;
                             }
-                            final int size = (int) extracted.getStackSize();
-                            if (stack.getCount() <= size) {
+                            final var extracted = storage.extract(key, stack.getCount(), Actionable.SIMULATE, source);
+                            if (extracted == 0) {
+                                continue;
+                            }
+                            if (stack.getCount() <= extracted) {
                                 items.remove(stacks);
                                 break;
                             }
                             for (final var alternative : stacks) {
-                                alternative.shrink(size);
+                                alternative.shrink(Ints.saturatedCast(extracted));
                             }
                         }
                     }
                     for (final var stacks : new ReferenceArrayList<>(fluids)) {
                         for (final var stack : stacks) {
-                            final var extracted = fluidInventory.extractItems(AEFluidStack.fromFluidStack(stack), Actionable.SIMULATE, source);
-                            if (extracted == null) {
+                            var key = AEFluidKey.of(stack);
+                            if (key == null) {
                                 continue;
                             }
-                            final int size = (int) extracted.getStackSize();
-                            if (stack.amount <= size) {
+                            final var extracted = storage.extract(key, stack.amount, Actionable.SIMULATE, source);
+                            if (extracted == 0) {
+                                continue;
+                            }
+                            if (stack.amount <= extracted) {
                                 fluids.remove(stacks);
                                 break;
                             }
                             for (final var alternative : stacks) {
-                                alternative.amount -= size;
+                                alternative.amount -= Ints.saturatedCast(extracted);
                             }
                         }
                     }
@@ -184,9 +185,9 @@ public final class NEWMachineAssemblyManager {
         for (final var stacks : fluids) {
             final List<ItemStack> packed = new ObjectArrayList<>();
             for (final var stack : stacks) {
-                final var drops = FakeFluids.packFluid2Drops(stack);
-                drops.setCount(stack.amount);
-                packed.add(drops);
+                var key = AEFluidKey.of(stack);
+                if (key == null) continue;
+                packed.add(GenericStack.wrapInItemStack(key, stack.amount));
             }
             result.add(packed);
         }
@@ -288,18 +289,18 @@ public final class NEWMachineAssemblyManager {
     public static final class Ingredient {
         private final Object ingredient;
         private final boolean item;
-        private final IAEStack<?> aeStack;
+        private final AEKey aeStack;
 
         public Ingredient(final ItemStack stack) {
             this.ingredient = stack;
             this.item = true;
-            this.aeStack = AEItemStack.fromItemStack(stack);
+            this.aeStack = AEItemKey.of(stack);
         }
 
         public Ingredient(final FluidStack stack) {
             this.ingredient = stack;
             this.item = false;
-            this.aeStack = AEFluidStack.fromFluidStack(stack);
+            this.aeStack = AEFluidKey.of(stack);
         }
 
         public Object getIngredient() {
@@ -310,7 +311,7 @@ public final class NEWMachineAssemblyManager {
             return this.item;
         }
 
-        public IAEStack<?> getAeStack() {
+        public AEKey getAeStack() {
             return this.aeStack;
         }
 
@@ -318,16 +319,16 @@ public final class NEWMachineAssemblyManager {
             return (ItemStack) this.ingredient;
         }
 
-        public IAEItemStack getAEItemStack() {
-            return this.aeStack instanceof IAEItemStack stack ? stack : null;
+        public AEItemKey getAEItemStack() {
+            return this.aeStack instanceof AEItemKey stack ? stack : null;
         }
 
         public FluidStack getFluidStack() {
             return (FluidStack) this.ingredient;
         }
 
-        public IAEFluidStack getAEFluidStack() {
-            return this.aeStack instanceof IAEFluidStack stack ? stack : null;
+        public AEFluidKey getAEFluidStack() {
+            return this.aeStack instanceof AEFluidKey stack ? stack : null;
         }
 
         @Override

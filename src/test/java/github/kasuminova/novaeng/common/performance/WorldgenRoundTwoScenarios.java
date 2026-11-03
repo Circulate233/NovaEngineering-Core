@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.performance;
 
-import appeng.core.worlddata.MeteorDataNameEncoder;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import github.kasuminova.novaeng.common.performance.SpawnPerformanceBenchmark.Scenario;
 import github.kasuminova.novaeng.common.performance.SpawnPerformanceBenchmark.Workload;
@@ -30,7 +29,6 @@ final class WorldgenRoundTwoScenarios {
     static List<Scenario> create() {
         try {
             final List<Scenario> cases = new ObjectArrayList<>(WorldgenHotspotScenarios.create().subList(0, 2));
-            cases.add(filename());
             cases.add(fileRead(256));
             cases.add(fileRead(16384));
             cases.add(stoneStates());
@@ -42,25 +40,6 @@ final class WorldgenRoundTwoScenarios {
         } catch (final Exception failure) {
             throw new IllegalStateException(failure);
         }
-    }
-
-    private static Scenario filename() {
-        final MeteorDataNameEncoder encoder = new MeteorDataNameEncoder(4);
-        final Workload before = new Workload() {
-            private int coordinate;
-
-            public long step() {
-                return encoder.encode(-300, this.coordinate++, -60000).hashCode();
-            }
-        };
-        final Workload after = new Workload() {
-            private int coordinate;
-
-            public long step() {
-                return MeteorDataFilename.encode(-300, this.coordinate++, -60000, 4, '_', '.', "dat").hashCode();
-            }
-        };
-        return checked("meteor_region_filename", before, after);
     }
 
     private static Scenario fileRead(final int payloadSize) throws Exception {

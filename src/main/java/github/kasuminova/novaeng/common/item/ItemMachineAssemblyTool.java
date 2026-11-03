@@ -1,20 +1,22 @@
 package github.kasuminova.novaeng.common.item;
 
-import appeng.api.networking.crafting.ICraftingGrid;
-import appeng.util.item.AEItemStack;
+import ae2.api.stacks.AEItemKey;
+import ae2.container.implementations.ContainerCraftConfirm;
+import ae2.container.interfaces.ICraftingGridContainer;
+import ae2.core.gui.locator.GuiHostLocator;
+import ae2.core.gui.locator.GuiHostLocators;
+import ae2.helpers.WirelessTerminalGuiHost;
+import baubles.api.BaublesApi;
 import com.brandon3055.draconicevolution.api.itemconfig.BooleanConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.IConfigurableItem;
 import com.brandon3055.draconicevolution.api.itemconfig.IItemConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.IntegerConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.ItemConfigFieldRegistry;
 import com.brandon3055.draconicevolution.api.itemconfig.ToolConfigHelper;
-import com.circulation.random_complement.common.interfaces.RCCraftingGridCache;
-import com.circulation.random_complement.common.util.MEHandler;
 import github.kasuminova.mmce.common.util.DynamicPattern;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.util.AssemblyBlockArray;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
@@ -22,9 +24,11 @@ import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.BlockArrayCache;
 import ink.ikx.mmce.common.utils.StructureIngredient;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -34,12 +38,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -193,7 +197,7 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         }
         final var ingredients = StructureIngredient.of(player.world, pos, array.copy());
         array = array.offset(pos);
-        if (!world.isOutsideBuildHeight(array.getMin()) || !world.isOutsideBuildHeight(array.getMax())) {
+        if (array.getMin().getY() < 0 || array.getMax().getY() > 255) {
             player.sendMessage(new TextComponentTranslation("message.assembly.tip.too_high",
                 "y = " + (array.getMin().getY() < 1 ? array.getMin().getY() : array.getMax().getY())));
             return EnumActionResult.FAIL;
@@ -202,22 +206,34 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         final boolean autoCraft = usingAE && isAutoAECrafting(stack);
         final var missing = NEWMachineAssemblyManager.checkAllItems(player, ingredients, usingAE, autoCraft);
         final var requests = missing.list();
-        if (autoCraft && !requests.isEmpty()) {
-            final var terminal = MEHandler.getTerminalGuiObject(player);
-            if (terminal != null && terminal.getActionableNode() != null && terminal.getActionableNode().getGrid() != null) {
-                final var grid = terminal.getActionableNode().getGrid();
-                final RCCraftingGridCache crafting = grid.getCache(ICraftingGrid.class);
-                final var craftable = crafting.rc$getCraftableItems();
-                final var queue = new ArrayDeque<ItemStack>();
-                for (final var alternatives : requests) {
-                    for (final var item : alternatives) {
-                        if (!item.isEmpty() && craftable.containsKey(AEItemStack.fromItemStack(item))) {
-                            queue.add(item);
-                            break;
+        if (autoCraft && !requests.isEmpty() && player instanceof EntityPlayerMP serverPlayer) {
+            final var locator = findWirelessTerminalLocator(player);
+            final var host = locator == null ? null : locator.locate(player, WirelessTerminalGuiHost.class);
+            if (locator != null && host != null) {
+                final var node = host.getActionableNode();
+                final var grid = node == null ? null : node.grid();
+                if (grid != null) {
+                    final var craftables = grid.getCraftingService().getCraftables(AEItemKey.filter());
+                    final var toCraft = new ObjectArrayList<ICraftingGridContainer.AutoCraftEntry>();
+                    for (final var stacks : requests) {
+                        for (final var item : stacks) {
+                            if (item.isEmpty()) {
+                                continue;
+                            }
+                            final var key = AEItemKey.of(item);
+                            if (key == null) {
+                                continue;
+                            }
+                            if (craftables.contains(key)) {
+                                toCraft.add(new ICraftingGridContainer.AutoCraftEntry(key, item.getCount(), new IntArrayList()));
+                                break;
+                            }
                         }
                     }
+                    if (!toCraft.isEmpty()) {
+                        ContainerCraftConfirm.openWithCraftingList(host, serverPlayer, locator, toCraft);
+                    }
                 }
-                AutoCraftingQueue.setQueueAndStrat(queue, player);
             }
         }
         if (requests.isEmpty() || !isNeedAllIngredient(stack)) {
@@ -255,6 +271,25 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     @Override
     public int getProfileCount(final ItemStack stack) {
         return 5;
+    }
+
+    private static GuiHostLocator findWirelessTerminalLocator(final EntityPlayer player) {
+        for (int slot = 0; slot < player.inventory.getSizeInventory(); slot++) {
+            final GuiHostLocator locator = GuiHostLocators.forInventorySlot(slot);
+            if (locator.locate(player, WirelessTerminalGuiHost.class) != null) {
+                return locator;
+            }
+        }
+        if (Loader.isModLoaded("baubles")) {
+            final var handler = BaublesApi.getBaublesHandler(player);
+            for (int slot = 0; slot < handler.getSlots(); slot++) {
+                final GuiHostLocator locator = GuiHostLocators.forBaubleSlot(slot);
+                if (locator.locate(player, WirelessTerminalGuiHost.class) != null) {
+                    return locator;
+                }
+            }
+        }
+        return null;
     }
 
     private static final class Configs {

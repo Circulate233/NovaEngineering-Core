@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.common.performance;
 
-import github.kasuminova.novaeng.common.util.EmptyQueue;
 import github.kasuminova.novaeng.common.util.IBlockPosEx;
 import github.kasuminova.novaeng.common.util.OnlyWriteEnergyContainer;
 import net.minecraft.util.EnumFacing;
@@ -54,23 +53,6 @@ class JavaSourceMigrationTest {
     }
 
     @Test
-    void emptyQueueStillDiscardsWritesAndReturnsNullForEmptyReads() {
-        final EmptyQueue<String> queue = EmptyQueue.empty();
-        assertSame(queue, EmptyQueue.<String>empty());
-        assertFalse(queue.add("ignored"));
-        assertFalse(queue.offer("ignored"));
-        assertFalse(queue.add("ignored"));
-        assertFalse(queue.containsAll(List.of()));
-        assertNull(queue.remove());
-        assertNull(queue.element());
-        assertNull(queue.poll());
-        assertNull(queue.peek());
-        assertFalse(queue.iterator().hasNext());
-        assertEquals(0, queue.size());
-        assertTrue(queue.isEmpty());
-    }
-
-    @Test
     void relativePositionTransformsPreserveAllSixFacingsAndIntegerOverflow() {
         for (final int x : new int[]{2, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
             final BlockPos origin = new BlockPos(11, 22, 33);
@@ -81,29 +63,6 @@ class JavaSourceMigrationTest {
             assertEquals(origin.add(x, -5, 3), IBlockPosEx.createPosByFacing(origin, EnumFacing.UP, x, 3, 5));
             assertEquals(origin.add(x, 5, 3), IBlockPosEx.createPosByFacing(origin, EnumFacing.DOWN, x, 3, 5));
         }
-    }
-
-    @Test
-    void betterP2PThreadWrapperAppliesWithoutCompilingAgainstKotlinPair() throws Exception {
-        final ClassNode target = new ClassNode();
-        new ClassReader(PerformanceMixinTestLoader.transformed(
-            "com.projecturanus.betterp2p.network.packet.ServerLinkP2PHandler")).accept(target, 0);
-        final var handler = target.methods.stream().filter(method -> method.name.contains("linkOnServerThread"))
-                                          .findFirst().orElseThrow();
-        new Analyzer<>(new BasicVerifier()).analyze(target.name, handler);
-        assertTrue(target.methods.stream().flatMap(method -> Stream.of(method.instructions.toArray()))
-                                 .anyMatch(instruction -> instruction instanceof MethodInsnNode call
-                                     && call.name.contains("linkOnServerThread")));
-        final ClassNode original = new ClassNode();
-        new ClassReader(PerformanceMixinTestLoader.resource(
-            "com.projecturanus.betterp2p.network.packet.ServerLinkP2PHandler")).accept(original, 0);
-        final var originalHandler = original.methods.stream().filter(method -> method.name.equals("onMessage")
-                                                && method.desc.startsWith("(Lcom/projecturanus/betterp2p/network/packet/C2SLinkP2P;"))
-                                                    .findFirst().orElseThrow();
-        final var originalCalls = calls(originalHandler);
-        assertFalse(originalCalls.isEmpty());
-        assertTrue(target.methods.stream().anyMatch(method -> calls(method).equals(originalCalls)),
-            "The wrapper must retain the original handler, including versions that link inside a nested Runnable");
     }
 
     private static final class EnergyStorage implements IEnergyStorage {

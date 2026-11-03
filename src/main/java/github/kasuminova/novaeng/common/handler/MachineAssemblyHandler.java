@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.common.handler;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
 import github.kasuminova.novaeng.common.item.ItemMachineAssemblyTool;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager;
 import hellfirepvp.modularmachinery.client.ClientScheduler;
 import hellfirepvp.modularmachinery.client.util.DynamicMachineRenderContext;
@@ -129,13 +128,11 @@ public final class MachineAssemblyHandler {
 
     @SubscribeEvent
     public void onPlayerLogOut(final PlayerEvent.PlayerLoggedOutEvent event) {
-        AutoCraftingQueue.removeQueue(event.player);
         NEWMachineAssemblyManager.removeMachineAssembly(event.player);
     }
 
     @SubscribeEvent
     public void onPlayerChangeDim(final PlayerEvent.PlayerChangedDimensionEvent event) {
-        AutoCraftingQueue.removeQueue(event.player);
         NEWMachineAssemblyManager.removeMachineAssembly(event.player);
     }
 }

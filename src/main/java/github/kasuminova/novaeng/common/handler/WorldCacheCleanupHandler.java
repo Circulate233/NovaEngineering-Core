@@ -3,7 +3,6 @@ package github.kasuminova.novaeng.common.handler;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.machine.MMAltar;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
@@ -38,7 +37,6 @@ public final class WorldCacheCleanupHandler {
         }
         HyperNetCaches.removeWorld(world);
         DreamEnergyCore.removeWorld(world);
-        AutoCraftingQueue.removeWorld(world);
         if (Mods.BM2.isPresent()) {
             MMAltar.removeWorld(world);
         }

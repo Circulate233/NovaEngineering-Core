@@ -1,19 +1,12 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
-import appeng.api.implementations.ICraftingPatternItem;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.crafting.ICraftingProvider;
-import appeng.api.networking.crafting.ICraftingProviderHelper;
-import appeng.api.networking.events.MENetworkCraftingPatternChange;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.items.misc.ItemEncodedPattern;
-import appeng.me.GridAccessException;
-import appeng.tile.inventory.AppEngInternalInventory;
-import appeng.util.inv.IAEAppEngInventory;
-import appeng.util.inv.InvOperation;
-import com.glodblock.github.util.FluidCraftingPatternDetails;
-import com.glodblock.github.util.FluidPatternDetails;
-import github.kasuminova.mmce.common.util.PatternItemFilter;
+import ae2.api.crafting.IPatternDetails;
+import ae2.api.crafting.PatternDetailsHelper;
+import ae2.api.networking.crafting.ICraftingProvider;
+import ae2.api.stacks.AEKey;
+import ae2.api.stacks.GenericStack;
+import ae2.util.inv.AppEngInternalInventory;
+import ae2.util.inv.InternalInventoryHost;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSearch;
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
@@ -29,27 +22,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
-public final class EFabricatorPatternBus extends EFabricatorPart implements IAEAppEngInventory {
+public final class EFabricatorPatternBus extends EFabricatorPart implements InternalInventoryHost {
 
     public static final int PATTERN_SLOTS = 72;
-    private final Set<IAEItemStack> aePatterns = new ObjectOpenHashSet<>();
-    private final AppEngInternalInventory patterns = new AppEngInternalInventory(this, PATTERN_SLOTS, 1, PatternItemFilter.INSTANCE);
-    private final ObjectArrayList<ICraftingPatternDetails> details = new ObjectArrayList<>(PATTERN_SLOTS);
+    private final Set<AEKey> aePatterns = new ObjectOpenHashSet<>();
+    private final AppEngInternalInventory patterns = new AppEngInternalInventory(this, PATTERN_SLOTS, 1);
+    private final ObjectArrayList<IPatternDetails> details = new ObjectArrayList<>(PATTERN_SLOTS);
     private int validPatterns;
-    private ICraftingPatternDetails[] detailsSnapshot;
 
     public EFabricatorPatternBus() {
         this.details.size(PATTERN_SLOTS);
     }
 
-    public Set<IAEItemStack> getAePatterns() {
+    public Set<AEKey> getAePatterns() {
         return this.aePatterns;
     }
 
@@ -61,28 +52,21 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
         for (int i = 0; i < PATTERN_SLOTS; i++) {
             this.refreshPattern(i);
         }
+        this.refreshPatternOutputs();
         this.notifyPatternChanged();
     }
 
     private void refreshPattern(final int slot) {
-        this.detailsSnapshot = null;
-        if (this.details.set(slot, null) != null) {
-            this.validPatterns--;
-        }
+        details.set(slot, null);
         final ItemStack pattern = this.patterns.getStackInSlot(slot);
-        if (pattern.isEmpty() || !(pattern.getItem() instanceof ICraftingPatternItem item)) {
+        if (pattern.isEmpty()) {
             return;
         }
-        final var detail = item.getPatternForItem(pattern, this.getWorld());
-        if (detail != null && (detail.isCraftable() || detail instanceof FluidCraftingPatternDetails)) {
-            this.details.set(slot, detail);
-            this.validPatterns++;
-            this.detailsSnapshot = null;
-        }
+        this.details.set(slot, PatternDetailsHelper.decodePattern(pattern, getWorld()));
     }
 
-    public List<ICraftingPatternDetails> getDetails() {
-        final List<ICraftingPatternDetails> result = new ObjectArrayList<>(this.validPatterns);
+    public List<IPatternDetails> getDetails() {
+        final List<IPatternDetails> result = new ObjectArrayList<>(this.validPatterns);
         for (final var detail : this.details) {
             if (detail != null) {
                 result.add(detail);
@@ -95,61 +79,39 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
         return this.validPatterns;
     }
 
-    void provideCrafting(final ICraftingProvider provider, final ICraftingProviderHelper tracker) {
-        ICraftingPatternDetails[] snapshot = this.detailsSnapshot;
-        if (snapshot == null) {
-            snapshot = new ICraftingPatternDetails[this.validPatterns];
-            int index = 0;
-            for (final ICraftingPatternDetails detail : this.details) {
-                if (detail != null) {
-                    snapshot[index++] = detail;
-                }
-            }
-            this.detailsSnapshot = snapshot;
-        }
-        for (final ICraftingPatternDetails detail : snapshot) {
-            if (detail.isCraftable() || detail instanceof FluidCraftingPatternDetails) {
-                tracker.addCraftingOption(provider, detail);
-            }
-        }
-    }
-
     @Override
-    public void saveChanges() {
+    public void saveChangedInventory(AppEngInternalInventory inv) {
         this.markNoUpdateSync();
     }
 
     @Override
-    public void onChangeInventory(final IItemHandler inventory, final int slot, final InvOperation operation,
-                                  final ItemStack removed, final ItemStack added) {
+    public void onChangeInventory(final AppEngInternalInventory inventory, final int slot) {
         this.refreshPattern(slot);
-        this.notifyPatternChanged();
         this.sendPatternSearchGUIUpdateToClient(slot);
-        switch (operation) {
-            case EXTRACT -> this.removePattern(removed);
-            case INSERT -> this.addPattern(added);
-            case SET -> {
-                this.removePattern(removed);
-                this.addPattern(added);
-            }
-        }
+        this.refreshPatternOutputs();
+        this.notifyPatternChanged();
     }
 
-    private void addPattern(final ItemStack stack) {
-        if (stack.getItem() instanceof ItemEncodedPattern item) {
-            final var pattern = item.getPatternForItem(stack, this.world);
-            if (pattern != null && (pattern.isCraftable() || pattern instanceof FluidPatternDetails)) {
-                this.aePatterns.add(pattern.getCondensedOutputs()[0]);
-            }
-        }
+    @Override
+    public boolean isClientSide() {
+        return world != null && world.isRemote;
     }
 
-    private void removePattern(final ItemStack stack) {
-        if (stack.getItem() instanceof ItemEncodedPattern item) {
-            final var pattern = item.getPatternForItem(stack, this.world);
-            if (pattern != null && (pattern.isCraftable() || pattern instanceof FluidPatternDetails)) {
-                this.aePatterns.remove(pattern.getCondensedOutputs()[0]);
+    private void refreshPatternOutputs() {
+        aePatterns.clear();
+        for (IPatternDetails detail : details) {
+            if (detail == null) {
+                return;
             }
+            final GenericStack stack = detail.getPrimaryOutput();
+            if (stack == null) {
+                return;
+            }
+            final AEKey key = stack.what();
+            if (key == null) {
+                return;
+            }
+            aePatterns.add(key);
         }
     }
 
@@ -157,12 +119,13 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
         if (this.partController == null) {
             return;
         }
-        try {
-            final var channel = this.partController.getChannel();
-            if (channel != null && channel.getProxy().isActive()) {
-                channel.getProxy().getGrid().postEvent(new MENetworkCraftingPatternChange(channel, channel.getProxy().getNode()));
-            }
-        } catch (final GridAccessException ignored) {
+        final var channel = this.partController.getChannel();
+        if (channel == null) {
+            return;
+        }
+        final var mainNode = channel.getMainNode();
+        if (mainNode.isActive()) {
+            ICraftingProvider.requestUpdate(mainNode);
         }
         this.partController.recalculateEnergyUsage();
     }
@@ -213,10 +176,8 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
     @Override
     public void readCustomNBT(final NBTTagCompound tag) {
         super.readCustomNBT(tag);
-        this.patterns.readFromNBT(tag.getCompoundTag("patterns"));
-        for (final ItemStack stack : this.patterns) {
-            this.addPattern(stack);
-        }
+        this.patterns.readFromNBT(tag, "patterns");
+        refreshPatterns();
     }
 
     @Override

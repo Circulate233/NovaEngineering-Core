@@ -28,8 +28,7 @@ final class WorldgenHotspotScenarios {
     static List<Scenario> create() {
         try {
             return List.of(temperature(false), temperature(true), classification("AtmosphereTypes", "getAtmosphereTypeFromValue"),
-                classification("Temps", "getTempFromValue"), orePredicate(), emptyAtmosphere(), radius(0), radius(8),
-                privateMap(false, false), privateMap(false, true), privateMap(true, false), privateMap(true, true));
+                classification("Temps", "getTempFromValue"), orePredicate(), emptyAtmosphere(), radius(0), radius(8));
         } catch (final Exception exception) {
             throw new IllegalStateException(exception);
         }
@@ -160,58 +159,6 @@ final class WorldgenHotspotScenarios {
                 return result.size();
             } catch (final Throwable failure) {
                 throw new IllegalStateException(failure);
-            }
-        };
-    }
-
-    private static Scenario privateMap(final boolean longs, final boolean replace) throws Exception {
-        final Class<?> fixture = longs ? PrivateIdMapsMixinTest.LongFixture.class : PrivateIdMapsMixinTest.IntFixture.class;
-        final Class<?> specialized = longs ? PrivateIdMapsMixinTest.PrimitiveLongFixture.class : PrivateIdMapsMixinTest.PrimitiveIntFixture.class;
-        return checked("private_" + (longs ? "long" : "int") + "_map_" + (replace ? "replace" : "lookup"),
-            mapWork(fixture, longs, replace), mapWork(specialized, longs, replace));
-    }
-
-    private static Workload mapWork(final Class<?> type, final boolean longs, final boolean replace) throws Exception {
-        final Class<?> key = longs ? long.class : int.class;
-        MethodHandle put = MethodHandles.publicLookup().unreflect(type.getMethod("put", key, Object.class));
-        MethodHandle get = MethodHandles.publicLookup().unreflect(type.getMethod("get", key));
-        if (longs) {
-            final Object instance = type.getConstructor().newInstance();
-            put = put.bindTo(instance);
-            get = get.bindTo(instance);
-        }
-        final Integer value = 42;
-        try {
-            for (int i = 0; i < 64; i++) {
-                if (longs) {
-                    final Object ignored = (Object) put.invokeExact(0x100000000L + i, (Object) value);
-                } else {
-                    final Object ignored = (Object) put.invokeExact(1000 + i, (Object) value);
-                }
-            }
-        } catch (final Throwable failure) {
-            throw new IllegalStateException(failure);
-        }
-        final MethodHandle operation = replace ? put : get;
-        return new Workload() {
-            private int index;
-
-            @Override
-            public long step() {
-                try {
-                    final int offset = this.index++ & 63;
-                    final Object result;
-                    if (longs) {
-                        result = replace ? (Object) operation.invokeExact(0x100000000L + offset, (Object) value)
-                            : (Object) operation.invokeExact(0x100000000L + offset);
-                    } else {
-                        result = replace ? (Object) operation.invokeExact(1000 + offset, (Object) value)
-                            : (Object) operation.invokeExact(1000 + offset);
-                    }
-                    return ((Integer) result).longValue();
-                } catch (final Throwable failure) {
-                    throw new IllegalStateException(failure);
-                }
             }
         };
     }

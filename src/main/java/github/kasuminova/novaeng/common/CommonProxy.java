@@ -1,9 +1,5 @@
 package github.kasuminova.novaeng.common;
 
-import appeng.api.AEApi;
-import baubles.api.BaublesApi;
-import com.circulation.random_complement.common.util.MEHandler;
-import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
@@ -14,10 +10,8 @@ import github.kasuminova.novaeng.common.container.ContainerEStorageController;
 import github.kasuminova.novaeng.common.container.ContainerGeocentricDrill;
 import github.kasuminova.novaeng.common.container.ContainerHyperNetTerminal;
 import github.kasuminova.novaeng.common.container.ContainerModularServerAssembler;
-import github.kasuminova.novaeng.common.container.ContainerNEWCraftConfirm;
 import github.kasuminova.novaeng.common.container.ContainerSingularityCore;
 import github.kasuminova.novaeng.common.enchantment.MagicBreaking;
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.handler.ECalculatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
 import github.kasuminova.novaeng.common.handler.EStorageEventHandler;
@@ -67,7 +61,6 @@ import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.common.trait.Register;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
-import github.kasuminova.novaeng.mixin.ae2.AccessorCellRegistry;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
@@ -92,7 +85,7 @@ public class CommonProxy implements IGuiHandler {
     }
 
     private static boolean hasDeniedAccess(final EFabricatorController controller, final EntityPlayer player) {
-        return controller != null && controller.getChannel() != null && ModIntegrationAE2.securityCheck(player, controller.getChannel().getProxy());
+        return controller != null && controller.getChannel() != null && !controller.getChannel().getMainNode().isActive();
     }
 
     public void setColor(final String ore, final int color) {
@@ -169,9 +162,6 @@ public class CommonProxy implements IGuiHandler {
                 RegistryMachineSpecial.registrySpecialMachine(SmallOreDrill.INSTANCE);
             }
         }
-        if (Mods.AE2.isPresent()) {
-            ((AccessorCellRegistry) AEApi.instance().registries().cell()).getHandlers().addFirst(EStorageCellHandler.INSTANCE);
-        }
         Register.INSTANCE.registerModifiers();
     }
 
@@ -219,13 +209,8 @@ public class CommonProxy implements IGuiHandler {
                 new ContainerGeocentricDrill((GeocentricDrillController) present, player);
             case ECALCULATOR_CONTROLLER -> {
                 final var controller = (ECalculatorController) present;
-                yield controller != null && controller.getChannel() != null && ModIntegrationAE2.securityCheck(player, controller.getChannel().getProxy())
+                yield controller != null && controller.getChannel() != null && !controller.getChannel().getMainNode().isActive()
                     ? null : new ContainerECalculatorController(controller, player);
-            }
-            case AUTO_CRAFTGUI -> {
-                final var stack = y == 1 ? BaublesApi.getBaublesHandler(player).getStackInSlot(x) : player.inventory.getStackInSlot(x);
-                final var terminal = MEHandler.getTerminalGuiObject(stack, player, x, y);
-                yield terminal == null ? null : new ContainerNEWCraftConfirm(player.inventory, terminal);
             }
             case MACHINE_ASSEMBLY_TOOL -> null;
         };
@@ -241,7 +226,7 @@ public class CommonProxy implements IGuiHandler {
         ESTORAGE_CONTROLLER(EStorageController.class), SINGULARITY_CORE(github.kasuminova.novaeng.common.tile.machine.SingularityCore.class),
         EFABRICATOR_CONTROLLER(EFabricatorController.class), EFABRICATOR_PATTERN_SEARCH(EFabricatorController.class),
         EFABRICATOR_PATTERN_BUS(EFabricatorPatternBus.class), GEOCENTRIC_DRILL_CONTROLLER(GeocentricDrillController.class),
-        ECALCULATOR_CONTROLLER(ECalculatorController.class), AUTO_CRAFTGUI(null), MACHINE_ASSEMBLY_TOOL(null);
+        ECALCULATOR_CONTROLLER(ECalculatorController.class), MACHINE_ASSEMBLY_TOOL(null);
         public static final GuiType[] VALUES = values();
         public final Class<? extends TileEntity> requiredTileEntity;
 

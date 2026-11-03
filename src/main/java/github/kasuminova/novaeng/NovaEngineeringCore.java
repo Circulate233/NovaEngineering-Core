@@ -32,7 +32,6 @@ import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
 import github.kasuminova.novaeng.common.performance.RecipeContextPool;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.common.util.NovaBiomeIdCache;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -178,7 +177,6 @@ public class NovaEngineeringCore {
         // that outlived its world's unload would keep that world - and every chunk and
         // entity in it - for the rest of the process. Nothing survives a server stop.
         HyperNetCaches.clear();
-        AutoCraftingQueue.clearAll();
         if (Mods.BM2.isPresent()) {
             MMAltar.clearCache();
         }

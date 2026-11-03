@@ -21,10 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PerformanceMixinRegistrationTest {
 
     private static final List<String> MIXINS = List.of(
-        "ae2.MixinBetterMeteoriteCompassMetadata",
-        "ae2.MixinCompassReaderRegions",
-        "ae2.MixinMeteorDataNameEncoder",
-        "ae2.MixinSpawnDataInput",
         "ar.MixinAtmosphereDimensionMap",
         "ar.MixinAtmosphereHandler",
         "ar.MixinAtmosphereTemperature",

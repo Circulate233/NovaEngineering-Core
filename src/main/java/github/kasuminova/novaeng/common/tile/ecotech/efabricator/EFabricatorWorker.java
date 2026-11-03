@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
-import appeng.api.config.Actionable;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.me.GridAccessException;
-import appeng.util.item.AEItemStack;
+import ae2.api.config.Actionable;
+import ae2.api.networking.IGrid;
+import ae2.api.networking.IGridNode;
+import ae2.api.networking.energy.IEnergyService;
+import ae2.api.stacks.AEItemKey;
+import ae2.api.stacks.KeyCounter;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.WorkerStatus;
 import github.kasuminova.novaeng.common.network.PktEFabricatorWorkerStatusUpdate;
@@ -92,13 +92,16 @@ public final class EFabricatorWorker extends EFabricatorPart {
         final int usage = controller.getOverclocked() && !controller.getActiveCooling()
             ? controller.getLevel().applyOverclockEnergyUsage(ENERGY_USAGE) : ENERGY_USAGE;
         double energy = this.energyCache;
-        IEnergyGrid grid = null;
+        IEnergyService grid = null;
         final var channel = controller.getChannel();
         if (channel != null) {
-            try {
-                grid = channel.getProxy().getGrid().getCache(IEnergyGrid.class);
-                energy += grid.getStoredPower();
-            } catch (final GridAccessException ignored) {
+            IGridNode node = channel.getMainNode().getNode();
+            if (node != null) {
+                IGrid igrid = node.grid();
+                if (igrid != null) {
+                    grid = igrid.getEnergyService();
+                    energy += grid.getStoredPower();
+                }
             }
         }
         int parallelism = (int) Math.min(Math.max(controller.getAvailableParallelism(), 1), energy / usage);
@@ -106,7 +109,7 @@ public final class EFabricatorWorker extends EFabricatorPart {
             parallelism = Math.min(parallelism, coolant / COOLANT_USAGE);
         }
         int completed = 0;
-        final IItemList<IAEItemStack> output = controller.getOutputBuffer();
+        final KeyCounter output = controller.getOutputBuffer();
         synchronized (output) {
             while (parallelism > completed && !this.queue.isEmpty()) {
                 final CraftWork work = this.queue.poll();
@@ -120,10 +123,16 @@ public final class EFabricatorWorker extends EFabricatorPart {
                 }
                 for (final ItemStack remaining : finished.remaining) {
                     if (!remaining.isEmpty()) {
-                        output.add(AEItemStack.fromItemStack(remaining));
+                        final var key = AEItemKey.of(remaining);
+                        if (key != null) {
+                            output.add(key, remaining.getCount());
+                        }
                     }
                 }
-                output.add(AEItemStack.fromItemStack(finished.output));
+                final var key = AEItemKey.of(finished.output);
+                if (key != null) {
+                    output.add(key, finished.output.getCount());
+                }
                 completed += finished.size;
             }
         }

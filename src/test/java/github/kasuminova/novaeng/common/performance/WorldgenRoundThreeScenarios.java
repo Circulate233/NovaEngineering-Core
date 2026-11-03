@@ -33,10 +33,6 @@ final class WorldgenRoundThreeScenarios {
     static List<Scenario> create() {
         try {
             final List<Scenario> cases = new ObjectArrayList<>();
-            cases.add(compass("compass_missing_one_target", -1, 1));
-            cases.add(compass("compass_missing_sixteen_targets", -1, 16));
-            cases.add(compass("compass_late_target", 8191, 1));
-            cases.add(compass("compass_first_target", 0, 1));
             for (final int size : new int[]{8, 24, 64}) {
                 cases.add(checked("vanilla_ore_geometry_" + size, vein(false, size), vein(true, size)));
             }
@@ -51,39 +47,6 @@ final class WorldgenRoundThreeScenarios {
         } catch (final Exception failure) {
             throw new IllegalStateException(failure);
         }
-    }
-
-    private static Scenario compass(final String name, final int match, final int targets) throws Exception {
-        return checked(name, compassWork(false, match, targets), compassWork(true, match, targets));
-    }
-
-    private static Workload compassWork(final boolean optimized, final int match, final int targetCount) throws Exception {
-        final MeteorCompassMetadataTest.Scan scan = MeteorCompassMetadataTest.scan(optimized, match, false);
-        final BlockStone stone = MeteorCompassMetadataTest.registered(WorldgenTestBlocks.stone(), new ResourceLocation("nova", "stone"));
-        final IBlockState[] states = scan.world().chunk.states;
-        Arrays.fill(states, stone.getDefaultState());
-        if (match >= 0) {
-            states[match] = scan.target().getDefaultState().withProperty(MeteorCompassMetadataTest.META, 3);
-        }
-        final List<ResourceLocation> names = new ObjectArrayList<>();
-        final List<Integer> metadata = new ObjectArrayList<>();
-        for (int i = 1; i < targetCount; i++) {
-            names.add(new ResourceLocation("nova", "absent_" + i));
-            metadata.add(3);
-        }
-        names.add(scan.target().getRegistryName());
-        metadata.add(3);
-        scan.targets(names, metadata);
-        final MethodHandle call = MethodHandles.lookup().unreflect(scan.method()).bindTo(scan.instance());
-        return () -> {
-            try {
-                final CallbackInfoReturnable<Future<?>> callback = new CallbackInfoReturnable<>("benchmark", true);
-                call.invokeExact((World) scan.world(), 0, 32, 0, (CallbackInfoReturnable) callback);
-                return scan.world().chunk.checksum + (scan.executor().last.found ? 1 : 0);
-            } catch (final Throwable failure) {
-                throw new IllegalStateException(failure);
-            }
-        };
     }
 
     private static Workload vein(final boolean optimized, final int size) throws Exception {
