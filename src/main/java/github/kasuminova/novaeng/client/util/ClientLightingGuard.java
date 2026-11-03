@@ -25,8 +25,13 @@ public final class ClientLightingGuard {
     }
 
     @Optional.Method(modid = "actinium")
+    public static boolean isIrisEnabled() {
+        return Iris.enabled;
+    }
+
+    @Optional.Method(modid = "actinium")
     public static boolean isIrisShadersEnabled() {
-        if (!Iris.enabled) {
+        if (!isIrisEnabled()) {
             return true;
         }
         if (!Iris.isInitialized()) {
@@ -37,7 +42,7 @@ public final class ClientLightingGuard {
     }
 
     public static boolean shouldProcessLighting(final World world) {
-        return !world.isRemote || Iris.enabled || !isActive();
+        return !world.isRemote || (MixinDecisions.actiniumLoaded && isIrisEnabled()) || !isActive();
     }
 
     public static boolean consumeRenderRefresh() {
