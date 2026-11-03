@@ -6,6 +6,9 @@ import net.minecraft.block.state.IBlockState;
  * Access to an exclusively owned section while it is being loaded, not a live-world compactor.
  */
 public interface SectionStorageAccess {
+    /** Discard cached IDs before the client replaces the contents of an existing palette. */
+    void nova$invalidatePaletteSetCache();
+
     void nova$initializeSection(int bits);
 
     int nova$sectionId(IBlockState state);

@@ -406,7 +406,7 @@ public final class MixinDecisions {
             case "minecraft.MixinMinecraftCtmPreload" -> ctmLoaded;
             case "ctm.MixinCtmLogicConnectionPosCache", "ctm.MixinDirConnectionPosCache" ->
                 NovaEngCoreConfig.CLIENT.optimizeChiselCtmConnectionOffsets;
-            case "reid.MixinSectionStorage", "reid.MixinReidSectionAccess",
+            case "reid.MixinSectionStorage", "reid.MixinSectionStorageClient", "reid.MixinReidSectionAccess",
                  "reid.MixinAnvilSectionCodec" -> NovaEngCoreConfig.SERVER.optimizeChunkPaletteGrowth;
             case "ar.MixinAtmosphereTemperature", "ar.MixinAtmosphereHandler", "ar.MixinAtmosphereTypes",
                  "ar.MixinAtmosphereTemps" -> NovaEngCoreConfig.SERVER.optimizeWorldgenAtmosphere;

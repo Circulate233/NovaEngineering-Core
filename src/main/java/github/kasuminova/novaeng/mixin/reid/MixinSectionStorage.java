@@ -6,7 +6,6 @@ import github.kasuminova.novaeng.common.performance.SectionStorageAccess;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.BitArray;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.BlockStateContainer;
@@ -51,19 +50,10 @@ public abstract class MixinSectionStorage implements SectionStorageAccess {
     @Unique
     private int nova$lastSetId;
 
-    @Redirect(
-        method = "read(Lnet/minecraft/network/PacketBuffer;)V",
-        at =
-        @At(
-            value = "INVOKE",
-            target =
-                "Lnet/minecraft/world/chunk/IBlockStatePalette;read(Lnet/minecraft/network/PacketBuffer;)V"),
-        require = 1)
-    private void nova$readPalette(
-        final IBlockStatePalette currentPalette, final PacketBuffer buffer) {
+    @Override
+    public void nova$invalidatePaletteSetCache() {
         this.nova$lastSetState = null;
         this.nova$lastSetPalette = null;
-        currentPalette.read(buffer);
     }
 
     /**

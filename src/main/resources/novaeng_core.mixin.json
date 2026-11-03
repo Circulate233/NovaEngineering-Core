@@ -1367,6 +1367,7 @@
     "zenutils.MixinLogOptionPosition"
   ],
   "client": [
+    "reid.MixinSectionStorageClient",
     "actinium.MixinActiniumWorldRendererLazyBatch",
     "actinium.MixinBuildContextMemory",
     "actinium.MixinBuildOutputBudgetRelease",
