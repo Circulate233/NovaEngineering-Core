@@ -12,7 +12,6 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.stream.Collectors;
 
 @ZenRegister
 @ZenClass("novaeng.StringUtils")
@@ -41,7 +40,9 @@ public class StringUtils {
             }
         }
 
-        return sorted.stream().map(e -> e.str).collect(Collectors.toCollection(ObjectArrayList::new));
+        final List<String> result = new ObjectArrayList<>(sorted.size());
+        for (final var element : sorted) result.add(element.str);
+        return result;
     }
 
     private static int getMatchRate(final char[] filterCharArr, final String targetCharArr) {

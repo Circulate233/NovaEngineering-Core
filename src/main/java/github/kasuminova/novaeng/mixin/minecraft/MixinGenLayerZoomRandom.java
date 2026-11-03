@@ -1,13 +1,14 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.GenLayerFuzzyZoom;
 import net.minecraft.world.gen.layer.GenLayerZoom;
 import net.minecraft.world.gen.layer.IntCache;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GenLayerZoom.class)
 public abstract class MixinGenLayerZoomRandom extends GenLayer {
@@ -16,13 +17,13 @@ public abstract class MixinGenLayerZoomRandom extends GenLayer {
         super(seed);
     }
 
-    @WrapMethod(method = "getInts(IIII)[I")
-    private int[] nova$fixedRandomChoices(final int areaX, final int areaY, final int width, final int height,
-                                          final Operation<int[]> original) {
+    @Inject(method = "getInts(IIII)[I", at = @At("HEAD"), cancellable = true, require = 1)
+    private void nova$fixedRandomChoices(final int areaX, final int areaY, final int width, final int height,
+                                         final CallbackInfoReturnable<int[]> cir) {
         final Class<?> type = this.getClass();
         final boolean fuzzy = type == GenLayerFuzzyZoom.class;
         if (!fuzzy && type != GenLayerZoom.class) {
-            return original.call(areaX, areaY, width, height);
+            return;
         }
         final int parentX = areaX >> 1;
         final int parentY = areaY >> 1;
@@ -56,7 +57,7 @@ public abstract class MixinGenLayerZoomRandom extends GenLayer {
         for (int y = 0; y < height; y++) {
             System.arraycopy(expanded, (y + (areaY & 1)) * expandedWidth + (areaX & 1), result, y * width, width);
         }
-        return result;
+        cir.setReturnValue(result);
     }
 
     @Unique

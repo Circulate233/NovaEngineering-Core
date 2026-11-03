@@ -101,8 +101,12 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     private static int getMaxDynamicPatternSize() {
         final var machines = new ObjectArrayList<>(MachineRegistry.getLoadedMachines());
         machines.addAll(NEWMachineAssemblyManager.getAllDynamicMachines());
-        return machines.parallelStream().mapToInt(machine -> machine.getDynamicPatterns().values().stream()
-                                                                    .mapToInt(DynamicPattern::getMaxSize).max().orElse(1)).max().orElse(1);
+        return machines.parallelStream().mapToInt(machine -> {
+            int maxSize = 1;
+            for (DynamicPattern pattern : machine.getDynamicPatterns().values())
+                maxSize = Math.max(maxSize, pattern.getMaxSize());
+            return maxSize;
+        }).max().orElse(1);
     }
 
     public BooleanConfigField getUsingAEConfig() {
@@ -197,7 +201,7 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         }
         final var ingredients = StructureIngredient.of(player.world, pos, array.copy());
         array = array.offset(pos);
-        if (array.getMin().getY() < 0 || array.getMax().getY() > 255) {
+        if (world.isOutsideBuildHeight(array.getMin()) || world.isOutsideBuildHeight(array.getMax())) {
             player.sendMessage(new TextComponentTranslation("message.assembly.tip.too_high",
                 "y = " + (array.getMin().getY() < 1 ? array.getMin().getY() : array.getMax().getY())));
             return EnumActionResult.FAIL;

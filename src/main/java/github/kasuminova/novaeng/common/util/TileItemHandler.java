@@ -5,6 +5,7 @@ import hellfirepvp.modularmachinery.common.tiles.base.TileEntitySynchronized;
 import hellfirepvp.modularmachinery.common.util.IItemHandlerImpl;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTPrimitive;
@@ -18,8 +19,8 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.IntConsumer;
-import java.util.stream.IntStream;
 
 public class TileItemHandler extends IItemHandlerImpl {
 
@@ -101,8 +102,23 @@ public class TileItemHandler extends IItemHandlerImpl {
         return this;
     }
 
-    public IntStream getAvailableSlotsStream() {
-        return this.availableSlots.stream();
+    public IntIterator availableSlotIterator() {
+        return new IntIterator() {
+            private int next = availableSlots.nextSetBit(0);
+
+            @Override
+            public boolean hasNext() {
+                return next >= 0;
+            }
+
+            @Override
+            public int nextInt() {
+                final int current = next;
+                if (current < 0) throw new NoSuchElementException();
+                next = availableSlots.nextSetBit(current + 1);
+                return current;
+            }
+        };
     }
 
     private void changed(final int slot) {

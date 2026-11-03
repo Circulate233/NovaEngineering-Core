@@ -66,23 +66,31 @@ public abstract class MixinVanillaBlockSpriteProxy {
     @Unique
     private static final ThreadLocal<ArrayList<BakedQuad>> nova$dedupeList = new ThreadLocal<>();
 
-    @Redirect(
-        method = "addSprites(Ljava/util/HashMap;Ljava/util/List;)Z",
-        at = @At(value = "NEW", target = "(I)Ljava/util/HashSet;"),
-        remap = false,
-        require = 1
-    )
-    private HashSet<BakedQuad> nova$reuseDedupeSet(final int requestedSize) {
-        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe) {
-            return new HashSet<>(requestedSize);
+    @Unique
+    private static IBlockState nova$extendState(final World world, final BlockPos pos, final IBlockState state) {
+        final IBlockState extended;
+        try {
+            extended = state.getBlock().getExtendedState(state, world, pos);
+        } catch (final Exception e) {
+            if (!nova$reportedExtensionFailure) {
+                nova$reportedExtensionFailure = true;
+                NovaEngineeringCore.log.warn("Failed to build the extended block state of "
+                    + state.getBlock().getRegistryName()
+                    + " while resolving JourneyMap's block sprites; those blocks keep the state they were given.", e);
+            }
+            return null;
         }
-        HashSet<BakedQuad> set = nova$dedupeSet.get();
-        if (set == null) {
-            set = new HashSet<>();
-            nova$dedupeSet.set(set);
+
+        if (extended == state || !(extended instanceof IExtendedBlockState ext)) {
+            return null;
         }
-        set.clear();
-        return set;
+        if (ext.getUnlistedProperties().containsKey(ModelErrorStateProperty.ERROR_STATE)) {
+            final ModelErrorStateProperty.ErrorState errorState = ext.getValue(ModelErrorStateProperty.ERROR_STATE);
+            if (errorState == null || errorState.hasErrored()) {
+                return null;
+            }
+        }
+        return extended;
     }
 
     @Redirect(
@@ -91,10 +99,10 @@ public abstract class MixinVanillaBlockSpriteProxy {
         remap = false,
         require = 1
     )
-    private ArrayList<BakedQuad> nova$reuseDedupeList(final Collection<?> source) {
+    private ArrayList<BakedQuad> nova$reuseDedupeList(final Collection<?> c) {
         if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe) {
-            final ArrayList<BakedQuad> fresh = new ArrayList<>(source.size());
-            for (final Object element : source) {
+            final ArrayList<BakedQuad> fresh = new ArrayList<>(c.size());
+            for (final Object element : c) {
                 fresh.add((BakedQuad) element);
             }
             return fresh;
@@ -105,7 +113,7 @@ public abstract class MixinVanillaBlockSpriteProxy {
             nova$dedupeList.set(list);
         }
         list.clear();
-        for (final Object element : source) {
+        for (final Object element : c) {
             list.add((BakedQuad) element);
         }
         return list;
@@ -164,31 +172,22 @@ public abstract class MixinVanillaBlockSpriteProxy {
         return extended;
     }
 
-    @Unique
-    private static IBlockState nova$extendState(final World world, final BlockPos pos, final IBlockState state) {
-        final IBlockState extended;
-        try {
-            extended = state.getBlock().getExtendedState(state, world, pos);
-        } catch (final Exception e) {
-            if (!nova$reportedExtensionFailure) {
-                nova$reportedExtensionFailure = true;
-                NovaEngineeringCore.log.warn("Failed to build the extended block state of "
-                        + state.getBlock().getRegistryName()
-                        + " while resolving JourneyMap's block sprites; those blocks keep the state they were given.", e);
-            }
-            return null;
+    @Redirect(
+        method = "addSprites(Ljava/util/HashMap;Ljava/util/List;)Z",
+        at = @At(value = "NEW", target = "(I)Ljava/util/HashSet;"),
+        remap = false,
+        require = 1
+    )
+    private HashSet<BakedQuad> nova$reuseDedupeSet(final int initialCapacity) {
+        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe) {
+            return new HashSet<>(initialCapacity);
         }
-
-        if (extended == state || !(extended instanceof IExtendedBlockState)) {
-            return null;
+        HashSet<BakedQuad> set = nova$dedupeSet.get();
+        if (set == null) {
+            set = new HashSet<>();
+            nova$dedupeSet.set(set);
         }
-        final IExtendedBlockState ext = (IExtendedBlockState) extended;
-        if (ext.getUnlistedProperties().containsKey(ModelErrorStateProperty.ERROR_STATE)) {
-            final ModelErrorStateProperty.ErrorState errorState = ext.getValue(ModelErrorStateProperty.ERROR_STATE);
-            if (errorState == null || errorState.hasErrored()) {
-                return null;
-            }
-        }
-        return extended;
+        set.clear();
+        return set;
     }
 }

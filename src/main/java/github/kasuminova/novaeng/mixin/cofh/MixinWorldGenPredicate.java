@@ -6,16 +6,31 @@ import com.llamalad7.mixinextras.sugar.Local;
 import github.kasuminova.novaeng.common.performance.WeightedBlockPredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.pattern.BlockMatcher;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(value = WorldGen.class, remap = false)
+@Mixin(value = WorldGen.class, remap = false, priority = 100)
 public abstract class MixinWorldGenPredicate {
 
-    @Redirect(method = "canGenerateInBlock(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;[Lcofh/cofhworld/util/random/WeightedBlock;)Z", at = @At(value = "INVOKE",
-        target = "Lnet/minecraft/block/state/pattern/BlockMatcher;forBlock(Lnet/minecraft/block/Block;)Lnet/minecraft/block/state/pattern/BlockMatcher;", remap = true), require = 1)
-    private static BlockMatcher nova$replacementPredicate(final Block blockType, @Local(name = "genBlock") final WeightedBlock material) {
+    @Unique
+    private static final ThreadLocal<BlockPos.MutableBlockPos> NOVA_COFHWORLD_POSITION =
+        ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
+
+    @Redirect(method = "canGenerateInBlock(Lnet/minecraft/world/World;III[Lcofh/cofhworld/util/random/WeightedBlock;)Z",
+        at = @At(value = "NEW", target = "net/minecraft/util/math/BlockPos"), require = 1)
+    private static BlockPos nova$reusePosition(final int x, final int y, final int z) {
+        return NOVA_COFHWORLD_POSITION.get().setPos(x, y, z);
+    }
+
+    @Redirect(method = "canGenerateInBlock(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;[Lcofh/cofhworld/util/random/WeightedBlock;)Z",
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/block/state/pattern/BlockMatcher;forBlock(Lnet/minecraft/block/Block;)Lnet/minecraft/block/state/pattern/BlockMatcher;",
+            remap = true), require = 1)
+    private static BlockMatcher nova$replacementPredicate(final Block blockType,
+                                                          @Local(name = "genBlock") final WeightedBlock material) {
         return ((WeightedBlockPredicate) (Object) material).nova$replacementPredicate();
     }
 }

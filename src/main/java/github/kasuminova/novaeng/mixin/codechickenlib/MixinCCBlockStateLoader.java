@@ -31,12 +31,13 @@ public abstract class MixinCCBlockStateLoader {
             return;
         }
 
-        final ResourceLocation probe = new ResourceLocation(
-                location.getNamespace(), "cc_blockstates/" + location.getPath() + ".json");
-        if (probe.toString().endsWith("_factories.json")) {
+        final String path = location.getPath();
+        if (path.endsWith("_factories")) {
             return;
         }
 
+        final ResourceLocation probe = new ResourceLocation(
+            location.getNamespace(), "cc_blockstates/" + path + ".json");
         final Boolean known = ClasspathAssetIndex.tryContains(probe);
         if (known != null) {
             cir.setReturnValue(known);

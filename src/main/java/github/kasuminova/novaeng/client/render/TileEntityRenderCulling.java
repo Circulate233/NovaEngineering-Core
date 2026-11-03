@@ -16,6 +16,7 @@ import net.minecraft.world.World;
  * Uses the caller's camera only during world entity rendering, including nested portal renders.
  */
 public final class TileEntityRenderCulling {
+    private static final int MAX_CACHED_DEPTH = 8;
     private static final ThreadLocal<PassStack> PASSES = ThreadLocal.withInitial(PassStack::new);
 
     private TileEntityRenderCulling() {
@@ -41,12 +42,25 @@ public final class TileEntityRenderCulling {
     public static void end() {
         final PassStack stack = PASSES.get();
         final Pass pass = stack.passes.get(--stack.depth);
-        pass.camera = null;
-        pass.world = null;
-        pass.approvedTile = null;
-        pass.preparedRendererTile = null;
-        pass.preparedRenderer = null;
-        pass.approvalDepth = 0;
+        pass.clear();
+        if (stack.depth == 0 && stack.passes.size() > MAX_CACHED_DEPTH) {
+            stack.passes.size(MAX_CACHED_DEPTH);
+            stack.passes.trim(MAX_CACHED_DEPTH);
+        }
+    }
+
+    /**
+     * Called on the client thread, including when the last render ended exceptionally.
+     */
+    public static void clearWorld(final World world) {
+        final PassStack stack = PASSES.get();
+        if (stack.depth == 0) {
+            PASSES.remove();
+            return;
+        }
+        for (final Pass pass : stack.passes) {
+            if (pass.world == world) pass.clear();
+        }
     }
 
     public static boolean shouldSkip(final TileEntity tile) {
@@ -102,12 +116,13 @@ public final class TileEntityRenderCulling {
     }
 
     public static void restoreApproval(final Approval previous) {
-        if (previous != null) {
+        if (previous != null && previous.pass != null) {
             final Pass pass = previous.pass;
             pass.approvedTile = previous.approvedTile;
             pass.preparedRendererTile = previous.preparedRendererTile;
             pass.preparedRenderer = previous.preparedRenderer;
             pass.approvalDepth--;
+            previous.clear();
         }
     }
 
@@ -158,6 +173,20 @@ public final class TileEntityRenderCulling {
         private double x;
         private double y;
         private double z;
+
+        private void clear() {
+            camera = null;
+            world = null;
+            approvedTile = null;
+            preparedRendererTile = null;
+            preparedRenderer = null;
+            for (int index = 0; index < approvalDepth; index++) approvals.get(index).clear();
+            approvalDepth = 0;
+            if (approvals.size() > MAX_CACHED_DEPTH) {
+                approvals.size(MAX_CACHED_DEPTH);
+                approvals.trim(MAX_CACHED_DEPTH);
+            }
+        }
     }
 
     public static final class Approval {
@@ -165,5 +194,12 @@ public final class TileEntityRenderCulling {
         private TileEntity approvedTile;
         private TileEntity preparedRendererTile;
         private TileEntitySpecialRenderer<TileEntity> preparedRenderer;
+
+        private void clear() {
+            pass = null;
+            approvedTile = null;
+            preparedRendererTile = null;
+            preparedRenderer = null;
+        }
     }
 }

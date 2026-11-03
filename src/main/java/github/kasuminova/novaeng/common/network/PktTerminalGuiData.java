@@ -11,6 +11,7 @@ import github.kasuminova.novaeng.common.tile.TileHyperNetTerminal;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminalGuiData, IMessage> {
@@ -119,18 +119,16 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
             return;
         }
 
-        Collection<Database> databases = center.getNode(Database.class).stream()
-                                               .filter(Database::isWorking)
-                                               .toList();
+        Collection<Database> databases = new ObjectArrayList<>();
+        for (Database database : center.getNode(Database.class))
+            if (database.isWorking()) databases.add(database);
 
-        Set<ResearchCognitionData> researchCognition = databases.stream()
-                                                                .flatMap(database -> database.getStoredResearchCognition().stream())
-                                                                .collect(Collectors.toSet());
+        Set<ResearchCognitionData> researchCognition = new ObjectOpenHashSet<>();
+        for (Database database : databases) researchCognition.addAll(database.getStoredResearchCognition());
 
         NBTTagList unlocked = new NBTTagList();
-        researchCognition.stream()
-                         .map(data -> new NBTTagString(data.getResearchName()))
-                         .forEach(unlocked::appendTag);
+        for (ResearchCognitionData data : researchCognition)
+            unlocked.appendTag(new NBTTagString(data.getResearchName()));
         tag.setTag("unlockedData", unlocked);
 
         NBTTagList databasesTag = new NBTTagList();
@@ -160,7 +158,7 @@ public class PktTerminalGuiData implements IMessage, IMessageHandler<PktTerminal
         Collection<ResearchStation> researchStations = center.getNode(ResearchStation.class);
         if (!researchStations.isEmpty()) {
             // 一个网络最多只能有一个研究站。
-            ResearchStation station = researchStations.stream().findFirst().get();
+            ResearchStation station = researchStations.iterator().next();
             ResearchStationType type = station.getType();
             tag.setString("researchStationType", type.getTypeName());
         }

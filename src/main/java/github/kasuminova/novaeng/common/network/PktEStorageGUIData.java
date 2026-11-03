@@ -20,8 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorageGUIData, IMessage> {
 
@@ -33,11 +31,12 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
 
     public PktEStorageGUIData(final EStorageController controller) {
         List<EStorageCellDrive> drives = controller.getCellDrives();
-        drives.stream()
-              .filter(drive -> drive.getDriveInv().getStackInSlot(0).getItem() instanceof EStorageCell cell && drive.isCellSupported(cell.getLevel()))
-              .map(EStorageCellData::from)
-              .filter(Objects::nonNull)
-              .forEach(dataList::add);
+        for (EStorageCellDrive drive : drives) {
+            if (!(drive.getDriveInv().getStackInSlot(0).getItem() instanceof EStorageCell cell)
+                || !drive.isCellSupported(cell.getLevel())) continue;
+            EStorageCellData data = EStorageCellData.from(drive);
+            if (data != null) dataList.add(data);
+        }
         energyData = new EStorageEnergyData(controller.getEnergyStored(), controller.getMaxEnergyStore(), controller.getEnergyConsumePerTick());
     }
 
@@ -49,19 +48,14 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
         if (!(cur instanceof GuiEStorageController)) {
             return;
         }
-        List<EStorageCellData> sorted = dataList.stream()
-                                                .sorted((o1, o2) -> {
-                                                    int byteResult = Long.compare(o2.usedBytes(), o1.usedBytes());
-                                                    if (byteResult != 0) {
-                                                        return byteResult;
-                                                    }
-                                                    int typeResult = Integer.compare(o2.usedTypes(), o1.usedTypes());
-                                                    if (typeResult != 0) {
-                                                        return typeResult;
-                                                    }
-                                                    return Integer.compare(o2.level().ordinal(), o1.level().ordinal());
-                                                })
-                                                .collect(Collectors.toList());
+        List<EStorageCellData> sorted = new ArrayList<>(dataList);
+        sorted.sort((o1, o2) -> {
+            int byteResult = Long.compare(o2.usedBytes(), o1.usedBytes());
+            if (byteResult != 0) return byteResult;
+            int typeResult = Integer.compare(o2.usedTypes(), o1.usedTypes());
+            if (typeResult != 0) return typeResult;
+            return Integer.compare(o2.level().ordinal(), o1.level().ordinal());
+        });
 
         Minecraft.getMinecraft().addScheduledTask(() -> {
             GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;

@@ -1,11 +1,12 @@
 package github.kasuminova.novaeng.mixin.botania_r;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,8 +16,7 @@ import vazkii.botania.api.subtile.SubTileGenerating;
 import vazkii.botania.common.block.subtile.generating.SubTileMunchdew;
 import vazkii.botania.common.core.handler.ConfigHandler;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Mixin(value = SubTileMunchdew.class, remap = false)
 public class MixinSubTileMunchdew extends SubTileGenerating {
@@ -38,30 +38,38 @@ public class MixinSubTileMunchdew extends SubTileGenerating {
             } else {
                 int manaPerLeaf = 160;
                 if (this.getMaxMana() - this.mana >= manaPerLeaf && this.ticksExisted % 2 == 0) {
-                    List<BlockPos> coords = new ObjectArrayList<>();
-                    BlockPos pos = this.supertile.getPos();
+                    final LongArrayList coords = new LongArrayList();
+                    final World world = this.supertile.getWorld();
+                    final BlockPos pos = this.supertile.getPos();
+                    final BlockPos.MutableBlockPos neighbor = new BlockPos.MutableBlockPos();
 
-                    for (BlockPos pos_ : BlockPos.getAllInBox(pos.add(-8, 0, -8), pos.add(8, 16, 8))) {
-                        if (this.supertile.getWorld().getBlockState(pos_).getMaterial() == Material.LEAVES) {
+                    for (BlockPos.MutableBlockPos cursor : BlockPos.getAllInBoxMutable(
+                        pos.getX() - 8, pos.getY(), pos.getZ() - 8,
+                        pos.getX() + 8, pos.getY() + 16, pos.getZ() + 8)) {
+                        if (world.getBlockState(cursor).getMaterial() == Material.LEAVES) {
+                            final int x = cursor.getX();
+                            final int y = cursor.getY();
+                            final int z = cursor.getZ();
                             boolean exposed = false;
 
                             for (EnumFacing dir : EnumFacing.VALUES) {
-                                IBlockState offState = this.supertile.getWorld().getBlockState(pos_.offset(dir));
-                                if (offState.getBlock().isAir(offState, this.supertile.getWorld(), pos_.offset(dir))) {
+                                neighbor.setPos(x, y, z).move(dir);
+                                IBlockState offState = world.getBlockState(neighbor);
+                                if (offState.getBlock().isAir(offState, world, neighbor)) {
                                     exposed = true;
                                     break;
                                 }
                             }
 
                             if (exposed) {
-                                coords.add(pos_);
+                                coords.add(cursor.toLong());
                             }
                         }
                     }
 
                     if (!coords.isEmpty()) {
-                        Collections.shuffle(coords);
-                        BlockPos breakCoords = coords.getFirst();
+                        final BlockPos breakCoords = BlockPos.fromLong(
+                            coords.getLong(ThreadLocalRandom.current().nextInt(coords.size())));
                         IBlockState state = this.supertile.getWorld().getBlockState(breakCoords);
                         this.supertile.getWorld().setBlockToAir(breakCoords);
                         this.ticksWithoutEating = 0;

@@ -2,6 +2,10 @@ package github.kasuminova.novaeng.common.performance;
 
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.server.management.PlayerChunkMapEntry;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.border.WorldBorder;
 
 import java.util.Random;
 
@@ -25,14 +29,24 @@ public final class SpawnChunkCandidates {
         }
     }
 
-    public void addPlayer(final int centerX, final int centerZ, final ChunkFilter filter) {
+    public void addPlayer(final int centerX, final int centerZ, final WorldBorder border,
+                          final PlayerChunkMap chunkMap, final boolean defaultBorder) {
+        this.addPlayer(centerX, centerZ, border, chunkMap, defaultBorder, null);
+    }
+
+    void addPlayer(final int centerX, final int centerZ, final ChunkFilter filter) {
+        this.addPlayer(centerX, centerZ, null, null, false, filter);
+    }
+
+    private void addPlayer(final int centerX, final int centerZ, final WorldBorder border,
+                           final PlayerChunkMap chunkMap, final boolean defaultBorder, final ChunkFilter filter) {
         if (this.positions.isEmpty()) {
             this.capChunkCount += 289;
             for (int dx = -7; dx <= 7; dx++) {
                 for (int dz = -7; dz <= 7; dz++) {
                     final int x = centerX + dx;
                     final int z = centerZ + dz;
-                    if (filter.test(x, z)) {
+                    if (this.isEligible(x, z, border, chunkMap, defaultBorder, filter)) {
                         final long key = (x & 0xFFFFFFFFL) | ((long) z << 32);
                         this.positions.add(key);
                         if (this.indexed) {
@@ -59,7 +73,8 @@ public final class SpawnChunkCandidates {
 
                 // Vanilla only deduplicates eligible chunks, not the outer ring or rejected chunks.
                 this.capChunkCount++;
-                if (dx != -8 && dx != 8 && dz != -8 && dz != 8 && filter.test(x, z)) {
+                if (dx != -8 && dx != 8 && dz != -8 && dz != 8
+                    && this.isEligible(x, z, border, chunkMap, defaultBorder, filter)) {
                     this.eligible.add(key);
                     this.positions.add(key);
                 }
@@ -78,6 +93,28 @@ public final class SpawnChunkCandidates {
             this.eligible.add(keys[i]);
         }
         this.indexed = true;
+    }
+
+    private boolean isEligible(final int x, final int z, final WorldBorder border,
+                               final PlayerChunkMap chunkMap, final boolean defaultBorder, final ChunkFilter filter) {
+        if (filter != null) {
+            return filter.test(x, z);
+        }
+        if (defaultBorder) {
+            if (!((x << 4) + 15 > border.minX() && (x << 4) < border.maxX()
+                && (z << 4) + 15 > border.minZ() && (z << 4) < border.maxZ())) {
+                return false;
+            }
+        } else if (!border.contains(new ChunkPos(x, z))) {
+            return false;
+        }
+        final PlayerChunkMapEntry entry = chunkMap.getEntry(x, z);
+        return entry != null && entry.isSentToPlayers();
+    }
+
+    @FunctionalInterface
+    interface ChunkFilter {
+        boolean test(int x, int z);
     }
 
     public int capChunkCount() {
@@ -101,10 +138,5 @@ public final class SpawnChunkCandidates {
             keys[other] = key;
         }
         return keys;
-    }
-
-    @FunctionalInterface
-    public interface ChunkFilter {
-        boolean test(int x, int z);
     }
 }

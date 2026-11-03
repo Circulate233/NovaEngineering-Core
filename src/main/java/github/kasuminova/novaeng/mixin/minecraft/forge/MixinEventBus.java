@@ -27,6 +27,13 @@ import java.lang.reflect.Method;
 public class MixinEventBus {
 
     @Redirect(method = "register(Ljava/lang/Object;)V", at = @At(value = "INVOKE",
+        target = "Ljava/lang/Class;getMethods()[Ljava/lang/reflect/Method;",
+        remap = false), remap = false, require = 1)
+    private Method[] nova$publicMethodsFromCache(final Class<?> owner) {
+        return DeclaredMethodTable.publicMethods(owner);
+    }
+
+    @Redirect(method = "register(Ljava/lang/Object;)V", at = @At(value = "INVOKE",
         target = "Ljava/lang/Class;getDeclaredMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;",
         remap = false), remap = false, require = 1)
     private Method nova$probeFromCache(final Class<?> owner,

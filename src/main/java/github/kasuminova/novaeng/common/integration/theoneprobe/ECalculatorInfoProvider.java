@@ -1,10 +1,9 @@
 package github.kasuminova.novaeng.common.integration.theoneprobe;
 
+import ae2.api.networking.crafting.CraftingJobStatus;
 import ae2.api.stacks.AEItemKey;
 import ae2.api.stacks.GenericStack;
-import ae2.api.networking.crafting.CraftingJobStatus;
 import ae2.me.cluster.implementations.CraftingCPUCluster;
-import github.kasuminova.mmce.common.util.TimeRecorder;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.ecalculator.ECPUCluster;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorController;
@@ -142,9 +141,14 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
                                                                         .width(150)
                          );
 
-        final int totalWorking = controller.getThreadCores().stream().mapToInt(core -> core.getCpus().size()).sum();
-        final int maxThreads = controller.getThreadCores().stream().mapToInt(ECalculatorThreadCore::getMaxThreads).sum();
-        final int maxHyperThreads = controller.getThreadCores().stream().mapToInt(ECalculatorThreadCore::getMaxHyperThreads).sum();
+        int totalWorking = 0;
+        int maxThreads = 0;
+        int maxHyperThreads = 0;
+        for (ECalculatorThreadCore core : controller.getThreadCores()) {
+            totalWorking += core.getCpus().size();
+            maxThreads += core.getMaxThreads();
+            maxHyperThreads += core.getMaxHyperThreads();
+        }
         percent = (float) totalWorking / (maxThreads + maxHyperThreads);
         color = ColorUtils.getGradientColor(new Color[]{
             LOW_COLOR, LOW_COLOR, LOW_COLOR, MID_COLOR, MID_COLOR, FULL_COLOR, FULL_COLOR
@@ -170,22 +174,18 @@ public class ECalculatorInfoProvider implements IProbeInfoProvider {
         leftInfo.text("{*top.ecalculator.controller.parallelism*}");
         rightInfo.text(TextFormatting.DARK_PURPLE + NovaEngUtils.formatDecimal(parallelism));
 
-        final int totalParallelismPerSecond = controller.getThreadCores().stream()
-                                                        .flatMap(core -> core.getCpus().stream())
-                                                        .map(ECPUCluster::from)
-                                                        .map(ECPUCluster::novaeng_ec$getParallelismRecorder)
-                                                        .mapToInt(TimeRecorder::usedTimeAvg)
-                                                        .sum();
+        int totalParallelismPerSecond = 0;
+        int totalCPUUsagePerSecond = 0;
+        for (ECalculatorThreadCore core : controller.getThreadCores()) {
+            for (var cpu : core.getCpus()) {
+                final ECPUCluster ecpu = ECPUCluster.from(cpu);
+                totalParallelismPerSecond += ecpu.novaeng_ec$getParallelismRecorder().usedTimeAvg();
+                totalCPUUsagePerSecond += ecpu.novaeng_ec$getTimeRecorder().usedTimeAvg();
+            }
+        }
 
         leftInfo.text("{*top.ecalculator.controller.avg_parallelism*}");
         rightInfo.text(TextFormatting.DARK_PURPLE + NovaEngUtils.formatDecimal(totalParallelismPerSecond) + "/t");
-
-        final int totalCPUUsagePerSecond = controller.getThreadCores().stream()
-                                                     .flatMap(core -> core.getCpus().stream())
-                                                     .map(ECPUCluster::from)
-                                                     .map(ECPUCluster::novaeng_ec$getTimeRecorder)
-                                                     .mapToInt(TimeRecorder::usedTimeAvg)
-                                                     .sum();
 
         TextFormatting cpuUsageColor;
         if (totalCPUUsagePerSecond < GLOBAL_CPU_USAGE_GREEN_THRESHOLD) {

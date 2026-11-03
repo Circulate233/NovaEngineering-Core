@@ -10,21 +10,17 @@ import org.spongepowered.asm.mixin.Unique;
 import techguns.api.guns.GunManager;
 import techguns.client.render.ItemRenderHack;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 @Mixin(value = ItemRenderHack.class, remap = false)
 public class MixinItemRenderHack {
 
     @Unique
-    private static final Set<ItemCameraTransforms.TransformType> novaEngineering_Core$set = new HashSet<>(
-        Arrays.asList(
-            ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
-            ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
-            ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
-            ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
-        )
+    private static final Set<ItemCameraTransforms.TransformType> novaEngineering_Core$set = Set.of(
+        ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
+        ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
+        ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
+        ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
     );
 
     /**

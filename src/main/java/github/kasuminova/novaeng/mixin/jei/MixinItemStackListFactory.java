@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.mixin.jei;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.client.util.JeiItemListCollector;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import mezz.jei.plugins.vanilla.ingredients.item.ItemStackListFactory;
 import mezz.jei.startup.StackHelper;
 import mezz.jei.util.ErrorUtil;
@@ -18,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,19 +28,19 @@ public abstract class MixinItemStackListFactory {
 
     @Shadow
     private void addItemStack(final StackHelper stackHelper, final ItemStack stack,
-                              final List<ItemStack> itemStacks, final Set<String> seen) {
+                              final List<ItemStack> itemList, final Set<String> itemNameSet) {
         throw new AssertionError();
     }
 
     @Shadow
     private void addBlockAndSubBlocks(final StackHelper stackHelper, final Block block,
-                                      final List<ItemStack> itemStacks, final Set<String> seen) {
+                                      final List<ItemStack> itemList, final Set<String> itemNameSet) {
         throw new AssertionError();
     }
 
     @Shadow
     private void addItemAndSubItems(final StackHelper stackHelper, final Item item,
-                                    final List<ItemStack> itemStacks, final Set<String> seen) {
+                                    final List<ItemStack> itemList, final Set<String> itemNameSet) {
         throw new AssertionError();
     }
 
@@ -58,8 +58,8 @@ public abstract class MixinItemStackListFactory {
             return;
         }
 
-        final List<ItemStack> itemStacks = new ArrayList<>();
-        final Set<String> seen = new HashSet<>();
+        final List<ItemStack> itemStacks = new ObjectArrayList<>();
+        final Set<String> seen = new ObjectOpenHashSet<>();
 
         final List<CreativeTabs> tabs = JeiItemListCollector.displayedTabs(CreativeTabs.CREATIVE_TAB_ARRAY);
         final List<NonNullList<ItemStack>> tabItems = JeiItemListCollector.collect(tabs);

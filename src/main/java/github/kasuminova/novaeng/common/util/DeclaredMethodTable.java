@@ -1,13 +1,10 @@
 package github.kasuminova.novaeng.common.util;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Comparator;
 
 /**
  * Answers declared-method lookups from a per-class table instead of the throwing reflective call.
@@ -16,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * and caught {@code NoSuchMethodException}, i.e. a filled-in stack trace. A table built with
  * {@link Class#getDeclaredMethods()} answers the same question, is cached by the JVM, and never throws.</p>
  *
- * <p>The answers are equivalent to the reflective ones: a class cannot declare two methods with the same name and
- * descriptor, and the only exception the callers handle is {@code NoSuchMethodException} — exactly the "no such
- * method" answer returned here. Reading the table also resolves every declared method's parameter types, which is
+ * <p>Covariant bridge methods can share a name and parameter list; lookup selects the most specific return type,
+ * as {@link Class#getDeclaredMethod(String, Class[])} does. The only exception callers handle is
+ * {@code NoSuchMethodException}, represented by a null result. Reading the table also resolves parameter types, which is
  * the class loading the caller's own probe for a non-existent method relied on.</p>
  *
  * <p>Keyed by class and read from whatever thread is registering: registration is a public API, so this stays a
@@ -26,7 +23,28 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class DeclaredMethodTable {
 
-    private static final Map<Class<?>, Map<String, Candidate[]>> TABLES = new ConcurrentHashMap<>();
+    private static final Comparator<Method> BY_NAME = Comparator.comparing(Method::getName);
+
+    private static final ClassValue<Table> TABLES = new ClassValue<>() {
+        @Override
+        protected Table computeValue(final @NonNull Class<?> type) {
+            final Method[] methods = type.getDeclaredMethods();
+            // Stable sorting preserves the VM's tie order for covariant bridge methods.
+            Arrays.sort(methods, BY_NAME);
+            final Class<?>[][] parameterTypes = new Class<?>[methods.length][];
+            for (int index = 0; index < methods.length; index++) {
+                parameterTypes[index] = methods[index].getParameterTypes();
+            }
+            return new Table(methods, parameterTypes);
+        }
+    };
+
+    private static final ClassValue<Method[]> PUBLIC_TABLES = new ClassValue<>() {
+        @Override
+        protected Method[] computeValue(final @NonNull Class<?> type) {
+            return type.getMethods();
+        }
+    };
 
     private DeclaredMethodTable() {
     }
@@ -40,39 +58,41 @@ public final class DeclaredMethodTable {
      * @return the matching declared method, or {@code null} when the class does not declare one
      */
     public static Method lookup(final Class<?> owner, final String name, final Class<?>[] parameterTypes) {
-        final Candidate[] candidates = TABLES.computeIfAbsent(owner, DeclaredMethodTable::build).get(name);
-        if (candidates == null) {
-            return null;
-        }
-        for (final Candidate candidate : candidates) {
-            if (Arrays.equals(candidate.parameterTypes(), parameterTypes)) {
-                return candidate.method();
+        final Table table = TABLES.get(owner);
+        final Method[] methods = table.methods;
+        int low = 0;
+        int high = methods.length;
+        while (low < high) {
+            final int middle = (low + high) >>> 1;
+            if (methods[middle].getName().compareTo(name) < 0) {
+                low = middle + 1;
+            } else {
+                high = middle;
             }
         }
-        return null;
+        Method selected = null;
+        for (int index = low; index < methods.length; index++) {
+            final Method method = methods[index];
+            if (!method.getName().equals(name)) {
+                break;
+            }
+            if (table.parameterTypes[index].length == parameterTypes.length
+                && Arrays.equals(table.parameterTypes[index], parameterTypes)
+                && (selected == null || selected.getReturnType().isAssignableFrom(method.getReturnType()))) {
+                selected = method;
+            }
+        }
+        return selected;
     }
 
     /**
-     * Groups one class's declared methods by name, resolving their parameter types on the way.
-     *
-     * @param owner class to read
-     * @return name to candidates table, not modified afterwards
+     * Returns the immutable-for-registration public method array for one class.
      */
-    private static Map<String, Candidate[]> build(final Class<?> owner) {
-        final Map<String, List<Candidate>> grouped = new Object2ObjectOpenHashMap<>();
-        for (final Method method : owner.getDeclaredMethods()) {
-            grouped.computeIfAbsent(method.getName(), ignored -> new ArrayList<>(1))
-                .add(new Candidate(method, method.getParameterTypes()));
-        }
-        final Map<String, Candidate[]> table = new Object2ObjectOpenHashMap<>(grouped.size() * 2);
-        for (final Map.Entry<String, List<Candidate>> entry : grouped.entrySet()) {
-            table.put(entry.getKey(), entry.getValue().toArray(new Candidate[0]));
-        }
-        return table;
+    public static Method[] publicMethods(final Class<?> owner) {
+        return PUBLIC_TABLES.get(owner);
     }
 
-    /** One declared method with the parameter types the table was built from. */
-    public record Candidate(Method method, Class<?>[] parameterTypes) {
+    private record Table(Method[] methods, Class<?>[][] parameterTypes) {
     }
 
 }

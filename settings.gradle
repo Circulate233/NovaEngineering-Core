@@ -1,4 +1,6 @@
 pluginManagement {
+    includeBuild('gradle/accesstransformers-gradle')
+
     repositories {
         gradlePluginPortal() {
             content {

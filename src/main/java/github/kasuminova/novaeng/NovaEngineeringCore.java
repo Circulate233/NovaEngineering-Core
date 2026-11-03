@@ -30,6 +30,7 @@ import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReply;
 import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerRequest;
+import github.kasuminova.novaeng.common.performance.MeteorWriteBatch;
 import github.kasuminova.novaeng.common.performance.RecipeContextPool;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
@@ -164,6 +165,7 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStopping(FMLServerStoppingEvent event) {
+        MeteorWriteBatch.flushAll();
         BandwidthStats.logSummary("server stopping");
         log.info("{}服务器正在关闭，正在生成网络包报告。", TextFormatting.BLUE);
         for (final String message : SPacketProfiler.getProfilerMessages()) {

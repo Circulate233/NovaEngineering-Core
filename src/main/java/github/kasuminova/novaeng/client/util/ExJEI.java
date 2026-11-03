@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.client.util;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.common.util.Functions;
+import github.kasuminova.novaeng.common.util.UuGraphIterator;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.ItemName;
@@ -53,7 +54,9 @@ public class ExJEI {
         Set<ItemStack> uniqueKeys = new ObjectOpenCustomHashSet<>(new Hash.Strategy<>() {
             @Override
             public int hashCode(ItemStack o) {
-                return Objects.hash(o.getItem(), o.getMetadata(), o.getTagCompound());
+                int hash = 31 + Objects.hashCode(o.getItem());
+                hash = 31 * hash + o.getMetadata();
+                return 31 * hash + Objects.hashCode(o.getTagCompound());
             }
 
             @Override
@@ -68,12 +71,10 @@ public class ExJEI {
             }
         });
 
-        UuGraph.iterator().forEachRemaining(item -> {
-            ItemStack stack = item.getKey();
-
+        ((UuGraphIterator) new UuGraph()).n$forEach((stack, v) -> {
             if (stack != null && uniqueKeys.add(stack)) {
-                if (item.getValue() != Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
-                    double bValue = item.getValue() / 100000;
+                if (v != Double.POSITIVE_INFINITY && !isBlock(stack.getItem().getRegistryName().getNamespace())) {
+                    double bValue = v / 100000;
                     new MCJeiRecipe("replicator_jei")
                         .addInput(CraftTweakerMC.getIItemStack(stack))
                         .addOutput(CraftTweakerMC.getIItemStack(stack))
@@ -95,7 +96,6 @@ public class ExJEI {
             }
         });
 
-        uniqueKeys.clear();
     }
 
     private static boolean isBlock(String s) {

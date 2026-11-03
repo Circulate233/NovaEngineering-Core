@@ -22,6 +22,7 @@ import github.kasuminova.novaeng.common.handler.HyperNetMachineEventHandler;
 import github.kasuminova.novaeng.common.handler.IEHandler;
 import github.kasuminova.novaeng.common.handler.MachineAssemblyHandler;
 import github.kasuminova.novaeng.common.handler.OreHandler;
+import github.kasuminova.novaeng.common.handler.PrimerOreEvents;
 import github.kasuminova.novaeng.common.handler.RegistryRemapHandler;
 import github.kasuminova.novaeng.common.handler.WorldCacheCleanupHandler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
@@ -46,6 +47,7 @@ import github.kasuminova.novaeng.common.machine.drills.MineralExtractor;
 import github.kasuminova.novaeng.common.machine.drills.OrichalcosDrill;
 import github.kasuminova.novaeng.common.machine.drills.SmallOreDrill;
 import github.kasuminova.novaeng.common.machine.drills.VoidMiner;
+import github.kasuminova.novaeng.common.performance.ClassResourceCacheCompactor;
 import github.kasuminova.novaeng.common.registry.RegistryAssembly;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -112,6 +114,7 @@ public class CommonProxy implements IGuiHandler {
         MinecraftForge.EVENT_BUS.register(WorldCacheCleanupHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(EnchantmentHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(OreHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(PrimerOreEvents.INSTANCE);
         MinecraftForge.EVENT_BUS.register(MachineAssemblyHandler.INSTANCE);
         if (Loader.isModLoaded("ftbquests")) {
             MinecraftForge.EVENT_BUS.register(FTBHandler.INSTANCE);
@@ -173,6 +176,7 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void loadComplete() {
+        ClassResourceCacheCompactor.compactIfGrown();
     }
 
     @Override

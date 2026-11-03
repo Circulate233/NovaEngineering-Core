@@ -26,15 +26,20 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         final List<ECalculatorThreadCore> threadCores = controller.getThreadCores();
         final List<ThreadCoreData> dataList = new ArrayList<>();
         for (final ECalculatorThreadCore threadCore : threadCores) {
-            final int hyperThreads = (int) threadCore.getCpus().stream()
-                                                     .map(ECPUCluster::from)
-                                                     .filter(ecpuCluster -> ecpuCluster.novaeng_ec$getUsedExtraStorage() > 0)
-                                                     .count();
+            int hyperThreads = 0;
+            for (final var cpu : threadCore.getCpus()) {
+                if (ECPUCluster.from(cpu).novaeng_ec$getUsedExtraStorage() > 0) hyperThreads++;
+            }
             dataList.add(new ThreadCoreData(threadCore.getControllerLevel(), threadCore.getCpus().size() - hyperThreads, hyperThreads, threadCore.getMaxThreads(), threadCore.getMaxHyperThreads()));
         }
         final List<ECPUData> ecpuData = getEcpuData(controller);
-        final int cpuUsagePerSecond = ecpuData.stream().mapToInt(ECPUData::cpuUsagePerSecond).sum();
-        return new ECalculatorData(totalStorage, ecpuData.stream().mapToLong(ECPUData::usedExtraMemory).sum(), accelerators, dataList, ecpuData, cpuUsagePerSecond);
+        int cpuUsagePerSecond = 0;
+        long usedExtraStorage = 0;
+        for (ECPUData data : ecpuData) {
+            cpuUsagePerSecond += data.cpuUsagePerSecond();
+            usedExtraStorage += data.usedExtraMemory();
+        }
+        return new ECalculatorData(totalStorage, usedExtraStorage, accelerators, dataList, ecpuData, cpuUsagePerSecond);
     }
 
     @Nonnull

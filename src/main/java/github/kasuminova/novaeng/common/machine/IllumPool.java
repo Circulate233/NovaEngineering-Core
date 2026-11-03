@@ -46,9 +46,9 @@ import vazkii.botania.common.Botania;
 import vazkii.botania.common.block.ModBlocks;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class IllumPool implements MachineSpecial {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModularMachinery.MODID, "illum_pool");
@@ -293,8 +293,10 @@ public class IllumPool implements MachineSpecial {
         Block blockDimensionCatalyst = com.meteor.extrabotany.common.block.ModBlocks.dimensioncatalyst;
 
         // 普通模式
+        final List<BlockPos> shiftedCatalystPositions = new ArrayList<>(CATALYST_POS_PRESET.size());
+        for (BlockPos pos : CATALYST_POS_PRESET) shiftedCatalystPositions.add(pos.add(0, 1, 0));
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(NORMAL_CATALYST,
-            buildModifierReplacementBlockArray(blockBifrostPerm, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
+            buildModifierReplacementBlockArray(blockBifrostPerm, shiftedCatalystPositions),
             ObjectLists.emptyList(),
             StringUtils.getText("novaeng.illum_pool.illum_pool.mode.e"),
             StackUtils.getStackFromBlockState(blockBifrostPerm.getDefaultState())));
@@ -318,7 +320,7 @@ public class IllumPool implements MachineSpecial {
             StackUtils.getStackFromBlockState(blockDimensionCatalyst.getDefaultState())));
         // 星光模式
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(STARLIGHT_CATALYST,
-            buildModifierReplacementBlockArray(blockLiquidStarLight, CATALYST_POS_PRESET.stream().map(pos -> pos.add(0, 1, 0)).collect(Collectors.toList())),
+            buildModifierReplacementBlockArray(blockLiquidStarLight, shiftedCatalystPositions),
             ObjectLists.emptyList(),
             StringUtils.getText("novaeng.illum_pool.illum_pool.mode.d"),
             StackUtils.getStackFromBlockState(blockLiquidStarLight.getDefaultState())));

@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.handler;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.client.memory.ClientMemoryCleanup;
 import github.kasuminova.novaeng.client.util.ClientLightingGuard;
 import github.kasuminova.novaeng.client.util.ClientWorldMemos;
 import github.kasuminova.novaeng.client.util.TitleUtils;
@@ -9,6 +10,7 @@ import github.kasuminova.novaeng.common.network.bandwidth.BandwidthDictionary;
 import github.kasuminova.novaeng.common.network.bandwidth.BandwidthStats;
 import github.kasuminova.novaeng.common.profiler.CPacketProfiler;
 import github.kasuminova.novaeng.common.profiler.TEUpdatePacketProfiler;
+import github.kasuminova.novaeng.mixin.minecraft.AccessorEntityRenderer;
 import github.kasuminova.novaeng.mixin.minecraft.AccessorParticleManager;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -25,7 +27,6 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("MethodMayBeStatic")
 public class ClientEventHandler {
     public static final ClientEventHandler INSTANCE = new ClientEventHandler();
 
@@ -69,9 +70,13 @@ public class ClientEventHandler {
             return;
         }
         this.clientTick++;
+        ClientMemoryCleanup.tick();
 
         if (ClientLightingGuard.consumeRenderRefresh()) {
             final Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.entityRenderer != null) {
+                ((AccessorEntityRenderer) minecraft.entityRenderer).nova$setLightmapUpdateNeeded(true);
+            }
             if (minecraft.world != null && minecraft.renderGlobal != null) {
                 minecraft.renderGlobal.loadRenderers();
             }
@@ -146,6 +151,12 @@ public class ClientEventHandler {
     public void onWorldUnloaded(final WorldEvent.Unload event) {
         if (event.getWorld().isRemote) {
             ClientWorldMemos.clearWorld(event.getWorld());
+            final Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.isCallingFromMinecraftThread()) {
+                ClientMemoryCleanup.clearWorld(event.getWorld());
+            } else {
+                minecraft.addScheduledTask(() -> ClientMemoryCleanup.clearWorld(event.getWorld()));
+            }
         }
     }
 }

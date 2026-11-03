@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
-import com.google.common.collect.Sets;
 import github.kasuminova.mmce.common.concurrent.TaskExecutor;
 import github.kasuminova.mmce.common.util.concurrent.ActionExecutor;
 import github.kasuminova.mmce.common.util.concurrent.ExecuteGroup;
@@ -10,6 +9,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -111,7 +111,7 @@ public abstract class MixinTaskExecutor implements ITaskExecutor {
             synchronized (this) {
                 queue = novaeng$requireMarkDirtyTEQueue;
                 if (queue == null) {
-                    queue = Sets.newIdentityHashSet();
+                    queue = new ReferenceOpenHashSet<>();
                     novaeng$requireMarkDirtyTEQueue = queue;
                 }
             }

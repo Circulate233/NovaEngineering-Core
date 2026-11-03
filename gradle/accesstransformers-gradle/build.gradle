@@ -1,0 +1,30 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+group = 'github.kasuminova.novaeng'
+version = '5.0.3'
+
+repositories {
+    maven {
+        url = 'https://maven.minecraftforge.net/'
+    }
+}
+
+dependencies {
+    implementation 'net.minecraftforge:accesstransformers-gradle:5.0.3'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+gradlePlugin {
+    plugins {
+        localAccessTransformers {
+            id = 'net.minecraftforge.accesstransformers'
+            implementationClass = 'github.kasuminova.novaeng.gradle.LocalAccessTransformersPlugin'
+        }
+    }
+}

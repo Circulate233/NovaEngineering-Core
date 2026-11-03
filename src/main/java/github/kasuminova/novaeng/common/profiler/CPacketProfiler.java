@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 public class CPacketProfiler {
     public static final ConcurrentHashMap<Class<?>, Tuple<Long, Long>> PACKET_TOTAL_SIZE = new ConcurrentHashMap<>();
@@ -52,16 +51,13 @@ public class CPacketProfiler {
         long profileTimeExisted = enabled ? System.currentTimeMillis() - profilerStartTime : profilerStopTime - profilerStartTime;
         double networkBandwidthPerSec = profileTimeExisted <= 0 ? 0 : (totalPacketSize / ((double) profileTimeExisted / 1000D));
 
-        @SuppressWarnings("SimplifyStreamApiCallChains")
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = CPacketProfiler.PACKET_TOTAL_SIZE.entrySet().stream()
-                                                                                               .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                                                                                               .limit(limit)
-                                                                                               .collect(Collectors.toList());
-        @SuppressWarnings("SimplifyStreamApiCallChains")
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted = TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet().stream()
-                                                                                                                  .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                                                                                                                  .limit(limit)
-                                                                                                                  .collect(Collectors.toList());
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new LinkedList<>(PACKET_TOTAL_SIZE.entrySet());
+        sorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
+        if (sorted.size() > limit) sorted.subList(limit, sorted.size()).clear();
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted =
+            new LinkedList<>(TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
+        teSorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
+        if (teSorted.size() > limit) teSorted.subList(limit, teSorted.size()).clear();
 
         CPacketProfilerData data = new CPacketProfilerData((float) networkBandwidthPerSec);
         sorted.forEach((entry) -> {
@@ -94,11 +90,9 @@ public class CPacketProfiler {
             return messages;
         }
 
-        @SuppressWarnings("SimplifyStreamApiCallChains")
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = CPacketProfiler.PACKET_TOTAL_SIZE.entrySet().stream()
-                                                                                               .sorted((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()))
-                                                                                               .limit(limit)
-                                                                                               .collect(Collectors.toList());
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new LinkedList<>(PACKET_TOTAL_SIZE.entrySet());
+        sorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
+        if (sorted.size() > limit) sorted.subList(limit, sorted.size()).clear();
 
         for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : sorted) {
             Class<?> pClass = entry.getKey();

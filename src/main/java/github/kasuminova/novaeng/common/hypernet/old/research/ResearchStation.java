@@ -29,7 +29,6 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * TODO: 硬编码喵
@@ -82,7 +81,14 @@ public class ResearchStation extends NetNode {
             return;
         }
 
-        if (nodes.stream().noneMatch(database -> database.hasDatabaseSpace(currentResearching))) {
+        boolean hasSpace = false;
+        for (Database database : nodes) {
+            if (database.hasDatabaseSpace(currentResearching)) {
+                hasSpace = true;
+                break;
+            }
+        }
+        if (!hasSpace) {
             event.setFailed("网络中所有的数据库存储已满！");
         }
     }
@@ -176,9 +182,9 @@ public class ResearchStation extends NetNode {
         ActiveMachineRecipe recipe = thread.getActiveRecipe();
         recipe.setTick(recipe.getTotalTick() + 1);
 
-        Collection<Database> databases = center.getNode(Database.class).stream()
-                                               .filter(Database::isWorking)
-                                               .collect(Collectors.toCollection(ObjectArrayList::new));
+        Collection<Database> databases = new ObjectArrayList<>();
+        for (Database database : center.getNode(Database.class))
+            if (database.isWorking()) databases.add(database);
         if (databases.isEmpty()) {
             return;
         }
@@ -258,12 +264,14 @@ public class ResearchStation extends NetNode {
 
         this.taskProvider = taskProvider.getUniqueID();
         this.consumption = 0D;
-        double progress = center.getNode(Database.class)
-                                .stream()
-                                .map(database -> database.getResearchingData(data))
-                                .filter(d -> d != -1D)
-                                .findFirst()
-                                .orElse(-1D);
+        double progress = -1D;
+        for (Database database : center.getNode(Database.class)) {
+            final double candidate = database.getResearchingData(data);
+            if (candidate != -1D) {
+                progress = candidate;
+                break;
+            }
+        }
 
         if (progress == -1) {
             for (final Database database : center.getNode(Database.class)) {

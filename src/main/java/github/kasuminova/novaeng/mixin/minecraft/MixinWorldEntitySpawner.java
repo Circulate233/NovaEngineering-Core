@@ -1,18 +1,16 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import github.kasuminova.novaeng.common.performance.SpawnChunkCandidates;
-import github.kasuminova.novaeng.common.performance.SpawnCountLimiter;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.management.PlayerChunkMap;
-import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
@@ -44,7 +42,17 @@ public abstract class MixinWorldEntitySpawner {
 
     @Unique
     private static boolean nova$isWithinSpawnLimit(final WorldServer world, final EnumCreatureType type, final int limit) {
-        return SpawnCountLimiter.isWithinLimit(world.loadedEntityList, entity -> entity.isCreatureType(type, true), limit);
+        if (limit < 0) {
+            return false;
+        }
+        final List<Entity> entities = world.loadedEntityList;
+        int count = 0;
+        for (int i = 0, size = entities.size(); i < size; i++) {
+            if (entities.get(i).isCreatureType(type, true) && ++count > limit) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Unique
@@ -81,21 +89,10 @@ public abstract class MixinWorldEntitySpawner {
         final WorldBorder border = world.getWorldBorder();
         final PlayerChunkMap chunkMap = world.getPlayerChunkMap();
         final boolean defaultBorder = border.getClass() == WorldBorder.class;
-        final SpawnChunkCandidates.ChunkFilter filter = (x, z) -> {
-            if (defaultBorder) {
-                if (!((x << 4) + 15 > border.minX() && (x << 4) < border.maxX()
-                    && (z << 4) + 15 > border.minZ() && (z << 4) < border.maxZ())) {
-                    return false;
-                }
-            } else if (!border.contains(new ChunkPos(x, z))) {
-                return false;
-            }
-            final PlayerChunkMapEntry entry = chunkMap.getEntry(x, z);
-            return entry != null && entry.isSentToPlayers();
-        };
         for (final EntityPlayer player : world.playerEntities) {
             if (!player.isSpectator()) {
-                candidates.addPlayer(MathHelper.floor(player.posX / 16.0), MathHelper.floor(player.posZ / 16.0), filter);
+                candidates.addPlayer(MathHelper.floor(player.posX / 16.0), MathHelper.floor(player.posZ / 16.0),
+                    border, chunkMap, defaultBorder);
             }
         }
 
@@ -180,7 +177,9 @@ public abstract class MixinWorldEntitySpawner {
                         if (result == Event.Result.ALLOW || (result == Event.Result.DEFAULT
                             && entity.getCanSpawnHere() && entity.isNotColliding())) {
                             if (!ForgeEventFactory.doSpecialSpawn(entity, world, entityX, y, entityZ, null)) {
-                                groupData = entity.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(entity)), groupData);
+                                pos.setPos(MathHelper.floor(entity.posX), MathHelper.floor(entity.posY),
+                                    MathHelper.floor(entity.posZ));
+                                groupData = entity.onInitialSpawn(world.getDifficultyForLocation(pos), groupData);
                             }
                             if (entity.isNotColliding()) {
                                 packSpawned++;

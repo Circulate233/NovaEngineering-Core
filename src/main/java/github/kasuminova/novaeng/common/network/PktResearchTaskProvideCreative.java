@@ -19,7 +19,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public class PktResearchTaskProvideCreative implements IMessage, IMessageHandler<PktResearchTaskProvideCreative, IMessage> {
 
@@ -85,13 +84,11 @@ public class PktResearchTaskProvideCreative implements IMessage, IMessageHandler
         }
 
         Collection<ResearchStation> stations = center.getNode(ResearchStation.class);
-        Optional<ResearchStation> first = stations.stream().findFirst();
-        //noinspection SimplifyOptionalCallChains
-        if (!first.isPresent()) {
+        if (stations.isEmpty()) {
             return null;
         }
 
-        ResearchStation researchStation = first.get();
+        ResearchStation researchStation = stations.iterator().next();
 
         ModularMachinery.EXECUTE_MANAGER.addSyncTask(() -> {
             researchStation.provideTask(researchTask, ctx.getServerHandler().player);

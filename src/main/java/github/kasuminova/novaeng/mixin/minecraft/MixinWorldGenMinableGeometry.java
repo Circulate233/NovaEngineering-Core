@@ -1,7 +1,10 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import com.google.common.base.Predicate;
+import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.performance.VanillaOreGeometryScratch;
+import github.kasuminova.novaeng.common.performance.WorldOreGeneration;
+import github.kasuminova.novaeng.common.performance.WorldgenOrePlacement;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -10,11 +13,16 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Random;
 
 @Mixin(WorldGenMinable.class)
 public abstract class MixinWorldGenMinableGeometry {
+
+    @Unique
+    private static final ThreadLocal<BlockPos.MutableBlockPos> NOVA_BLOCK_POSITION =
+        ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
 
     @Shadow
     public IBlockState oreBlock;
@@ -31,6 +39,11 @@ public abstract class MixinWorldGenMinableGeometry {
      */
     @Overwrite
     public boolean generate(final World world, final Random random, final BlockPos position) {
+        if (NovaEngCoreConfig.SERVER.unifiedOreGeneration
+            && this.numberOfBlocks >= 1 && this.numberOfBlocks <= 64) {
+            return WorldOreGeneration.vanilla(world, random, position, this.numberOfBlocks,
+                this.oreBlock, this.predicate);
+        }
         final float angle = random.nextFloat() * (float) Math.PI;
         final double xStart = position.getX() + 8 + MathHelper.sin(angle) * this.numberOfBlocks / 8.0F;
         final double xEnd = position.getX() + 8 - MathHelper.sin(angle) * this.numberOfBlocks / 8.0F;
@@ -41,6 +54,7 @@ public abstract class MixinWorldGenMinableGeometry {
         if (this.numberOfBlocks <= 0) {
             return true;
         }
+        final BlockPos.MutableBlockPos blockPosition = NOVA_BLOCK_POSITION.get();
         final double[] zDistances = VanillaOreGeometryScratch.borrow();
         try {
             for (int i = 0; i < this.numberOfBlocks; i++) {
@@ -94,10 +108,10 @@ public abstract class MixinWorldGenMinableGeometry {
                                 distanceZ *= distanceZ;
                             }
                             if (distanceXY + distanceZ < 1.0D) {
-                                final BlockPos blockPosition = new BlockPos(x, y, z);
+                                blockPosition.setPos(x, y, z);
                                 final IBlockState state = world.getBlockState(blockPosition);
                                 if (state.getBlock().isReplaceableOreGen(state, world, blockPosition, this.predicate)) {
-                                    world.setBlockState(blockPosition, this.oreBlock, 2);
+                                    WorldgenOrePlacement.set(world, blockPosition, this.oreBlock, 2);
                                 }
                             }
                         }

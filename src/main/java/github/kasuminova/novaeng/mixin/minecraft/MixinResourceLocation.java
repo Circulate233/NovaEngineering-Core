@@ -5,6 +5,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Locale;
 
 @Mixin(ResourceLocation.class)
 public abstract class MixinResourceLocation {
@@ -20,6 +24,16 @@ public abstract class MixinResourceLocation {
 
     @Unique
     private volatile int nova$stableHash;
+
+    @Redirect(method = "<init>(I[Ljava/lang/String;)V", at = @At(value = "INVOKE",
+        target = "Ljava/lang/String;toLowerCase(Ljava/util/Locale;)Ljava/lang/String;", ordinal = 0), require = 1)
+    @SuppressWarnings("StringEquality")
+    private String nova$defaultNamespace(final String namespace, final Locale locale) {
+        // splitObjectName supplies this exact literal for names without a namespace.
+        // Preserve both content and reference identity, and leave all other folding
+        // (including Unicode and non-root locales) to the original implementation.
+        return namespace == "minecraft" && locale == Locale.ROOT ? namespace : namespace.toLowerCase(locale);
+    }
 
     /**
      * @author circulation

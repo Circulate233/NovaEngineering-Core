@@ -1,62 +1,34 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ClassInheritanceMultiMap;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Iterator;
 
 @Mixin(Chunk.class)
 public abstract class MixinChunkEntityQuery {
 
-    @Shadow
-    @Final
-    private ClassInheritanceMultiMap<Entity>[] entityLists;
+    @Redirect(
+        method = "getEntitiesWithinAABBForEntity(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Ljava/util/List;Lcom/google/common/base/Predicate;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ClassInheritanceMultiMap;isEmpty()Z", remap = false),
+        require = 1
+    )
+    private boolean nova$emptyWhenSectionMissing(final ClassInheritanceMultiMap<Entity> entities) {
+        return entities == null || entities.isEmpty();
+    }
 
-    /**
-     * @author circulation
-     * @reason Walk entity lists by index to avoid per-section iterator allocations during bounds queries.
-     */
-    @Overwrite
-    public void getEntitiesWithinAABBForEntity(final Entity excluded,
-                                               final AxisAlignedBB bounds,
-                                               final List<Entity> result,
-                                               final Predicate<? super Entity> predicate) {
-        int minSection = MathHelper.floor((bounds.minY - World.MAX_ENTITY_RADIUS) / 16.0D);
-        int maxSection = MathHelper.floor((bounds.maxY + World.MAX_ENTITY_RADIUS) / 16.0D);
-        minSection = MathHelper.clamp(minSection, 0, this.entityLists.length - 1);
-        maxSection = MathHelper.clamp(maxSection, 0, this.entityLists.length - 1);
-        for (int section = minSection; section <= maxSection; section++) {
-            final ClassInheritanceMultiMap<Entity> entities = this.entityLists[section];
-            if (entities.isEmpty()) {
-                continue;
-            }
-            final List<Entity> values = ((AccessorClassInheritanceMultiMap<Entity>) entities).nova$getValues();
-            for (int index = 0, size = values.size(); index < size; index++) {
-                final Entity entity = values.get(index);
-                if (entity.getEntityBoundingBox().intersects(bounds) && entity != excluded
-                    && (predicate == null || predicate.apply(entity))) {
-                    result.add(entity);
-                }
-                final Entity[] parts = entity.getParts();
-                if (parts == null) {
-                    continue;
-                }
-                for (final Entity part : parts) {
-                    if (part != excluded && part.getEntityBoundingBox().intersects(bounds)
-                        && (predicate == null || predicate.apply(part))) {
-                        result.add(part);
-                    }
-                }
-            }
-        }
+    @Redirect(
+        method = "getEntitiesWithinAABBForEntity(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Ljava/util/List;Lcom/google/common/base/Predicate;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ClassInheritanceMultiMap;iterator()Ljava/util/Iterator;"),
+        require = 1
+    )
+    private Iterator<Entity> nova$iterateValues(final ClassInheritanceMultiMap<Entity> entities) {
+        return entities == null ? Collections.emptyIterator()
+            : ((AccessorClassInheritanceMultiMap<Entity>) entities).nova$getValues().iterator();
     }
 }

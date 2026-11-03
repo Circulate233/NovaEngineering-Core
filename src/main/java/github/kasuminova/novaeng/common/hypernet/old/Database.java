@@ -11,6 +11,7 @@ import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.tiles.TileFactoryController;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -21,7 +22,6 @@ import stanhebben.zenscript.annotations.ZenMethod;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
 @ZenRegister
 @ZenClass("novaeng.hypernet.Database")
 public class Database extends NetNode {
-    private final Set<ResearchCognitionData> storedResearchCognition = new HashSet<>();
+    private final Set<ResearchCognitionData> storedResearchCognition = new ObjectOpenHashSet<>();
     private final Object2DoubleOpenHashMap<ResearchCognitionData> researchingCognition = new Object2DoubleOpenHashMap<>();
     private final DatabaseType type;
 

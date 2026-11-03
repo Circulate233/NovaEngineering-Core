@@ -1,18 +1,17 @@
 package github.kasuminova.novaeng.mixin.botania;
 
-import java.awt.Color;
-import java.util.List;
 import github.kasuminova.novaeng.common.entity.EntityManaPoolOutputItem;
+import ink.ikx.rt.impl.mods.botania.event.PoolTradeEvent;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import ink.ikx.rt.impl.mods.botania.event.PoolTradeEvent;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import vazkii.botania.api.internal.VanillaPacketDispatcher;
@@ -33,6 +32,9 @@ import vazkii.botania.common.core.handler.ConfigHandler;
 import vazkii.botania.common.core.handler.ManaNetworkHandler;
 import vazkii.botania.common.core.handler.ModSounds;
 
+import java.awt.Color;
+import java.util.List;
+
 /**
  * Runs pool item handling as a single server-side batch every 20 ticks.
  *
@@ -40,7 +42,7 @@ import vazkii.botania.common.core.handler.ModSounds;
  * is allowed to perform an immediate infusion batch so newly dropped inputs
  * do not wait for the next scheduled batch.</p>
  */
-@Mixin(value = TilePool.class, remap = false, priority = 1100)
+@Mixin(value = TilePool.class, remap = false, priority = 100)
 public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPool, IKeyLocked, ISparkAttachable, IThrottledPacket, ITickable {
 
     @Unique
@@ -64,6 +66,17 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
     private boolean sendPacket;
     @Shadow
     public int manaCap;
+
+    @Unique
+    private final BlockPos.MutableBlockPos nova$recipeBelow = new BlockPos.MutableBlockPos();
+    @Unique
+    private AxisAlignedBB nova$batchBounds;
+    @Unique
+    private int nova$batchBoundsX = Integer.MIN_VALUE;
+    @Unique
+    private int nova$batchBoundsY = Integer.MIN_VALUE;
+    @Unique
+    private int nova$batchBoundsZ = Integer.MIN_VALUE;
 
     @Shadow
     public abstract int getCurrentMana();
@@ -122,10 +135,17 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
         }
 
         if (this.ticks % BATCH_INTERVAL == 0) {
-            List<EntityItem> items = this.world.getEntitiesWithinAABB(
-                EntityItem.class,
-                new AxisAlignedBB(this.getPos(), this.getPos().add(1, 1, 1))
-            );
+            final int x = this.pos.getX();
+            final int y = this.pos.getY();
+            final int z = this.pos.getZ();
+            if (this.nova$batchBounds == null || this.nova$batchBoundsX != x
+                || this.nova$batchBoundsY != y || this.nova$batchBoundsZ != z) {
+                this.nova$batchBoundsX = x;
+                this.nova$batchBoundsY = y;
+                this.nova$batchBoundsZ = z;
+                this.nova$batchBounds = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+            }
+            List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, this.nova$batchBounds);
 
             novaeng$processingBatch = true;
             try {
@@ -216,7 +236,9 @@ public abstract class MixinTilePoolManaBatch extends TileMod implements IManaPoo
             if (stack.isEmpty()) {
                 break;
             }
-            RecipeManaInfusion recipe = TilePool.getMatchingRecipe(stack, this.world.getBlockState(this.pos.down()));
+            this.nova$recipeBelow.setPos(this.pos.getX(), this.pos.getY() - 1, this.pos.getZ());
+            RecipeManaInfusion recipe = TilePool.getMatchingRecipe(
+                stack, this.world.getBlockState(this.nova$recipeBelow));
             if (recipe == null) {
                 break;
             }
