@@ -16,7 +16,7 @@ public abstract class MixinGLStateManagerUploadBinding {
     @Redirect(method = "getBoundTextureForServerState()I",
         at = @At(value = "INVOKE",
             target = "Lcom/gtnewhorizons/angelica/glsm/backend/RenderBackend;getInteger(I)I"),
-        require = 1)
+        remap = false, require = 0)
     private static int nova$reuseUploadBinding(final RenderBackend backend, final int parameter) {
         final int texture = TextureUploadBindingScope.current();
         return texture >= 0 && parameter == 32873 ? texture : backend.getInteger(parameter);
