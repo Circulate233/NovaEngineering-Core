@@ -1377,6 +1377,8 @@
     "actinium.MixinEntityGatherer",
     "actinium.MixinGLStateManagerGenericAttributes",
     "actinium.MixinGLStateManagerUploadBinding",
+    "actinium.MixinGLSMVertexInputVertexArray",
+    "actinium.MixinGLSMCurrentAttribsGenericAttributes",
     "actinium.MixinGLStateManagerVertexArray",
     "actinium.MixinImmediateCommandListVertexArray",
     "actinium.MixinPassThroughGLStateManagerVertexArray",
