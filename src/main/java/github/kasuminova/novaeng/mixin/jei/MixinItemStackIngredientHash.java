@@ -1,32 +1,28 @@
 package github.kasuminova.novaeng.mixin.jei;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import github.kasuminova.novaeng.common.util.collection.WeakObject2IntCache;
 import mezz.jei.plugins.vanilla.ingredients.item.ItemStackHelper;
 import mezz.jei.util.Log;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(value = ItemStackHelper.class, remap = false)
 public abstract class MixinItemStackIngredientHash {
 
-    @Shadow
-    @Final
-    private Object2IntMap<ItemStack> hashCache;
+    @Unique
+    private final WeakObject2IntCache<ItemStack> nova$hashes = new WeakObject2IntCache<>();
 
     /**
      * @author circulation
-     * @reason Read cached primitive hashes without boxing them as Integer on every ingredient visit.
+     * @reason Cache primitive hashes without boxing values or retaining temporary ingredient stacks.
      */
     @Overwrite
     public int getHash(final ItemStack ingredient) {
-        final int cached = this.hashCache.getInt(ingredient);
-        if (cached != this.hashCache.defaultReturnValue() || this.hashCache.containsKey(ingredient)) {
-            return cached;
-        }
+        final long cached = this.nova$hashes.getCached(ingredient);
+        if (cached != WeakObject2IntCache.ABSENT) return (int) cached;
         int hash = ingredient.getCount() * 31 + ingredient.getItemDamage();
         hash = hash * 31 + ingredient.getItem().getRegistryName().hashCode();
         final NBTTagCompound tag = ingredient.getTagCompound();
@@ -37,7 +33,7 @@ public abstract class MixinItemStackIngredientHash {
                 Log.get().error("Stack overflow while hashing ItemStack ingredient: {}", ingredient.getItem().getRegistryName(), e);
             }
         }
-        this.hashCache.put(ingredient, hash);
+        this.nova$hashes.put(ingredient, hash);
         return hash;
     }
 }

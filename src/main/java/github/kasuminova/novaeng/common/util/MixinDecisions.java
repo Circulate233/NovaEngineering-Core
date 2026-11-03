@@ -23,6 +23,8 @@ public final class MixinDecisions {
     public static final boolean ic2Loaded = isPresent("ic2");
     public static final boolean immersiveEngineeringLoaded = isPresent("immersiveengineering");
     public static final boolean neoFontRenderUiLoaded = isPresent("neofontrender_ui_enhancements");
+    public static final boolean neoFontRenderLoaded = isPresent("neofontrender");
+    public static final boolean rpsIdeasLoaded = isPresent("rpsideas");
     public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean mmceLoaded = isPresent("modularmachinery");
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
@@ -47,8 +49,50 @@ public final class MixinDecisions {
     }
 
     public static boolean shouldApply(final String mixinName) {
-        if (mixinName.equals("ae2.MixinMeteorWriteBatch"))
-            return ae2Loaded && NovaEngCoreConfig.SERVER.optimizeMeteorSpawnDataIo && NovaEngCoreConfig.SERVER.batchMeteorSpawnWrites;
+        switch (mixinName) {
+            case "minecraft.forge.MixinOreRecipeRevision" -> {
+                return true;
+            }
+            case "mmce.MixinOredictCache", "mmce.MixinCraftingCheckResultAllocation" -> {
+                return mmceLoaded;
+            }
+            case "ae2.AccessorItemVariantRecords", "ae2.MixinItemListBulkIteration",
+                 "ae2.MixinItemListIgnoreCraftingCopies", "ae2.MixinMECraftingInventoryIteration" -> {
+                return ae2Loaded;
+            }
+            case "neofontrender.AccessorSignOcclusionCuller" -> {
+                return neoFontRenderLoaded;
+            }
+            case "neofontrender.MixinCosmicCacheLifecycle" -> {
+                return neoFontRenderLoaded;
+            }
+            case "geckolib3.MixinAnimationControllerQueues", "geckolib3.MixinAnimationProcessorTrackers",
+                 "geckolib3.MixinAnimationTrackerScope", "geckolib3.MixinAnimationFactoryIds" -> {
+                return isPresent("geckolib3");
+            }
+            case "rpsideas.AccessorItemBioticSensor" -> {
+                return rpsIdeasLoaded;
+            }
+            case "konkrete.MixinStringUtils" -> {
+                return isPresent("konkrete");
+            }
+            case "neofontrender.MixinVanillaGuiTreeSession" -> {
+                return neoFontRenderUiLoaded;
+            }
+            case "minecraft.MixinRegionRenderCacheBuilderCapacity" -> {
+                return actiniumLoaded;
+            }
+            case "lumenized.MixinBloomRenderLayerCapacity" -> {
+                return actiniumLoaded && isPresent("lumenized");
+            }
+            case "mmce.MixinBufferBuilderPoolMemory", "mmce.MixinReusableVBOUploaderGrowth",
+                 "mmce.MixinControllerModelTaskRetirement" -> {
+                return mmceLoaded && isPresent("geckolib3");
+            }
+            case "ae2.MixinMeteorWriteBatch" -> {
+                return ae2Loaded && NovaEngCoreConfig.SERVER.optimizeMeteorSpawnDataIo && NovaEngCoreConfig.SERVER.batchMeteorSpawnWrites;
+            }
+        }
         final Boolean worldgenAuxiliary = switch (mixinName) {
             case "artemislib.MixinAttachAttributes" -> isPresent("artemislib");
             case "astralsorcery.MixinAttributeOwner" -> astralSorceryLoaded;
@@ -64,21 +108,28 @@ public final class MixinDecisions {
             case "tconstruct.MixinIslandList", "tconstruct.MixinIslandQueries" -> isPresent("tconstruct");
             case "minecraft.MixinLeafBlockKind", "minecraft.MixinPathStateMemo",
                  "minecraft.MixinPathNodeClassification", "minecraft.MixinWorldCollisionReads",
-                 "minecraft.MixinWorldEmptyLightListener", "minecraft.MixinLazyAttributeOperations" -> true;
-            case "minecraft.MixinBiomeCacheLastEntry", "minecraft.MixinLowerStringMapNames" -> true;
+                 "minecraft.MixinWorldEmptyLightListener", "minecraft.MixinLazyAttributeOperations",
+                 "minecraft.MixinBiomeCacheLastEntry", "minecraft.MixinLowerStringMapNames" -> true;
             default -> null;
         };
         if (worldgenAuxiliary != null) return NovaEngCoreConfig.SERVER.optimizeWorldgenAuxiliaries && worldgenAuxiliary;
-        if (mixinName.equals("actuallyadditions.MixinWorldgenOreFactory"))
-            return isPresent("actuallyadditions");
-        if (mixinName.equals("bettermeteor.MixinCompassTargetScan"))
-            return NovaEngCoreConfig.SERVER.optimizeMeteorCompassTargetScan && ae2Loaded && isPresent("better_meteorite");
-        if (mixinName.equals("kirino.InvokerArrayRange"))
-            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
-        if (mixinName.equals("architecturecraft.InvokerMessageSide"))
-            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && isPresent("architecturecraft");
-        if ((mixinName.equals("minecraft.forge.AccessorFluidRegistryIds") || mixinName.equals("minecraft.forge.InvokerFluidRegistryDelegate")))
-            return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+        switch (mixinName) {
+            case "actuallyadditions.MixinWorldgenOreFactory" -> {
+                return isPresent("actuallyadditions");
+            }
+            case "bettermeteor.MixinCompassTargetScan" -> {
+                return NovaEngCoreConfig.SERVER.optimizeMeteorCompassTargetScan && ae2Loaded && isPresent("better_meteorite");
+            }
+            case "kirino.InvokerArrayRange" -> {
+                return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+            }
+            case "architecturecraft.InvokerMessageSide" -> {
+                return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && isPresent("architecturecraft");
+            }
+            case "minecraft.forge.AccessorFluidRegistryIds", "minecraft.forge.InvokerFluidRegistryDelegate" -> {
+                return NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
+            }
+        }
         if (mixinName.endsWith("PrimitiveBiMap")) {
             if (!NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps) return false;
             final String owner = mixinName.substring(0, mixinName.indexOf('.'));
@@ -123,7 +174,7 @@ public final class MixinDecisions {
                 && !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
             case "librarianlib.MixinLibrarianFieldCache", "librarianlib.MixinLibrarianTilePrewarm" ->
                 isPresent("librarianlib");
-            case "kirino.MixinKirinoScanning", "minecraft.forge.MixinOreRecipeRevision",
+            case "kirino.MixinKirinoScanning",
                  "minecraft.forge.MixinOreIngredientInputs", "minecraft.MixinIngredientRecipeRevision",
                  "minecraft.MixinLocaleParsing" -> true;
             default -> null;
@@ -316,7 +367,7 @@ public final class MixinDecisions {
                  "actinium.MixinImmediateCommandListVertexArray",
                  "actinium.MixinPassThroughGLStateManagerVertexArray" -> NovaEngCoreConfig.CLIENT.optimizeVaoBindings;
             case "minecraft.MixinTileEntityRendererDistance",
-                 "minecraft.MixinRenderGlobalTileEntityCulling" ->
+                 "minecraft.MixinEntityRendererTileEntityCulling" ->
                 NovaEngCoreConfig.CLIENT.optimizeTesrRenderDistance || NovaEngCoreConfig.CLIENT.optimizeTesrFrustumCulling;
             case "minecraft.MixinSoundHandlerUpdateBatch", "minecraft.MixinSoundSystemWakeups" ->
                 NovaEngCoreConfig.CLIENT.optimizeSoundUpdateWakeups;

@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.handler;
 
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.client.memory.ClientMemoryCleanup;
 import github.kasuminova.novaeng.client.util.ClientLightingGuard;
 import github.kasuminova.novaeng.client.util.ClientWorldMemos;
 import github.kasuminova.novaeng.client.util.TitleUtils;
@@ -69,6 +70,7 @@ public class ClientEventHandler {
             return;
         }
         this.clientTick++;
+        ClientMemoryCleanup.tick();
 
         if (ClientLightingGuard.consumeRenderRefresh()) {
             final Minecraft minecraft = Minecraft.getMinecraft();
@@ -149,6 +151,12 @@ public class ClientEventHandler {
     public void onWorldUnloaded(final WorldEvent.Unload event) {
         if (event.getWorld().isRemote) {
             ClientWorldMemos.clearWorld(event.getWorld());
+            final Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.isCallingFromMinecraftThread()) {
+                ClientMemoryCleanup.clearWorld(event.getWorld());
+            } else {
+                minecraft.addScheduledTask(() -> ClientMemoryCleanup.clearWorld(event.getWorld()));
+            }
         }
     }
 }

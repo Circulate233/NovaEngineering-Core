@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.minecraft.forge;
 
+import github.kasuminova.novaeng.common.performance.OreIdsCache;
 import github.kasuminova.novaeng.common.performance.StartupCraftingScope;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
@@ -16,15 +17,18 @@ public abstract class MixinOreRecipeRevision {
         target = "Lnet/minecraftforge/fml/common/eventhandler/EventBus;post(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z"), require = 1)
     private static boolean nova$observeOreRegistration(final EventBus bus, final Event event) {
         StartupCraftingScope.ingredientsChanged();
+        OreIdsCache.invalidate();
         try {
             return bus.post(event);
         } finally {
             StartupCraftingScope.ingredientsChanged();
+            OreIdsCache.invalidate();
         }
     }
 
-    @Inject(method = "rebakeMap", at = @At("HEAD"), require = 1)
+    @Inject(method = "rebakeMap", at = {@At("HEAD"), @At("RETURN")}, require = 1)
     private static void nova$observeOreRebuild(final CallbackInfo ci) {
         StartupCraftingScope.ingredientsChanged();
+        OreIdsCache.invalidate();
     }
 }

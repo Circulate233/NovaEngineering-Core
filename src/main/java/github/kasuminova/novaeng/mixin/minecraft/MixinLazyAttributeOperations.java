@@ -7,9 +7,11 @@ import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +20,23 @@ import java.util.Set;
 public abstract class MixinLazyAttributeOperations implements AttributeModifierState {
     @Shadow
     @Final
-    private Map<Integer, Set<AttributeModifier>> mapByOperation;
+    private Map<?, ?> mapByOperation;
+
+    @Unique
+    private Set<AttributeModifier> nova$addition;
+    @Unique
+    private Set<AttributeModifier> nova$multiplyBase;
+    @Unique
+    private Set<AttributeModifier> nova$multiplyTotal;
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", remap = false,
+        target = "Lcom/google/common/collect/Maps;newHashMap()Ljava/util/HashMap;", ordinal = 0), require = 1)
+    private HashMap<?, ?> nova$omitOperationMap() {
+        return null;
+    }
 
     // The constructor's empty-set factory and following put are replaced together.
-    // The private map remains non-null; no null set is published through any attribute API.
+    // All operation-map reads below use the three slots; public collections remain live and mutable.
     @Redirect(method = "<init>", at = @At(value = "INVOKE", remap = false,
         target = "Lcom/google/common/collect/Sets;newHashSet()Ljava/util/HashSet;"), require = 1)
     private HashSet<AttributeModifier> nova$deferEmptySet() {
@@ -38,20 +53,20 @@ public abstract class MixinLazyAttributeOperations implements AttributeModifierS
     @Redirect(method = {"getModifiersByOperation", "applyModifier", "removeModifier(Lnet/minecraft/entity/ai/attributes/AttributeModifier;)V"},
         at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"), require = 4)
     private Object nova$liveOperation(final Map<?, ?> map, final Object key) {
-        final Object current = map.get(key);
-        if (map != mapByOperation || current != null || !(key instanceof Integer operation) || operation < 0 || operation > 2)
-            return current;
-        final Set<AttributeModifier> modifiers = new LazyModifierSet();
-        mapByOperation.put(operation, modifiers);
-        return modifiers;
+        if (map != mapByOperation) return map.get(key);
+        if (!(key instanceof Integer operation)) return null;
+        return switch (operation) {
+            case 0 -> nova$addition == null ? nova$addition = new LazyModifierSet() : nova$addition;
+            case 1 -> nova$multiplyBase == null ? nova$multiplyBase = new LazyModifierSet() : nova$multiplyBase;
+            case 2 -> nova$multiplyTotal == null ? nova$multiplyTotal = new LazyModifierSet() : nova$multiplyTotal;
+            default -> null;
+        };
     }
 
     @Override
     public boolean nova$hasModifiers() {
-        for (int operation = 0; operation < 3; operation++) {
-            final Set<AttributeModifier> modifiers = mapByOperation.get(operation);
-            if (modifiers != null && !modifiers.isEmpty()) return true;
-        }
-        return false;
+        return nova$addition != null && !nova$addition.isEmpty()
+            || nova$multiplyBase != null && !nova$multiplyBase.isEmpty()
+            || nova$multiplyTotal != null && !nova$multiplyTotal.isEmpty();
     }
 }

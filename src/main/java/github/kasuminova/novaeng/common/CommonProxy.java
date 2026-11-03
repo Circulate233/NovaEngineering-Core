@@ -53,6 +53,7 @@ import github.kasuminova.novaeng.common.machine.drills.MineralExtractor;
 import github.kasuminova.novaeng.common.machine.drills.OrichalcosDrill;
 import github.kasuminova.novaeng.common.machine.drills.SmallOreDrill;
 import github.kasuminova.novaeng.common.machine.drills.VoidMiner;
+import github.kasuminova.novaeng.common.performance.ClassResourceCacheCompactor;
 import github.kasuminova.novaeng.common.registry.RegistryAssembly;
 import github.kasuminova.novaeng.common.registry.RegistryBlocks;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
@@ -185,6 +186,7 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void loadComplete() {
+        ClassResourceCacheCompactor.compactIfGrown();
     }
 
     @Override
