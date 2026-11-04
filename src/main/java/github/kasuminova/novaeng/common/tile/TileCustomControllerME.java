@@ -1,37 +1,50 @@
 package github.kasuminova.novaeng.common.tile;
 
-import appeng.api.networking.GridFlags;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.events.MENetworkChannelsChanged;
-import appeng.api.networking.events.MENetworkEventSubscribe;
-import appeng.api.networking.events.MENetworkPowerStatusChange;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.networking.security.IActionSource;
-import appeng.api.networking.ticking.IGridTickable;
-import appeng.api.util.AECableType;
-import appeng.api.util.AEPartLocation;
-import appeng.api.util.DimensionalCoord;
-import appeng.me.GridAccessException;
-import appeng.me.helpers.AENetworkProxy;
-import appeng.me.helpers.IGridProxyable;
-import appeng.me.helpers.MachineSource;
-import appeng.util.Platform;
+import ae2.api.AECapabilities;
+import ae2.api.networking.GridFlags;
+import ae2.api.networking.IGridNode;
+import ae2.api.networking.IGridNodeListener;
+import ae2.api.networking.IManagedGridNode;
+import ae2.api.networking.security.IActionSource;
+import ae2.api.util.AECableType;
+import ae2.me.ManagedGridNode;
+import ae2.me.helpers.IGridConnectedTile;
+import ae2.me.helpers.MachineSource;
+import ae2.util.Platform;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class TileCustomControllerME extends TileCustomController implements IActionHost, IGridProxyable, IGridTickable {
-    protected final AENetworkProxy proxy = new AENetworkProxy(this, "aeProxy", getVisualItemStack(), true);
+public abstract class TileCustomControllerME extends TileCustomController implements IGridConnectedTile {
+    private static final IGridNodeListener<TileCustomControllerME> NODE_LISTENER = new IGridNodeListener<>() {
+        @Override
+        public void onSaveChanges(final TileCustomControllerME nodeOwner, final IGridNode node) {
+            nodeOwner.saveChanges();
+        }
+
+        @Override
+        public void onStateChanged(final TileCustomControllerME nodeOwner,
+                                   final IGridNode node,
+                                   final State state) {
+            nodeOwner.onMainNodeStateChanged(state);
+        }
+    };
+
+    protected final IManagedGridNode mainNode = new ManagedGridNode(this, NODE_LISTENER)
+        .setVisualRepresentation(getVisualItemStack())
+        .setInWorldNode(true)
+        .setTagName("aeProxy");
     protected final IActionSource source;
 
     public TileCustomControllerME() {
         this.source = new MachineSource(this);
-        this.proxy.setIdlePowerUsage(0.0D);
-        this.proxy.setFlags(GridFlags.REQUIRE_CHANNEL);
+        this.mainNode.setIdlePowerUsage(0.0D);
+        this.mainNode.setFlags(GridFlags.REQUIRE_CHANNEL);
     }
 
     public abstract ItemStack getVisualItemStack();
@@ -39,98 +52,95 @@ public abstract class TileCustomControllerME extends TileCustomController implem
     @Override
     public void readCustomNBT(final NBTTagCompound compound) {
         super.readCustomNBT(compound);
-        if (FMLCommonHandler.instance().getSide().isServer()) {
-            proxy.readFromNBT(compound);
-        }
+        mainNode.loadFromNBT(compound);
     }
 
     @Override
     public void writeCustomNBT(final NBTTagCompound compound) {
         super.writeCustomNBT(compound);
-        proxy.writeToNBT(compound);
+        mainNode.saveToNBT(compound);
     }
 
-    // AppEng Compat
-
-    @MENetworkEventSubscribe
-    public void stateChange(final MENetworkChannelsChanged change) {
-        this.notifyNeighbors();
-    }
-
-    @MENetworkEventSubscribe
-    public void stateChange(final MENetworkPowerStatusChange change) {
-        this.notifyNeighbors();
+    @Override
+    public void onMainNodeStateChanged(final IGridNodeListener.State reason) {
+        notifyNeighbors();
     }
 
     private void notifyNeighbors() {
-        if (this.proxy.isActive()) {
-            try {
-                this.proxy.getTick().wakeDevice(this.proxy.getNode());
-            } catch (GridAccessException e) {
-                // :P
-            }
-            Platform.notifyBlocksOfNeighbors(this.getWorld(), this.getPos());
+        if (!mainNode.isActive()) {
+            return;
         }
+        mainNode.ifPresent((grid, node) -> grid.getTickManager().wakeDevice(node));
+        Platform.notifyBlocksOfNeighbors(this.getWorld(), this.getPos());
     }
 
     @Override
-    public void gridChanged() {
-
-    }
-
-    @Nonnull
-    @Override
+    @Nullable
     public IGridNode getActionableNode() {
-        return proxy.getNode();
+        return mainNode.getNode();
     }
 
     @Nonnull
     @Override
-    public AENetworkProxy getProxy() {
-        return proxy;
+    public IManagedGridNode getMainNode() {
+        return mainNode;
     }
 
-    @Nonnull
     @Override
-    public DimensionalCoord getLocation() {
-        return new DimensionalCoord(this);
+    public void saveChanges() {
+        markDirty();
     }
 
     @Nullable
     @Override
-    public IGridNode getGridNode(@Nonnull final AEPartLocation dir) {
-        return proxy.getNode();
+    public IGridNode getGridNode(@Nonnull final EnumFacing dir) {
+        return mainNode.getNode();
     }
 
     @Nonnull
     @Override
-    public AECableType getCableConnectionType(@Nonnull final AEPartLocation dir) {
+    public AECableType getCableConnectionType(@Nonnull final EnumFacing dir) {
         return AECableType.SMART;
     }
 
     @Override
-    public void securityBreak() {
-        getWorld().destroyBlock(getPos(), true);
+    public boolean hasCapability(@Nonnull final Capability<?> capability, @Nullable final EnumFacing facing) {
+        if (capability == AECapabilities.IN_WORLD_GRID_NODE_HOST) {
+            return true;
+        }
+        return super.hasCapability(capability, facing);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(@Nonnull final Capability<T> capability, @Nullable final EnumFacing facing) {
+        if (capability == AECapabilities.IN_WORLD_GRID_NODE_HOST) {
+            return AECapabilities.IN_WORLD_GRID_NODE_HOST.cast(this);
+        }
+        return super.getCapability(capability, facing);
     }
 
     @Override
     public void onChunkUnload() {
         super.onChunkUnload();
-        proxy.onChunkUnload();
+        mainNode.destroy();
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
-        proxy.invalidate();
+        mainNode.destroy();
     }
 
     @Override
     public void validate() {
         super.validate();
         if (!getWorld().isRemote) {
-            ModularMachinery.EXECUTE_MANAGER.addSyncTask(proxy::onReady);
+            ModularMachinery.EXECUTE_MANAGER.addSyncTask(() -> {
+                if (!mainNode.isReady()) {
+                    mainNode.create(getWorld(), getPos());
+                }
+            });
         }
     }
-
 }

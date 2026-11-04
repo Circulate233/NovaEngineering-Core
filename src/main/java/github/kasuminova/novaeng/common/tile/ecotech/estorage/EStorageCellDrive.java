@@ -1,25 +1,15 @@
 package github.kasuminova.novaeng.common.tile.ecotech.estorage;
 
-import appeng.api.AEApi;
-import appeng.api.networking.events.MENetworkCellArrayUpdate;
-import appeng.api.networking.security.IActionSource;
-import appeng.api.networking.storage.IStorageGrid;
-import appeng.api.storage.ICellInventory;
-import appeng.api.storage.ICellInventoryHandler;
-import appeng.api.storage.IMEInventory;
-import appeng.api.storage.IMEInventoryHandler;
-import appeng.api.storage.ISaveProvider;
-import appeng.api.storage.IStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IAEStack;
-import appeng.api.storage.data.IItemList;
-import appeng.me.GridAccessException;
-import appeng.me.helpers.AENetworkProxy;
-import appeng.tile.inventory.AppEngCellInventory;
-import appeng.util.helpers.ItemHandlerUtil;
-import appeng.util.inv.IAEAppEngInventory;
-import appeng.util.inv.InvOperation;
-import appeng.util.inv.filter.IAEItemFilter;
+import ae2.api.inventories.InternalInventory;
+import ae2.api.stacks.AEKeyType;
+import ae2.api.storage.StorageCells;
+import ae2.api.storage.cells.ISaveProvider;
+import ae2.api.storage.cells.StorageCell;
+import ae2.api.storage.cells.StorageCellStatistics;
+import ae2.util.inv.AppEngCellInventory;
+import ae2.util.inv.AppEngInternalInventory;
+import ae2.util.inv.InternalInventoryHost;
+import ae2.util.inv.filter.IAEItemFilter;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageController;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageCapacity;
@@ -27,7 +17,6 @@ import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorage
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageType;
 import github.kasuminova.novaeng.common.container.data.EStorageCellData;
 import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCell;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellFluid;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCellGas;
@@ -45,26 +34,21 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Map;
 
-import static appeng.helpers.ItemStackHelper.stackFromNBT;
-import static appeng.helpers.ItemStackHelper.stackWriteToNBT;
-
-@SuppressWarnings("rawtypes")
-public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IAEAppEngInventory {
+public class EStorageCellDrive extends EStoragePart implements ISaveProvider, InternalInventoryHost {
 
     @Getter
     protected final AppEngCellInventory driveInv = new AppEngCellInventory(this, 1);
-    protected final Map<IStorageChannel<? extends IAEStack<?>>, IMEInventoryHandler<?>> inventoryHandlers = new Reference2ObjectOpenHashMap<>();
+    protected final Map<AEKeyType, ECellDriveWatcher> inventoryHandlers = new Reference2ObjectOpenHashMap<>();
 
-    protected EStorageCellHandler cellHandler = null;
     @Getter
-    protected ECellDriveWatcher<IAEItemStack> watcher = null;
+    protected StorageCell cellHandler = null;
+    @Getter
+    protected ECellDriveWatcher watcher = null;
 
     protected boolean isCached = false;
 
@@ -112,34 +96,29 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         };
     }
 
-    public static DriveStorageType getCellType(final EStorageCell<?> cell) {
+    public static DriveStorageType getCellType(final EStorageCell cell) {
         DriveStorageType type;
-        if (cell instanceof EStorageCellItem) {
-            type = DriveStorageType.ITEM;
-        } else if (cell instanceof EStorageCellFluid) {
-            type = DriveStorageType.FLUID;
-        } else if (Mods.MEKENG.isPresent() && cell instanceof EStorageCellGas) {
-            type = DriveStorageType.GAS;
-        } else {
-            return null;
+        switch (cell) {
+            case EStorageCellItem _ -> type = DriveStorageType.ITEM;
+            case EStorageCellFluid _ -> type = DriveStorageType.FLUID;
+            case EStorageCellGas _ when Mods.MEKENG.isPresent() -> type = DriveStorageType.GAS;
+            case null, default -> {
+                return null;
+            }
         }
         return type;
     }
 
-    public static DriveStorageCapacity getCapacity(final ICellInventoryHandler cellInvHandler) {
-        if (cellInvHandler == null) {
+    public static DriveStorageCapacity getCapacity(final StorageCell cellInventory) {
+        if (!(cellInventory instanceof StorageCellStatistics statistics)) {
             return DriveStorageCapacity.EMPTY;
         }
-        ICellInventory cellInv = cellInvHandler.getCellInv();
-        if (cellInv == null) {
-            return DriveStorageCapacity.EMPTY;
-        }
-        long totalTypes = cellInv.getTotalItemTypes();
-        long storedTypes = cellInv.getStoredItemTypes();
+        long totalTypes = statistics.getTotalTypes();
+        long storedTypes = statistics.getStoredTypes();
         if (storedTypes == 0) {
             return DriveStorageCapacity.EMPTY;
         }
-        if (cellInv.getFreeBytes() <= 0) {
+        if (statistics.getUsedBytes() >= statistics.getTotalBytes()) {
             return DriveStorageCapacity.FULL;
         }
         if (storedTypes >= totalTypes) {
@@ -193,28 +172,18 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         cellHandler = null;
         inventoryHandlers.clear();
         isCached = true;
+        driveInv.setHandler(0, null);
         ItemStack stack = driveInv.getStackInSlot(0);
         if (stack.isEmpty()) {
             updateDriveBlockState();
             return;
         }
-        if ((cellHandler = EStorageCellHandler.getHandler(stack)) == null) {
-            return;
-        }
-        ICellInventoryHandler cellInventory = null;
-        final Collection<IStorageChannel<? extends IAEStack<?>>> storageChannels = AEApi.instance().storage().storageChannels();
-        for (final IStorageChannel<? extends IAEStack<?>> channel : storageChannels) {
-            cellInventory = cellHandler.getCellInventory(stack, this, channel);
-            if (cellInventory == null) {
-                continue;
-            }
+        StorageCell cellInventory = StorageCells.getCellInventory(stack, this);
+        if (cellInventory != null && stack.getItem() instanceof EStorageCell cell) {
+            cellHandler = cellInventory;
             driveInv.setHandler(0, cellInventory);
-            watcher = new ECellDriveWatcher<>(cellInventory, channel, this);
-            if (partController != null) {
-                watcher.setPriority(partController.getChannel().getPriority());
-            }
-            inventoryHandlers.put(channel, watcher);
-            break;
+            watcher = new ECellDriveWatcher(cellInventory, this);
+            inventoryHandlers.put(cell.getKeyType(), watcher);
         }
         if (partController != null) {
             partController.recalculateEnergyUsage();
@@ -252,98 +221,35 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         markForUpdate();
     }
 
-    public <T extends IAEStack<T>> IMEInventoryHandler<T> getHandler(final IStorageChannel<T> channel) {
+    public ECellDriveWatcher getHandler(final AEKeyType channel) {
         updateHandler(false);
-        if (driveInv.getStackInSlot(0).getItem() instanceof EStorageCell<?> cell && isCellSupported(cell.getLevel())) {
-            IMEInventoryHandler<?> handler = inventoryHandlers.get(channel);
-            return handler == null ? null : (IMEInventoryHandler<T>) handler;
+        if (driveInv.getStackInSlot(0).getItem() instanceof EStorageCell cell && isCellSupported(cell.getLevel())) {
+            return inventoryHandlers.get(channel);
         }
         return null;
     }
 
     @Override
-    public void onChangeInventory(final IItemHandler inv, final int slot, final InvOperation mc, final ItemStack removed, final ItemStack added) {
+    public void onChangeInventory(final AppEngInternalInventory inv, final int slot) {
         this.isCached = false; // recalculate the storage cell.
         this.updateHandler(true);
         this.markForUpdateSync();
-
-        EStorageController controller = getController();
-        if (controller == null) {
-            return;
-        }
-
-        EStorageMEChannel channel = controller.getChannel();
-        AENetworkProxy proxy = channel.getProxy();
-        IActionSource source = channel.getSource();
-
-        try {
-            if (proxy.isActive()) {
-                final IStorageGrid gs = proxy.getStorage();
-                postChanges(gs, removed, added, source);
-            }
-            proxy.getGrid().postEvent(new MENetworkCellArrayUpdate());
-        } catch (final GridAccessException ignored) {
-        }
-
     }
 
     @Override
-    public void onAssembled() {
-        super.onAssembled();
-        if (watcher != null) {
-            watcher.setPriority(partController.getChannel().getPriority());
-        }
+    public void saveChangedInventory(final AppEngInternalInventory inv) {
+        saveChanges();
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return world.isRemote;
     }
 
     @Override
     public void onDisassembled() {
         super.onDisassembled();
-        EStorageController controller = getController();
-        if (controller == null) {
-            return;
-        }
-        EStorageMEChannel channel = controller.getChannel();
-        if (channel == null) {
-            return;
-        }
-        AENetworkProxy proxy = channel.getProxy();
-        IActionSource source = channel.getSource();
-
-        try {
-            if (proxy.isActive()) {
-                ItemStack removed = driveInv.getStackInSlot(0);
-                final IStorageGrid gs = proxy.getStorage();
-                postChanges(gs, removed, ItemStack.EMPTY, source);
-            }
-            proxy.getGrid().postEvent(new MENetworkCellArrayUpdate());
-        } catch (final GridAccessException ignored) {
-        }
-    }
-
-    public void postChanges(final IStorageGrid gs, final ItemStack removed, final ItemStack added, final IActionSource src) {
-        if (cellHandler == null) {
-            return;
-        }
-        for (final IStorageChannel<?> chan : AEApi.instance().storage().storageChannels()) {
-            final IItemList<?> myChanges = chan.createList();
-
-            if (!removed.isEmpty()) {
-                final IMEInventory myInv = cellHandler.getCellInventory(removed, null, chan);
-                if (myInv != null) {
-                    myInv.getAvailableItems(myChanges);
-                    for (final IAEStack is : myChanges) {
-                        is.setStackSize(-is.getStackSize());
-                    }
-                }
-            }
-            if (!added.isEmpty()) {
-                final IMEInventory myInv = cellHandler.getCellInventory(added, null, chan);
-                if (myInv != null) {
-                    myInv.getAvailableItems(myChanges);
-                }
-            }
-            gs.postAlterationOfStoredItems(chan, myChanges, src);
-        }
+        driveInv.persist();
     }
 
     public void onWriting() {
@@ -362,7 +268,7 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
     @Override
     public <T> T getCapability(@Nonnull final Capability<T> capability, @Nullable final EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(driveInv);
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(driveInv.toItemHandler());
         }
         return super.getCapability(capability, facing);
     }
@@ -372,9 +278,9 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         super.readCustomNBT(tag);
 
         final NBTTagCompound opt = tag.getCompoundTag("driveInv");
-        for (int x = 0; x < driveInv.getSlots(); x++) {
+        for (int x = 0; x < driveInv.size(); x++) {
             final NBTTagCompound item = opt.getCompoundTag("item" + x);
-            ItemHandlerUtil.setStackInSlot(driveInv, x, stackFromNBT(item));
+            driveInv.setItemDirect(x, item.hasKey("id", 8) ? new ItemStack(item) : ItemStack.EMPTY);
         }
 
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
@@ -387,20 +293,15 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         super.writeCustomNBT(tag);
 
         final NBTTagCompound opt = new NBTTagCompound();
-        for (int x = 0; x < driveInv.getSlots(); x++) {
+        for (int x = 0; x < driveInv.size(); x++) {
             final NBTTagCompound itemNBT = new NBTTagCompound();
             final ItemStack is = driveInv.getStackInSlot(x);
             if (!is.isEmpty()) {
-                stackWriteToNBT(is, itemNBT);
+                is.writeToNBT(itemNBT);
             }
             opt.setTag("item" + x, itemNBT);
         }
         tag.setTag("driveInv", opt);
-    }
-
-    @Override
-    public void saveChanges(@Nullable final ICellInventory<?> cellInventory) {
-        saveChanges();
     }
 
     @Override
@@ -418,13 +319,10 @@ public class EStorageCellDrive extends EStoragePart implements ISaveProvider, IA
         private static final CellInvFilter INSTANCE = new CellInvFilter();
 
         @Override
-        public boolean allowExtract(IItemHandler inv, int slot, int amount) {
-            return true;
-        }
-
-        @Override
-        public boolean allowInsert(IItemHandler inv, int slot, ItemStack stack) {
-            return !stack.isEmpty() && EStorageCellHandler.getHandler(stack) != null;
+        public boolean allowInsert(InternalInventory inv, int slot, ItemStack stack) {
+            return !stack.isEmpty()
+                && stack.getItem() instanceof EStorageCell
+                && StorageCells.isCellHandled(stack);
         }
 
     }

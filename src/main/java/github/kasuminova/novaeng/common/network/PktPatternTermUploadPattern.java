@@ -1,16 +1,12 @@
 package github.kasuminova.novaeng.common.network;
 
-import appeng.api.AEApi;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.container.implementations.ContainerPatternEncoder;
-import appeng.items.misc.ItemEncodedPattern;
-import appeng.me.GridAccessException;
-import com.glodblock.github.util.FluidCraftingPatternDetails;
+import ae2.api.crafting.IPatternDetails;
+import ae2.api.crafting.PatternDetailsHelper;
+import ae2.api.networking.security.IActionHost;
+import ae2.container.SlotSemantics;
+import ae2.container.me.patternencode.ContainerPatternEncodingTerm;
+import ae2.core.definitions.AEItems;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMEChannel;
-import github.kasuminova.novaeng.mixin.ae2.AccessorContainerPatternEncoder;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
@@ -33,56 +29,52 @@ public final class PktPatternTermUploadPattern implements IMessage, IMessageHand
     public IMessage onMessage(final PktPatternTermUploadPattern message, final MessageContext context) {
         final var player = context.getServerHandler().player;
         ModularMachinery.EXECUTE_MANAGER.addSyncTask(() -> {
-            if (!(player.openContainer instanceof ContainerPatternEncoder container)) {
+            if (!(player.openContainer instanceof ContainerPatternEncodingTerm container)) {
                 return;
             }
-            final var accessor = (AccessorContainerPatternEncoder) container;
-            final var slot = accessor.getPatternSlotOUT();
-            final ItemStack stack = slot.getStack();
-            if (stack.isEmpty()) {
+            final ItemStack patternStack = container.getSlots(SlotSemantics.ENCODED_PATTERN).stream()
+                                                      .findFirst().map(net.minecraft.inventory.Slot::getStack).orElse(ItemStack.EMPTY);
+            if (patternStack.isEmpty()) {
                 return;
             }
-            final var part = container.getPart();
-            final var itemObject = accessor.getIGuiItemObject();
-            final Iterable<IGridNode> nodes;
-            if (part != null) {
-                try {
-                    nodes = part.getProxy().getGrid().getMachines(EFabricatorMEChannel.class);
-                } catch (final GridAccessException ignored) {
-                    return;
-                }
-            } else if (itemObject instanceof IActionHost host) {
-                nodes = host.getActionableNode().getGrid().getMachines(EFabricatorMEChannel.class);
-            } else {
+            if (!(container.getTarget() instanceof IActionHost itemObject)) {
                 return;
             }
-            if (!nodes.iterator().hasNext() || !(stack.getItem() instanceof ItemEncodedPattern item)) {
+            final var node = itemObject.getActionableNode();
+            if (node == null) {
                 return;
             }
-            final ICraftingPatternDetails pattern = item.getPatternForItem(stack, player.world);
-            if (!pattern.isCraftable() && !(pattern instanceof FluidCraftingPatternDetails)) {
+            final var grid = node.grid();
+            if (grid == null) {
                 return;
             }
-            final IAEItemStack output = pattern.getCondensedOutputs()[0];
-            for (final IGridNode node : nodes) {
-                final var channel = (EFabricatorMEChannel) node.getMachine();
+            final var channelNodes = grid.getMachines(EFabricatorMEChannel.class);
+            if (channelNodes.isEmpty()) {
+                return;
+            }
+            final IPatternDetails pattern = PatternDetailsHelper.decodePattern(patternStack, player.world);
+            if (pattern == null || pattern.getPrimaryOutput() == null) {
+                return;
+            }
+            final var out = pattern.getPrimaryOutput().what();
+            for (final EFabricatorMEChannel channel : channelNodes) {
                 final var controller = channel.getController();
                 if (controller == null) {
                     continue;
                 }
                 for (final var bus : controller.getPatternBuses()) {
-                    if (bus.getAePatterns().contains(output)) {
+                    if (bus.getAePatterns().contains(out)) {
                         player.sendMessage(new TextComponentTranslation("novaeng.efabricator_parallel_proc.tooltip.0"));
-                        player.inventory.placeItemBackInInventory(player.world, AEApi.instance().definitions().materials()
-                                                                                     .blankPattern().maybeStack(slot.getStack().getCount()).orElse(ItemStack.EMPTY));
-                        slot.putStack(ItemStack.EMPTY);
+                        player.inventory.placeItemBackInInventory(player.world,
+                            new ItemStack(AEItems.BLANK_PATTERN.item(), patternStack.getCount()));
+                        container.clear();
                         return;
                     }
                 }
             }
-            for (final IGridNode node : nodes) {
-                if (((EFabricatorMEChannel) node.getMachine()).insertPattern(stack)) {
-                    slot.putStack(ItemStack.EMPTY);
+            for (final EFabricatorMEChannel channel : channelNodes) {
+                if (channel.insertPattern(patternStack)) {
+                    container.clear();
                     break;
                 }
             }

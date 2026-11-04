@@ -1,13 +1,11 @@
 package github.kasuminova.novaeng.common.container.data;
 
-import appeng.api.storage.ICellInventory;
-import appeng.api.storage.ICellInventoryHandler;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.tile.inventory.AppEngCellInventory;
+import ae2.api.storage.StorageCells;
+import ae2.api.storage.cells.StorageCell;
+import ae2.api.storage.cells.StorageCellStatistics;
+import ae2.util.inv.AppEngCellInventory;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageLevel;
 import github.kasuminova.novaeng.common.block.ecotech.estorage.prop.DriveStorageType;
-import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
-import github.kasuminova.novaeng.common.estorage.EStorageCellHandler;
 import github.kasuminova.novaeng.common.item.estorage.EStorageCell;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import net.minecraft.item.ItemStack;
@@ -20,31 +18,17 @@ public record EStorageCellData(DriveStorageType type, DriveStorageLevel level, i
         if (stack.isEmpty()) {
             return null;
         }
-        EStorageCellHandler handler = EStorageCellHandler.getHandler(stack);
-        if (handler == null) {
+        StorageCell cellInventory = StorageCells.getCellInventory(stack, null);
+        if (!(cellInventory instanceof StorageCellStatistics statistics)) {
             return null;
         }
-        EStorageCell<?> cell = (EStorageCell<?>) stack.getItem();
+        EStorageCell cell = (EStorageCell) stack.getItem();
         DriveStorageType type = EStorageCellDrive.getCellType(cell);
         if (type == null) {
             return null;
         }
         DriveStorageLevel level = cell.getLevel();
-        ECellDriveWatcher<IAEItemStack> watcher = drive.getWatcher();
-        if (watcher == null) {
-            return null;
-        }
-        ICellInventoryHandler<?> cellInventory = (ICellInventoryHandler<?>) watcher.getInternal();
-        if (cellInventory == null) {
-            return null;
-        }
-        ICellInventory<?> cellInv = cellInventory.getCellInv();
-        if (cellInv == null) {
-            return null;
-        }
-        long storedTypes = cellInv.getStoredItemTypes();
-        long usedBytes = cellInv.getUsedBytes();
-        return new EStorageCellData(type, level, (int) storedTypes, usedBytes);
+        return new EStorageCellData(type, level, (int) statistics.getStoredTypes(), statistics.getUsedBytes());
     }
 
 }

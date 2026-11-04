@@ -1,16 +1,11 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.config.PowerMultiplier;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.me.GridAccessException;
-import appeng.util.Platform;
-import appeng.util.item.ItemList;
-import github.kasuminova.mmce.client.util.ItemStackUtils;
+import ae2.api.config.Actionable;
+import ae2.api.config.PowerMultiplier;
+import ae2.api.networking.energy.IEnergyService;
+import ae2.api.storage.StorageHelper;
+import ae2.api.stacks.KeyCounter;
+import ae2.api.stacks.GenericStack;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.util.BlockModelHider;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorController;
@@ -48,8 +43,7 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         new BlockPos(-1, 1, 0), new BlockPos(-1, 0, 0), new BlockPos(-1, -1, 0), new BlockPos(-1, 1, 1), new BlockPos(-1, 0, 1), new BlockPos(-1, -1, 1));
     private final ObjectArrayList<IFluidHandler> coolantInputHandlers = new ObjectArrayList<>();
     private final ObjectArrayList<IFluidHandler> coolantOutputHandlers = new ObjectArrayList<>();
-    private final IItemStorageChannel itemChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
-    private IItemList<IAEItemStack> outputBuffer = new ItemList();
+    private KeyCounter outputBuffer = new KeyCounter();
     private double energyConsumePerTick = 64.0;
     private EFabricatorMEChannel channel;
     private int length;
@@ -108,15 +102,11 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         return this.coolantOutputHandlers;
     }
 
-    public IItemStorageChannel getItemChannel() {
-        return this.itemChannel;
-    }
-
-    public IItemList<IAEItemStack> getOutputBuffer() {
+    public KeyCounter getOutputBuffer() {
         return this.outputBuffer;
     }
 
-    public void setOutputBuffer(final IItemList<IAEItemStack> buffer) {
+    public void setOutputBuffer(final KeyCounter buffer) {
         this.outputBuffer = buffer;
     }
 
@@ -249,7 +239,7 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     @Override
     public boolean onSyncTick() {
-        if (this.channel == null || !this.channel.getProxy().isActive()) {
+        if (this.channel == null || !this.channel.getMainNode().isActive()) {
             this.tickExecutor = null;
             return false;
         }
@@ -331,12 +321,11 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public void supplyWorkerPower() {
-        final IEnergyGrid energy;
-        try {
-            energy = this.channel.getProxy().getEnergy();
-        } catch (final GridAccessException ignored) {
+        final var node = this.channel.getMainNode().getNode();
+        if (node == null) {
             return;
         }
+        final IEnergyService energy = node.grid().getEnergyService();
         for (final var worker : this.getWorkers()) {
             if (worker.getEnergyCache() < worker.getMaxEnergyCache()) {
                 worker.supplyEnergy((int) energy.extractAEPower(worker.getMaxEnergyCache() - worker.getEnergyCache(),
@@ -346,14 +335,15 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public void clearOutputBuffer() {
-        try {
-            final var proxy = this.channel.getProxy();
-            final var inventory = proxy.getStorage().getInventory(this.itemChannel);
-            for (final var stack : this.outputBuffer) {
-                final var remainder = Platform.poweredInsert(proxy.getEnergy(), inventory, stack.copy(), this.channel.getSource());
-                stack.setStackSize(remainder == null ? 0 : remainder.getStackSize());
-            }
-        } catch (final GridAccessException ignored) {
+        final var node = this.channel.getMainNode().getNode();
+        if (node == null) {
+            return;
+        }
+        final var energy = node.grid().getEnergyService();
+        final var inventory = node.grid().getStorageService().getInventory();
+        for (final var stack : this.outputBuffer) {
+            final var inserted = StorageHelper.poweredInsert(energy, inventory, stack.getKey(), stack.getLongValue(), channel.getSource());
+            outputBuffer.set(stack.getKey(), stack.getLongValue() - inserted);
         }
     }
 
@@ -454,7 +444,7 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         if (this.energyConsumePerTick != drain) {
             this.energyConsumePerTick = drain;
             if (this.channel != null) {
-                this.channel.getProxy().setIdlePowerUsage(drain);
+                this.channel.getMainNode().setIdlePowerUsage(drain);
             }
         }
     }
@@ -462,9 +452,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     public boolean insertPattern(final ItemStack stack) {
         for (final var bus : this.getPatternBuses()) {
             final var inventory = bus.getPatterns();
-            for (int i = 0; i < inventory.getSlots(); i++) {
+            for (int i = 0; i < inventory.size(); i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
-                    inventory.setStackInSlot(i, ItemUtils.copyStackWithSize(stack, 1));
+                    inventory.setItemDirect(i, ItemUtils.copyStackWithSize(stack, 1));
                     return true;
                 }
             }
@@ -638,10 +628,12 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         this.setOverclocked(tag.getBoolean("overclock"));
         this.setActiveCooling(tag.getBoolean("activeCooling"));
         this.coolantCache = tag.getInteger("coolantCache");
-        this.outputBuffer = new ItemList();
+        this.outputBuffer = new KeyCounter();
         final NBTTagList items = tag.getTagList("outputBuffer", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < items.tagCount(); i++) {
-            this.outputBuffer.add(this.itemChannel.createStack(ItemStackUtils.readNBTOversize(items.getCompoundTagAt(i))));
+        for (GenericStack stack : GenericStack.readList(items)) {
+            if (stack != null) {
+                this.outputBuffer.add(stack.what(), stack.amount());
+            }
         }
         this.loaded = previouslyLoaded;
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
@@ -656,12 +648,12 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         tag.setBoolean("overclock", this.overclocked);
         tag.setBoolean("activeCooling", this.activeCooling);
         tag.setInteger("coolantCache", this.coolantCache);
-        final NBTTagList items = new NBTTagList();
         synchronized (this.outputBuffer) {
+            final List<GenericStack> stacks = new ObjectArrayList<>();
             for (final var stack : this.outputBuffer) {
-                items.appendTag(ItemStackUtils.writeNBTOversize(stack.getCachedItemStack(stack.getStackSize())));
+                stacks.add(new GenericStack(stack.getKey(), stack.getLongValue()));
             }
+            tag.setTag("outputBuffer", GenericStack.writeList(stacks));
         }
-        tag.setTag("outputBuffer", items);
     }
 }

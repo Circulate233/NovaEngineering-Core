@@ -4,25 +4,7 @@ import net.minecraftforge.fml.common.Loader;
 
 public enum Mods {
 
-    AE2("appliedenergistics2"),
-    AE2EL("appliedenergistics2") {
-        @Override
-        public boolean loaded() {
-            if (this.initialized) {
-                return this.loaded;
-            }
-            this.initialized = true;
-            if (!super.loaded()) {
-                return this.loaded = false;
-            }
-            try {
-                Class.forName("appeng.core.AE2ELCore");
-                return this.loaded = true;
-            } catch (Exception e) {
-                return this.loaded = false;
-            }
-        }
-    },
+    AE2("ae2"),
     IC2("ic2"),
     MEK("mekanism"),
     MEKCEU("mekanism") {

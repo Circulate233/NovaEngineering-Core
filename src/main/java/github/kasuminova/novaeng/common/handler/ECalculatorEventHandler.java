@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.handler;
 
-import appeng.api.config.SecurityPermissions;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.networking.security.ISecurityGrid;
-import appeng.me.helpers.IGridProxyable;
-import appeng.tile.inventory.AppEngInternalInventory;
+import ae2.api.networking.IGridNode;
+import ae2.api.networking.security.IActionHost;
+import ae2.api.util.DimensionalBlockPos;
+import ae2.util.Platform;
+import ae2.util.inv.AppEngInternalInventory;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
 import github.kasuminova.novaeng.common.item.ecalculator.ECalculatorCell;
@@ -34,17 +32,15 @@ public class ECalculatorEventHandler {
 
     public static final int UPDATE_INTERVAL = 10;
 
-    private static boolean canInteract(final EntityPlayer player, final IGridProxyable proxyable) {
-        final IGridNode gn = proxyable.getProxy().getNode();
+    private static boolean canInteract(final EntityPlayer player,
+                                      final TileEntity target,
+                                      final IActionHost actionHost) {
+        final IGridNode gn = actionHost.getActionableNode();
         if (gn != null) {
-            final IGrid g = gn.getGrid();
-            final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-            if (!eg.isNetworkPowered()) {
+            if (!gn.isPowered()) {
                 return true;
             }
-
-            final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-            return sg.hasPermission(player, SecurityPermissions.BUILD);
+            return Platform.hasPermissions(new DimensionalBlockPos(target), player);
         }
         return true;
     }
@@ -95,7 +91,7 @@ public class ECalculatorEventHandler {
         ECalculatorController controller = drive.getController();
         if (controller != null) {
             ECalculatorMEChannel channel = controller.getChannel();
-            if (channel != null && !canInteract(player, channel)) {
+            if (channel != null && !canInteract(player, drive, channel)) {
                 player.sendMessage(new TextComponentTranslation("novaeng.ecalculator_cell_drive.player.no_permission"));
                 event.setCanceled(true);
                 return;

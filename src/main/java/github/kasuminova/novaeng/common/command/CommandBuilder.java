@@ -29,7 +29,7 @@ public class CommandBuilder extends CommandBase {
     }
 
     @Override
-    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String @NotNull [] args) {
+    public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, @NotNull String[] args) {
         if (args.length >= 2) {
             switch (args[0]) {
                 case "tick" -> isTickWork = args[1].equals("true");

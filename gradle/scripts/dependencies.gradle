@@ -31,6 +31,10 @@ repositories {
         url = 'https://api.modrinth.com/maven'
     }
     maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
+    maven {
         name = "GTNH Maven"
         url = uri("https://nexus.gtnewhorizons.com/repository/public/")
     }
@@ -107,16 +111,10 @@ dependencies {
     modImplementation 'curse.maven:the-one-probe-245211:2667280'
     modCompileOnly 'curse.maven:FTB-Library-237167:2985811'
     modCompileOnly 'curse.maven:FTBU-237102:3157548'
-    modImplementation 'curse.maven:ae2-extended-life-570458:6302098'
-    modCompileOnly 'curse.maven:better-meteorite-1264853:6525827'
-    modImplementation 'curse.maven:ae2fluidcraft-rework-unofficial-1404390:7742544'
-    modCompileOnly('curse.maven:MekanismEnergistics-1027681:5775101') {
-        accessTransformers.configure(it) {
-            config = project.file('accesstransformers/mekanism-energistics.cfg')
-        }
-    }
-    modCompileOnly 'curse.maven:nae2-884359:5380800'
-    modImplementation 'curse.maven:CodeChickenLib-242818:2779848'
+    modImplementation 'com.github.FormlessDragon:AppliedCompatibility:v1.0.1:dev'
+    modImplementation 'com.github.FormlessDragon:Applied-Energistics-2-Supergiant:v1.1.0:dev'
+    modCompileOnly 'com.github.FormlessDragon:Applied-Mekanistics:v1.2.1:dev'
+    modImplementation 'curse.maven:codechicken-lib-cre-1328922:6898525'
     modImplementation 'curse.maven:wanionlib-253043:4623135'
     modCompileOnly 'curse.maven:avaritia-1-1x-unofficial-1165010:7939693'
     modCompileOnly 'curse.maven:eternal-singularity-253077:2922583'
@@ -148,7 +146,6 @@ dependencies {
     modCompileOnly 'curse.maven:more-electric-tools-366298:3491973'
     modCompileOnly 'curse.maven:extrabotany-299086:3112313'
     modCompileOnly 'curse.maven:libnine-322344:3073839'
-    modCompileOnly 'curse.maven:lazy-ae2-322347:3254160'
     modCompileOnly 'curse.maven:better-chat-363860:3048407'
     modCompileOnly 'curse.maven:lunatriuscore-225605:2489549'
     modCompileOnly 'curse.maven:immersive-petroleum-268250:3382321'
@@ -165,7 +162,7 @@ dependencies {
     modCompileOnly 'curse.maven:guide-api-228832:2645992'
     modCompileOnly 'curse.maven:patchouli-306770:3162874'
     modCompileOnly 'curse.maven:libvulpes-236541:3801015'
-    modCompileOnly 'curse.maven:random-complement-1198138:9009274'
+    modCompileOnly 'curse.maven:random-complement-1198138:8828633'
     modCompileOnly 'curse.maven:actually-additions-228404:3117927'
     modCompileOnly 'curse.maven:artemislib-313590:2741812'
     modImplementation 'curse.maven:brandons-core-231382:3408276'
@@ -212,7 +209,6 @@ dependencies {
             config = project.file('accesstransformers/astral-sorcery.cfg')
         }
     }
-    modCompileOnly 'curse.maven:ae2-crafting-tree-legacy-1121489:5814089'
     modCompileOnly 'curse.maven:applecore-224472:2969118'
     modCompileOnly 'curse.maven:spice-of-life-carrot-edition-277616:2959847'
     modCompileOnly 'curse.maven:just-enough-resources-jer-240630:4440935'
@@ -228,7 +224,6 @@ dependencies {
     modCompileOnly 'curse.maven:athenaeum-284350:3063275'
     modCompileOnly 'curse.maven:better-builders-wands-238403:2691084'
     modCompileOnly 'curse.maven:better-loading-screen-229302:6771073'
-    modCompileOnly 'curse.maven:betterer-p2p-943734:7231397'
     modCompileOnly 'curse.maven:celeritas-extra-1451214:9182637'
     modCompileOnly 'curse.maven:electroblobs-wizardry-265642:8320066'
     modCompileOnly 'curse.maven:ender-core-ceu-1530852:8734025'
@@ -252,7 +247,6 @@ dependencies {
     modCompileOnly 'curse.maven:more-flux-storage-1492345:7805126'
     modCompileOnly 'curse.maven:more-overlays-243478:2745657'
     modCompileOnly 'curse.maven:mrcrayfish-furniture-mod-55438:3865259'
-    modCompileOnly 'curse.maven:not-enough-energistics-515565:6325382'
     modCompileOnly 'curse.maven:omlib-254334:3466259'
     modCompileOnly 'curse.maven:openmodularturrets-224663:3466431'
     modCompileOnly 'curse.maven:packagedauto-308380:7329681'
@@ -348,4 +342,5 @@ dependencies {
             config = project.file('accesstransformers/thermal-foundation.cfg')
         }
     }
+    modCompileOnly "curse.maven:mouse-tweaks-unofficial-461660:5876158"
 }

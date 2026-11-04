@@ -32,7 +32,7 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
     public PktEStorageGUIData(final EStorageController controller) {
         List<EStorageCellDrive> drives = controller.getCellDrives();
         for (EStorageCellDrive drive : drives) {
-            if (!(drive.getDriveInv().getStackInSlot(0).getItem() instanceof EStorageCell<?> cell)
+            if (!(drive.getDriveInv().getStackInSlot(0).getItem() instanceof EStorageCell cell)
                 || !drive.isCellSupported(cell.getLevel())) continue;
             EStorageCellData data = EStorageCellData.from(drive);
             if (data != null) dataList.add(data);

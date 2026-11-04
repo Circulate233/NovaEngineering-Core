@@ -1,16 +1,10 @@
 package github.kasuminova.novaeng.common.util;
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.networking.storage.IStorageGrid;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.channels.IFluidStorageChannel;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEFluidStack;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.helpers.WirelessTerminalGuiObject;
-import appeng.me.helpers.PlayerSource;
-import com.circulation.random_complement.common.util.MEHandler;
+import ae2.api.config.Actionable;
+import ae2.api.networking.security.IActionHost;
+import ae2.container.AEBaseContainer;
+import ae2.api.storage.MEStorage;
+import ae2.me.helpers.PlayerSource;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager.Ingredient;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager.OperatingStatus;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
@@ -256,15 +250,16 @@ public final class AssemblyBlockArray extends BlockArray {
             }
         }
         final var materials = getMaterialList(info);
-        WirelessTerminalGuiObject terminal = null;
-        IMEMonitor<IAEItemStack> items = null;
-        IMEMonitor<IAEFluidStack> fluids = null;
+        boolean hasAE = false;
+        IActionHost terminal = null;
+        MEStorage storage = null;
         if (this.usingAE) {
-            terminal = MEHandler.getTerminalGuiObject(player);
-            if (terminal != null && terminal.getActionableNode() != null && terminal.getActionableNode().getGrid() != null) {
-                final IStorageGrid storage = terminal.getActionableNode().getGrid().getCache(IStorageGrid.class);
-                items = storage.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
-                fluids = storage.getInventory(AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class));
+            if (player.openContainer instanceof AEBaseContainer c) {
+                terminal = (IActionHost) c.getTarget();
+            }
+            if (terminal != null && terminal.getActionableNode() != null && terminal.getActionableNode().grid() != null) {
+                storage = terminal.getActionableNode().grid().getStorageService().getInventory();
+                hasAE = true;
             }
         }
         final var inventory = player.inventory.mainInventory;
@@ -284,23 +279,28 @@ public final class AssemblyBlockArray extends BlockArray {
                 return OperatingStatus.SUCCESS;
             }
         }
-        if (items != null) {
+        if (hasAE) {
             for (final var pair : materials) {
                 final var ingredient = pair.getFirst();
                 if (ingredient.isItem()) {
                     if (ingredient.getItemStack().isEmpty()) {
                         continue;
                     }
-                    final var extracted = items.extractItems(ingredient.getAEItemStack(), Actionable.MODULATE, new PlayerSource(player, terminal));
-                    if (extracted == null || extracted.getStackSize() == 0) {
+                    final var key = ingredient.getAEItemStack();
+                    if (key == null) {
+                        continue;
+                    }
+                    final var extracted = storage.extract(key, ingredient.getItemStack().getCount(), Actionable.MODULATE, new PlayerSource(player, terminal));
+                    if (extracted == 0) {
                         continue;
                     }
                 } else {
-                    final var extracted = fluids.extractItems(ingredient.getAEFluidStack(), Actionable.SIMULATE, new PlayerSource(player, terminal));
-                    if (extracted == null || extracted.getStackSize() < 1000) {
+                    final var key = ingredient.getAEFluidStack();
+                    final var extracted = storage.extract(key, 1000, Actionable.SIMULATE, new PlayerSource(player, terminal));
+                    if (extracted < 1000) {
                         continue;
                     }
-                    fluids.extractItems(ingredient.getAEFluidStack(), Actionable.MODULATE, new PlayerSource(player, terminal));
+                    storage.extract(key, 1000, Actionable.MODULATE, new PlayerSource(player, terminal));
                 }
                 this.placeBlock(player, world, pos, pair.getSecond());
                 return OperatingStatus.SUCCESS;

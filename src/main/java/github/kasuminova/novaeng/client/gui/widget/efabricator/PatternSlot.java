@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.client.gui.widget.efabricator;
 
-import appeng.api.implementations.ICraftingPatternItem;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.util.item.AEItemStack;
+import ae2.api.crafting.IPatternDetails;
+import ae2.api.crafting.PatternDetailsHelper;
+import ae2.api.stacks.AEItemKey;
+import ae2.api.stacks.GenericStack;
 import github.kasuminova.mmce.client.gui.util.MousePos;
 import github.kasuminova.mmce.client.gui.util.RenderPos;
 import github.kasuminova.mmce.client.gui.util.RenderSize;
@@ -24,12 +24,12 @@ import java.util.WeakHashMap;
 
 public class PatternSlot extends SlotItemVirtual {
 
-    private static final WeakHashMap<IAEItemStack, WeakReference<ICraftingPatternDetails>> DETAILS_CACHE = new WeakHashMap<>();
+    private static final WeakHashMap<AEItemKey, WeakReference<IPatternDetails>> DETAILS_CACHE = new WeakHashMap<>();
 
     private final BlockPos slotOwnerPos;
     private final int slotIndex;
 
-    private ICraftingPatternDetails details = null;
+    private IPatternDetails details = null;
 
     public PatternSlot(final BlockPos slotOwnerPos, final int slotIndex) {
         this.slotOwnerPos = slotOwnerPos;
@@ -41,8 +41,13 @@ public class PatternSlot extends SlotItemVirtual {
     public void render(final WidgetGui widgetGui, final RenderSize renderSize, final RenderPos renderPos, final MousePos mousePos) {
         final ItemStack prevStack = stackInSlot;
         if (details != null) {
-            IAEItemStack primaryOutput = details.getPrimaryOutput();
-            stackInSlot = primaryOutput.getCachedItemStack(primaryOutput.getStackSize());
+            GenericStack primaryOutput = details.getPrimaryOutput();
+            if (primaryOutput.what() instanceof AEItemKey itemKey) {
+                final int amount = (int) Math.min(Integer.MAX_VALUE, primaryOutput.amount());
+                stackInSlot = itemKey.toStack(amount);
+            } else {
+                stackInSlot = GenericStack.wrapInItemStack(primaryOutput);
+            }
         }
         super.render(widgetGui, renderSize, renderPos, mousePos);
         stackInSlot = prevStack;
@@ -72,24 +77,15 @@ public class PatternSlot extends SlotItemVirtual {
 
     @Override
     public SlotItemVirtual setStackInSlot(final ItemStack stackInSlot) {
-        if (stackInSlot.getItem() instanceof ICraftingPatternItem patternItem) {
-            AEItemStack key = AEItemStack.fromItemStack(stackInSlot);
-            if (key == null) {
-                this.details = null;
-                return super.setStackInSlot(stackInSlot);
-            }
-
-            if (DETAILS_CACHE.containsKey(key)) {
-                WeakReference<ICraftingPatternDetails> ref = DETAILS_CACHE.get(key);
-                if (ref != null) {
-                    this.details = ref.get();
-                } else {
-                    this.details = patternItem.getPatternForItem(stackInSlot, Minecraft.getMinecraft().world);
-                    DETAILS_CACHE.put(key.copy(), new WeakReference<>(this.details));
-                }
+        AEItemKey key = AEItemKey.of(stackInSlot);
+        if (key != null) {
+            WeakReference<IPatternDetails> ref = DETAILS_CACHE.get(key);
+            IPatternDetails cachedDetails = ref == null ? null : ref.get();
+            if (cachedDetails != null) {
+                this.details = cachedDetails;
             } else {
-                this.details = patternItem.getPatternForItem(stackInSlot, Minecraft.getMinecraft().world);
-                DETAILS_CACHE.put(key.copy(), new WeakReference<>(this.details));
+                this.details = PatternDetailsHelper.decodePattern(stackInSlot, Minecraft.getMinecraft().world);
+                DETAILS_CACHE.put(key, new WeakReference<>(this.details));
             }
         } else {
             this.details = null;
@@ -99,7 +95,7 @@ public class PatternSlot extends SlotItemVirtual {
     }
 
     @Nullable
-    public ICraftingPatternDetails getDetails() {
+    public IPatternDetails getDetails() {
         return details;
     }
 

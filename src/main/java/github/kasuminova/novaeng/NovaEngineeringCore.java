@@ -8,7 +8,6 @@ import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.integration.DECoreBindingIndex;
 import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
-import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
@@ -34,7 +33,6 @@ import github.kasuminova.novaeng.common.network.packetprofiler.PktCProfilerReque
 import github.kasuminova.novaeng.common.performance.MeteorWriteBatch;
 import github.kasuminova.novaeng.common.performance.RecipeContextPool;
 import github.kasuminova.novaeng.common.profiler.SPacketProfiler;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.common.util.NovaBiomeIdCache;
 import github.kasuminova.novaeng.novaeng_core.Tags;
@@ -59,8 +57,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
     dependencies = "required-after:modularmachinery@[2.3.0,);" +
         "required-after:theoneprobe;" +
-        "required-after:appliedenergistics2@[v0.56.4,);" +
-        "required-after:ae2fc@[2.6.3-r,);" +
+        "required-after:ae2@[1.0.17,);" +
         "required-after-client:lumenized@[1.0.2,);" +
         "after:astralsorcery"
     ,
@@ -126,7 +123,6 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktCProfilerReply.class, PktCProfilerReply.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktGeocentricDrillControl.class, PktGeocentricDrillControl.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktItemDisplay.class, PktItemDisplay.class, start++, Side.SERVER);
-        NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
         proxy.preInit();
 
@@ -183,7 +179,6 @@ public class NovaEngineeringCore {
         // that outlived its world's unload would keep that world - and every chunk and
         // entity in it - for the rest of the process. Nothing survives a server stop.
         HyperNetCaches.clear();
-        AutoCraftingQueue.clearAll();
         if (Mods.BM2.isPresent()) {
             MMAltar.clearCache();
         }

@@ -1,49 +1,64 @@
 package github.kasuminova.novaeng.common.tile.ecotech.efabricator;
 
-import appeng.api.networking.GridFlags;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.crafting.ICraftingPatternDetails;
-import appeng.api.networking.crafting.ICraftingProvider;
-import appeng.api.networking.crafting.ICraftingProviderHelper;
-import appeng.api.networking.events.MENetworkChannelsChanged;
-import appeng.api.networking.events.MENetworkCraftingPatternChange;
-import appeng.api.networking.events.MENetworkEventSubscribe;
-import appeng.api.networking.events.MENetworkPowerStatusChange;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.networking.security.IActionSource;
-import appeng.api.util.AECableType;
-import appeng.api.util.AEPartLocation;
-import appeng.api.util.DimensionalCoord;
-import appeng.me.GridAccessException;
-import appeng.me.helpers.AENetworkProxy;
-import appeng.me.helpers.IGridProxyable;
-import appeng.me.helpers.MachineSource;
-import com.glodblock.github.common.item.ItemFluidPacket;
-import com.glodblock.github.common.item.fake.FakeItemRegister;
-import com.glodblock.github.util.FluidCraftingPatternDetails;
-import github.kasuminova.mmce.common.util.PatternItemFilter;
+import ae2.api.AECapabilities;
+import ae2.api.crafting.IPatternDetails;
+import ae2.api.crafting.PatternDetailsHelper;
+import ae2.api.networking.GridFlags;
+import ae2.api.networking.IGridNode;
+import ae2.api.networking.IGridNodeListener;
+import ae2.api.networking.IManagedGridNode;
+import ae2.api.networking.crafting.ICraftingProvider;
+import ae2.api.stacks.AEItemKey;
+import ae2.api.stacks.KeyCounter;
+import ae2.api.networking.security.IActionSource;
+import ae2.api.util.AECableType;
+import ae2.me.ManagedGridNode;
+import ae2.me.helpers.IGridConnectedTile;
+import ae2.me.helpers.MachineSource;
+import com.google.common.primitives.Ints;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker.CraftWork;
 import hellfirepvp.modularmachinery.ModularMachinery;
-import net.minecraft.inventory.InventoryCrafting;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
-public final class EFabricatorMEChannel extends EFabricatorPart implements ICraftingProvider, IActionHost, IGridProxyable {
+public final class EFabricatorMEChannel extends EFabricatorPart implements ICraftingProvider, IGridConnectedTile {
 
-    private final AENetworkProxy aEProxy = new AENetworkProxy(this, "channel", this.getVisualItemStack(), true);
+    private final IGridNodeListener<EFabricatorMEChannel> nodeListener = new IGridNodeListener<>() {
+        @Override
+        public void onSaveChanges(EFabricatorMEChannel nodeOwner, IGridNode node) {
+            nodeOwner.saveChanges();
+        }
+
+        @Override
+        public void onStateChanged(EFabricatorMEChannel nodeOwner, IGridNode node, State state) {
+            nodeOwner.postPatternChangeEvent();
+        }
+    };
+    private final ItemStack visualItemStack;
+    private final IManagedGridNode mainNode = new ManagedGridNode(this, nodeListener);
     private final IActionSource source = new MachineSource(this);
     private boolean wasActive;
 
     public EFabricatorMEChannel() {
-        this.aEProxy.setIdlePowerUsage(1.0);
-        this.aEProxy.setFlags(GridFlags.REQUIRE_CHANNEL, GridFlags.DENSE_CAPACITY);
+        var controller = getController();
+        visualItemStack = controller == null ? new ItemStack(BlockEFabricatorMEChannel.INSTANCE) : new ItemStack(Objects.requireNonNull(controller.getParentController()));
+        mainNode.setIdlePowerUsage(1.0)
+            .setFlags(GridFlags.REQUIRE_CHANNEL, GridFlags.DENSE_CAPACITY)
+            .setVisualRepresentation(this.visualItemStack)
+            .setInWorldNode(true)
+            .setTagName("channel");
     }
 
     private static ItemStack getContainerItem(@Nullable final ItemStack stack) {
@@ -76,96 +91,74 @@ public final class EFabricatorMEChannel extends EFabricatorPart implements ICraf
             : new ItemStack(Objects.requireNonNull(controller.getParentController()));
     }
 
-    @MENetworkEventSubscribe
-    public void stateChange(final MENetworkPowerStatusChange event) {
-        this.postPatternChangeEvent();
-    }
-
-    @MENetworkEventSubscribe
-    public void stateChange(final MENetworkChannelsChanged event) {
-        this.postPatternChangeEvent();
-    }
-
     private void postPatternChangeEvent() {
-        final boolean active = this.aEProxy.isActive();
+        final boolean active = this.mainNode.isActive();
         if (this.wasActive != active) {
             this.wasActive = active;
-            try {
-                this.aEProxy.getGrid().postEvent(new MENetworkCraftingPatternChange(this, this.aEProxy.getNode()));
-            } catch (final GridAccessException ignored) {
-            }
+            ICraftingProvider.requestUpdate(mainNode);
         }
     }
 
     @Override
-    public void provideCrafting(final ICraftingProviderHelper tracker) {
+    public List<IPatternDetails> getAvailablePatterns() {
         final EFabricatorController controller = this.getController();
         if (controller == null) {
-            return;
+            return Collections.emptyList();
         }
+
+        final var patternBuses = controller.getPatternBuses();
+        if (patternBuses == null) {
+            return Collections.emptyList();
+        }
+
+        final List<IPatternDetails> details = new ObjectArrayList<>();
         for (final var bus : controller.getPatternBuses()) {
-            bus.provideCrafting(this, tracker);
+            details.addAll(bus.getDetails());
         }
+        return details;
     }
 
     @Override
-    public boolean pushPattern(final ICraftingPatternDetails pattern, final InventoryCrafting table) {
+    public boolean pushPattern(final IPatternDetails pattern, final KeyCounter[] inputHolder, final int multiplier) {
         if (this.isBusy()) {
             return false;
         }
-        if (!pattern.isCraftable()) {
-            return pattern instanceof FluidCraftingPatternDetails fluid && this.pushFluidPattern(fluid, table);
-        }
-        final ItemStack output = pattern.getOutput(table, this.getWorld());
-        if (output.isEmpty()) {
-            return false;
-        }
-        final ItemStack[] remaining = new ItemStack[9];
-        Arrays.fill(remaining, ItemStack.EMPTY);
-        int size = 0;
-        for (int i = 0; i < Math.min(table.getSizeInventory(), 9); i++) {
-            final ItemStack item = table.getStackInSlot(i);
-            if (!item.isEmpty()) {
-                if (size == 0) {
-                    size = item.getCount();
-                }
-                remaining[i] = getContainerItem(item);
-            }
-        }
-        output.setCount(output.getCount() * size);
-        return this.partController.offerWork(new CraftWork(remaining, output, size));
-    }
 
-    private boolean pushFluidPattern(final FluidCraftingPatternDetails pattern, final InventoryCrafting table) {
-        final var outputs = pattern.getOutputs();
-        final ItemStack output = outputs[0] == null ? ItemStack.EMPTY : outputs[0].getCachedItemStack(outputs[0].getStackSize());
-        if (output.isEmpty()) {
+        if (!(pattern.getPrimaryOutput().what() instanceof AEItemKey outputKey)) {
             return false;
         }
+        if (inputHolder.length > 9 || multiplier <= 0) {
+            return false;
+        }
+
         final ItemStack[] remaining = new ItemStack[9];
         Arrays.fill(remaining, ItemStack.EMPTY);
-        int size = 0;
-        for (int i = 0; i < Math.min(table.getSizeInventory(), 9); i++) {
-            final ItemStack item = table.getStackInSlot(i);
-            if (!item.isEmpty()) {
-                if (size == 0) {
-                    size = item.getCount();
-                    if (item.getItem() instanceof ItemFluidPacket) {
-                        final int amount = ((FluidStack) FakeItemRegister.getStack(item)).amount;
-                        final int patternAmount = ((FluidStack) FakeItemRegister.getStack(pattern.getInputs()[i])).amount;
-                        size = amount / patternAmount;
-                    }
-                }
-                remaining[i] = getContainerItem(item);
+        for (int i = 0; i < inputHolder.length; i++) {
+            final var entry = inputHolder[i].getFirstEntry();
+            if (entry == null) {
+                return false;
             }
+            final long value = entry.getLongValue();
+            if (!(entry.getKey() instanceof AEItemKey key)) {
+                return false;
+            }
+            remaining[i] = getContainerItem(key.toStack(Ints.saturatedCast(value)));
         }
-        output.setCount(output.getCount() * size);
-        return this.partController.offerWork(new CraftWork(remaining, output, size));
+        final var outputAmount = Math.multiplyExact(pattern.getPrimaryOutput().amount(), multiplier);
+        if (outputAmount > Integer.MAX_VALUE) {
+            return false;
+        }
+        return this.partController.offerWork(new CraftWork(remaining, outputKey.toStack(Ints.saturatedCast(outputAmount)), multiplier));
     }
 
     public boolean insertPattern(final ItemStack stack) {
-        return PatternItemFilter.INSTANCE.allowInsert(null, -1, stack)
-            && this.partController != null && this.partController.insertPattern(stack);
+        if (!PatternDetailsHelper.isEncodedPattern(stack)) {
+            return false;
+        }
+        if (partController != null) {
+            return partController.insertPattern(stack);
+        }
+        return false;
     }
 
     @Override
@@ -175,73 +168,42 @@ public final class EFabricatorMEChannel extends EFabricatorPart implements ICraf
 
     @Override
     @Nonnull
-    public IGridNode getActionableNode() {
-        return this.aEProxy.getNode();
-    }
-
-    @Override
-    @Nonnull
-    public AENetworkProxy getProxy() {
-        return this.aEProxy;
-    }
-
-    @Override
-    @Nonnull
-    public DimensionalCoord getLocation() {
-        return new DimensionalCoord(this);
-    }
-
-    @Override
-    public void gridChanged() {
-    }
-
-    @Override
-    @Nullable
-    public IGridNode getGridNode(@Nonnull final AEPartLocation direction) {
-        return this.aEProxy.getNode();
-    }
-
-    @Override
-    @Nonnull
-    public AECableType getCableConnectionType(@Nonnull final AEPartLocation direction) {
-        return AECableType.DENSE_SMART;
-    }
-
-    @Override
-    public void securityBreak() {
-        this.getWorld().destroyBlock(this.getPos(), true);
+    public IManagedGridNode getMainNode() {
+        return this.mainNode;
     }
 
     @Override
     public void readCustomNBT(final NBTTagCompound tag) {
         super.readCustomNBT(tag);
-        this.aEProxy.readFromNBT(tag);
+        this.mainNode.loadFromNBT(tag);
     }
 
     @Override
     public void writeCustomNBT(final NBTTagCompound tag) {
         super.writeCustomNBT(tag);
-        this.aEProxy.writeToNBT(tag);
+        this.mainNode.saveToNBT(tag);
     }
 
     @Override
     public void onChunkUnload() {
         super.onChunkUnload();
-        this.aEProxy.onChunkUnload();
+        this.mainNode.destroy();
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
-        this.aEProxy.invalidate();
+        this.mainNode.destroy();
     }
 
     @Override
     public void onAssembled() {
         super.onAssembled();
-        this.aEProxy.setVisualRepresentation(this.getVisualItemStack());
+        this.mainNode.setVisualRepresentation(this.getVisualItemStack());
         ModularMachinery.EXECUTE_MANAGER.addSyncTask(() -> {
-            this.aEProxy.onReady();
+            if (!mainNode.isReady() && !getWorld().isRemote) {
+                this.mainNode.create(getWorld(), getPos());
+            }
             this.partController.recalculateEnergyUsage();
         });
     }
@@ -249,7 +211,30 @@ public final class EFabricatorMEChannel extends EFabricatorPart implements ICraf
     @Override
     public void onDisassembled() {
         super.onDisassembled();
-        this.aEProxy.setVisualRepresentation(this.getVisualItemStack());
-        this.aEProxy.invalidate();
+        this.mainNode.setVisualRepresentation(this.getVisualItemStack());
+        this.mainNode.destroy();
+    }
+
+    @Override
+    public void saveChanges() {
+        this.markDirty();
+    }
+
+    @Override
+    public AECableType getCableConnectionType(EnumFacing dir) {
+        return AECableType.DENSE_SMART;
+    }
+
+    @Override
+    public boolean hasCapability(@NotNull Capability<?> capability, @Nullable EnumFacing facing) {
+        return capability == AECapabilities.IN_WORLD_GRID_NODE_HOST || super.hasCapability(capability, facing);
+    }
+
+    @Override
+    public @Nullable <T> T getCapability(@NotNull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == AECapabilities.IN_WORLD_GRID_NODE_HOST) {
+            return AECapabilities.IN_WORLD_GRID_NODE_HOST.cast(this);
+        }
+        return super.getCapability(capability, facing);
     }
 }

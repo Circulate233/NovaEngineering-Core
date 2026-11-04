@@ -7,7 +7,6 @@ import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.performance.ClassResourceCacheCompactor;
 import github.kasuminova.novaeng.common.performance.MeteorWriteBatch;
 import github.kasuminova.novaeng.common.performance.SpawnCandidateList;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.mixin.rpsideas.AccessorItemBioticSensor;
 import hellfirepvp.modularmachinery.common.base.Mods;
@@ -75,7 +74,6 @@ public final class WorldCacheCleanupHandler {
         }
         HyperNetCaches.removeWorld(world);
         DreamEnergyCore.removeWorld(world);
-        AutoCraftingQueue.removeWorld(world);
         if (Mods.BM2.isPresent()) {
             MMAltar.removeWorld(world);
         }
