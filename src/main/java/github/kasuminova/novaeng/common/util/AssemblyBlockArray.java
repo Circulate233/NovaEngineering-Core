@@ -205,14 +205,12 @@ public final class AssemblyBlockArray extends BlockArray {
     public void start(final boolean usingAE, final boolean ignoreFluids) {
         this.usingAE = usingAE;
         this.ignoreFluids = ignoreFluids;
+        // Required fluids are always placed last; ignoreFluids only allows replacing existing fluids.
         final var solid = new ArrayDeque<QueuedPlacement>();
         final var fluid = new ArrayDeque<QueuedPlacement>();
         for (final var entry : this.pattern.entrySet()) {
             getMaterialList(entry.getValue());
             final var stage = getPlacementStage(entry.getValue());
-            if (ignoreFluids && stage == PlacementStage.FLUID) {
-                continue;
-            }
             final var placement = new QueuedPlacement(entry.getKey(), entry.getValue(), stage);
             (stage == PlacementStage.FLUID ? fluid : solid).add(placement);
         }
@@ -248,12 +246,14 @@ public final class AssemblyBlockArray extends BlockArray {
             return OperatingStatus.SUCCESS;
         }
         final var old = world.getBlockState(pos);
-        if (old != null && old.getBlock() != Blocks.AIR && !(this.ignoreFluids && isFluid(old))) {
+        if (old != null && old.getBlock() != Blocks.AIR) {
             if (this.matchesState(info, old)) {
                 return OperatingStatus.ALREADY_EXISTS;
             }
-            player.sendMessage(new TextComponentTranslation("message.assembly.tip.cannot_replace", MiscUtils.posToString(pos)));
-            return OperatingStatus.FAILURE;
+            if (!(this.ignoreFluids && isFluid(old))) {
+                player.sendMessage(new TextComponentTranslation("message.assembly.tip.cannot_replace", MiscUtils.posToString(pos)));
+                return OperatingStatus.FAILURE;
+            }
         }
         final var materials = getMaterialList(info);
         WirelessTerminalGuiObject terminal = null;
