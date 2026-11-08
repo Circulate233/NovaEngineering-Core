@@ -470,7 +470,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeSoundUpdateWakeups")
-        @Config.Comment("Notify the sound command thread once after each tickable sound's volume, pitch and position update. Commands and play/stop notifications remain unchanged.")
+        @Config.Comment("Batch sound parameter notifications and wake initialization waits when the sound library finishes. Commands and play/stop notifications remain unchanged.")
         public boolean optimizeSoundUpdateWakeups = true;
 
         @Config.RequiresMcRestart

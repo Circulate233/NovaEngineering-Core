@@ -4,7 +4,6 @@ import com.brandon3055.draconicevolution.blocks.tileentity.TileGrinder;
 import github.kasuminova.novaeng.common.hypernet.old.HyperNetCaches;
 import github.kasuminova.novaeng.common.machine.DreamEnergyCore;
 import github.kasuminova.novaeng.common.machine.MMAltar;
-import github.kasuminova.novaeng.common.performance.ClassResourceCacheCompactor;
 import github.kasuminova.novaeng.common.performance.MeteorWriteBatch;
 import github.kasuminova.novaeng.common.performance.SpawnCandidateList;
 import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
@@ -79,7 +78,6 @@ public final class WorldCacheCleanupHandler {
         if (Mods.BM2.isPresent()) {
             MMAltar.removeWorld(world);
         }
-        ClassResourceCacheCompactor.compactIfGrown();
     }
 
     @SubscribeEvent

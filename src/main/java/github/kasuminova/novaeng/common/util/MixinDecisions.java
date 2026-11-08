@@ -170,7 +170,7 @@ public final class MixinDecisions {
             case "astralsorcery.MixinAstralSorceryConfig" -> NovaEngCoreConfig.CLIENT.optimizeAstralSorceryConfigSave;
             case "astralsorcery.MixinTileAccelerationBlacklist" ->
                 NovaEngCoreConfig.SERVER.optimizeHorologiumAccelerationBlacklist;
-            case "enderio.MixinRecipeFactoryXmlInputFactory" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoXmlFactory;
+            case "enderio.MixinRecipeFactoryXmlInputFactory", "enderio.MixinStaxFactory" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoXmlFactory;
             case "enderio.MixinAlloyRecipeManager" -> NovaEngCoreConfig.CLIENT.optimizeEnderIoAlloyIndex;
             case "minecraft.MixinShapelessRecipeAllocation" ->
                 NovaEngCoreConfig.CLIENT.optimizeShapelessRecipeAllocation;
@@ -190,6 +190,8 @@ public final class MixinDecisions {
             case "enderio.MixinNNList" -> enderioLoaded;
             case "threng.MixinL9AspectInventory", "threng.MixinL9AspectSlot" -> threngLoaded;
             case "immersiveengineering.MixinTileEntityPumpjack" -> immersiveEngineeringLoaded;
+            case "immersiveengineering.MixinMetalComponentLookup" ->
+                immersiveEngineeringLoaded && NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
             case "cofh.MixinTypeEntry" -> cofhLoaded;
             case "cofh.MixinTransposerRecipeCategoryFill",
                  "cofh.MixinTransposerRecipeCategoryExtract" ->
@@ -213,9 +215,13 @@ public final class MixinDecisions {
             case "minecraft.forge.MixinChunkIOProviderNbt" -> NovaEngCoreConfig.PERFORMANCE.optimizeFerriteChunkNbt;
             case "minecraft.MixinMultipartModelBuilder" -> NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
             case "jei.MixinElementSearch" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
+            case "jei.MixinIngredientInformation" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
+            case "vintagefix.MixinDefaultPackJarUri" -> NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
+            case "patchouli.MixinBookContentsLocale" -> NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
             case "jei.MixinStackHelper" -> NovaEngCoreConfig.CLIENT.optimizeJeiStackUidCache;
             case "jei.MixinRecipeRegistryId" -> NovaEngCoreConfig.CLIENT.optimizeJeiRecipeId;
-            case "jei.MixinRecipeMapDeduplication", "jei.MixinItemStackIngredientHash" ->
+            case "jei.MixinRecipeMapDeduplication", "jei.MixinItemStackIngredientHash",
+                 "jei.AccessorIngredients", "jei.MixinRecipeRegistryInsertion" ->
                 NovaEngCoreConfig.CLIENT.optimizeJeiRecipeIndex;
             case "jei.MixinRecipeHandlerSelection" -> NovaEngCoreConfig.CLIENT.optimizeJeiRecipeHandlerSelection;
             case "mantle.MixinRecipeItemCombination" -> NovaEngCoreConfig.CLIENT.optimizeMantleRecipeCombinations;
@@ -226,6 +232,8 @@ public final class MixinDecisions {
             case "minecraft.forge.MixinCraftingHelperJarScan" -> NovaEngCoreConfig.CLIENT.optimizeForgeRecipeJarScan;
             case "stellarcore.MixinClasspathIndexWorker" ->
                 NovaEngCoreConfig.CLIENT.optimizeClasspathIndexWorker;
+            case "stellarcore.InvokerDirectoryPathIndex", "stellarcore.MixinDirectoryPathIndexScan" ->
+                stellarCoreLoaded && NovaEngCoreConfig.CLIENT.optimizeClasspathIndexWorker;
             case "mmce.MixinBlockArrayIngredients" ->
                 NovaEngCoreConfig.CLIENT.optimizeMmcePreviewIngredients;
             case "mmce.MixinBlockStateDescriptorHash" -> NovaEngCoreConfig.CLIENT.optimizeMmceBlockStateDescriptorHash;
@@ -250,6 +258,8 @@ public final class MixinDecisions {
                 || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
             case "minecraft.forge.MixinEventBus" -> NovaEngCoreConfig.CLIENT.optimizeEventBusRegistration;
             case "zenscript.MixinTypeRegistry",
+                 "zenscript.MixinScriptPathParsing",
+                 "zenscript.MixinGenericTypeArguments",
                  "zenscript.MixinJavaMethod",
                  "zenutils.MixinClasspathBytesPath",
                  "zenscript.MixinZenTypeNativeMethods" -> NovaEngCoreConfig.CLIENT.optimizeZenScriptCompilation;
@@ -284,7 +294,8 @@ public final class MixinDecisions {
             case "minecraft.MixinTileEntityRendererDistance",
                  "minecraft.MixinEntityRendererTileEntityCulling" ->
                 NovaEngCoreConfig.CLIENT.optimizeTesrRenderDistance || NovaEngCoreConfig.CLIENT.optimizeTesrFrustumCulling;
-            case "minecraft.MixinSoundHandlerUpdateBatch", "minecraft.MixinSoundSystemWakeups" ->
+            case "minecraft.MixinSoundHandlerUpdateBatch", "minecraft.MixinSoundSystemWakeups",
+                 "minecraft.MixinSoundSystemInitialization" ->
                 NovaEngCoreConfig.CLIENT.optimizeSoundUpdateWakeups;
             case "minecraft.MixinInventoryChangeTrigger$Instance",
                  "minecraft.MixinInventoryChangeTrigger$Listeners",
@@ -344,7 +355,6 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.SERVER.optimizeVanillaOreGeometry || NovaEngCoreConfig.SERVER.unifiedOreGeneration;
             case "minecraft.MixinAttributeModifierSnapshot" ->
                 NovaEngCoreConfig.SERVER.optimizeAttributeModifierSnapshots;
-            case "minecraft.MixinGenLayerZoomRandom" -> NovaEngCoreConfig.SERVER.optimizeBiomeZoomRandom;
             case "minecraft.MixinMapGenStructure" -> NovaEngCoreConfig.SERVER.optimizeStructureLookup;
             case "minecraft.MixinStateImplementationProperties" ->
                 NovaEngCoreConfig.SERVER.optimizeBlockStateProperties;

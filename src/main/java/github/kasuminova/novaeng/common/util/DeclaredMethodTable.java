@@ -2,9 +2,10 @@ package github.kasuminova.novaeng.common.util;
 
 import org.jspecify.annotations.NonNull;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Answers declared-method lookups from a per-class table instead of the throwing reflective call.
@@ -23,19 +24,13 @@ import java.util.Comparator;
  */
 public final class DeclaredMethodTable {
 
-    private static final Comparator<Method> BY_NAME = Comparator.comparing(Method::getName);
+    private static final VarHandle PARAMETERS = MethodHandles.arrayElementVarHandle(Class[][].class);
 
     private static final ClassValue<Table> TABLES = new ClassValue<>() {
         @Override
         protected Table computeValue(final @NonNull Class<?> type) {
             final Method[] methods = type.getDeclaredMethods();
-            // Stable sorting preserves the VM's tie order for covariant bridge methods.
-            Arrays.sort(methods, BY_NAME);
-            final Class<?>[][] parameterTypes = new Class<?>[methods.length][];
-            for (int index = 0; index < methods.length; index++) {
-                parameterTypes[index] = methods[index].getParameterTypes();
-            }
-            return new Table(methods, parameterTypes);
+            return new Table(methods);
         }
     };
 
@@ -59,25 +54,16 @@ public final class DeclaredMethodTable {
      */
     public static Method lookup(final Class<?> owner, final String name, final Class<?>[] parameterTypes) {
         final Table table = TABLES.get(owner);
-        final Method[] methods = table.methods;
-        int low = 0;
-        int high = methods.length;
-        while (low < high) {
-            final int middle = (low + high) >>> 1;
-            if (methods[middle].getName().compareTo(name) < 0) {
-                low = middle + 1;
-            } else {
-                high = middle;
-            }
-        }
         Method selected = null;
-        for (int index = low; index < methods.length; index++) {
-            final Method method = methods[index];
-            if (!method.getName().equals(name)) {
-                break;
+        for (int index = table.heads[name.hashCode() & (table.heads.length - 1)]; index >= 0; index = table.next[index]) {
+            final Method method = table.methods[index];
+            if (!method.getName().equals(name) || method.getParameterCount() != parameterTypes.length) continue;
+            Class<?>[] parameters = (Class<?>[]) PARAMETERS.getAcquire(table.parameterTypes, index);
+            if (parameters == null) {
+                parameters = method.getParameterTypes();
+                PARAMETERS.setRelease(table.parameterTypes, index, parameters);
             }
-            if (table.parameterTypes[index].length == parameterTypes.length
-                && Arrays.equals(table.parameterTypes[index], parameterTypes)
+            if (Arrays.equals(parameters, parameterTypes)
                 && (selected == null || selected.getReturnType().isAssignableFrom(method.getReturnType()))) {
                 selected = method;
             }
@@ -92,7 +78,27 @@ public final class DeclaredMethodTable {
         return PUBLIC_TABLES.get(owner);
     }
 
-    private record Table(Method[] methods, Class<?>[][] parameterTypes) {
+    private static final class Table {
+        private final Method[] methods;
+        private final Class<?>[][] parameterTypes;
+        private final int[] heads;
+        private final int[] next;
+
+        private Table(final Method[] methods) {
+            this.methods = methods;
+            this.parameterTypes = new Class<?>[methods.length][];
+            int capacity = 1;
+            while (capacity < methods.length) capacity <<= 1;
+            this.heads = new int[capacity];
+            this.next = new int[methods.length];
+            Arrays.fill(heads, -1);
+            // Reverse insertion preserves the VM's declaration order, including equal covariant bridges.
+            for (int index = methods.length - 1; index >= 0; index--) {
+                final int bucket = methods[index].getName().hashCode() & (capacity - 1);
+                next[index] = heads[bucket];
+                heads[bucket] = index;
+            }
+        }
     }
 
 }
