@@ -18,7 +18,7 @@ public abstract class MixinGLStateManagerVertexArray {
         at = @At(value = "INVOKE",
             target = "Lcom/gtnewhorizons/angelica/glsm/backend/RenderBackend;bindVertexArray(I)V",
             remap = false),
-        remap = false, require = 1)
+        remap = false, require = 0)
     private static void nova$skipSameVertexArray(final RenderBackend backend,
                                                  final int normalizedVertexArray) {
         final GenericAttributeState state = GenericAttributeStateImpl.instance();
@@ -29,17 +29,17 @@ public abstract class MixinGLStateManagerVertexArray {
     }
 
     @Inject(method = "glDeleteVertexArrays(I)V", at = @At("RETURN"),
-        remap = false, require = 1)
+        remap = false, require = 0)
     private static void nova$invalidateDeletedVertexArray(final int array, final CallbackInfo ci) {
         GenericAttributeStateImpl.instance().invalidateVertexArray();
     }
 
-    @Inject(method = "reset()V", at = @At("RETURN"), remap = false, require = 1)
+    @Inject(method = "reset()V", at = @At("RETURN"), remap = false, require = 0)
     private static void nova$invalidateAfterReset(final CallbackInfo ci) {
         GenericAttributeStateImpl.instance().invalidateVertexArray();
     }
 
-    @Inject(method = "preInit(II)V", at = @At("RETURN"), remap = false, require = 1)
+    @Inject(method = "preInit(II)V", at = @At("RETURN"), remap = false, require = 0)
     private static void nova$invalidateAfterPreInit(final int displayWidth,
                                                     final int displayHeight,
                                                     final CallbackInfo ci) {
@@ -47,13 +47,13 @@ public abstract class MixinGLStateManagerVertexArray {
     }
 
     @Inject(method = "init(Ljava/lang/Runnable;)V", at = @At("RETURN"),
-        remap = false, require = 1)
+        remap = false, require = 0)
     private static void nova$invalidateAfterInit(final Runnable initCallback, final CallbackInfo ci) {
         GenericAttributeStateImpl.instance().invalidateVertexArray();
     }
 
     @Inject(method = "markSplashComplete()V", at = @At("RETURN"),
-        remap = false, require = 1)
+        remap = false, require = 0)
     private static void nova$invalidateAfterSplash(final CallbackInfo ci) {
         GenericAttributeStateImpl.instance().invalidateVertexArray();
     }
