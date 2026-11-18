@@ -150,9 +150,14 @@ public class NetNodeImpl extends NetNode {
     }
 
     @Override
-    public void readNBT(final NBTTagCompound customData) {
+    public synchronized void readNBT(final NBTTagCompound customData) {
         super.readNBT(customData);
-        this.computationPointConsumption = customData.getDouble("c");
+        // Server-side consumers are rebuilt by resumed recipe ticks, not persisted totals.
+        clearRecipeConsumers();
+        if (owner.getWorld() != null && owner.getWorld().isRemote) {
+            // The client still receives the total through the controller's custom data.
+            this.computationPointConsumption = customData.getDouble("c");
+        }
     }
 
     @Override

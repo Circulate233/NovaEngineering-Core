@@ -139,30 +139,33 @@ public class HyperNetEventHandler {
 
     @SubscribeEvent
     public void onServerTick(final TickEvent.ServerTickEvent event) {
-        if (event.side.isClient()) {
+        if (event.side.isClient() || event.phase != TickEvent.Phase.START) {
             return;
         }
 
-        switch (event.phase) {
-            case START -> {
-                Action action;
-                while ((action = TICK_START_ACTIONS.poll()) != null) {
-                    try {
-                        action.doAction();
-                    } catch (Exception e) {
-                        NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));
-                    }
-                }
+        Action action;
+        while ((action = TICK_START_ACTIONS.poll()) != null) {
+            try {
+                action.doAction();
+            } catch (Exception e) {
+                NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));
             }
-            case END -> {
-                Action action;
-                while ((action = TICK_END_ACTIONS.poll()) != null) {
-                    try {
-                        action.doAction();
-                    } catch (Exception e) {
-                        NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));
-                    }
-                }
+        }
+    }
+
+    // MMCE waits for its asynchronous machine tasks at LOW priority.
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onServerTickEnd(final TickEvent.ServerTickEvent event) {
+        if (event.side.isClient() || event.phase != TickEvent.Phase.END) {
+            return;
+        }
+
+        Action action;
+        while ((action = TICK_END_ACTIONS.poll()) != null) {
+            try {
+                action.doAction();
+            } catch (Exception e) {
+                NovaEngineeringCore.log.warn(ThrowableUtil.stackTraceToString(e));
             }
         }
     }

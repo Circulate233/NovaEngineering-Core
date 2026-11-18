@@ -313,6 +313,9 @@ public final class MixinDecisions {
                  "minecraft.forge.MixinEventBusPost" -> NovaEngCoreConfig.SERVER.optimizeForgeEventDispatch;
             case "zenutils.MixinCatenationManager" -> NovaEngCoreConfig.SERVER.optimizeZenUtilsTickWork;
             case "ic2.MixinConfigTickPath" -> NovaEngCoreConfig.SERVER.optimizeIc2TickConfigPath;
+            case "ic2.AccessorEnergyNetDelegate",
+                 "ic2.MixinEnergyNetChangeHandler", "ic2.MixinEnergyNetEventHandlerRecovery",
+                 "ic2.MixinEnergyNetLocalRecovery" -> ic2Loaded;
             case "minecraft.MixinMinecraftServerDimensionIds", "minecraft.forge.AccessorDimensionManagerWorlds",
                  "minecraft.forge.MixinDimensionManagerLeakCheck" -> NovaEngCoreConfig.SERVER.optimizeDimensionTickIds;
             case "stellarcore.MixinPlayerChunkMapSnapshot" -> !stellarCoreLoaded
