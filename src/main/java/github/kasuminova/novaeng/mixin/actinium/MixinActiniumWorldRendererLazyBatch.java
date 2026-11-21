@@ -8,25 +8,15 @@ import github.kasuminova.novaeng.client.render.TileEntityRenderCulling;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Opens Actinium's TESR GL guard and FastTESR batch only when the current render pass reaches an
- * actual dispatcher render call. The original pass predicate, iteration, exception handling, and
- * cleanup structure remain in control.
+ * Opens the FastTESR batch when the current render pass reaches an actual dispatcher render call.
+ * Actinium's GL guard still encloses its pass setup and all three TESR batchers' flushes.
  */
 @Mixin(value = ActiniumWorldRenderer.class, remap = false)
 public abstract class MixinActiniumWorldRendererLazyBatch {
-
-    @Unique
-    private static void nova$restoreOpenedBatch() {
-        final State state = TileEntityBatchScopes.current();
-        if (state != null && state.isBatchOpened()) {
-            TileEntityGlStateGuard.restoreForBatch();
-        }
-    }
 
     @Redirect(
         method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
@@ -39,102 +29,32 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
     private void nova$deferBatchOpen(final TileEntityRendererDispatcher dispatcher) {
     }
 
-    @Unique
-    private static void nova$drawOpenedBatch(final TileEntityRendererDispatcher dispatcher, final int renderPass) {
+    @Redirect(
+        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;drawBatch(I)V",
+            remap = false),
+        remap = false,
+        require = 2
+    )
+    private void nova$drawOpenedBatchOnExit(final TileEntityRendererDispatcher dispatcher, final int pass) {
         final State state = TileEntityBatchScopes.current();
         if (state != null && state.isBatchOpened()) {
-            dispatcher.drawBatch(renderPass);
+            dispatcher.drawBatch(pass);
         }
     }
 
     @Redirect(
         method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
         at = @At(value = "INVOKE",
-            target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;restoreForBatch()V",
-            ordinal = 0,
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$restoreOpenedBatchNormal() {
-        nova$restoreOpenedBatch();
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
-            target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;restoreForBatch()V",
-            ordinal = 1,
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$restoreOpenedBatchExceptional() {
-        nova$restoreOpenedBatch();
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;drawBatch(I)V",
-            ordinal = 0,
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$drawOpenedBatchNormal(final TileEntityRendererDispatcher dispatcher, final int pass) {
-        nova$drawOpenedBatch(dispatcher, pass);
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher;drawBatch(I)V",
-            ordinal = 1,
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$drawOpenedBatchExceptional(final TileEntityRendererDispatcher dispatcher, final int pass) {
-        nova$drawOpenedBatch(dispatcher, pass);
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
             target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;pop()V",
-            ordinal = 0,
             remap = false),
         remap = false,
-        require = 1
+        require = 2
     )
-    private void nova$popOpenedGuardNormal() {
-        nova$popOpenedGuard();
-    }
-
-    @Redirect(
-        method = "renderBlockEntities(Lcom/dhj/actinium/render/terrain/ActiniumWorldRenderer$TileEntityRenderContext;)I",
-        at = @At(value = "INVOKE",
-            target = "Lcom/dhj/actinium/render/terrain/TileEntityGlStateGuard;pop()V",
-            ordinal = 1,
-            remap = false),
-        remap = false,
-        require = 1
-    )
-    private void nova$popOpenedGuardExceptional() {
-        nova$popOpenedGuard();
-    }
-
-    @Unique
-    private static void nova$popOpenedGuard() {
-        final State state = TileEntityBatchScopes.current();
-        try {
-            if (state != null && state.isGuardPushed()) {
-                TileEntityGlStateGuard.pop();
-            }
-        } finally {
-            TileEntityBatchScopes.end();
-        }
+    private void nova$endBatchScope() {
+        TileEntityBatchScopes.end();
+        TileEntityGlStateGuard.pop();
     }
 
     @Redirect(
@@ -145,8 +65,9 @@ public abstract class MixinActiniumWorldRendererLazyBatch {
         remap = false,
         require = 1
     )
-    private void nova$deferGuardPush() {
-        // The original guard push/pop already encloses the full method in a try/finally.
+    private void nova$beginBatchScope() {
+        // New TESR batchers may touch GL while beginning or flushing an otherwise empty pass.
+        TileEntityGlStateGuard.push();
         TileEntityBatchScopes.begin();
     }
 

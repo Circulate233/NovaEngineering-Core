@@ -2,7 +2,7 @@ package github.kasuminova.novaeng.client.geometry.item;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import github.kasuminova.novaeng.mixin.geometry.actinium.MixinGeometryDisplayLists;
 import github.kasuminova.novaeng.mixin.geometry.item.MixinItemLayerModel;
 import github.kasuminova.novaeng.testutil.ForgeReflectionEnvironment;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -22,7 +22,6 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.BufferedInputStream;
@@ -259,15 +258,7 @@ class CompactItemModelTest {
         invokeMixin("github.kasuminova.novaeng.mixin.geometry.MixinGeometryLitItem", "novaeng$renderLayers", null, model,
             -1, null, callback);
         assertFalse(callback.isCancelled(), "Non-ITEM geometry must continue through the original renderer");
-        final String displayLists = "github.kasuminova.novaeng.mixin.geometry.actinium.MixinGeometryDisplayLists";
-        final CallbackInfoReturnable<Boolean> stableCallback = new CallbackInfoReturnable<>("isStableModel", true);
-        invokeMixin(displayLists, "novaeng$stable", model, stableCallback);
-        assertFalse(stableCallback.getReturnValue());
-        final List<BakedQuad> unusedQuads = List.of();
-        assertEquals(71, invokeMixin(displayLists, "novaeng$format", unusedQuads, (Operation<Integer>) args -> 71, model));
-        final int[] sampledColors = {1, 2};
-        assertSame(sampledColors, invokeMixin(displayLists, "novaeng$colors", null, unusedQuads, -1, null,
-            (Operation<int[]>) args -> sampledColors, model));
+        assertFalse(MixinGeometryDisplayLists.isStableModel(model));
         assertFalse(model.novaeng$isGeometryExposed());
         final List<BakedQuad> quads = model.novaeng$readQuads(null, null, 0);
         assertTrue(model.novaeng$isGeometryExposed());

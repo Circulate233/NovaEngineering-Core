@@ -57,9 +57,6 @@ dependencies {
     // Exact library versions embedded by NeoFontRender UI Enhancements at runtime.
     compileOnly 'com.huaban:jieba-analysis:1.0.2'
     compileOnly 'net.sf.jazzy:jazzy:0.5.2-rtext-1.4.1-2'
-    // Exact parser artifacts embedded by the installed Actinium build.
-    compileOnly 'org.antlr:antlr4-runtime:4.13.2'
-    compileOnly 'org.taumc:glsl-transformation-lib:0.2.0-33.g3ec381e'
     modCompileOnly name: 'neofontrender', version: '0.8.0-full'
     modCompileOnly name: 'neofontrender-ui-enhancements', version: '0.8.9'
 
@@ -127,7 +124,7 @@ dependencies {
     modCompileOnly 'curse.maven:geckolib-388172:4020277'
     modCompileOnly 'curse.maven:botania-225643:3330934'
     modCompileOnly 'curse.maven:baubles-227083:2518667'
-    modImplementation 'curse.maven:zenutil-401178:9380480'
+    modImplementation 'curse.maven:zenutil-401178:9680761'
     modCompileOnly 'curse.maven:scalingguis-319656:5150678'
     modCompileOnly 'curse.maven:matter-overdrive-community-edition-557428:4592069'
     modCompileOnly 'curse.maven:cofh-core-69162:2920433'
@@ -185,7 +182,7 @@ dependencies {
             config = project.file('accesstransformers/ender-utilities.cfg')
         }
     }
-    modCompileOnly("curse.maven:actinium-1-12-2-optimization-1650442:9242705")
+    modCompileOnly name: 'Actinium', version: 'alpha-0.0.14-0ecd38ed'
     modCompileOnly("curse.maven:chisel-235279:2915375")
     modCompileOnly("curse.maven:taiga-replant-replant-971802:5086860")
     modCompileOnly('curse.maven:librarianlib-continuous-1058274:6617935') {

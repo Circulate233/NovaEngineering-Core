@@ -163,7 +163,7 @@ public final class MixinConfigIntegrityTest {
     }
 
     private static String requiredSide(final String name) {
-        if (name.startsWith("geometry.") || name.startsWith("moreoverlays.")
+        if (name.startsWith("geometry.") || name.startsWith("moreoverlays.") || name.startsWith("actinium.")
             || Set.of("ftbquests.MixinQuestWrapper", "geckolib3.MixinRawGeometryTreeLookup",
             "mekanism.MixinSolarActivatorTexturePreload", "mekanism.MixinDimensionalStabilizerOverlaySnapshot",
             "astralsorcery.MixinBufferBatchCapacity", "neofontrender.MixinCosmicTessellatorCapacity",
@@ -267,6 +267,26 @@ public final class MixinConfigIntegrityTest {
                         final Class<?> actual = loader.loadClass(DECISIONS);
                         final Class<?> settings = loader.loadClass("github.kasuminova.novaeng.NovaEngCoreConfig");
                         for (final boolean enabled : List.of(false, true)) {
+                            for (final String name : List.of("MixinGLStateManagerGenericAttributes",
+                                "MixinGLSMCurrentAttribsGenericAttributes", "MixinRenderSystemGenericAttributes",
+                                "MixinShaderManagerGenericAttributes")) {
+                                gate(actual, settings, "CLIENT", "optimizeGenericAttributes", enabled,
+                                    "actinium." + name, enabled);
+                            }
+                            for (final String name : List.of("MixinGLStateManagerVertexArray", "MixinGLSMVertexInputVertexArray",
+                                "MixinGLSMAttribStackVertexArray", "MixinImmediateCommandListVertexArray",
+                                "MixinPassThroughGLStateManagerVertexArray")) {
+                                gate(actual, settings, "CLIENT", "optimizeVaoBindings", enabled,
+                                    "actinium." + name, enabled);
+                            }
+                            gate(actual, settings, "CLIENT", "optimizeAtlasUploadBinding", enabled,
+                                "actinium.MixinGLSMTexturesUploadBinding", enabled);
+                            gate(actual, settings, "CLIENT", "optimizeAtlasUploadBinding", enabled,
+                                "minecraft.MixinTextureMapUploadBinding", enabled && present.contains("actinium"));
+                            for (final boolean startup : List.of(false, true)) {
+                                gate(actual, settings, "PERFORMANCE", "optimizeStartupWork", startup,
+                                    "minecraft.MixinDynamicTextureUploadBinding", enabled && startup && present.contains("actinium"));
+                            }
                             gate(actual, settings, "CLIENT", "compressAnimationFrames", enabled,
                                 "minecraft.MixinAnimationFrameStorage", enabled);
                             for (final String name : List.of("minecraft.MixinGlobalTessellatorCapacity", "minecraft.MixinTesrTessellatorCapacity",
