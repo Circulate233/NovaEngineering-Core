@@ -1,47 +1,207 @@
 package github.kasuminova.novaeng.client.resource;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import github.kasuminova.novaeng.NovaEngineeringCore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
 /**
- * Shares model JSON parsing between loaders during one resource reload generation.
+ * Generation-scoped JSON metadata index keyed by resource location and source-pack identity.
  *
- * <p>Every query still resolves the winning resource source through the live resource manager.
- * Only parsed metadata from an explicitly static winning pack is reused, so dynamic overlays keep
- * their normal priority and update semantics. This index does not eliminate resource lookup.</p>
+ * <p>Each query first resolves and opens the current winning source. Static sources then share one
+ * parsed result, while unknown and mutable sources are parsed every time. The cache therefore
+ * avoids duplicate JSON parsing without bypassing dynamic overlay lookup or priority semantics.</p>
+ *
+ * <p>Nesting is tolerated through a depth counter rather than being rejected. A reload started from inside
+ * another reload would otherwise abort the outer reload with an exception, which is a far worse outcome than
+ * serving a slightly longer lived answer.</p>
  */
-public interface ModelJsonMetadataIndex {
+public final class ModelJsonMetadataIndex {
+
+    private static final Metadata EMPTY = new Metadata(false);
+    private static final ModelJsonMetadataIndex INSTANCE = new ModelJsonMetadataIndex();
+
+    private final AtomicLong nextGeneration = new AtomicLong();
+    private final AtomicInteger depth = new AtomicInteger();
+    private final AtomicReference<Generation> activeGeneration = new AtomicReference<>();
+
+    private final Supplier<IResourceManager> resources;
+
+    private ModelJsonMetadataIndex() {
+        this(() -> Minecraft.getMinecraft().getResourceManager());
+    }
+
+    ModelJsonMetadataIndex(final Supplier<IResourceManager> resources) {
+        this.resources = resources;
+    }
 
     /**
-     * Starts a metadata generation, retaining the current generation for nested reload calls.
-     */
-    void begin();
-
-    /**
-     * Reports whether loader mixins may answer from this generation.
+     * Returns the shared metadata owner used by resource and model-loader mixins.
      *
-     * @return {@code true} while a model reload is active
+     * @return shared metadata index
      */
-    boolean isActive();
+    public static ModelJsonMetadataIndex instance() {
+        return INSTANCE;
+    }
 
-    /**
-     * Tests the LibNine {@code 9s} discriminator in the selected model JSON.
-     *
-     * @param location exact resource location consumed by LibNine
-     * @param type requested discriminator value
-     * @return whether the parsed string equals {@code type}
-     */
-    boolean isLibNineType(ResourceLocation location, String type);
+    private static Metadata parse(final InputStream stream,
+                                  final ResourceLocation location,
+                                  final Generation generation) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            return readMetadata(reader);
+        } catch (final IOException | RuntimeException failure) {
+            logFailure(generation, location, failure);
+            return EMPTY;
+        }
+    }
 
-    /**
-     * Tests the AE2 {@code ae2_uvl_marker} value in a normalized model JSON resource.
-     *
-     * @param location normalized {@code models/...json} resource location
-     * @return parsed marker value, or {@code false} when absent or invalid
-     */
-    boolean hasUvlMarker(ResourceLocation location);
+    @SuppressWarnings("deprecation")
+    static Metadata readMetadata(final JsonReader reader) throws IOException {
+        boolean uvlMarker = false;
+        boolean validUvlMarker = true;
+        reader.setLenient(true);
+        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+            throw new IOException("Model JSON root is not an object");
+        }
+        reader.beginObject();
+        while (reader.hasNext()) {
+            final String name = reader.nextName();
+            if ("ae2_uvl_marker".equals(name)) {
+                final JsonToken token = reader.peek();
+                if (token == JsonToken.BOOLEAN) {
+                    uvlMarker = reader.nextBoolean();
+                } else if (token == JsonToken.STRING) {
+                    uvlMarker = Boolean.parseBoolean(reader.nextString());
+                } else if (token == JsonToken.NULL) {
+                    reader.nextNull();
+                } else {
+                    reader.skipValue();
+                    validUvlMarker = false;
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        reader.setLenient(false);
+        if (reader.peek() != JsonToken.END_DOCUMENT) {
+            throw new IOException("Model JSON has trailing content");
+        }
+        return new Metadata(validUvlMarker && uvlMarker);
+    }
 
-    /**
-     * Ends the generation and releases cached metadata and pack identities.
-     */
-    void end();
+    private static void logFailure(final Generation generation,
+                                   final ResourceLocation location,
+                                   final Throwable failure) {
+        if (generation.loggedFailures.add(location)) {
+            NovaEngineeringCore.log.warn(
+                "Failed to read model JSON metadata for {} in generation {}.",
+                location, generation.id, failure);
+        }
+    }
+
+    public void begin() {
+        if (this.depth.incrementAndGet() == 1) {
+            this.activeGeneration.set(new Generation(this.nextGeneration.incrementAndGet()));
+        }
+    }
+
+    public boolean isActive() {
+        return this.activeGeneration.get() != null;
+    }
+
+    public boolean hasUvlMarker(final ResourceLocation location) {
+        return this.lookup(location).uvlMarker;
+    }
+
+    public void end() {
+        if (this.depth.updateAndGet(current -> current > 0 ? current - 1 : 0) != 0) {
+            return;
+        }
+        final Generation generation = this.activeGeneration.getAndSet(null);
+        if (generation != null) {
+            generation.metadata.clear();
+            generation.loggedFailures.clear();
+        }
+    }
+
+    private Metadata lookup(final ResourceLocation location) {
+        final Generation generation = this.activeGeneration.get();
+        if (generation == null) {
+            return EMPTY;
+        }
+
+        try (IResource resource = this.resources.get().getResource(location)) {
+            final InputStream stream = resource.getInputStream();
+            if (!(stream instanceof SourcedResourceStream sourced) || !sourced.isCacheableSource()) {
+                return parse(stream, location, generation);
+            }
+
+            final MetadataKey key = new MetadataKey(location, sourced.sourceIdentity(), generation.id);
+            final Metadata result = generation.metadata.computeIfAbsent(
+                key, ignored -> parse(stream, location, generation));
+            if (this.activeGeneration.get() != generation) {
+                generation.metadata.remove(key, result);
+                return EMPTY;
+            }
+            return result;
+        } catch (final FileNotFoundException ignored) {
+            return EMPTY;
+        } catch (final IOException | RuntimeException failure) {
+            logFailure(generation, location, failure);
+            return EMPTY;
+        }
+    }
+
+    private static final class Generation {
+        private final long id;
+        private final ConcurrentHashMap<MetadataKey, Metadata> metadata = new ConcurrentHashMap<>();
+        private final Set<ResourceLocation> loggedFailures = ConcurrentHashMap.newKeySet();
+
+        private Generation(final long id) {
+            this.id = id;
+        }
+    }
+
+    private record MetadataKey(ResourceLocation location, Object sourceIdentity, long generation) {
+
+        @Override
+        public boolean equals(final Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (!(other instanceof MetadataKey(ResourceLocation location1, Object identity, long generation1))) {
+                return false;
+            }
+            return this.generation == generation1
+                && this.sourceIdentity == identity
+                && this.location.equals(location1);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = this.location.hashCode();
+            result = 31 * result + System.identityHashCode(this.sourceIdentity);
+            result = 31 * result + Long.hashCode(this.generation);
+            return result;
+        }
+    }
+
+    record Metadata(boolean uvlMarker) {
+    }
 }

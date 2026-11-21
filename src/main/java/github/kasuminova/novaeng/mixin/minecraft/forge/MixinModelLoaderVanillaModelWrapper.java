@@ -43,12 +43,17 @@ public abstract class MixinModelLoaderVanillaModelWrapper {
     @Overwrite
     public Collection<ResourceLocation> getDependencies() {
         ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
-        Map<ModelResourceLocation, IModel> stateModels = ((AccessorModelLoader) (Object) this.this$0).getStateModels();
+        // Override registration only contributes to setupModelRegistry. Runtime
+        // dependency resolution must not repopulate its released loading table.
+        Map<ModelResourceLocation, IModel> stateModels = this.this$0.isLoading()
+            ? ((AccessorModelLoader) (Object) this.this$0).getStateModels() : null;
         for (ResourceLocation dep : model.getOverrideLocations()) {
             if (!location.equals(dep)) {
                 builder.add(dep);
-                stateModels.put(ModelLoader.getInventoryVariant(dep.toString()),
-                    ModelLoaderRegistry.getModelOrLogError(dep, "Could not load override model " + dep + " for model " + location));
+                if (stateModels != null) {
+                    stateModels.put(ModelLoader.getInventoryVariant(dep.toString()),
+                        ModelLoaderRegistry.getModelOrLogError(dep, "Could not load override model " + dep + " for model " + location));
+                }
             }
         }
         if (model.getParentLocation() != null && !model.getParentLocation().getPath().startsWith("builtin/")) {

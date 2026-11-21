@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.client.resource;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -55,8 +56,7 @@ public final class DirectoryExistenceCache {
             return file.exists();
         }
         final String path = file.getAbsolutePath();
-        final DirectoryResourceSnapshot snapshot = generation.directories.computeIfAbsent(
-            root, DirectoryResourceSnapshot::new);
+        final DirectoryResourceSnapshot snapshot = generation.snapshot(root);
         final Boolean indexed = snapshot.contains(path);
         if (indexed != null) {
             return indexed;
@@ -68,6 +68,18 @@ public final class DirectoryExistenceCache {
         final boolean exists = file.exists();
         generation.answers.put(path, exists);
         return exists;
+    }
+
+    /** BASE resource names already contain the snapshot key; ordinary probes need no File or replacement String. */
+    public boolean existsResource(final File root, final String name) {
+        final Generation generation = this.activeGeneration;
+        if (generation != null) {
+            final DirectoryResourceSnapshot snapshot = generation.snapshot(root);
+            final Boolean indexed = snapshot.containsResource(name);
+            if (indexed != null) return indexed;
+        }
+        // Retain BASE's global literal replacement, File normalization, and live behavior outside a reload.
+        return exists(root, new File(root, name.replace("assets/", "")));
     }
 
     /** Starts a generation, discarding everything remembered before the outermost one. */
@@ -86,6 +98,22 @@ public final class DirectoryExistenceCache {
 
     private static final class Generation {
         private final Map<String, Boolean> answers = new ConcurrentHashMap<>();
-        private final Map<File, DirectoryResourceSnapshot> directories = new ConcurrentHashMap<>();
+        // Windows File.hashCode lowercases its path on every query; the comparator keeps the same root equivalence without that allocation.
+        private final Map<String, DirectoryResourceSnapshot> directories = File.separatorChar == '\\'
+            ? new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER) : new ConcurrentHashMap<>();
+
+        private DirectoryResourceSnapshot snapshot(final File root) {
+            final String path = root.getPath();
+            final DirectoryResourceSnapshot existing = directories.get(path);
+            if (existing != null) return existing;
+            // Only the first lookup for a root takes this lock; concurrent misses must not build duplicate directory walks.
+            synchronized (directories) {
+                final DirectoryResourceSnapshot raced = directories.get(path);
+                if (raced != null) return raced;
+                final DirectoryResourceSnapshot created = new DirectoryResourceSnapshot(root);
+                directories.put(path, created);
+                return created;
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hellfirepvp.modularmachinery.common.crafting.helper.RecipeCraftingContext.CraftingCheckResult;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
@@ -10,6 +12,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
 
@@ -20,14 +24,41 @@ public abstract class MixinCraftingCheckResultAllocation {
     @Mutable
     private Object2IntMap<String> unlocErrorMessagesMap;
 
+    @Unique
+    private String nova$onlyError;
+    @Unique
+    private int nova$onlyErrorCount;
+
+    // The development jar initializes this eagerly; the deployed jar already initializes it lazily.
+    @WrapOperation(method = "<init>*", at = @At(value = "NEW", target =
+        "it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap"), require = 0)
+    private static Object2IntOpenHashMap<String> nova$deferErrors(final Operation<Object2IntOpenHashMap<String>> original) {
+        return null;
+    }
+
     /**
      * @author NovaEngineering
-     * @reason Successful checks need no error map; allocate one only for the first actual error.
+     * @reason Keep the common single-error result inline; preserve the original hash order on promotion.
      */
     @Overwrite
     public void addError(final String error) {
         if (error.isEmpty()) return;
-        if (unlocErrorMessagesMap == null) unlocErrorMessagesMap = new Object2IntOpenHashMap<>(2);
+        if (unlocErrorMessagesMap == null) {
+            if (nova$onlyError == null) {
+                nova$onlyError = error;
+                nova$onlyErrorCount = 1;
+                return;
+            }
+            if (nova$onlyError.equals(error)) {
+                nova$onlyErrorCount++;
+                return;
+            }
+            // Capacity affects iteration order and therefore the winner among equal-frequency errors.
+            unlocErrorMessagesMap = new Object2IntOpenHashMap<>();
+            unlocErrorMessagesMap.put(nova$onlyError, nova$onlyErrorCount);
+            nova$onlyError = null;
+            nova$onlyErrorCount = 0;
+        }
         ((Object2IntOpenHashMap<String>) unlocErrorMessagesMap).addTo(error, 1);
     }
 
@@ -38,6 +69,8 @@ public abstract class MixinCraftingCheckResultAllocation {
     @Overwrite
     public void overrideError(final String error) {
         if (unlocErrorMessagesMap != null) unlocErrorMessagesMap.clear();
+        nova$onlyError = null;
+        nova$onlyErrorCount = 0;
         this.addError(error);
     }
 
@@ -47,7 +80,7 @@ public abstract class MixinCraftingCheckResultAllocation {
      */
     @Overwrite
     public boolean isFailure() {
-        return unlocErrorMessagesMap != null && !unlocErrorMessagesMap.isEmpty();
+        return nova$onlyError != null || (unlocErrorMessagesMap != null && !unlocErrorMessagesMap.isEmpty());
     }
 
     /**
@@ -56,7 +89,7 @@ public abstract class MixinCraftingCheckResultAllocation {
      */
     @Overwrite
     public boolean isSuccess() {
-        return unlocErrorMessagesMap == null || unlocErrorMessagesMap.isEmpty();
+        return !isFailure();
     }
 
     /**
@@ -65,7 +98,9 @@ public abstract class MixinCraftingCheckResultAllocation {
      */
     @Overwrite
     public List<String> getUnlocalizedErrorMessages() {
-        final ObjectArrayList<String> result = new ObjectArrayList<>(unlocErrorMessagesMap == null ? 0 : unlocErrorMessagesMap.size());
+        final ObjectArrayList<String> result = new ObjectArrayList<>(
+            nova$onlyError != null ? 1 : unlocErrorMessagesMap == null ? 0 : unlocErrorMessagesMap.size());
+        if (nova$onlyError != null) result.add(nova$onlyError);
         if (unlocErrorMessagesMap != null) {
             result.addAll(unlocErrorMessagesMap.keySet());
             result.sort((left, right) -> Integer.compare(unlocErrorMessagesMap.getInt(left), unlocErrorMessagesMap.getInt(right)));
@@ -79,6 +114,7 @@ public abstract class MixinCraftingCheckResultAllocation {
      */
     @Overwrite
     public String getFirstErrorMessage(final String defaultMessage) {
+        if (nova$onlyError != null) return nova$onlyError;
         if (unlocErrorMessagesMap == null || unlocErrorMessagesMap.isEmpty()) return defaultMessage;
         String first = defaultMessage;
         int minimum = 0;

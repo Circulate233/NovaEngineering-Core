@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.jei;
 
+import github.kasuminova.novaeng.common.util.collection.WeakCacheMaintenance;
 import github.kasuminova.novaeng.common.util.collection.WeakObject2IntCache;
 import mezz.jei.plugins.vanilla.ingredients.item.ItemStackHelper;
 import mezz.jei.util.Log;
@@ -13,7 +14,8 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class MixinItemStackIngredientHash {
 
     @Unique
-    private final WeakObject2IntCache<ItemStack> nova$hashes = new WeakObject2IntCache<>();
+    private final WeakObject2IntCache<ItemStack> nova$hashes =
+        WeakCacheMaintenance.register(new WeakObject2IntCache<>());
 
     /**
      * @author circulation

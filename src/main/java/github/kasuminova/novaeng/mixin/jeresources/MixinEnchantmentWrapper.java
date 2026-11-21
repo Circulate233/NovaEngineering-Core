@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 @Mixin(value = EnchantmentWrapper.class, remap = false)
 public abstract class MixinEnchantmentWrapper {
@@ -19,8 +20,11 @@ public abstract class MixinEnchantmentWrapper {
     @Nullable
     @Overwrite
     public static EnchantmentWrapper create(final ItemStack itemStack) {
-        final ObjectArrayList<EnchantmentEntry> entries = new ObjectArrayList<>(
-            EnchantmentRegistry.getInstance().getEnchantments(itemStack));
-        return entries.isEmpty() ? null : InvokerEnchantmentWrapper.nova$create(itemStack, entries);
+        final Set<EnchantmentEntry> applicable = EnchantmentRegistry.getInstance().getEnchantments(itemStack);
+        if (applicable.isEmpty()) {
+            return null;
+        }
+        final ObjectArrayList<EnchantmentEntry> entries = new ObjectArrayList<>(applicable);
+        return InvokerEnchantmentWrapper.nova$create(itemStack, entries);
     }
 }

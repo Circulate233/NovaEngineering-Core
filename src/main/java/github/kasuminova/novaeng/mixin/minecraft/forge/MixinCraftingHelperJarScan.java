@@ -45,6 +45,9 @@ public abstract class MixinCraftingHelperJarScan {
             return;
         }
         ZipFile zip = null;
+        if (!RecipeJarProbe.mayContain(source, base + "/_factories.json")) {
+            return;
+        }
         try {
             zip = new ZipFile(source);
             // ZIPFS rejects some malformed entry paths even when _factories.json is absent.
@@ -72,6 +75,15 @@ public abstract class MixinCraftingHelperJarScan {
         } finally {
             IOUtils.closeQuietly(zip);
         }
+    }
+
+    // ForgeHooks calls this overload directly for advancements, bypassing the recipe redirect above.
+    @Redirect(method = "loadFactories(Lnet/minecraftforge/fml/common/ModContainer;Ljava/lang/String;[Lnet/minecraftforge/common/crafting/CraftingHelper$FactoryLoader;)V",
+        at = @At(value = "INVOKE", target = "Ljava/io/File;isFile()Z"), require = 1)
+    private static boolean nova$probeAdvancementFactories(final File source, final ModContainer mod, final String base,
+                                                          final CraftingHelper.FactoryLoader<?>[] loaders) {
+        return source.isFile() && (!source.getName().endsWith(".jar") || !base.endsWith("/advancements")
+            || RecipeJarProbe.mayContain(source, base + "/_factories.json"));
     }
 
     @Redirect(method = "findFiles(Lnet/minecraftforge/fml/common/ModContainer;Ljava/lang/String;Ljava/util/function/Function;Ljava/util/function/BiFunction;ZZ)Z", at = @At(value = "INVOKE",

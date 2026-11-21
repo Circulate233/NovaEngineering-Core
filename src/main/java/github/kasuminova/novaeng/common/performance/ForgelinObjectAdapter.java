@@ -123,7 +123,9 @@ public final class ForgelinObjectAdapter implements ILanguageAdapter {
         }
         Intrinsics.checkNotNullParameter(container, "container");
         Intrinsics.checkNotNullParameter(classLoader, "classLoader");
-        LOGGER.debug("FML has asked for {} to be constructed", objectClass.getSimpleName());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("FML has asked for {} to be constructed", objectClass.getSimpleName());
+        }
         try {
             Class.forName(objectClass.getName(), true, classLoader);
         } catch (AssertionError failure) {
@@ -147,7 +149,29 @@ public final class ForgelinObjectAdapter implements ILanguageAdapter {
     @Override
     public void setProxy(final Field target, final Class<?> proxyTarget, final Object proxy)
         throws IllegalAccessException, NoSuchFieldException {
-        original().setProxy(target, proxyTarget, proxy);
+        final ILanguageAdapter adapter = original();
+        if (adapter.getClass() != KotlinAdapter.class || target == null || proxyTarget == null || proxy == null) {
+            adapter.setProxy(target, proxyTarget, proxy);
+            return;
+        }
+        final MethodHandle getter = OBJECTS.get(proxyTarget).handle();
+        if (getter == null) {
+            adapter.setProxy(target, proxyTarget, proxy);
+            return;
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Setting proxy: {}.{} -> {}", target.getDeclaringClass().getSimpleName(), target.getName(), proxy);
+        }
+        final Object instance;
+        try {
+            instance = (Object) getter.invokeExact();
+        } catch (RuntimeException | Error failure) {
+            throw failure;
+        } catch (Throwable failure) {
+            throw new IllegalStateException(failure);
+        }
+        // Field.set retains the original access checks, receiver validation and static-field handling.
+        target.set(instance, proxy);
     }
 
     @Override

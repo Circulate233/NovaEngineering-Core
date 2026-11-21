@@ -3,8 +3,7 @@ package github.kasuminova.novaeng.common.util;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.datasync.DataParameter;
-
-import java.lang.reflect.Field;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class EntityLivingBaseValues {
 
@@ -13,9 +12,7 @@ public class EntityLivingBaseValues {
     static {
         DataParameter<Float> health = null;
         try {
-            Field filedHealth = EntityLivingBase.class.getDeclaredField("HEALTH");
-            filedHealth.setAccessible(true);
-            health = (DataParameter<Float>) filedHealth.get(null);
+            health = ObfuscationReflectionHelper.getPrivateValue(EntityLivingBase.class, null, "field_184632_c");
         } catch (Exception e) {
             NovaEngineeringCore.log.warn("Cannot get field EntityLivingBase.HEALTH!", e);
         }

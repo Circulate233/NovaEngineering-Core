@@ -7,6 +7,7 @@ import hellfirepvp.modularmachinery.common.integration.crafttweaker.MachineModif
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.event.MMEvents;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
+import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.SmartInterfaceType;
 import net.minecraft.util.text.translation.I18n;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -64,18 +65,22 @@ public class ResearchStationType extends NetNodeType {
                               .setValueInfo(I18n.translateToLocalFormatted("novaeng.hypernet.research_station.overclocking.tooltip.0") + "§a%.0f")
                               .setFooterInfo("novaeng.hypernet.research_station.overclocking.tooltip.1")
         );
-        MMEvents.onMachinePostTick(name, event -> {
-            var ctrl = event.getController();
-            var data = ctrl.getCustomDataTag();
-            var nullable = ctrl.getSmartInterfaceData("overclocking");
-            short overclocking = nullable == null ? 1 : (short) nullable.getValue();
-            if (overclocking < 1) {
-                nullable.setValue(1);
-            } else if (overclocking > 5) {
-                nullable.setValue(5);
-            }
-            data.setShort("overclocking", overclocking);
-        });
+        MMEvents.onMachinePostTick(name, event -> updateOverclocking(event.getController()));
+    }
+
+    static void updateOverclocking(final TileMultiblockMachineController ctrl) {
+        var data = ctrl.getCustomDataTag();
+        var smartInterface = ctrl.getSmartInterfaceData("overclocking");
+        short overclocking = smartInterface == null ? 1 : normalizeOverclocking(smartInterface.getValue());
+        if (smartInterface != null) {
+            smartInterface.setValue(overclocking);
+        }
+        data.setShort("overclocking", overclocking);
+    }
+
+    static short normalizeOverclocking(final float value) {
+        // Clamp before narrowing to short, including oversized values from saved interfaces.
+        return (short) Math.clamp((int) value, 1, 5);
     }
 
     @ZenGetter("maxTechLevel")

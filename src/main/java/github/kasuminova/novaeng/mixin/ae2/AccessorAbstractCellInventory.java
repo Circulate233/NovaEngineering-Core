@@ -15,6 +15,9 @@ public interface AccessorAbstractCellInventory {
     int getMaxItemTypes();
 
     @Accessor
+    void setMaxItemTypes(int maxItemTypes);
+
+    @Accessor
     short getStoredItemTypes();
 
     @Accessor

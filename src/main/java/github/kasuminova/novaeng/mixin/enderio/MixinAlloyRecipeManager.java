@@ -5,14 +5,23 @@ import crazypants.enderio.base.recipe.alloysmelter.AlloyRecipeManager;
 import crazypants.enderio.base.recipe.lookup.TriItemLookup;
 import github.kasuminova.novaeng.common.performance.AlloyRecipeIndexWriter;
 import github.kasuminova.novaeng.common.performance.RecipeItemAlternatives;
+import github.kasuminova.novaeng.common.performance.UnorderedAlloyRecipeLookup;
 import net.minecraft.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 
 @Mixin(value = AlloyRecipeManager.class, remap = false)
 public abstract class MixinAlloyRecipeManager {
+
+    @Redirect(method = {"<init>", "rebuild"}, at = @At(value = "NEW",
+        target = "crazypants/enderio/base/recipe/lookup/TriItemLookup"), require = 2)
+    private TriItemLookup<IManyToOneRecipe> nova$unorderedLookup() {
+        return new UnorderedAlloyRecipeLookup<>();
+    }
 
     /**
      * @author circulation
@@ -40,11 +49,16 @@ public abstract class MixinAlloyRecipeManager {
         }
         if (alternatives.size() == 2) {
             final AlloyRecipeIndexWriter<IManyToOneRecipe> writer =
-                new AlloyRecipeIndexWriter<>(lookup, recipe, first.size() + second.size());
+                lookup instanceof UnorderedAlloyRecipeLookup<?> ? null
+                    : new AlloyRecipeIndexWriter<>(lookup, recipe, first.size() + second.size());
             for (int firstIndex = 0; firstIndex < first.size(); firstIndex++) {
                 final Item a = first.get(firstIndex);
                 for (int secondIndex = 0; secondIndex < second.size(); secondIndex++) {
                     final Item b = second.get(secondIndex);
+                    if (lookup instanceof UnorderedAlloyRecipeLookup<IManyToOneRecipe> unordered) {
+                        unordered.addUnordered(recipe, a, b);
+                        continue;
+                    }
                     writer.add(a, b);
                     if (a != b) {
                         writer.add(b, a);
@@ -55,13 +69,18 @@ public abstract class MixinAlloyRecipeManager {
         }
         final List<Item> third = RecipeItemAlternatives.uniqueItems(alternatives.get(2));
         final AlloyRecipeIndexWriter<IManyToOneRecipe> writer =
-            new AlloyRecipeIndexWriter<>(lookup, recipe, first.size() + second.size() + third.size());
+            lookup instanceof UnorderedAlloyRecipeLookup<?> ? null
+                : new AlloyRecipeIndexWriter<>(lookup, recipe, first.size() + second.size() + third.size());
         for (int firstIndex = 0; firstIndex < first.size(); firstIndex++) {
             final Item a = first.get(firstIndex);
             for (int secondIndex = 0; secondIndex < second.size(); secondIndex++) {
                 final Item b = second.get(secondIndex);
                 for (int thirdIndex = 0; thirdIndex < third.size(); thirdIndex++) {
                     final Item c = third.get(thirdIndex);
+                    if (lookup instanceof UnorderedAlloyRecipeLookup<IManyToOneRecipe> unordered) {
+                        unordered.addUnordered(recipe, a, b, c);
+                        continue;
+                    }
                     writer.add(a, b, c);
                     if (b != c) {
                         writer.add(a, c, b);

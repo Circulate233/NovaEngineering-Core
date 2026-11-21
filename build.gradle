@@ -190,6 +190,7 @@ dependencies {
     }
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'it.unimi.dsi:fastutil:8.5.18'
+    testImplementation 'io.github.classgraph:classgraph:4.8.184'
     testImplementation 'org.ow2.asm:asm-tree:9.9.1'
     testImplementation 'org.ow2.asm:asm-analysis:9.9.1'
 }
@@ -368,6 +369,8 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
+    systemProperty 'novaeng.test.refmap', layout.buildDirectory.file('mixin/novaeng_core.refmap.json').get().asFile.absolutePath
+    systemProperty 'novaeng.test.srgToNamed', layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.tsrg').get().asFile.absolutePath
     javaLauncher.set(javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(25)
     })

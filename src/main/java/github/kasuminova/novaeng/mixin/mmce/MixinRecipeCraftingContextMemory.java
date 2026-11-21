@@ -1,10 +1,13 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
 import github.kasuminova.novaeng.common.performance.RecipeContextAccess;
+import hellfirepvp.modularmachinery.common.crafting.helper.ComponentOutputRestrictor;
 import hellfirepvp.modularmachinery.common.crafting.helper.ComponentRequirement;
+import hellfirepvp.modularmachinery.common.crafting.helper.CraftCheck;
 import hellfirepvp.modularmachinery.common.crafting.helper.ProcessingComponent;
 import hellfirepvp.modularmachinery.common.crafting.helper.RecipeCraftingContext;
 import hellfirepvp.modularmachinery.common.crafting.helper.RequirementComponents;
+import hellfirepvp.modularmachinery.common.util.ResultChance;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import org.spongepowered.asm.mixin.Final;
@@ -36,7 +39,18 @@ public abstract class MixinRecipeCraftingContextMemory implements RecipeContextA
     private long groupId;
 
     @Shadow
+    @Final
+    private List<ComponentOutputRestrictor> currentRestrictions;
+
+    @Shadow
     public abstract RecipeCraftingContext setGroupId(long i);
+
+    @Shadow
+    private static List<ProcessingComponent<?>> getCopiedRequirementComponents(
+        final RecipeCraftingContext.ReqCompMap plain, final RecipeCraftingContext.TaggedReqCompMap tagged,
+        final ComponentRequirement<?, ?> requirement, final List<ProcessingComponent<?>> components) {
+        throw new AssertionError();
+    }
 
     /**
      * @author NovaEngineering
@@ -46,38 +60,35 @@ public abstract class MixinRecipeCraftingContextMemory implements RecipeContextA
     public void updateRequirementComponents() {
         requirementComponents.clear();
         final RecipeCraftingContext context = (RecipeCraftingContext) (Object) this;
-        for (final ComponentRequirement<?, ?> requirement : requirements) {
-            boolean matched = false;
-            for (final var group : typeComponents.entrySet()) {
-                ObjectArrayList<ProcessingComponent<?>> valid = null;
-                for (final ProcessingComponent<?> component : group.getValue()) {
-                    if (requirement.isValidComponent(component, context)
-                        && (requirement.getTag() == null || requirement.getTag().equals(component.getTag()))) {
-                        if (valid == null) valid = new ObjectArrayList<>(2);
-                        valid.add(component);
-                    }
-                }
-                if (valid != null) {
-                    requirementComponents.computeIfAbsent(group.getKey(), key -> new ObjectArrayList<>(2))
-                                         .add(new RequirementComponents(requirement, valid));
-                    matched = true;
-                }
-            }
-            // Missing requirements still participate in group zero so their error checks are preserved.
-            if (!matched) {
-                requirementComponents.computeIfAbsent(0L, key -> new ObjectArrayList<>(2))
-                                     .add(new RequirementComponents(requirement, ObjectLists.emptyList()));
+        // Every candidate group must contain every requirement, including its missing-component check.
+        if (typeComponents.isEmpty()) {
+            requirementComponents.put(0L, new ObjectArrayList<>(requirements.size()));
+        } else {
+            for (final Long key : typeComponents.keySet()) {
+                requirementComponents.put(key, new ObjectArrayList<>(requirements.size()));
             }
         }
-        if (requirementComponents.isEmpty()) {
-            requirementComponents.put(0L, ObjectLists.emptyList());
-            setGroupId(0L);
-        } else {
-            for (final long key : requirementComponents.keySet()) {
-                if (key >= 0) {
-                    setGroupId(key);
-                    break;
+        for (final ComponentRequirement<?, ?> requirement : requirements) {
+            for (final var group : requirementComponents.entrySet()) {
+                ObjectArrayList<ProcessingComponent<?>> valid = null;
+                final Collection<ProcessingComponent<?>> candidates = typeComponents.get(group.getKey());
+                if (candidates != null) {
+                    for (final ProcessingComponent<?> component : candidates) {
+                        if (requirement.isValidComponent(component, context)
+                            && (requirement.getTag() == null || requirement.getTag().equals(component.getTag()))) {
+                            if (valid == null) valid = new ObjectArrayList<>(2);
+                            valid.add(component);
+                        }
+                    }
                 }
+                group.getValue().add(new RequirementComponents(requirement,
+                    valid == null ? ObjectLists.emptyList() : valid));
+            }
+        }
+        for (final long key : requirementComponents.keySet()) {
+            if (key >= 0) {
+                setGroupId(key);
+                break;
             }
         }
         final long[] keys = new long[requirementComponents.size()];
@@ -87,6 +98,49 @@ public abstract class MixinRecipeCraftingContextMemory implements RecipeContextA
         groupKeys[0] = keys;
         if (groupKeys[1] == null) groupKeys[1] = new long[1];
         groupKeys[1][0] = groupId;
+    }
+
+    /**
+     * @author NovaEngineering
+     * @reason Allocate deferred single-component errors only after the first failure; keep commit-on-failure order.
+     */
+    @Overwrite
+    private boolean canStartCrafting(final RecipeCraftingContext.CraftingCheckResult result,
+                                     final RequirementComponents reqComponent,
+                                     final RecipeCraftingContext.ReqCompMap plain,
+                                     final RecipeCraftingContext.TaggedReqCompMap tagged) {
+        final RecipeCraftingContext context = (RecipeCraftingContext) (Object) this;
+        final ComponentRequirement<?, ?> requirement = reqComponent.requirement();
+        requirement.startRequirementCheck(ResultChance.GUARANTEED, context);
+        final List<ProcessingComponent<?>> components = reqComponent.components();
+        if (!components.isEmpty()) {
+            if (requirement instanceof ComponentRequirement.MultiComponent multi) {
+                final CraftCheck check = multi.canStartCrafting(
+                    getCopiedRequirementComponents(plain, tagged, requirement, components), context);
+                if (check.isSuccess()) return true;
+                result.addError(check.getUnlocalizedMessage());
+                return false;
+            }
+            ObjectArrayList<String> errors = null;
+            for (final ProcessingComponent<?> component : components) {
+                final CraftCheck check = requirement.canStartCrafting(component, context, currentRestrictions);
+                if (check.isSuccess()) {
+                    requirement.endRequirementCheck();
+                    return true;
+                }
+                if (!check.isInvalid() && !check.getUnlocalizedMessage().isEmpty()) {
+                    if (errors == null) errors = new ObjectArrayList<>(2);
+                    errors.add(check.getUnlocalizedMessage());
+                }
+            }
+            if (errors != null) {
+                for (int i = 0; i < errors.size(); i++) result.addError(errors.get(i));
+            }
+        } else {
+            result.addError(requirement.getMissingComponentErrorMessage(requirement.getActionType()));
+        }
+        requirement.endRequirementCheck();
+        return false;
     }
 
     @Override

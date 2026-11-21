@@ -45,6 +45,9 @@ public class NovaEngCoreConfig {
     @SuppressWarnings("CanBeFinal")
     public static class Performance {
         @Config.RequiresMcRestart
+        @Config.Comment("Share immutable model, text, recipe and mapping strings through fixed-size weak indexes.")
+        public boolean shareImmutableStrings = true;
+        @Config.RequiresMcRestart
         @Config.Name("PrimitiveBiMaps")
         @Config.Comment("Use primitive bidirectional ID maps and primitive call sites in supported mods.")
         public boolean primitiveBiMaps = true;
@@ -53,6 +56,11 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeStartupWork")
         @Config.Comment("Reuse startup indexes and immutable parsing metadata, and initialize deferred client data when it is first needed.")
         public boolean optimizeStartupWork = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("ReduceRuntimeAllocations")
+        @Config.Comment("Avoid temporary inventory, recipe, trait-query and rendering containers in supported runtime paths while preserving live data and callback behavior.")
+        public boolean reduceRuntimeAllocations = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeStellarNbtMapEquality")
@@ -191,6 +199,46 @@ public class NovaEngCoreConfig {
     @SuppressWarnings("CanBeFinal")
     public static class Client {
         @Config.RequiresMcRestart
+        @Config.Name("CompactStatDisplays")
+        @Config.Comment("Keep owned item-stat display templates compact; public stat names remain independent mutable components.")
+        public boolean compactStatDisplays = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("CompactModelTransforms")
+        @Config.Comment("Share owned model transforms during compact geometry bake and discard the generation index afterwards.")
+        public boolean compactModelTransforms = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("CompressAnimationFrames")
+        @Config.Comment("Store unexposed animation frames losslessly with a bounded reusable decode window.")
+        public boolean compressAnimationFrames = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeNullifierModel")
+        @Config.Comment("Render the Ender Utilities Nullifier from bounded baked geometry without retaining ModelLoader or unbaked model registries.")
+        public boolean optimizeNullifierModel = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeRetainedRenderBuffers")
+        @Config.Comment("Start long-lived GUI tessellators small and release finished loading-screen upload storage. Normal buffer growth is preserved.")
+        public boolean optimizeRetainedRenderBuffers = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeMenuWorkingAllocations")
+        @Config.Comment("Avoid temporary render-route hash arrays and reuse navigation validation and GL projection scratch without changing live UI checks.")
+        public boolean optimizeMenuWorkingAllocations = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeLightOverlay")
+        @Config.Comment("Batch MoreOverlays light markers and reuse storage for the built-in scanner.")
+        public boolean optimizeLightOverlay = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("CompactBakedGeometry")
+        @Config.Comment("Store owned baked geometry compactly and read it directly in client renderers.")
+        public boolean compactBakedGeometry = true;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeFerritePredicates")
         @Config.Comment("Canonicalize multipart model predicates by property/value and by their sorted And/Or inputs, following FerriteCore's predicate cache.")
         public boolean optimizeFerritePredicates = true;
@@ -199,11 +247,6 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeFerriteMultipartModels")
         @Config.Comment("Reuse baked multipart models with identical selectors and child models in the same order. Disable VintageFix mixin.model_optimizations.dedup_multipart when enabling this.")
         public boolean optimizeFerriteMultipartModels = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeFerriteModelResourceLocation")
-        @Config.Comment("Bypass ModelResourceLocation's toString/parse constructor round trip for ordinary ResourceLocations.")
-        public boolean optimizeFerriteModelResourceLocation = true;
 
         @Config.RequiresMcRestart
         @Config.Name("EnableNovaEngTitle")
@@ -268,6 +311,11 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeMekanismSawmillRegistration")
         @Config.Comment("Register log recipes sequentially instead of dispatching workers that contend for the same crafting lock. Applies on both sides.")
         public boolean optimizeMekanismSawmillRegistration = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("DeferSolarActivatorScreen")
+        @Config.Comment("Load the large solar neutron activator screen texture on first render instead of during TESR registration. Disable to prewarm it during startup.")
+        public boolean deferSolarActivatorScreen = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeMmcePreviewIngredients")
@@ -371,7 +419,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeModelJsonMetadata")
-        @Config.Comment("Share static model JSON parsing between LibNine and AE2 UVL probes.")
+        @Config.Comment("Cache static model JSON metadata for AE2 UVL probes.")
         public boolean optimizeModelJsonMetadata = true;
 
         @Config.RequiresMcRestart
@@ -470,7 +518,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeSoundUpdateWakeups")
-        @Config.Comment("Notify the sound command thread once after each tickable sound's volume, pitch and position update. Commands and play/stop notifications remain unchanged.")
+        @Config.Comment("Batch sound parameter notifications and wake initialization waits when the sound library finishes. Commands and play/stop notifications remain unchanged.")
         public boolean optimizeSoundUpdateWakeups = true;
 
         @Config.RequiresMcRestart
@@ -570,7 +618,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeResourceLocationStableValue")
-        @Config.Comment("Cache ResourceLocation string and hash results, and skip repeated lowercase conversion of its canonical default namespace.")
+        @Config.Comment("Cache ResourceLocation string/hash results and share namespace, path, variant and complete strings before substring/lowercase/concatenation allocation.")
         public boolean optimizeResourceLocationStableValue = true;
 
         @Config.RequiresMcRestart
@@ -592,6 +640,16 @@ public class NovaEngCoreConfig {
 
     @SuppressWarnings("CanBeFinal")
     public static class Server {
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeEntityConstruction")
+        @Config.Comment("Share attribute name layouts and defer unused modifier maps and pathfinding buffers when constructing living entities.")
+        public boolean optimizeEntityConstruction = true;
+
+        @Config.RequiresMcRestart
+        @Config.Name("OptimizeFrequencyManagers")
+        @Config.Comment("Tick Mekanism frequencies directly and retire discarded private managers at server stop.")
+        public boolean optimizeFrequencyManagers = true;
+
         @Config.RequiresMcRestart
         @Config.Name("BatchMeteorSpawnWrites")
         @Config.Comment("Enabled by default. Coalesce changed meteor region writes until an AE2 queue drain exits (including exceptions). Flushes at save/unload/server stop and retries failed writes at server tick end. Disable to use synchronous writes.")
@@ -690,11 +748,6 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeStructureLookup")
         @Config.Comment("Walk the known structure starts of a map generator from a cached array instead of probing its open hash map on every position query.")
         public boolean optimizeStructureLookup = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeAe2ItemListCapacity")
-        @Config.Comment("Start an AE2 item list with the capacity of the largest list seen so far instead of growing it from the default capacity, which removes a chain of rehashes from every item list built for a crafting job.")
-        public boolean optimizeAe2ItemListCapacity = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeBiomeIdLookup")

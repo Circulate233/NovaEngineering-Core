@@ -14,27 +14,30 @@ import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 
 /**
  * Only caches context-independent raw classifications; every query still reads the current block state.
  */
 public final class StablePathNodeTypes {
+    private static final Method MATERIAL = ObfuscationReflectionHelper.findMethod(Block.class, "func_149688_o",
+        Material.class, IBlockState.class);
+    private static final Method PASSABLE = ObfuscationReflectionHelper.findMethod(Block.class, "func_176205_b",
+        boolean.class, IBlockAccess.class, BlockPos.class);
     private static final PathNodeType[] KINDS = PathNodeType.values();
     private static final ClassValue<Integer> METHODS = new ClassValue<>() {
         @Override
         protected Integer computeValue(final Class<?> type) {
             try {
-                final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(type, MethodHandles.lookup());
-                if (lookup.revealDirect(lookup.findVirtual(type, "getAiPathNodeType", MethodType.methodType(PathNodeType.class,
-                    IBlockState.class, IBlockAccess.class, BlockPos.class, EntityLiving.class))).getDeclaringClass() != Block.class)
+                if (type.getMethod("getAiPathNodeType", IBlockState.class, IBlockAccess.class, BlockPos.class,
+                    EntityLiving.class).getDeclaringClass() != Block.class)
                     return 0;
-                if (!declaredByBlock(lookup, type, "getMaterial", "func_149688_o", MethodType.methodType(Material.class, IBlockState.class)))
+                if (!declaredByBlock(type, MATERIAL))
                     return 0;
-                return declaredByBlock(lookup, type, "isPassable", "func_176205_b", MethodType.methodType(boolean.class, IBlockAccess.class, BlockPos.class)) ? 2 : 1;
-            } catch (final ReflectiveOperationException unavailable) {
+                return declaredByBlock(type, PASSABLE) ? 2 : 1;
+            } catch (ReflectiveOperationException | LinkageError | SecurityException unavailable) {
                 return 0;
             }
         }
@@ -43,13 +46,8 @@ public final class StablePathNodeTypes {
     private StablePathNodeTypes() {
     }
 
-    private static boolean declaredByBlock(final MethodHandles.Lookup lookup, final Class<?> type,
-                                           final String named, final String srg, final MethodType signature) throws ReflectiveOperationException {
-        try {
-            return lookup.revealDirect(lookup.findVirtual(type, named, signature)).getDeclaringClass() == Block.class;
-        } catch (final NoSuchMethodException obfuscated) {
-            return lookup.revealDirect(lookup.findVirtual(type, srg, signature)).getDeclaringClass() == Block.class;
-        }
+    private static boolean declaredByBlock(final Class<?> type, final Method method) throws NoSuchMethodException {
+        return type.getMethod(method.getName(), method.getParameterTypes()).getDeclaringClass() == Block.class;
     }
 
     public static PathNodeType get(final IBlockState state) {

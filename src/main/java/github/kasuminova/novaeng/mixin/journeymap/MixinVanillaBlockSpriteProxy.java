@@ -5,23 +5,24 @@ import codechicken.lib.model.bakery.ModelErrorStateProperty;
 import codechicken.lib.model.bakery.generation.IBlockBakery;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import github.kasuminova.novaeng.common.performance.JourneyMapStateMemo;
+import journeymap.client.cartography.color.ColoredSprite;
 import journeymap.client.mod.vanilla.VanillaBlockSpriteProxy;
+import journeymap.client.model.block.BlockMD;
+import journeymap.client.model.chunk.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Gives JourneyMap the same block state the world renderer bakes, so blocks whose model comes from a
@@ -45,11 +46,6 @@ import java.util.HashSet;
  * states by two facings per block, and each of those re-reads the same world state - keyed on the raw state instance so
  * a changed block is still re-extended.</p>
  *
- * <p>{@code addSprites} also builds a {@code HashSet} and an {@code ArrayList} on every call, purely to drop the
- * duplicate quads of a list before reading their sprites off them, and throws both away when the loop ends. This runs
- * once per block of every chunk JourneyMap colours, so those two throwaways were a measurable share of what the map
- * task allocates. Both are handed out from a thread local and cleared for the next call instead, which is sound
- * because neither outlives the method: the deduplicated list is only read by the loop that follows it.</p>
  */
 @Mixin(value = VanillaBlockSpriteProxy.class, remap = false)
 public abstract class MixinVanillaBlockSpriteProxy {
@@ -57,14 +53,19 @@ public abstract class MixinVanillaBlockSpriteProxy {
     @Unique
     private static boolean nova$reportedExtensionFailure;
 
-    @Unique
-    private static final ThreadLocal<Object[]> nova$lastExtension = new ThreadLocal<>();
+    @Inject(method = "getSprites(Ljourneymap/client/model/block/BlockMD;Ljourneymap/client/model/chunk/ChunkMD;Lnet/minecraft/util/math/BlockPos;)Ljava/util/Collection;",
+        at = @At("HEAD"), require = 1)
+    private void nova$beginExtension(final BlockMD block, final ChunkMD chunk, final BlockPos pos,
+                                     final CallbackInfoReturnable<Collection<ColoredSprite>> ci) {
+        JourneyMapStateMemo.begin();
+    }
 
-    @Unique
-    private static final ThreadLocal<HashSet<BakedQuad>> nova$dedupeSet = new ThreadLocal<>();
-
-    @Unique
-    private static final ThreadLocal<ArrayList<BakedQuad>> nova$dedupeList = new ThreadLocal<>();
+    @Inject(method = "getSprites(Ljourneymap/client/model/block/BlockMD;Ljourneymap/client/model/chunk/ChunkMD;Lnet/minecraft/util/math/BlockPos;)Ljava/util/Collection;",
+        at = @At("RETURN"), require = 1)
+    private void nova$endExtension(final BlockMD block, final ChunkMD chunk, final BlockPos pos,
+                                   final CallbackInfoReturnable<Collection<ColoredSprite>> ci) {
+        JourneyMapStateMemo.current().close();
+    }
 
     @Unique
     private static IBlockState nova$extendState(final World world, final BlockPos pos, final IBlockState state) {
@@ -74,9 +75,7 @@ public abstract class MixinVanillaBlockSpriteProxy {
         } catch (final Exception e) {
             if (!nova$reportedExtensionFailure) {
                 nova$reportedExtensionFailure = true;
-                NovaEngineeringCore.log.warn("Failed to build the extended block state of "
-                    + state.getBlock().getRegistryName()
-                    + " while resolving JourneyMap's block sprites; those blocks keep the state they were given.", e);
+                NovaEngineeringCore.log.warn("Failed to build the extended block state of {} while resolving JourneyMap's block sprites; those blocks keep the state they were given.", state.getBlock().getRegistryName(), e);
             }
             return null;
         }
@@ -93,32 +92,6 @@ public abstract class MixinVanillaBlockSpriteProxy {
         return extended;
     }
 
-    @Redirect(
-        method = "addSprites(Ljava/util/HashMap;Ljava/util/List;)Z",
-        at = @At(value = "NEW", target = "(Ljava/util/Collection;)Ljava/util/ArrayList;"),
-        remap = false,
-        require = 1
-    )
-    private ArrayList<BakedQuad> nova$reuseDedupeList(final Collection<?> c) {
-        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe) {
-            final ArrayList<BakedQuad> fresh = new ArrayList<>(c.size());
-            for (final Object element : c) {
-                fresh.add((BakedQuad) element);
-            }
-            return fresh;
-        }
-        ArrayList<BakedQuad> list = nova$dedupeList.get();
-        if (list == null) {
-            list = new ArrayList<>();
-            nova$dedupeList.set(list);
-        }
-        list.clear();
-        for (final Object element : c) {
-            list.add((BakedQuad) element);
-        }
-        return list;
-    }
-
     @WrapOperation(
         method = "getSprites(Ljourneymap/client/model/block/BlockMD;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/EnumFacing;Ljava/util/HashMap;Ljourneymap/client/model/chunk/ChunkMD;Lnet/minecraft/util/math/BlockPos;)Z",
         at = @At(value = "INVOKE",
@@ -130,9 +103,6 @@ public abstract class MixinVanillaBlockSpriteProxy {
     private IBlockState nova$extendStateForBakery(final World world, final BlockPos pos,
                                                   final Operation<IBlockState> original) {
         final IBlockState state = original.call(world, pos);
-        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites) {
-            return state;
-        }
         final IBlockState extended = nova$bakeryState(world, pos, state);
         return extended != null ? extended : state;
     }
@@ -155,39 +125,14 @@ public abstract class MixinVanillaBlockSpriteProxy {
             return null;
         }
 
-        final Object[] memo = nova$lastExtension.get();
-        if (memo != null && memo[0] == world && pos.equals(memo[1]) && memo[2] == state) {
-            return (IBlockState) memo[3];
+        final JourneyMapStateMemo memo = JourneyMapStateMemo.current();
+        if (memo != null && memo.matches(world, pos, state)) {
+            return memo.result();
         }
 
         final IBlockState extended = nova$extendState(world, pos, state);
-        final Object[] next = memo == null ? new Object[4] : memo;
-        next[0] = world;
-        next[1] = pos;
-        next[2] = state;
-        next[3] = extended;
-        if (memo == null) {
-            nova$lastExtension.set(next);
-        }
+        if (memo != null) memo.remember(world, pos, state, extended);
         return extended;
     }
 
-    @Redirect(
-        method = "addSprites(Ljava/util/HashMap;Ljava/util/List;)Z",
-        at = @At(value = "NEW", target = "(I)Ljava/util/HashSet;"),
-        remap = false,
-        require = 1
-    )
-    private HashSet<BakedQuad> nova$reuseDedupeSet(final int initialCapacity) {
-        if (!NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe) {
-            return new HashSet<>(initialCapacity);
-        }
-        HashSet<BakedQuad> set = nova$dedupeSet.get();
-        if (set == null) {
-            set = new HashSet<>();
-            nova$dedupeSet.set(set);
-        }
-        set.clear();
-        return set;
-    }
 }

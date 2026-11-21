@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
  */
 public final class ArchiveResourceIndex {
     private static final Set<String> INDEXED_ROOTS =
-        ObjectSets.unmodifiable(new ObjectOpenHashSet<>(new String[]{"recipes", "avaritia_recipes", "cc_blockstates", "patchouli_books", "spells"}));
+        ObjectSets.unmodifiable(ObjectOpenHashSet.of("recipes", "advancements", "avaritia_recipes", "cc_blockstates", "patchouli_books", "spells"));
     // Independent archive probes run concurrently; fastutil has no equivalent concurrent map.
     private static final ConcurrentMap<File, Snapshot> SNAPSHOTS = new ConcurrentHashMap<>();
 
@@ -69,6 +69,10 @@ public final class ArchiveResourceIndex {
             if (!snapshot.roots.contains(root)) {
                 return false;
             }
+            // The scan recorded this root from an entry, including implicit directories.
+            if (path.length() == rootEnd || path.length() == rootEnd + 1 && path.charAt(rootEnd) == '/') {
+                return true;
+            }
             if (!INDEXED_ROOTS.contains(path.substring(namespaceEnd + 1, rootEnd))) {
                 return true;
             }
@@ -77,17 +81,39 @@ public final class ArchiveResourceIndex {
             if (match >= 0) {
                 return true;
             }
-            final String directory = normalized + '/';
-            final int directoryMatch = Arrays.binarySearch(snapshot.entries, directory);
-            final int next = directoryMatch >= 0 ? directoryMatch : -directoryMatch - 1;
-            if (next == snapshot.entries.length) {
-                return false;
-            }
-            final String entry = snapshot.entries[next];
-            return entry.startsWith(directory);
+            return hasDescendant(snapshot.entries, normalized);
         } catch (IOException failure) {
             return true;
         }
+    }
+
+    private static boolean hasDescendant(final String[] entries, final String path) {
+        // Lower bound for the virtual key path + '/'. Do not use the insertion point for path:
+        // sibling names such as "foo.json-variant" sort before "foo.json/child".
+        int low = 0;
+        int high = entries.length;
+        while (low < high) {
+            final int mid = (low + high) >>> 1;
+            final String entry = entries[mid];
+            final int common = Math.min(entry.length(), path.length());
+            int comparison = 0;
+            for (int i = 0; i < common; i++) {
+                comparison = entry.charAt(i) - path.charAt(i);
+                if (comparison != 0) {
+                    break;
+                }
+            }
+            if (comparison == 0) {
+                comparison = entry.length() <= path.length() ? -1 : entry.charAt(path.length()) - '/';
+            }
+            if (comparison < 0) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low < entries.length && entries[low].startsWith(path)
+            && entries[low].length() > path.length() && entries[low].charAt(path.length()) == '/';
     }
 
     public static boolean isConventional(final File source, final ZipFile zip) throws IOException {

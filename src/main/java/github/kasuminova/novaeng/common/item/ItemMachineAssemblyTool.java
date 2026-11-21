@@ -197,7 +197,7 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         }
         final var ingredients = StructureIngredient.of(player.world, pos, array.copy());
         array = array.offset(pos);
-        if (!world.isOutsideBuildHeight(array.getMin()) || !world.isOutsideBuildHeight(array.getMax())) {
+        if (world.isOutsideBuildHeight(array.getMin()) || world.isOutsideBuildHeight(array.getMax())) {
             player.sendMessage(new TextComponentTranslation("message.assembly.tip.too_high",
                 "y = " + (array.getMin().getY() < 1 ? array.getMin().getY() : array.getMax().getY())));
             return EnumActionResult.FAIL;

@@ -152,7 +152,8 @@ public class ResearchStation extends NetNode {
         double baseConsumption = currentResearching.getMinComputationPointPerTick();
         consumption = consumed;
 
-        final short overclockingValue = (short) Math.max(0, event.getController().getCustomDataTag().getShort("overclocking") - 1);
+        final int overclockingValue = ResearchStationType.normalizeOverclocking(
+            event.getController().getCustomDataTag().getShort("overclocking")) - 1;
 
         ActiveMachineRecipe activeRecipe = event.getActiveRecipe();
         int totalTick = activeRecipe.getTotalTick();
