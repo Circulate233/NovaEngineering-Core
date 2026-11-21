@@ -191,7 +191,7 @@ public final class MixinDecisions {
                  "techguns.MixinTemplateInputBuffer", "immersiveengineering.MixinManualRecipeDisplay",
                  "jeresources.MixinEnchantmentWrapper", "jeresources.InvokerEnchantmentWrapper",
                  "neofontrender.MixinSpellcheckLazy", "neofontrender.MixinChatHistoryLazy",
-                 "actinium.MixinShaderTextCache", "ic2.MixinIc2LazyDummies",
+                 "ic2.MixinIc2LazyDummies",
                  "solcarrot.MixinFoodCatalogLazy", "ingameinfoxml.MixinLazyTagFactories",
                  "geckolib3.MixinGeckoConverter", "jecharacters.MixinPinyinAcceleratedNode",
                  "codechickenlib.MixinCclFactoryProbe", "ar.MixinWavefrontSyntax",
@@ -367,7 +367,7 @@ public final class MixinDecisions {
             case "neofontrender.MixinJiebaDictionaryCharacters" -> NovaEngCoreConfig.CLIENT.optimizeJiebaDictionaryCharacters;
             case "minecraft.MixinTextureMapUploadBinding" ->
                 actiniumLoaded && NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
-            case "actinium.MixinGLStateManagerUploadBinding" -> NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
+            case "actinium.MixinGLSMTexturesUploadBinding" -> NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
             case "minecraft.MixinFallbackResourceManager", "ae2.MixinUVLModelLoader" ->
                 NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
@@ -381,8 +381,12 @@ public final class MixinDecisions {
             case "actinium.MixinEntityGatherer" -> NovaEngCoreConfig.CLIENT.optimizeEntityGatherer;
             case "actinium.MixinActiniumWorldRendererLazyBatch" -> NovaEngCoreConfig.CLIENT.optimizeTesrLazyBatch;
             case "actinium.MixinGLStateManagerGenericAttributes",
+                 "actinium.MixinGLSMCurrentAttribsGenericAttributes",
+                 "actinium.MixinRenderSystemGenericAttributes",
                  "actinium.MixinShaderManagerGenericAttributes" -> NovaEngCoreConfig.CLIENT.optimizeGenericAttributes;
             case "actinium.MixinGLStateManagerVertexArray",
+                 "actinium.MixinGLSMVertexInputVertexArray",
+                 "actinium.MixinGLSMAttribStackVertexArray",
                  "actinium.MixinImmediateCommandListVertexArray",
                  "actinium.MixinPassThroughGLStateManagerVertexArray" -> NovaEngCoreConfig.CLIENT.optimizeVaoBindings;
             case "minecraft.MixinTileEntityRendererDistance",

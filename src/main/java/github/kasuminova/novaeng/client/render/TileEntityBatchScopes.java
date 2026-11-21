@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.client.render;
 
-import com.dhj.actinium.render.terrain.TileEntityGlStateGuard;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 
@@ -24,7 +23,6 @@ public final class TileEntityBatchScopes {
     public static void end() {
         final Stack stack = STACKS.get();
         final State state = stack.states.get(--stack.depth);
-        state.guardPushed = false;
         state.batchOpened = false;
     }
 
@@ -34,22 +32,13 @@ public final class TileEntityBatchScopes {
     }
 
     public static final class State {
-        private boolean guardPushed;
         private boolean batchOpened;
-
-        public boolean isGuardPushed() {
-            return guardPushed;
-        }
 
         public boolean isBatchOpened() {
             return batchOpened;
         }
 
         public void ensureOpened(final TileEntityRendererDispatcher dispatcher) {
-            if (!guardPushed) {
-                TileEntityGlStateGuard.push();
-                guardPushed = true;
-            }
             if (!batchOpened) {
                 dispatcher.preDrawBatch();
                 batchOpened = true;

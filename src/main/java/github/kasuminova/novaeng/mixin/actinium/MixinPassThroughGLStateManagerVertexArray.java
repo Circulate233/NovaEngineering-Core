@@ -1,21 +1,31 @@
 package github.kasuminova.novaeng.mixin.actinium;
 
-import github.kasuminova.novaeng.client.gl.GenericAttributeStateImpl;
 import com.mitchej123.glsm.impl.PassThroughGLStateManager;
+import github.kasuminova.novaeng.client.gl.GenericAttributeStateImpl;
+import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Invalidates the VAO shadow before the pass-through GL service issues a raw LWJGL bind.
+ * Invalidates the VAO shadow before the pass-through GL service changes the raw LWJGL binding.
  */
 @Mixin(value = PassThroughGLStateManager.class, remap = false)
 public abstract class MixinPassThroughGLStateManagerVertexArray {
 
-    @Inject(method = "glBindVertexArray(I)V", at = @At("HEAD"),
+    @Redirect(method = "glBindVertexArray(I)V",
+        at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL30;glBindVertexArray(I)V"),
         remap = false, require = 1)
-    private void nova$invalidateBeforePassThroughBind(final int array, final CallbackInfo ci) {
+    private void nova$invalidateBeforePassThroughBind(final int array) {
         GenericAttributeStateImpl.instance().invalidateVertexArray();
+        GL30.glBindVertexArray(array);
+    }
+
+    @Redirect(method = "glDeleteVertexArrays(I)V",
+        at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL30;glDeleteVertexArrays(I)V"),
+        remap = false, require = 1)
+    private void nova$invalidateBeforePassThroughDelete(final int array) {
+        GenericAttributeStateImpl.instance().invalidateVertexArray();
+        GL30.glDeleteVertexArrays(array);
     }
 }

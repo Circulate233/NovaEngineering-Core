@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +37,11 @@ public final class IsolatedMixinTransformer {
     }
 
     public static byte[][] transform(final String[] targets, final String... mixins) throws Exception {
+        return transformInPackage("github.kasuminova.novaeng.mixin.mmce", targets, mixins);
+    }
+
+    public static byte[][] transformInPackage(final String mixinPackage, final String[] targets,
+                                              final String... mixins) throws Exception {
         final var urls = new LinkedHashSet<URL>();
         for (ClassLoader loader = IsolatedMixinTransformer.class.getClassLoader(); loader != null; loader = loader.getParent()) {
             if (loader instanceof URLClassLoader urlLoader) urls.addAll(List.of(urlLoader.getURLs()));
@@ -47,7 +53,8 @@ public final class IsolatedMixinTransformer {
         try (final URLClassLoader isolated = new URLClassLoader(urls.toArray(URL[]::new), ClassLoader.getPlatformClassLoader())) {
             final Class<?> runner = Class.forName(IsolatedMixinTransformer.class.getName(), true, isolated);
             try {
-                return (byte[][]) runner.getMethod("run", String[].class, String[].class).invoke(null, targets, mixins);
+                return (byte[][]) runner.getMethod("run", String.class, String[].class, String[].class)
+                                        .invoke(null, mixinPackage, targets, mixins);
             } catch (final java.lang.reflect.InvocationTargetException e) {
                 if (e.getCause() instanceof Exception exception) throw exception;
                 throw (Error) e.getCause();
@@ -56,6 +63,10 @@ public final class IsolatedMixinTransformer {
     }
 
     public static byte[][] run(final String[] targets, final String[] mixins) throws Exception {
+        return run("github.kasuminova.novaeng.mixin.mmce", targets, mixins);
+    }
+
+    public static byte[][] run(final String mixinPackage, final String[] targets, final String[] mixins) throws Exception {
         final ClassLoader loader = IsolatedMixinTransformer.class.getClassLoader();
         final var getInstance = MixinService.class.getDeclaredMethod("getInstance");
         getInstance.setAccessible(true);
@@ -70,8 +81,9 @@ public final class IsolatedMixinTransformer {
                 default -> throw new AssertionError(method);
             });
         final String config = "{\"required\":true,\"minVersion\":\"0.8.7\",\"compatibilityLevel\":\"JAVA_25\","
-            + "\"package\":\"github.kasuminova.novaeng.mixin.mmce\",\"mixins\":["
-            + String.join(",", java.util.Arrays.stream(mixins).map(s -> "\"" + s + "\"").toList()) + "]}";
+            + "\"package\":\"" + mixinPackage + "\",\"mixins\":["
+            + String.join(",", Arrays.stream(mixins).map(s -> "\"" + s + "\"").toList())
+            + "],\"injectors\":{\"defaultRequire\":1}}";
         final IClassBytecodeProvider bytecode = (IClassBytecodeProvider) Proxy.newProxyInstance(loader,
             new Class<?>[]{IClassBytecodeProvider.class}, (proxy, method, args) -> {
                 try (final InputStream stream = loader.getResourceAsStream(((String) args[0]).replace('.', '/') + ".class")) {
