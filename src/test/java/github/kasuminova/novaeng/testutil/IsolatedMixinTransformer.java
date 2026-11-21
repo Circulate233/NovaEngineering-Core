@@ -42,6 +42,12 @@ public final class IsolatedMixinTransformer {
 
     public static byte[][] transformInPackage(final String mixinPackage, final String[] targets,
                                               final String... mixins) throws Exception {
+        return transformInPackage(mixinPackage, targets, Map.of(), mixins);
+    }
+
+    public static byte[][] transformInPackage(final String mixinPackage, final String[] targets,
+                                              final Map<String, byte[]> bytecodeOverrides,
+                                              final String... mixins) throws Exception {
         final var urls = new LinkedHashSet<URL>();
         for (ClassLoader loader = IsolatedMixinTransformer.class.getClassLoader(); loader != null; loader = loader.getParent()) {
             if (loader instanceof URLClassLoader urlLoader) urls.addAll(List.of(urlLoader.getURLs()));
@@ -53,8 +59,8 @@ public final class IsolatedMixinTransformer {
         try (final URLClassLoader isolated = new URLClassLoader(urls.toArray(URL[]::new), ClassLoader.getPlatformClassLoader())) {
             final Class<?> runner = Class.forName(IsolatedMixinTransformer.class.getName(), true, isolated);
             try {
-                return (byte[][]) runner.getMethod("run", String.class, String[].class, String[].class)
-                                        .invoke(null, mixinPackage, targets, mixins);
+                return (byte[][]) runner.getMethod("run", String.class, String[].class, Map.class, String[].class)
+                                        .invoke(null, mixinPackage, targets, bytecodeOverrides, mixins);
             } catch (final java.lang.reflect.InvocationTargetException e) {
                 if (e.getCause() instanceof Exception exception) throw exception;
                 throw (Error) e.getCause();
@@ -67,6 +73,11 @@ public final class IsolatedMixinTransformer {
     }
 
     public static byte[][] run(final String mixinPackage, final String[] targets, final String[] mixins) throws Exception {
+        return run(mixinPackage, targets, Map.of(), mixins);
+    }
+
+    public static byte[][] run(final String mixinPackage, final String[] targets,
+                              final Map<String, byte[]> bytecodeOverrides, final String[] mixins) throws Exception {
         final ClassLoader loader = IsolatedMixinTransformer.class.getClassLoader();
         final var getInstance = MixinService.class.getDeclaredMethod("getInstance");
         getInstance.setAccessible(true);
@@ -86,7 +97,7 @@ public final class IsolatedMixinTransformer {
             + "],\"injectors\":{\"defaultRequire\":1}}";
         final IClassBytecodeProvider bytecode = (IClassBytecodeProvider) Proxy.newProxyInstance(loader,
             new Class<?>[]{IClassBytecodeProvider.class}, (proxy, method, args) -> {
-                try (final InputStream stream = loader.getResourceAsStream(((String) args[0]).replace('.', '/') + ".class")) {
+                try (final InputStream stream = classStream(loader, bytecodeOverrides, (String) args[0])) {
                     if (stream == null) throw new ClassNotFoundException((String) args[0]);
                     final var node = new ClassNode();
                     new ClassReader(stream).accept(node, args.length > 2 ? (int) args[2] : 0);
@@ -134,11 +145,19 @@ public final class IsolatedMixinTransformer {
         final byte[][] result = new byte[targets.length][];
         for (int i = 0; i < targets.length; i++) {
             final String name = targets[i].replace('/', '.');
-            try (final InputStream stream = loader.getResourceAsStream(targets[i].replace('.', '/') + ".class")) {
+            try (final InputStream stream = classStream(loader, bytecodeOverrides, targets[i])) {
                 if (stream == null) throw new ClassNotFoundException(name);
                 result[i] = (byte[]) transform.invoke(transformer, name, name, stream.readAllBytes());
             }
         }
         return result;
+    }
+
+    private static InputStream classStream(final ClassLoader loader, final Map<String, byte[]> overrides,
+                                           final String name) {
+        final String internalName = name.replace('.', '/');
+        final byte[] replacement = overrides.get(internalName);
+        return replacement == null ? loader.getResourceAsStream(internalName + ".class")
+            : new ByteArrayInputStream(replacement);
     }
 }
