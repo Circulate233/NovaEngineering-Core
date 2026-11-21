@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.client.memory;
 import github.kasuminova.novaeng.client.render.LitItemQuadScratch;
 import github.kasuminova.novaeng.client.render.TileEntityRenderCulling;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
+import github.kasuminova.novaeng.common.util.collection.WeakCacheMaintenance;
 import github.kasuminova.novaeng.mixin.neofontrender.AccessorSignOcclusionCuller;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
@@ -28,6 +29,7 @@ public final class ClientMemoryCleanup {
     }
 
     public static void tick() {
+        WeakCacheMaintenance.tick();
         if (!quadScratchInstalled) {
             if (MixinDecisions.actiniumLoaded) LitItemQuadScratch.install();
             quadScratchInstalled = true;

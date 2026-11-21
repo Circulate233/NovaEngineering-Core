@@ -1,14 +1,17 @@
 package github.kasuminova.novaeng.client.util;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import mezz.jei.util.Log;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -25,41 +28,35 @@ import java.util.stream.Collectors;
 public final class JeiItemListCollector {
 
     private static final int MAX_PARALLELISM = 8;
+    private static final Method[] TAB_CALLBACKS = {
+        ObfuscationReflectionHelper.findMethod(CreativeTabs.class, "func_78018_a", void.class, NonNullList.class)
+    };
+    private static final Method[] ITEM_CALLBACKS = {
+        ObfuscationReflectionHelper.findMethod(Item.class, "func_150895_a", void.class, CreativeTabs.class, NonNullList.class),
+        ObfuscationReflectionHelper.findMethod(Item.class, "func_194125_a", boolean.class, CreativeTabs.class),
+        ObfuscationReflectionHelper.findMethod(Item.class, "getCreativeTabs", CreativeTabs[].class),
+        ObfuscationReflectionHelper.findMethod(Item.class, "func_77640_w", CreativeTabs.class)
+    };
     private static final ClassValue<Boolean> DEFAULT_TAB = new ClassValue<>() {
         @Override
-        protected Boolean computeValue(final Class<?> type) {
+        protected Boolean computeValue(final @NonNull Class<?> type) {
             if (type == CreativeTabs.class) return true;
             final Class<?> parent = type.getSuperclass();
             return parent != null && DEFAULT_TAB.get(parent)
-                && !overrides(type, new String[]{"displayAllRelevantItems", "func_78018_a"}, NonNullList.class);
+                && !overrides(type, TAB_CALLBACKS);
         }
     };
     private static final ClassValue<Boolean> DEFAULT_ITEM = new ClassValue<>() {
         @Override
-        protected Boolean computeValue(final Class<?> type) {
+        protected Boolean computeValue(final @NonNull Class<?> type) {
             if (type == Item.class) return true;
             final Class<?> parent = type.getSuperclass();
-            if (parent == null || !DEFAULT_ITEM.get(parent)) return false;
-            try {
-                for (final var method : type.getDeclaredMethods()) {
-                    final Class<?>[] parameters;
-                    switch (method.getName()) {
-                        case "getSubItems", "func_150895_a" -> parameters = new Class<?>[]{CreativeTabs.class, NonNullList.class};
-                        case "isInCreativeTab", "func_194125_a" -> parameters = new Class<?>[]{CreativeTabs.class};
-                        case "getCreativeTabs", "getCreativeTab", "func_77640_w" -> parameters = new Class<?>[0];
-                        default -> { continue; }
-                    }
-                    if (Arrays.equals(method.getParameterTypes(), parameters)) return false;
-                }
-            } catch (LinkageError | SecurityException unavailable) {
-                return false;
-            }
-            return true;
+            return parent != null && DEFAULT_ITEM.get(parent) && !overrides(type, ITEM_CALLBACKS);
         }
     };
 
     public static List<CreativeTabs> displayedTabs(final CreativeTabs[] tabs) {
-        final ArrayList<CreativeTabs> displayed = new ArrayList<>(tabs.length);
+        final ObjectArrayList<CreativeTabs> displayed = new ObjectArrayList<>(tabs.length);
         for (final CreativeTabs tab : tabs) {
             if (tab != CreativeTabs.HOTBAR) displayed.add(tab);
         }
@@ -77,7 +74,7 @@ public final class JeiItemListCollector {
         try {
             return pool.submit(() -> tabs.parallelStream()
                                           .map(tab -> collectTab(tab, candidates.get(tab)))
-                                          .collect(Collectors.toList()))
+                                         .collect(Collectors.toCollection(ObjectArrayList::new)))
                        .get();
         } catch (final InterruptedException interrupted) {
             Thread.currentThread().interrupt();
@@ -91,7 +88,7 @@ public final class JeiItemListCollector {
 
     private static List<NonNullList<ItemStack>> collectSerial(final List<CreativeTabs> tabs,
                                                             final Map<CreativeTabs, List<Item>> candidates) {
-        final ArrayList<NonNullList<ItemStack>> result = new ArrayList<>(tabs.size());
+        final ObjectArrayList<NonNullList<ItemStack>> result = new ObjectArrayList<>(tabs.size());
         for (final CreativeTabs tab : tabs) result.add(collectTab(tab, candidates.get(tab)));
         return result;
     }
@@ -114,10 +111,10 @@ public final class JeiItemListCollector {
     }
 
     private static Map<CreativeTabs, List<Item>> indexTabs(final List<CreativeTabs> tabs) {
-        final Map<CreativeTabs, List<Item>> result = new IdentityHashMap<>();
+        final Map<CreativeTabs, List<Item>> result = new Reference2ObjectOpenHashMap<>();
         for (final CreativeTabs tab : tabs) {
             if (tab != null && DEFAULT_TAB.get(tab.getClass())) {
-                result.put(tab, new ArrayList<>());
+                result.put(tab, new ObjectArrayList<>());
             }
         }
         if (result.isEmpty()) {
@@ -146,11 +143,12 @@ public final class JeiItemListCollector {
         return result;
     }
 
-    private static boolean overrides(final Class<?> type, final String[] names, final Class<?>... parameters) {
+    private static boolean overrides(final Class<?> type, final Method[] originals) {
         try {
             for (final var method : type.getDeclaredMethods()) {
-                for (final String name : names) {
-                    if (method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), parameters)) return true;
+                for (final Method original : originals) {
+                    if (method.getName().equals(original.getName()) && method.getParameterCount() == original.getParameterCount()
+                        && Arrays.equals(method.getParameterTypes(), original.getParameterTypes())) return true;
                 }
             }
         } catch (LinkageError | SecurityException unavailable) {

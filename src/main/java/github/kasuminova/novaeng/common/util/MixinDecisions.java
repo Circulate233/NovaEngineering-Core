@@ -25,6 +25,9 @@ public final class MixinDecisions {
     public static final boolean rpsIdeasLoaded = isPresent("rpsideas");
     public static final boolean ctmLoaded = isPresent("ctm");
     public static final boolean mmceLoaded = isPresent("modularmachinery");
+    private static final boolean mmceCopyShellPoolAvailable = mmceLoaded
+        && MixinDecisions.class.getClassLoader().getResource(
+        "hellfirepvp/modularmachinery/common/util/ItemUtils$CopyShellPool.class") != null;
     public static final boolean packagedAutoLoaded = isPresent("packagedauto");
     public static final boolean packagedAstralLoaded = isPresent("packagedastral");
     public static final boolean circulationNetworksLoaded = isPresent("circulation_networks");
@@ -47,6 +50,93 @@ public final class MixinDecisions {
     }
 
     public static boolean shouldApply(final String mixinName) {
+        switch (mixinName) {
+            case "minecraft.MixinStatListDisplayMemory" -> {
+                return NovaEngCoreConfig.CLIENT.compactStatDisplays;
+            }
+            case "minecraft.forge.MixinOwnedTransformFactories", "minecraft.forge.MixinPerspectiveTransformSharing" -> {
+                return NovaEngCoreConfig.CLIENT.compactModelTransforms && NovaEngCoreConfig.CLIENT.compactBakedGeometry;
+            }
+            case "minecraft.MixinAnimationFrameStorage" -> {
+                return NovaEngCoreConfig.CLIENT.compressAnimationFrames;
+            }
+            case "minecraft.MixinModelResourceLocationStrings" -> {
+                return NovaEngCoreConfig.CLIENT.optimizeResourceLocationStableValue;
+            }
+            case "minecraft.MixinTextComponentStringSharing", "minecraft.MixinBlockPartFaceStrings",
+                 "minecraft.MixinModelBlockTextureStrings", "minecraft.MixinModelBlockJsonStrings",
+                 "codechicken.MixinObfRemapperStrings" -> {
+                return NovaEngCoreConfig.PERFORMANCE.shareImmutableStrings;
+            }
+            case "mmce.MixinMachineRecipeStrings" -> {
+                return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.shareImmutableStrings;
+            }
+            case "jei.MixinHeiIngredientStrings" -> {
+                return isPresent("jei") && NovaEngCoreConfig.PERFORMANCE.shareImmutableStrings;
+            }
+            case "rtg.MixinConfigPropertyStrings" -> {
+                return isPresent("rtg") && NovaEngCoreConfig.PERFORMANCE.shareImmutableStrings;
+            }
+            case "enderutilities.MixinNullifierModelReloadLifecycle", "enderutilities.MixinNullifierModelBake" -> {
+                return isPresent("enderutilities") && NovaEngCoreConfig.CLIENT.optimizeNullifierModel;
+            }
+            case "jei.MixinJeiStarterHashCacheCleanup", "jei.MixinRecipeRegistryIndexMemory",
+                 "jei.MixinHeiTableMemoryAccess" -> {
+                return isPresent("jei") && NovaEngCoreConfig.CLIENT.optimizeJeiRecipeIndex;
+            }
+            case "astralsorcery.MixinBufferBatchCapacity" -> {
+                return astralSorceryLoaded && NovaEngCoreConfig.CLIENT.optimizeRetainedRenderBuffers;
+            }
+            case "neofontrender.MixinCosmicTessellatorCapacity" -> {
+                return neoFontRenderLoaded && NovaEngCoreConfig.CLIENT.optimizeRetainedRenderBuffers;
+            }
+            case "minecraft.MixinTextureUploadCapacity", "minecraft.MixinGlobalTessellatorCapacity",
+                 "minecraft.MixinTesrTessellatorCapacity", "minecraft.forge.MixinSplashUploadBufferLifecycle" -> {
+                return NovaEngCoreConfig.CLIENT.optimizeRetainedRenderBuffers;
+            }
+            case "customloadingscreen.MixinTextureAnimatorUploadMemory" -> {
+                return isPresent("customloadingscreen") && NovaEngCoreConfig.CLIENT.optimizeRetainedRenderBuffers;
+            }
+            case "neofontrender.MixinTextRouteCacheKeyHash", "neofontrender.MixinFontConfigPaths",
+                 "neofontrender.MixinCosmicReusableWords" -> {
+                return neoFontRenderLoaded && NovaEngCoreConfig.CLIENT.optimizeMenuWorkingAllocations;
+            }
+            case "neofontrender.MixinUiNavigationRuntime", "neofontrender.MixinUiTreeValidator" -> {
+                return neoFontRenderLoaded && isPresent("neofontrender_ui_enhancements")
+                    && NovaEngCoreConfig.CLIENT.optimizeMenuWorkingAllocations;
+            }
+            case "ae2.MixinMECraftingInventorySnapshot" -> {
+                return ae2Loaded && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
+            }
+            case "mmce.MixinActiveRecipeLazyData" -> {
+                return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
+            }
+            case "mmce.MixinItemHandlerGenericCopy", "mmce.MixinItemUtilsGenericCopy",
+                 "mmce.InvokerItemHandlerCopyShellPool" -> {
+                return mmceCopyShellPoolAvailable && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
+            }
+            case "mekanism.MixinDimensionalStabilizerOverlaySnapshot" -> {
+                return isPresent("mekanism") && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
+            }
+            case "tconstruct.MixinTraitTagQueries", "tconstruct.MixinAbstractTraitTagQuery" -> {
+                return isPresent("tconstruct") && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
+            }
+        }
+        if (mixinName.startsWith("moreoverlays."))
+            return isPresent("moreoverlays") && NovaEngCoreConfig.CLIENT.optimizeLightOverlay;
+        if (mixinName.equals("mekanism.MixinFrequencyManagerTick") || mixinName.equals("mekanism.MixinMekanismFrequencyManagerLifecycle"))
+            return isPresent("mekanism") && NovaEngCoreConfig.SERVER.optimizeFrequencyManagers;
+        if (mixinName.equals("minecraft.MixinLazyAttributeModifierMaps") || mixinName.equals("minecraft.MixinLazyPathHeap")
+            || mixinName.equals("minecraft.MixinLazyPathFinder") || mixinName.equals("minecraft.MixinAttributeNameIndex")
+            || mixinName.equals("minecraft.MixinAttributeNameIndexStorage"))
+            return NovaEngCoreConfig.SERVER.optimizeEntityConstruction;
+        if (mixinName.startsWith("geometry.")) {
+            if (!NovaEngCoreConfig.CLIENT.compactBakedGeometry) return false;
+            if (mixinName.startsWith("geometry.actinium.")) return actiniumLoaded;
+            if (mixinName.equals("geometry.MixinGeometryRenderItem")) return !isPresent("celeritasextra");
+            if (mixinName.equals("geometry.MixinGeometryItemFrameLod")) return isPresent("celeritasextra");
+            return true;
+        }
         // Target availability is handled by Mixin; mod checks here express cross-mod requirements.
         switch (mixinName) {
             case "minecraft.MixinRegionRenderCacheBuilderCapacity", "lumenized.MixinBloomRenderLayerCapacity" -> {
@@ -89,6 +179,12 @@ public final class MixinDecisions {
             case "minecraft.forge.MixinForgelinConstructionAdapter" -> isPresent("forgelin_continuous");
             case "cofh.MixinThermalStartupScope" -> cofhLoaded;
             case "mekanism.MixinMekanismStartupScope" -> isPresent("universaltweaks");
+            case "mekanism.MixinSolarActivatorTexturePreload" ->
+                isPresent("mekanismmultiblockmachine") && NovaEngCoreConfig.CLIENT.deferSolarActivatorScreen;
+            case "ftbquests.MixinQuestWrapper" ->
+                isPresent("ftbquests") && isPresent("itemfilters") && isPresent("jei");
+            case "enderio.MixinRecipesRegistration" -> enderioLoaded;
+            case "geckolib3.MixinRawGeometryTreeLookup" -> isPresent("geckolib3");
             // Primitive registration applies the same lazy field policy directly in its overwrite.
             case "librarianlib.MixinLibrarianPacketPrewarm" -> !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps;
             case "journeymap.MixinThemeTexturePreload", "journeymap.MixinWidgetTexturePreload",
@@ -207,17 +303,15 @@ public final class MixinDecisions {
                 !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && (NovaEngCoreConfig.CLIENT.optimizeFrozenRegistryIdLookup || NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork);
             case "minecraft.forge.MixinForgeRegistryIterator" ->
                 !NovaEngCoreConfig.PERFORMANCE.primitiveBiMaps && NovaEngCoreConfig.CLIENT.optimizeFrozenRegistryIdLookup;
-            case "minecraft.MixinModelResourceLocationFastPath" ->
-                NovaEngCoreConfig.CLIENT.optimizeFerriteModelResourceLocation;
             case "minecraft.MixinConditionPropertyValueCanonicalization",
                  "minecraft.MixinConditionAndCanonicalization",
                  "minecraft.MixinConditionOrCanonicalization" -> NovaEngCoreConfig.CLIENT.optimizeFerritePredicates;
             case "minecraft.forge.MixinChunkIOProviderNbt" -> NovaEngCoreConfig.PERFORMANCE.optimizeFerriteChunkNbt;
             case "minecraft.MixinMultipartModelBuilder" -> NovaEngCoreConfig.CLIENT.optimizeFerriteMultipartModels;
-            case "jei.MixinElementSearch" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
-            case "jei.MixinIngredientInformation" -> NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
-            case "vintagefix.MixinDefaultPackJarUri" -> NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
-            case "patchouli.MixinBookContentsLocale" -> NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
+            case "jei.MixinElementSearch", "jei.MixinIngredientInformation" ->
+                NovaEngCoreConfig.CLIENT.optimizeJeiAsyncSearchIndex;
+            case "vintagefix.MixinDefaultPackJarUri", "patchouli.MixinBookContentsLocale" ->
+                NovaEngCoreConfig.PERFORMANCE.optimizeStartupWork;
             case "jei.MixinStackHelper" -> NovaEngCoreConfig.CLIENT.optimizeJeiStackUidCache;
             case "jei.MixinRecipeRegistryId" -> NovaEngCoreConfig.CLIENT.optimizeJeiRecipeId;
             case "jei.MixinRecipeMapDeduplication", "jei.MixinItemStackIngredientHash",
@@ -234,7 +328,7 @@ public final class MixinDecisions {
                 NovaEngCoreConfig.CLIENT.optimizeClasspathIndexWorker;
             case "stellarcore.InvokerDirectoryPathIndex", "stellarcore.MixinDirectoryPathIndexScan" ->
                 stellarCoreLoaded && NovaEngCoreConfig.CLIENT.optimizeClasspathIndexWorker;
-            case "mmce.MixinBlockArrayIngredients" ->
+            case "mmce.MixinBlockArrayIngredients", "mmce.MixinBlockInformationIngredients" ->
                 NovaEngCoreConfig.CLIENT.optimizeMmcePreviewIngredients;
             case "mmce.MixinBlockStateDescriptorHash" -> NovaEngCoreConfig.CLIENT.optimizeMmceBlockStateDescriptorHash;
             case "nuclearcraft.MixinValidFluidInputs" -> NovaEngCoreConfig.CLIENT.optimizeNuclearCraftValidFluids;
@@ -254,8 +348,8 @@ public final class MixinDecisions {
             case "konkrete.MixinLocalsCopy" -> NovaEngCoreConfig.CLIENT.optimizeKonkreteLocalsCopy;
             case "journeymap.MixinJMChunkCache" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkDrain;
             case "journeymap.MixinJMChunkStorage" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapChunkBuffer;
-            case "journeymap.MixinVanillaBlockSpriteProxy" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites
-                || NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
+            case "journeymap.MixinVanillaBlockSpriteProxy" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites;
+            case "journeymap.MixinVanillaBlockSpriteDedupe" -> NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
             case "minecraft.forge.MixinEventBus" -> NovaEngCoreConfig.CLIENT.optimizeEventBusRegistration;
             case "zenscript.MixinTypeRegistry",
                  "zenscript.MixinScriptPathParsing",
@@ -274,7 +368,7 @@ public final class MixinDecisions {
             case "minecraft.MixinTextureMapUploadBinding" ->
                 actiniumLoaded && NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
             case "actinium.MixinGLStateManagerUploadBinding" -> NovaEngCoreConfig.CLIENT.optimizeAtlasUploadBinding;
-            case "minecraft.MixinFallbackResourceManager", "libnine.MixinL9Models", "ae2.MixinUVLModelLoader" ->
+            case "minecraft.MixinFallbackResourceManager", "ae2.MixinUVLModelLoader" ->
                 NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
             case "minecraft.MixinModelManagerResourceGeneration" -> NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata
                 || NovaEngCoreConfig.CLIENT.optimizeModelBakeInputs
@@ -364,7 +458,6 @@ public final class MixinDecisions {
             case "minecraft.MixinEntityDataManagerLookup" -> NovaEngCoreConfig.SERVER.optimizeEntityDataManagerLookup;
             case "minecraft.MixinBiome",
                  "minecraft.forge.MixinForgeRegistry" -> NovaEngCoreConfig.SERVER.optimizeBiomeIdLookup;
-            case "ae2.MixinItemListCapacity" -> NovaEngCoreConfig.SERVER.optimizeAe2ItemListCapacity;
             case "universaltweaks.MixinUTEntityDesync" -> NovaEngCoreConfig.SERVER.optimizeUniversalTweaksEntityBlacklist;
             default -> true;
         };

@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
 import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndex;
-import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndexImpl;
 import github.kasuminova.novaeng.client.resource.SourcedResourceInputStream;
 import github.kasuminova.stellarcore.mixin.util.StellarCoreResourcePack;
 import net.minecraft.client.resources.DefaultResourcePack;
@@ -25,7 +24,7 @@ public abstract class MixinFallbackResourceManager {
     private void nova$identifyModelJsonSource(final ResourceLocation location,
                                               final IResourcePack resourcePack,
                                               final CallbackInfoReturnable<InputStream> cir) {
-        final ModelJsonMetadataIndex metadata = ModelJsonMetadataIndexImpl.instance();
+        final ModelJsonMetadataIndex metadata = ModelJsonMetadataIndex.instance();
         if (!metadata.isActive() || !location.getPath().endsWith(".json")) {
             return;
         }

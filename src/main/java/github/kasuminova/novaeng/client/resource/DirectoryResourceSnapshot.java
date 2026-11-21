@@ -20,6 +20,7 @@ import java.util.Set;
 final class DirectoryResourceSnapshot {
 
     private static final boolean CASE_INSENSITIVE = File.separatorChar == '\\';
+    private static final String ASSETS = "assets/";
 
     private final String rootPath;
     private final String prefix;
@@ -35,7 +36,11 @@ final class DirectoryResourceSnapshot {
             Files.walkFileTree(root.toPath().toAbsolutePath(), new SimpleFileVisitor<>() {
                 @Override
                 public @NonNull FileVisitResult preVisitDirectory(final @NonNull Path directory, final @NonNull BasicFileAttributes attributes) {
-                    paths.add(directory.toString());
+                    if (attributes.isSymbolicLink() || attributes.isOther()) {
+                        uncertainPrefixes.add(key(directory));
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                    paths.add(key(directory));
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -43,23 +48,23 @@ final class DirectoryResourceSnapshot {
                 public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attributes) {
                     if (attributes.isSymbolicLink() || attributes.isOther()) {
                         // A linked directory may expose descendants outside the walked tree.
-                        uncertainPrefixes.add(file.toString());
+                        uncertainPrefixes.add(key(file));
                     } else {
-                        paths.add(file.toString());
+                        paths.add(key(file));
                     }
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public @NonNull FileVisitResult visitFileFailed(final @NonNull Path file, final @NonNull IOException failure) {
-                    uncertainPrefixes.add(file.toString());
+                    uncertainPrefixes.add(key(file));
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public @NonNull FileVisitResult postVisitDirectory(final @NonNull Path directory, final IOException failure) {
                     if (failure != null) {
-                        uncertainPrefixes.add(directory.toString());
+                        uncertainPrefixes.add(key(directory));
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -67,8 +72,35 @@ final class DirectoryResourceSnapshot {
         } catch (final NoSuchFileException ignored) {
             // A missing root is an empty snapshot, under the generation's existing stability contract.
         } catch (final IOException | SecurityException failure) {
-            this.uncertainPrefixes.add(this.rootPath);
+            this.uncertainPrefixes.add(ASSETS);
         }
+    }
+
+    private String key(final Path path) {
+        final String absolute = path.toString();
+        return absolute.length() == rootPath.length() ? ASSETS
+            : ASSETS + absolute.substring(prefix.length()).replace(File.separatorChar, '/');
+    }
+
+    private static boolean isSimpleResourceName(final String name) {
+        int start = ASSETS.length();
+        for (int end = start; end <= name.length(); end++) {
+            if (end < name.length()) {
+                final char value = name.charAt(end);
+                if (value == '\\' || CASE_INSENSITIVE && (value == '~' || value == ':')) return false;
+                if (value != '/') continue;
+            }
+            final int length = end - start;
+            if (length == 0 && !(start == ASSETS.length() && end == name.length())
+                || length == 1 && name.charAt(start) == '.'
+                || length == 2 && name.charAt(start) == '.' && name.charAt(start + 1) == '.') return false;
+            if (CASE_INSENSITIVE && length > 0) {
+                final char last = name.charAt(end - 1);
+                if (last == '.' || last == ' ') return false;
+            }
+            start = end + 1;
+        }
+        return true;
     }
 
     private static boolean isSimplePath(final String path) {
@@ -112,14 +144,25 @@ final class DirectoryResourceSnapshot {
         if (!isSimplePath(path)) {
             return null;
         }
-        if (this.paths.contains(path)) {
+        return lookup(path.length() == rootPath.length() ? ASSETS
+            : ASSETS + path.substring(prefix.length()).replace(File.separatorChar, '/'));
+    }
+
+    /** BASE strips every literal assets/ occurrence; only the ordinary leading prefix is indexed directly. */
+    Boolean containsResource(final String name) {
+        if (!name.startsWith(ASSETS) || name.indexOf(ASSETS, ASSETS.length()) >= 0 || !isSimpleResourceName(name)) return null;
+        return lookup(name);
+    }
+
+    private Boolean lookup(final String name) {
+        if (this.paths.contains(name)) {
             return Boolean.TRUE;
         }
         for (final String uncertain : this.uncertainPrefixes) {
-            if (path.regionMatches(CASE_INSENSITIVE, 0, uncertain, 0, uncertain.length())
-                && (path.length() == uncertain.length()
-                || uncertain.endsWith(File.separator)
-                || path.charAt(uncertain.length()) == File.separatorChar)) {
+            if (name.regionMatches(CASE_INSENSITIVE, 0, uncertain, 0, uncertain.length())
+                && (name.length() == uncertain.length()
+                || uncertain.endsWith("/")
+                || name.charAt(uncertain.length()) == '/')) {
                 return null;
             }
         }

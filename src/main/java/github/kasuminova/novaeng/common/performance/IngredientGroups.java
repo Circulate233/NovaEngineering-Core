@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.performance;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 
 public final class IngredientGroups {
@@ -13,7 +13,7 @@ public final class IngredientGroups {
         for (final List<? extends T> group : groups) {
             size = Math.addExact(size, group.size());
         }
-        final List<T> result = new ArrayList<>(size);
+        final List<T> result = new ObjectArrayList<>(size);
         for (final List<? extends T> group : groups) {
             for (final T value : group) {
                 result.add(value);

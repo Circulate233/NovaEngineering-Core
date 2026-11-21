@@ -8,7 +8,6 @@ import github.kasuminova.novaeng.client.model.TextureLocationCache;
 import github.kasuminova.novaeng.client.model.async.ModelBookshelfBakeCache;
 import github.kasuminova.novaeng.client.resource.DirectoryExistenceCache;
 import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndex;
-import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndexImpl;
 import net.minecraft.client.renderer.block.model.ModelManager;
 import net.minecraft.client.resources.IResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +33,7 @@ public abstract class MixinModelManagerResourceGeneration {
         MultipartModelCache.clear();
         final boolean metadata = NovaEngCoreConfig.CLIENT.optimizeModelJsonMetadata;
         final boolean existence = NovaEngCoreConfig.CLIENT.optimizeResourceExistence;
-        final ModelJsonMetadataIndex metadataIndex = metadata ? ModelJsonMetadataIndexImpl.instance() : null;
+        final ModelJsonMetadataIndex metadataIndex = metadata ? ModelJsonMetadataIndex.instance() : null;
         final DirectoryExistenceCache existenceCache = existence ? DirectoryExistenceCache.instance() : null;
         if (metadataIndex != null) {
             metadataIndex.begin();
@@ -83,7 +82,7 @@ public abstract class MixinModelManagerResourceGeneration {
             }
         } finally {
             if ((flags & 1) != 0) {
-                ModelJsonMetadataIndexImpl.instance().end();
+                ModelJsonMetadataIndex.instance().end();
             }
         }
     }

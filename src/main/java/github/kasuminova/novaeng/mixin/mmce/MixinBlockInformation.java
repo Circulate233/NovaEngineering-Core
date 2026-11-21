@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * 消除多方块结构加载期 {@code BlockInformation} 池的同步与扩容开销。
+ * 为多方块结构加载期 {@code BlockInformation} 池预分配容量。
  *
  * <p>{@code BlockArray#addBlock} 对结构中的每个方块位置都会调用一次 {@code canonicalize}，
- * 而原实现每次都对池加锁，且池使用默认容量（16），在机器数量下会反复重哈希。
- * 加载期为单线程，锁没有竞争，因此只去掉同步并把容量调整到合理规模。
+ * 池使用默认容量（16），在机器数量下会反复重哈希。
+ * 机器解析和旋转缓存均使用 common pool，因此必须保留池的同步。
  *
  * <p>刻意不缓存 {@code hashCode}：结构反序列化过程中 {@code addMatchingStates}
  * 仍会修改 {@code matchingStates}，缓存会使集合内部状态失配。
@@ -46,12 +46,25 @@ public class MixinBlockInformation {
     }
 
     /**
+     * @author NovaEngineering
+     * @reason A machine reload must not clear the backing table during a worker insertion.
+     */
+    @Overwrite(remap = false)
+    public static void clearPool() {
+        synchronized (POOL) {
+            POOL.clear();
+        }
+    }
+
+    /**
      * @author circulation
-     * @reason 结构加载为单线程，同步块无收益且阻碍 JIT 内联。
+     * @reason Retain pool safety during parallel machine parsing and rotation-cache construction.
      */
     @Overwrite(remap = false)
     public BlockArray.BlockInformation canonicalize() {
-        return POOL.addOrGet((BlockArray.BlockInformation) (Object) this);
+        synchronized (POOL) {
+            return POOL.addOrGet((BlockArray.BlockInformation) (Object) this);
+        }
     }
 
 }

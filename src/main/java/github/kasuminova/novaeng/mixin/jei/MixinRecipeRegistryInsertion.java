@@ -32,9 +32,11 @@ public abstract class MixinRecipeRegistryInsertion {
     private static Map<IIngredientType<?>, List<?>> nova$flattenGroups(
         final Map<IIngredientType<?>, List<List<?>>> groups) {
         // Retain HEI's map layout and callback order; only eliminate list growth and per-group toArray copies.
-        final Map<IIngredientType<?>, List<?>> flattened = new Reference2ObjectOpenHashMap<>();
+        // Multi-type callback order depends on capacity; retain HEI's default for those maps.
+        final Map<IIngredientType<?>, List<?>> flattened = groups.size() <= 1
+            ? new Reference2ObjectOpenHashMap<>(1) : new Reference2ObjectOpenHashMap<>();
         for (final var entry : groups.entrySet()) {
-            flattened.put(entry.getKey(), IngredientGroups.flatten((List) entry.getValue()));
+            flattened.put(entry.getKey(), IngredientGroups.flatten(entry.getValue()));
         }
         return flattened;
     }

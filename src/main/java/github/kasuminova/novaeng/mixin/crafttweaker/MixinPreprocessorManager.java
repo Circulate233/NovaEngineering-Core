@@ -4,11 +4,11 @@ import crafttweaker.preprocessor.IPreprocessor;
 import crafttweaker.preprocessor.PreprocessorFactory;
 import crafttweaker.preprocessor.PreprocessorManager;
 import crafttweaker.runtime.ScriptFile;
+import github.kasuminova.novaeng.common.crafttweaker.util.ScriptDirective;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class MixinPreprocessorManager {
 
     @Shadow
+    // CraftTweaker declares concrete HashMap fields; Mixin requires the same descriptors.
     private HashMap<String, PreprocessorFactory<?>> registeredPreprocessorActions;
 
     @Shadow
@@ -32,17 +33,11 @@ public abstract class MixinPreprocessorManager {
      */
     @Overwrite(remap = false)
     private IPreprocessor checkLine(final ScriptFile scriptFile, final String line, final int lineIndex) {
-        final String trimmed = line.trim();
-        if (trimmed.isEmpty() || trimmed.charAt(0) != '#') {
+        final String directive = ScriptDirective.name(line);
+        if (directive == null) {
             return null;
         }
-
-        final String[] splits = trimmed.substring(1).split(" ");
-        if (splits.length == 0) {
-            return null;
-        }
-
-        final PreprocessorFactory<?> factory = registeredPreprocessorActions.get(splits[0]);
+        final PreprocessorFactory<?> factory = registeredPreprocessorActions.get(directive);
         if (factory == null) {
             return null;
         }
@@ -64,7 +59,9 @@ public abstract class MixinPreprocessorManager {
             return;
         }
 
-        for (final IPreprocessor preprocessor : new ArrayList<>(preprocessors)) {
+        // Post-actions may mutate the source list. One array preserves that snapshot
+        // contract without a temporary list wrapper and its iterator.
+        for (final IPreprocessor preprocessor : preprocessors.toArray(new IPreprocessor[preprocessors.size()])) {
             preprocessor.executeActionOnFinish(scriptFile);
         }
     }

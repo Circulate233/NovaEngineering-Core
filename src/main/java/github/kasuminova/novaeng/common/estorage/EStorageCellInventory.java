@@ -22,7 +22,6 @@ import io.netty.util.internal.ThrowableUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellInventory<T> {
     public static final String ITEM_SLOT = "#";
@@ -33,10 +32,9 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
     private final EStorageCell<T> cellType;
     private final IStorageChannel<T> channel;
 
-    @SuppressWarnings("deprecation")
     protected EStorageCellInventory(final EStorageCell<T> cellType, final ItemStack o, final ISaveProvider container) {
         super(cellType, o, container);
-        ReflectionHelper.setPrivateValue(AbstractCellInventory.class, this, cellType.getTotalTypes(o), "maxItemTypes", null);
+        ((AccessorAbstractCellInventory) this).setMaxItemTypes(cellType.getTotalTypes(o));
         this.cellType = cellType;
         this.channel = cellType.getChannel();
     }
@@ -132,6 +130,9 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
             return;
         }
         NBTTagCompound tagCompound = inv.getTagCompound();
+        // The live counter is already updated by saveChanges/injectItems. Only
+        // the serialized tag still describes how many slots the previous save wrote.
+        final int oldStoredItems = tagCompound.getShort(ITEM_TYPE_TAG);
 
         long itemCount = 0;
 
@@ -147,8 +148,6 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
 
             x++;
         }
-
-        final short oldStoredItems = inv.getStoredItemTypes();
 
         inv.setStoredItemTypes((short) this.cellItems.size());
 
@@ -166,7 +165,7 @@ public class EStorageCellInventory<T extends IAEStack<T>> extends AbstractCellIn
         }
 
         // clean any old crusty stuff...
-        for (; x >= oldStoredItems && x < inv.getMaxItemTypes(); x++) {
+        for (; x < oldStoredItems; x++) {
             tagCompound.removeTag(ITEM_SLOT + x);
             tagCompound.removeTag(ITEM_SLOT_COUNT + x);
         }

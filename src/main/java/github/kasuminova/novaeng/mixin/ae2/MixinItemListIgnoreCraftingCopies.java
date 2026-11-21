@@ -5,6 +5,7 @@ import appeng.api.storage.data.IItemList;
 import appeng.util.inv.ItemListIgnoreCrafting;
 import appeng.util.item.ItemList;
 import github.kasuminova.novaeng.common.performance.AvailableStackIteration;
+import github.kasuminova.novaeng.common.performance.ae2.CraftingSnapshotCapacity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -13,10 +14,20 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.function.Consumer;
 
 @Mixin(value = ItemListIgnoreCrafting.class, remap = false)
-public abstract class MixinItemListIgnoreCraftingCopies<T extends IAEStack<T>> implements AvailableStackIteration<T> {
+public abstract class MixinItemListIgnoreCraftingCopies<T extends IAEStack<T>> implements AvailableStackIteration<T>, CraftingSnapshotCapacity {
     @Shadow
     @Final
     private IItemList<T> target;
+
+    @Override
+    public int nova$itemTypeCount() {
+        return target instanceof CraftingSnapshotCapacity capacity ? capacity.nova$itemTypeCount() : 0;
+    }
+
+    @Override
+    public void nova$reserveItemTypes(final int count) {
+        if (target instanceof CraftingSnapshotCapacity capacity) capacity.nova$reserveItemTypes(count);
+    }
 
     /**
      * @author NovaEngineering

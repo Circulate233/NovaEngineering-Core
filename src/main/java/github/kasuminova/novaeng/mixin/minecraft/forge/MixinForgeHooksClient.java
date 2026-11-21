@@ -24,8 +24,9 @@ public class MixinForgeHooksClient {
         int size = format.getIntegerSize();
         int offset = format.getColorOffset() / 4; // assumes that color is aligned
         boolean hasColor = format.hasColor();
+        int[] words = hasColor ? quad.getVertexData() : null;
         for (int i = 0; i < 4; i++) {
-            int vc = hasColor ? (quad.getVertexData().length > offset + size * i ? quad.getVertexData()[offset + size * i] : 0xFFFFFFFF) : 0xFFFFFFFF;
+            int vc = hasColor && words.length > offset + size * i ? words[offset + size * i] : 0xFFFFFFFF;
             float vcr = vc & 0xFF;
             float vcg = (vc >>> 8) & 0xFF;
             float vcb = (vc >>> 16) & 0xFF;

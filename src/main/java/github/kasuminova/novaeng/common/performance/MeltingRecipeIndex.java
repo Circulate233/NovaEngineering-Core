@@ -40,13 +40,14 @@ public final class MeltingRecipeIndex {
                 current = snapshot;
                 if (current == null || current.source != source || current.revision != tracked.revision()) {
                     synchronized (tracked) {
-                        final Map<String, List<MeltingRecipe>> buckets = new Object2ObjectOpenHashMap<>();
+                        final Object2ObjectOpenHashMap<String, List<MeltingRecipe>> buckets = new Object2ObjectOpenHashMap<>();
                         for (final MeltingRecipe recipe : tracked) {
                             buckets.computeIfAbsent(recipe.output.getFluid().getName(), key -> new ObjectArrayList<>()).add(recipe);
                         }
                         buckets.replaceAll((key, value) -> new ObjectImmutableList<>(value));
-                        current = new Snapshot(source, tracked.revision(), Object2ObjectMaps.unmodifiable(
-                            new Object2ObjectOpenHashMap<>(buckets)));
+                        // The local builder has no remaining writer after publication; the
+                        // read-only wrapper can own it directly without copying every bucket.
+                        current = new Snapshot(source, tracked.revision(), Object2ObjectMaps.unmodifiable(buckets));
                         snapshot = current;
                     }
                 }

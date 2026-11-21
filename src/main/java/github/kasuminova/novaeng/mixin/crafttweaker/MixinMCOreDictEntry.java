@@ -1,17 +1,21 @@
 package github.kasuminova.novaeng.mixin.crafttweaker;
 
+import crafttweaker.api.item.IItemStack;
+import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.CraftTweaker;
 import crafttweaker.mc1120.oredict.MCOreDictEntry;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreIngredient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.lang.reflect.Field;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +34,23 @@ import java.util.Map;
  */
 @Mixin(value = MCOreDictEntry.class, remap = false)
 public class MixinMCOreDictEntry {
+
+    @Unique
+    private static Map<NonNullList<ItemStack>, String> nova$buildIndex() {
+        final String[] names = OreDictionary.getOreNames();
+        final Map<NonNullList<ItemStack>, String> index = new Reference2ObjectOpenHashMap<>(names.length);
+        for (final String name : names) {
+            if (name != null) {
+                index.putIfAbsent(OreDictionary.getOres(name, false), name);
+            }
+        }
+        return index;
+    }
+
+    @Shadow
+    public String getName() {
+        throw new AssertionError();
+    }
 
     @Unique
     private static volatile Map<NonNullList<ItemStack>, String> nova$namesByOres;
@@ -93,16 +114,18 @@ public class MixinMCOreDictEntry {
         return null;
     }
 
-    @Unique
-    private static Map<NonNullList<ItemStack>, String> nova$buildIndex() {
-        final String[] names = OreDictionary.getOreNames();
-        final Map<NonNullList<ItemStack>, String> index = new IdentityHashMap<>(names.length * 2);
-        for (final String name : names) {
-            if (name != null) {
-                index.putIfAbsent(OreDictionary.getOres(name, false), name);
-            }
+    /**
+     * @author NovaEngineering
+     * @reason Avoid stream stages and list growth while retaining fresh wildcard-size wrappers on every call.
+     */
+    @Overwrite(remap = false)
+    public List<IItemStack> getItems() {
+        final List<ItemStack> ores = OreDictionary.getOres(getName());
+        final List<IItemStack> items = new ObjectArrayList<>(ores.size());
+        for (final ItemStack ore : ores) {
+            items.add(CraftTweakerMC.getIItemStackWildcardSize(ore));
         }
-        return index;
+        return items;
     }
 
     @Unique
