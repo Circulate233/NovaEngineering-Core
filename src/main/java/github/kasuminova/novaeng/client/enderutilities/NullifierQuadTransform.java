@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.enderutilities;
 
-import dhj.embeddedt.embeddium.impl.model.quad.BakedQuadView;
+import github.kasuminova.novaeng.client.geometry.ActiniumQuadFlags;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -75,9 +75,7 @@ final class NullifierQuadTransform {
             }
             final BakedQuad result = new BakedQuad(words, source.getTintIndex(), transform.rotate(source.getFace()), source.getSprite(),
                 source.shouldApplyDiffuseLighting(), format);
-            if (source instanceof BakedQuadView from && result instanceof BakedQuadView to) {
-                to.addFlags(producerFlags(from.getFlags()));
-            }
+            ActiniumQuadFlags.copyMasked(source, result, ~DERIVED_FLAGS);
             return result;
         }
     }

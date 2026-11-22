@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.client.geometry.block;
 
-import dhj.embeddedt.embeddium.impl.model.quad.BakedQuadView;
+import github.kasuminova.novaeng.client.geometry.ActiniumQuadFlags;
 import github.kasuminova.novaeng.client.geometry.GeometryGeneration;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -58,9 +58,10 @@ final class BlockGeometryPages {
     }
 
     Material material(final BlockGeometryRecord.Columns columns, final BakedQuad quad) {
+        final int flags = ActiniumQuadFlags.get(quad);
         final int hash = Material.hash(columns, quad.getSprite(), quad.getTintIndex(), quad.getFace(), quad.shouldApplyDiffuseLighting(),
-            quad.getFormat(), quad instanceof BakedQuadView extension ? extension.getFlags() : 0);
-        return writers[(hash ^ (hash >>> 16)) & (writers.length - 1)].material(columns, quad, hash);
+            quad.getFormat(), flags);
+        return writers[(hash ^ (hash >>> 16)) & (writers.length - 1)].material(columns, quad, flags, hash);
     }
 
     void seal() {
@@ -95,12 +96,12 @@ final class BlockGeometryPages {
             return record;
         }
 
-        synchronized Material material(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int hash) {
-            if (closed) return new Material(columns, quad);
+        synchronized Material material(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int flags, final int hash) {
+            if (closed) return new Material(columns, quad, flags);
             if (capturedMaterials == null) capturedMaterials = new Int2ObjectOpenHashMap<>();
             final Material existing = capturedMaterials.get(hash);
-            if (existing != null && existing.matches(columns, quad)) return existing;
-            final Material material = new Material(columns, quad);
+            if (existing != null && existing.matches(columns, quad, flags)) return existing;
+            final Material material = new Material(columns, quad, flags);
             if (capturedMaterials.size() == PAGE_SIZE) capturedMaterials.clear();
             capturedMaterials.put(hash, material);
             return material;
@@ -227,13 +228,17 @@ final class BlockGeometryPages {
         private final int flags;
 
         Material(final BlockGeometryRecord.Columns columns, final BakedQuad quad) {
+            this(columns, quad, ActiniumQuadFlags.get(quad));
+        }
+
+        private Material(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int flags) {
             this.columns = columns;
             sprite = quad.getSprite();
             tint = quad.getTintIndex();
             face = faceId(quad.getFace());
             diffuse = quad.shouldApplyDiffuseLighting();
             format = quad.getFormat();
-            flags = quad instanceof BakedQuadView extension ? extension.getFlags() : 0;
+            this.flags = flags;
         }
 
         private Material(final BlockGeometryRecord.Columns columns, final Material source) {
@@ -266,14 +271,14 @@ final class BlockGeometryPages {
 
         BakedQuad quad(final Shape shape) {
             final BakedQuad quad = new BakedQuad(shape.decode(columns), tint, facing(), sprite, diffuse, format);
-            if (quad instanceof BakedQuadView extension) extension.addFlags(flags);
+            ActiniumQuadFlags.add(quad, flags);
             return quad;
         }
 
-        private boolean matches(final BlockGeometryRecord.Columns columns, final BakedQuad quad) {
+        private boolean matches(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int flags) {
             return sprite == quad.getSprite() && tint == quad.getTintIndex() && face == faceId(quad.getFace())
                 && diffuse == quad.shouldApplyDiffuseLighting() && format == quad.getFormat()
-                && flags == (quad instanceof BakedQuadView extension ? extension.getFlags() : 0)
+                && this.flags == flags
                 && Objects.equals(this.columns, columns);
         }
 

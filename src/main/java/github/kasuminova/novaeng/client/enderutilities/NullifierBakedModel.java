@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.client.enderutilities;
 
 import com.google.common.collect.ImmutableMap;
-import dhj.embeddedt.embeddium.impl.model.quad.BakedQuadView;
 import fi.dy.masa.enderutilities.item.ItemNullifier;
+import github.kasuminova.novaeng.client.geometry.ActiniumQuadFlags;
 import it.unimi.dsi.fastutil.objects.AbstractObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
@@ -247,13 +247,13 @@ public final class NullifierBakedModel implements IBakedModel {
             face = quad.getFace();
             tint = quad.getTintIndex();
             diffuse = quad.shouldApplyDiffuseLighting();
-            flags = quad instanceof BakedQuadView extension ? extension.getFlags() : 0;
+            flags = ActiniumQuadFlags.get(quad);
         }
 
         private boolean matches(final BakedQuad quad) {
             return tint == quad.getTintIndex() && face == quad.getFace() && sprite == quad.getSprite()
                 && diffuse == quad.shouldApplyDiffuseLighting() && format.equals(quad.getFormat())
-                && flags == (quad instanceof BakedQuadView extension ? extension.getFlags() : 0)
+                && flags == ActiniumQuadFlags.get(quad)
                 && Arrays.equals(words, quad.getVertexData());
         }
     }
