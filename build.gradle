@@ -390,10 +390,14 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
+    // Cleanroom resolves its default log and config paths against the working directory.
+    workingDir temporaryDir
     dependsOn loggingAgentJar
     systemProperty 'novaeng.test.loggingAgentJar', loggingAgentJar.get().archiveFile.get().asFile.absolutePath
+    systemProperty 'novaeng.test.projectDir', layout.projectDirectory.asFile.absolutePath
     systemProperty 'novaeng.test.refmap', layout.buildDirectory.file('mixin/novaeng_core.refmap.json').get().asFile.absolutePath
     systemProperty 'novaeng.test.srgToNamed', layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.tsrg').get().asFile.absolutePath
+    systemProperty 'novaeng.test.srgMappings', layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.srg').get().asFile.absolutePath
     javaLauncher.set(javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(25)
     })

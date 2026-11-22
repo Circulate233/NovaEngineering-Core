@@ -266,6 +266,7 @@ public final class MixinConfigIntegrityTest {
                         loaded.addAll(present);
                         final Class<?> actual = loader.loadClass(DECISIONS);
                         final Class<?> settings = loader.loadClass("github.kasuminova.novaeng.NovaEngCoreConfig");
+                        if (present.isEmpty() && !poolPresent) checkJourneyMapGates(actual, settings);
                         for (final boolean enabled : List.of(false, true)) {
                             for (final String name : List.of("MixinGLStateManagerGenericAttributes",
                                 "MixinGLSMCurrentAttribsGenericAttributes", "MixinRenderSystemGenericAttributes",
@@ -361,6 +362,24 @@ public final class MixinConfigIntegrityTest {
         }
     }
 
+    private static void checkJourneyMapGates(final Class<?> actual, final Class<?> config) throws Exception {
+        final Object client = config.getField("CLIENT").get(null);
+        final var blockSprites = client.getClass().getField("optimizeJourneymapBlockSprites");
+        final var spriteDedupe = client.getClass().getField("optimizeJourneymapSpriteDedupe");
+        final var shouldApply = actual.getMethod("shouldApply", String.class);
+        for (final boolean sprites : List.of(false, true)) {
+            blockSprites.setBoolean(client, sprites);
+            for (final boolean dedupe : List.of(false, true)) {
+                spriteDedupe.setBoolean(client, dedupe);
+                final String flags = " with block sprites=" + sprites + " and sprite dedupe=" + dedupe;
+                require((boolean) shouldApply.invoke(null, "journeymap.MixinVanillaBlockSpriteProxy") == sprites,
+                    "JourneyMap block sprite gate" + flags);
+                require((boolean) shouldApply.invoke(null, "journeymap.MixinVanillaBlockSpriteDedupe") == dedupe,
+                    "JourneyMap sprite dedupe gate" + flags);
+            }
+        }
+    }
+
     private static void gate(final Class<?> actual, final Class<?> config, final String group, final String setting,
                              final boolean value, final String name, final boolean expected) throws Exception {
         final Object category = config.getField(group).get(null);
@@ -376,7 +395,7 @@ public final class MixinConfigIntegrityTest {
 
     @Test
     void allMixinsAreRegisteredCompiledAndCorrectlyGated() throws Exception {
-        final Path repo = Path.of("").toAbsolutePath().normalize();
+        final Path repo = Path.of(System.getProperty("novaeng.test.projectDir"));
         // Resolve the actual main output, including customized Gradle build directories,
         // without running MixinDecisions' static mod-discovery initialization.
         final Class<?> decisions = Class.forName(DECISIONS, false, getClass().getClassLoader());

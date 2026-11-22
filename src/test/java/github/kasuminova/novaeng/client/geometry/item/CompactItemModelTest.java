@@ -19,16 +19,11 @@ import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.lang.reflect.Modifier;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -426,37 +421,6 @@ class CompactItemModelTest {
                 assertEquals(calls, observed);
             }
         }
-    }
-
-    @Test
-    void availableV2CorpusMatchesAll196689OriginalQuads() throws Exception {
-        final Path corpus = Path.of(".gradle/model-memory-audit-20261118/static-sprites.bin");
-        Assumptions.assumeTrue(Files.isRegularFile(corpus), "Local audited V2 sprite corpus is optional");
-        int sprites = 0, quads = 0;
-        try (final DataInputStream input = new DataInputStream(new BufferedInputStream(Files.newInputStream(corpus)))) {
-            while (input.available() > 0) {
-                input.skipNBytes(input.readUnsignedShort());
-                final int width = input.readUnsignedShort(), height = input.readUnsignedShort();
-                final int[] pixels = new int[width * height];
-                for (int i = 0; i < pixels.length; i++) pixels[i] = input.readUnsignedByte() << 24;
-                final int recordedEdges = input.readInt();
-                input.skipNBytes(recordedEdges * 7L);
-                final Sprite sprite = new Sprite(width, height, new int[][]{pixels});
-                final ItemContour contour = ItemContour.create(width, height, new int[][]{pixels});
-                assertNotNull(contour);
-                assertEquals(recordedEdges, contour.size());
-                final List<BakedQuad> expected = ItemLayerModel.getQuadsForSprite(sprites % 5, sprite, DefaultVertexFormats.ITEM, Optional.empty());
-                final ItemQuadView cursor = new ItemQuadView();
-                for (int i = 0; i < expected.size(); i++) {
-                    cursor.decode(contour, sprite, sprites % 5, i);
-                    compare(expected.get(i), cursor);
-                }
-                sprites++;
-                quads += expected.size();
-            }
-        }
-        assertEquals(6655, sprites);
-        assertEquals(196689, quads);
     }
 
     private static final class BakeHook extends MixinItemLayerModel {

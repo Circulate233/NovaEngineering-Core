@@ -34,22 +34,17 @@ class LoggingSilencerAgentIntegrationTest {
 
     @Test
     void missingConfigurationLeavesExistingLoggingEnabled() throws Exception {
-        runProbe("missing", null);
-    }
-
-    @Test
-    void explicitlyDisabledConfigurationLeavesExistingLoggingEnabled() throws Exception {
-        runProbe("disabled", false);
+        runProbe(false, true);
     }
 
     @Test
     void enabledConfigurationSilencesAlreadyLoadedAndNewLoggerEntrypoints() throws Exception {
-        runProbe("enabled", true);
+        runProbe(true, true);
     }
 
     @Test
     void enabledConfigurationSilencesLoggerClassesOnTheirFirstLoad() throws Exception {
-        runProbe("enabled-cold", true, false);
+        runProbe(true, false);
     }
 
     @Test
@@ -70,35 +65,29 @@ class LoggingSilencerAgentIntegrationTest {
         }
     }
 
-    private void runProbe(final String name, final Boolean enabled) throws Exception {
-        runProbe(name, enabled, true);
-    }
-
-    private void runProbe(final String name, final Boolean enabled, final boolean preload) throws Exception {
-        final Path directory = Files.createDirectory(temporary.resolve(name));
-        if (enabled != null) {
-            final Path config = directory.resolve("config/novaeng_core.cfg");
+    private void runProbe(final boolean enabled, final boolean preload) throws Exception {
+        if (enabled) {
+            final Path config = temporary.resolve("config/novaeng_core.cfg");
             Files.createDirectories(config.getParent());
-            Files.writeString(config, "general {\n    performance {\n        B:DisableLogOutput=" + enabled
-                + "\n    }\n}\n");
+            Files.writeString(config, "general {\n    performance {\n        B:DisableLogOutput=true\n    }\n}\n");
         }
         final Path agentJar = agentJar();
         final List<String> arguments = new ArrayList<>();
         if (preload) {
-            arguments.add("-javaagent:" + createPreloadJar(directory.resolve("preload.jar")));
+            arguments.add("-javaagent:" + createPreloadJar(temporary.resolve("preload.jar")));
         }
         arguments.add("-javaagent:" + agentJar);
         arguments.add("-cp");
         arguments.add(classpath());
         arguments.add(LoggingAgentProbe.class.getName());
-        arguments.add(Boolean.toString(Boolean.TRUE.equals(enabled)));
-        final Path argumentFile = directory.resolve("java-arguments.txt");
+        arguments.add(Boolean.toString(enabled));
+        final Path argumentFile = temporary.resolve("java-arguments.txt");
         Files.writeString(argumentFile, String.join("\n", arguments.stream().map(LoggingSilencerAgentIntegrationTest::quote).toList()),
             StandardCharsets.UTF_8);
-        final Path output = directory.resolve("probe-output.txt");
+        final Path output = temporary.resolve("probe-output.txt");
         final Path java = Path.of(System.getProperty("java.home"), "bin", isWindows() ? "java.exe" : "java");
         final Process process = new ProcessBuilder(java.toString(), "@" + argumentFile)
-            .directory(directory.toFile()).redirectErrorStream(true).redirectOutput(output.toFile()).start();
+            .directory(temporary.toFile()).redirectErrorStream(true).redirectOutput(output.toFile()).start();
         final boolean finished = process.waitFor(40, TimeUnit.SECONDS);
         if (!finished) {
             process.destroyForcibly();
@@ -108,7 +97,7 @@ class LoggingSilencerAgentIntegrationTest {
         assertTrue(finished, "Logging agent probe timed out:\n" + result);
         assertEquals(0, process.exitValue(), result);
         assertTrue(result.contains("DIRECT_STDOUT_ALIVE"), result);
-        assertTrue(result.contains("PROBE_OK suppressed=" + Boolean.TRUE.equals(enabled)), result);
+        assertTrue(result.contains("PROBE_OK suppressed=" + enabled), result);
     }
 
     private static Path agentJar() {

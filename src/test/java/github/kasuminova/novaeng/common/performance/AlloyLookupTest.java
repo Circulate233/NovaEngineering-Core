@@ -82,7 +82,7 @@ public class AlloyLookupTest {
     private static ClassLoader lookupLoader() throws Exception {
         final Map<String, String> methods = new HashMap<>();
         final Map<String, String> fields = new HashMap<>();
-        for (final String line : Files.readAllLines(Path.of("build/moddev/artifacts/intermediateToNamed.srg"))) {
+        for (final String line : Files.readAllLines(Path.of(System.getProperty("novaeng.test.srgMappings")))) {
             final String[] parts = line.split(" ");
             if (line.startsWith("MD: ")) methods.put(parts[1] + parts[2], parts[3].substring(parts[3].lastIndexOf('/') + 1));
             if (line.startsWith("FD: ")) fields.put(parts[1], parts[2].substring(parts[2].lastIndexOf('/') + 1));

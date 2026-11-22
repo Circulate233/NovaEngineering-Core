@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.performance;
 import crazypants.enderio.base.config.recipes.IRecipeConfigElement;
 import crazypants.enderio.base.config.recipes.StaxFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLEventReader;
@@ -12,6 +13,7 @@ import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -125,8 +127,8 @@ class StartupOptimizationTest {
     }
 
     @Test
-    void jarRootUriListsRealResourcesAndKeepsExistingFileSystemOpen() throws Exception {
-        final var archive = Files.createTempDirectory("nova-jar-uri-").resolve("pack with spaces.jar");
+    void jarRootUriListsRealResourcesAndKeepsExistingFileSystemOpen(@TempDir final Path rootDirectory) throws Exception {
+        final Path archive = rootDirectory.resolve("pack with spaces.jar");
         final var normalizer = Class.forName("github.kasuminova.novaeng.mixin.vintagefix.MixinDefaultPackJarUri")
             .getDeclaredMethod("nova$completeJarRoot", String.class);
         normalizer.setAccessible(true);
@@ -134,46 +136,31 @@ class StartupOptimizationTest {
         final URI root = URI.create((String) normalizer.invoke(null, input));
         assertEquals(input + "!/", root.toString());
         assertEquals(root.toString(), normalizer.invoke(null, root.toString()));
-        try {
-            try (var fs = FileSystems.newFileSystem(root, Map.of("create", "true"))) {
-                Files.createDirectories(fs.getPath("/assets/test"));
-                Files.writeString(fs.getPath("/assets/test/model.json"), "{}");
-                assertSame(fs, FileSystems.getFileSystem(root));
-                assertTrue(Files.isRegularFile(fs.getPath("/assets/test/model.json")));
-                assertTrue(fs.isOpen());
-            }
-        } finally {
-            Files.deleteIfExists(archive);
-            Files.deleteIfExists(archive.getParent());
+        try (var fs = FileSystems.newFileSystem(root, Map.of("create", "true"))) {
+            Files.createDirectories(fs.getPath("/assets/test"));
+            Files.writeString(fs.getPath("/assets/test/model.json"), "{}");
+            assertSame(fs, FileSystems.getFileSystem(root));
+            assertTrue(Files.isRegularFile(fs.getPath("/assets/test/model.json")));
+            assertTrue(fs.isOpen());
         }
     }
 
     @Test
-    void directoryScanPreservesFilesAndStopsOnGenerationChange() throws Exception {
-        final var root = Files.createTempDirectory("nova-directory-scan-");
-        final var nested = Files.createDirectories(root.resolve("assets/test/empty"));
+    void directoryScanPreservesFilesAndStopsOnGenerationChange(@TempDir final Path root) throws Exception {
+        Files.createDirectories(root.resolve("assets/test/empty"));
         final var a = root.resolve("assets/test/model.json");
         final var b = root.resolve("README.txt");
         Files.writeString(a, "{}");
         Files.writeString(b, "readme");
-        try {
-            final Set<String> paths = new HashSet<>();
-            DirectoryTreeScan.scan(root.toFile(), () -> true, paths::add);
-            assertEquals(Set.of(root.relativize(a).toString(), root.relativize(b).toString()), paths);
-            final AtomicBoolean current = new AtomicBoolean(true);
-            paths.clear();
-            DirectoryTreeScan.scan(root.toFile(), current::get, path -> { paths.add(path); current.set(false); });
-            assertEquals(1, paths.size());
-            paths.clear();
-            DirectoryTreeScan.scan(root.toFile(), () -> false, paths::add);
-            assertTrue(paths.isEmpty());
-        } finally {
-            Files.delete(a);
-            Files.delete(b);
-            Files.delete(nested);
-            Files.delete(nested.getParent());
-            Files.delete(nested.getParent().getParent());
-            Files.delete(root);
-        }
+        final Set<String> paths = new HashSet<>();
+        DirectoryTreeScan.scan(root.toFile(), () -> true, paths::add);
+        assertEquals(Set.of(root.relativize(a).toString(), root.relativize(b).toString()), paths);
+        final AtomicBoolean current = new AtomicBoolean(true);
+        paths.clear();
+        DirectoryTreeScan.scan(root.toFile(), current::get, path -> { paths.add(path); current.set(false); });
+        assertEquals(1, paths.size());
+        paths.clear();
+        DirectoryTreeScan.scan(root.toFile(), () -> false, paths::add);
+        assertTrue(paths.isEmpty());
     }
 }

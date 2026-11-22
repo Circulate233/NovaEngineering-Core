@@ -1,34 +1,23 @@
 package github.kasuminova.novaeng.mixin.journeymap;
 
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.performance.JourneyMapQuadScratch;
 import github.kasuminova.novaeng.common.performance.JourneyMapStateMemo;
-import journeymap.client.model.block.BlockMD;
-import journeymap.client.model.chunk.ChunkMD;
-import net.minecraft.util.math.BlockPos;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import journeymap.client.cartography.color.ColoredSprite;
 import journeymap.client.mod.vanilla.VanillaBlockSpriteProxy;
+import journeymap.client.model.block.BlockMD;
+import journeymap.client.model.chunk.ChunkMD;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.FMLInjectionData;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
+import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Test;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,20 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JourneyMapSpriteDedupeTest {
     private static final MethodHandle WRAPPER = wrapper();
-    private static Object previousHome;
-
-    @BeforeAll
-    static void prepareConfig() throws Exception {
-        final Field home = FMLInjectionData.class.getDeclaredField("minecraftHome");
-        home.setAccessible(true); previousHome = home.get(null);
-        home.set(null, Files.createTempDirectory("journeymap-config-test").toFile());
-    }
-
-    @AfterAll
-    static void restoreHome() throws Exception {
-        final Field home = FMLInjectionData.class.getDeclaredField("minecraftHome");
-        home.setAccessible(true); home.set(null, previousHome);
-    }
 
     @Test
     void actualJourneyMapAndFastutilAgreeOnSpriteContentsAndSpecialCases() throws Throwable {
@@ -116,26 +91,6 @@ class JourneyMapSpriteDedupeTest {
     }
 
     @Test
-    void eachMixinIsSelectedBeforeInjectionByItsOwnStartupFlag() throws Exception {
-        final var selection = startupSelection();
-        final boolean state = NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites;
-        final boolean dedupe = NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe;
-        try {
-            for (final boolean stateEnabled : new boolean[]{false, true}) {
-                for (final boolean dedupeEnabled : new boolean[]{false, true}) {
-                    NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites = stateEnabled;
-                    NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe = dedupeEnabled;
-                    assertEquals(stateEnabled, selection.invoke(null, "journeymap.MixinVanillaBlockSpriteProxy"));
-                    assertEquals(dedupeEnabled, selection.invoke(null, "journeymap.MixinVanillaBlockSpriteDedupe"));
-                }
-            }
-        } finally {
-            NovaEngCoreConfig.CLIENT.optimizeJourneymapBlockSprites = state;
-            NovaEngCoreConfig.CLIENT.optimizeJourneymapSpriteDedupe = dedupe;
-        }
-    }
-
-    @Test
     void headAndReturnRestoreTheMemoWithoutUsingCallbackObjects() throws Exception {
         final var begin = MixinVanillaBlockSpriteProxy.class.getDeclaredMethod("nova$beginExtension", BlockMD.class, ChunkMD.class, BlockPos.class, CallbackInfoReturnable.class);
         final var end = MixinVanillaBlockSpriteProxy.class.getDeclaredMethod("nova$endExtension", BlockMD.class, ChunkMD.class, BlockPos.class, CallbackInfoReturnable.class);
@@ -150,32 +105,6 @@ class JourneyMapSpriteDedupeTest {
         assertSame(outer, JourneyMapStateMemo.current());
         end.invoke(target, null, null, null, null);
         assertNull(JourneyMapStateMemo.current());
-    }
-
-    private static java.lang.reflect.Method startupSelection() throws Exception {
-        final String originalName = "github/kasuminova/novaeng/common/util/MixinDecisions";
-        final String isolatedName = "github/kasuminova/novaeng/mixin/journeymap/IsolatedJourneyMapSelection";
-        final ClassNode source = new ClassNode();
-        try (final var input = JourneyMapSpriteDedupeTest.class.getClassLoader().getResourceAsStream(originalName + ".class")) {
-            new ClassReader(input).accept(source, 0);
-        }
-        final ClassNode isolated = new ClassNode();
-        isolated.version = source.version; isolated.access = Opcodes.ACC_PUBLIC; isolated.name = isolatedName; isolated.superName = "java/lang/Object";
-        for (final var method : source.methods) {
-            if (!method.name.equals("isOptimizationEnabled")) continue;
-            method.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC;
-            for (final var instruction : method.instructions) {
-                if (instruction instanceof MethodInsnNode call && call.owner.equals(originalName)) call.owner = isolatedName;
-            }
-            isolated.methods.add(method);
-        }
-        final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS); isolated.accept(writer);
-        final byte[] bytes = writer.toByteArray();
-        final Class<?> type = new ClassLoader(JourneyMapSpriteDedupeTest.class.getClassLoader()) {
-            Class<?> define() { return defineClass(isolatedName.replace('/', '.'), bytes, 0, bytes.length); }
-        }.define();
-        // Use the exact production startup switch while excluding unrelated mod discovery's static bootstrap.
-        return type.getMethod("isOptimizationEnabled", String.class);
     }
 
     private static void compareSprites(final HashMap<String, ColoredSprite> expected, final HashMap<String, ColoredSprite> actual) throws Exception {
