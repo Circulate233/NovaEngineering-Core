@@ -19,6 +19,9 @@ public class NovaEngCoreMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(final String mixinPackage) {
         ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE);
+        if (NovaEngCoreConfig.PERFORMANCE.disableLogOutput && !Boolean.getBoolean("novaeng.logOutputSuppressed")) {
+            NovaEngCoreEarlyMixinLoader.LOG.warn("DisableLogOutput requires -javaagent:<path-to-NovaCore-logging-agent.jar>; logging is still active");
+        }
     }
 
     @Override

@@ -177,7 +177,7 @@ public final class MixinConfigIntegrityTest {
             "minecraft.MixinLazyAttributeModifierMaps", "minecraft.MixinLazyPathHeap", "minecraft.MixinLazyPathFinder",
             "minecraft.MixinAttributeNameIndex", "minecraft.MixinAttributeNameIndexStorage",
             "enderio.MixinRecipesRegistration", "mmce.MixinBlockInformationIngredients",
-            "ae2.MixinMECraftingInventorySnapshot", "mmce.MixinActiveRecipeLazyData", "mmce.MixinItemHandlerGenericCopy",
+            "mmce.MixinActiveRecipeLazyData", "mmce.MixinItemHandlerGenericCopy",
             "mmce.MixinItemUtilsGenericCopy", "mmce.InvokerItemHandlerCopyShellPool",
             "tconstruct.MixinTraitTagQueries", "tconstruct.MixinAbstractTraitTagQuery",
             "minecraft.forge.MixinChunkIOProviderNbt", "minecraft.forge.MixinFMLOutboundHandlerReply").contains(name))
@@ -337,8 +337,6 @@ public final class MixinConfigIntegrityTest {
                             gate(actual, settings, "PERFORMANCE", "optimizeStartupWork", enabled, "geckolib3.MixinRawGeometryTreeLookup", enabled && present.contains("geckolib3"));
                             gate(actual, settings, "PERFORMANCE", "optimizeStartupWork", enabled, "ftbquests.MixinQuestWrapper", enabled && present.containsAll(List.of("ftbquests", "itemfilters", "jei")));
                             gate(actual, settings, "PERFORMANCE", "optimizeStartupWork", enabled, "mekanism.MixinSolarActivatorTexturePreload", enabled && present.contains("mekanismmultiblockmachine"));
-                            gate(actual, settings, "PERFORMANCE", "reduceRuntimeAllocations", enabled,
-                                "ae2.MixinMECraftingInventorySnapshot", enabled && present.contains("appliedenergistics2"));
                             gate(actual, settings, "PERFORMANCE", "reduceRuntimeAllocations", enabled,
                                 "mmce.MixinActiveRecipeLazyData", enabled && present.contains("modularmachinery"));
                             for (final String name : List.of("MixinItemHandlerGenericCopy", "MixinItemUtilsGenericCopy", "InvokerItemHandlerCopyShellPool")) {

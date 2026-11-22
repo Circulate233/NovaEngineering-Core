@@ -45,6 +45,11 @@ public class NovaEngCoreConfig {
     @SuppressWarnings("CanBeFinal")
     public static class Performance {
         @Config.RequiresMcRestart
+        @Config.Name("DisableLogOutput")
+        @Config.Comment("Replace game, loader, Log4j and JUL logging methods with no-op bodies. Disabled by default. Requires -javaagent:<path-to-NovaCore-logging-agent.jar>; the standalone agent reads this setting before the loader starts. Disables all log levels, including errors. Does not suppress ordinary System.out/System.err output or evaluate fewer arguments at the caller.")
+        public boolean disableLogOutput = false;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Share immutable model, text, recipe and mapping strings through fixed-size weak indexes.")
         public boolean shareImmutableStrings = true;
         @Config.RequiresMcRestart

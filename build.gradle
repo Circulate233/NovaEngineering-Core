@@ -253,6 +253,8 @@ processResources {
 }
 
 sourceSets {
+    // Keep premain and its helpers off the mod JAR's system-loader classpath.
+    loggingAgent
     main {
         java {
             srcDir generatedTagsSourceDir
@@ -262,6 +264,8 @@ sourceSets {
         // Exercise the actual 1.12.2 NBT types and transformed constructor, not substitutes.
         compileClasspath += sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.compileClasspath
+        compileClasspath += sourceSets.loggingAgent.output
+        runtimeClasspath += sourceSets.loggingAgent.output
     }
 }
 
@@ -309,6 +313,23 @@ jar {
         }
     }
     finalizedBy(tasks.named(reobfTaskName).get())
+}
+
+def loggingAgentJar = tasks.register('loggingAgentJar', Jar) {
+    group = 'build'
+    description = 'Build the standalone no-op logging agent without game or loader dependencies'
+    archiveClassifier = 'logging-agent'
+    from sourceSets.loggingAgent.output
+    manifest {
+        attributes(
+            'Premain-Class': 'github.kasuminova.novaeng.common.logging.agent.LoggingSilencerAgent',
+            'Can-Retransform-Classes': 'true'
+        )
+    }
+}
+
+tasks.named('assemble').configure {
+    dependsOn loggingAgentJar
 }
 
 
@@ -369,6 +390,8 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
+    dependsOn loggingAgentJar
+    systemProperty 'novaeng.test.loggingAgentJar', loggingAgentJar.get().archiveFile.get().asFile.absolutePath
     systemProperty 'novaeng.test.refmap', layout.buildDirectory.file('mixin/novaeng_core.refmap.json').get().asFile.absolutePath
     systemProperty 'novaeng.test.srgToNamed', layout.buildDirectory.file('moddev/artifacts/intermediateToNamed.tsrg').get().asFile.absolutePath
     javaLauncher.set(javaToolchains.launcherFor {

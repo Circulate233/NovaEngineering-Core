@@ -105,9 +105,6 @@ public final class MixinDecisions {
                 return neoFontRenderLoaded && isPresent("neofontrender_ui_enhancements")
                     && NovaEngCoreConfig.CLIENT.optimizeMenuWorkingAllocations;
             }
-            case "ae2.MixinMECraftingInventorySnapshot" -> {
-                return ae2Loaded && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
-            }
             case "mmce.MixinActiveRecipeLazyData" -> {
                 return mmceLoaded && NovaEngCoreConfig.PERFORMANCE.reduceRuntimeAllocations;
             }
