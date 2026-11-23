@@ -588,7 +588,7 @@ public class NovaEngCoreConfig {
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeJourneymapBlockSprites")
-        @Config.Comment("JourneyMap re-reads the raw block state and bakes it straight from the chunk, which no CodeChicken Lib bakery can bake: the sprite map and the model error state only exist after ModelBakery.handleExtendedState ran. Resolve block sprites from the block's own extended state instead, so blocks baked by CodeChicken Lib (Thermal Expansion and Thermal Dynamics) show their sprites on the map instead of showing nothing.")
+        @Config.Comment("Give JourneyMap the extended state needed by CodeChicken Lib models, such as Thermal Expansion machines. Use JourneyMap's texture fallback when the block state cannot be prepared.")
         public boolean optimizeJourneymapBlockSprites = true;
 
         @Config.RequiresMcRestart

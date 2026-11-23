@@ -21,12 +21,15 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin {
         if (!Boolean.parseBoolean(System.getProperty("novaeng.earlyEventTransforms", "true"))) return;
         Launch.classLoader.addTransformerExclusion("github.kasuminova.novaeng.common.asm.early.");
         final EarlyEventTransformer transformer = new EarlyEventTransformer();
-        for (final String target : new String[]{EarlyEventTransformer.SUBSCRIBER, EarlyEventTransformer.SUBSCRIPTION}) {
-            if (Launch.classLoader.isClassLoaded(target)) {
-                LOG.warn("{} was loaded before NovaCore's early event patch; keeping original behavior", target);
-            } else {
-                TransformerDelegate.registerExplicitTransformer(transformer, target);
-            }
+        t(EarlyEventTransformer.SUBSCRIBER, transformer);
+        t(EarlyEventTransformer.SUBSCRIPTION, transformer);
+    }
+
+    private static void t(String target, EarlyEventTransformer transformer) {
+        if (Launch.classLoader.isClassLoaded(target)) {
+            LOG.warn("{} was loaded before NovaCore's early event patch; keeping original behavior", target);
+        } else {
+            TransformerDelegate.registerExplicitTransformer(transformer, target);
         }
     }
 
@@ -49,7 +52,7 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin {
     @Override
     public void injectData(final Map<String, Object> data) {
         // Runs before VintageFix's tweak loads and deserializes its jar discovery cache.
-        if ( CleanroomModDiscoverer.instance().isModPresent("vintagefix"))
+        if (CleanroomModDiscoverer.instance().isModPresent("vintagefix"))
             VintageFixJarCacheFix.apply();
     }
 
