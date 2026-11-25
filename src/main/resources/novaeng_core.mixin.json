@@ -1448,6 +1448,7 @@
     "actinium.MixinQuadTreeConstruction",
     "actinium.MixinRenderSectionMemoryBudget",
     "actinium.MixinRenderSystemGenericAttributes",
+    "actinium.MixinSpriteMipPixels",
     "actinium.MixinShaderManagerGenericAttributes",
     "actinium.MixinSortOutputBudgetRelease",
     "actinium.MixinVintageScratchMemory",

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.RandomAccess;
+import java.util.function.BiFunction;
 
 /** Public reads publish stable arrays; only private vanilla animation reads borrow the decode window. */
 public final class OwnedAnimationFrames extends AbstractList<int[][]> implements RandomAccess {
@@ -47,6 +48,30 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
     public List<int[][]> internalView() {
         if (internal == null) internal = new InternalView();
         return internal;
+    }
+
+    /** Edits the actual base mip without publishing an outer array or a decode window. */
+    public <S> S editBaseLevels(S state, final BiFunction<S, int[], S> editor) {
+        if (frames.isEmpty()) return state;
+        final Ownership owner = owner();
+        owner.activeEdits++;
+        try {
+            for (final Frame frame : frames) {
+                if (frame == null || frame.mips.length == 0) continue;
+                // A caller holding a published outer array may have replaced its base level.
+                final int[] pixels;
+                if (frame.source != null) pixels = frame.source[0];
+                else if (frame.mips[0] != null) pixels = frame.mips[0].stable(owner);
+                else continue;
+                if (pixels != null) state = editor.apply(state, pixels);
+            }
+            return state;
+        } finally {
+            if (--owner.activeEdits == 0 && owner.packAfterEdit) {
+                owner.packAfterEdit = false;
+                owner.pack(true, null);
+            }
+        }
     }
 
     @Override public int size() { return frames.size(); }
@@ -136,6 +161,8 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
         private Reference2ObjectOpenHashMap<int[], Mip> pixels;
         private Reference2ObjectOpenHashMap<int[][], Frame> sourceFrames;
         private final List<WeakReference<OwnedAnimationFrames>> lists = new ObjectArrayList<>(2);
+        private int activeEdits;
+        private boolean packAfterEdit;
         Frame frame(final int[][] source, final boolean published) {
             if (source == null) return null;
             index();
@@ -193,6 +220,11 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
         void pack(final boolean compress, final PixelFrameCodec.Encoder sharedEncoder) {
             if (!compress) {
                 releaseIndexes();
+                return;
+            }
+            // Keep an editor's pixels attached to every sharing frame, even across a nested pack.
+            if (activeEdits != 0) {
+                packAfterEdit = true;
                 return;
             }
             // Include earlier mipmap-list generations: old public lists must keep aliasing the same pixels.
