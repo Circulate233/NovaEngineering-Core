@@ -10,6 +10,7 @@ import net.minecraft.client.resources.IResourceManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,6 +32,20 @@ public abstract class MixinTextureMapStaticFrames {
         target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;getFrameTextureData(I)[[I"), require = 0)
     private int[][] nova$borrowInitialUpload(final TextureAtlasSprite sprite, final int frame,
                                             final Operation<int[][]> original) {
+        return nova$initialUploadPixels(sprite, frame, original);
+    }
+
+    /** Cleanroom performs the initial upload synchronously in this Forge-named method. */
+    @WrapOperation(method = "finishLoading", remap = false, require = 1, at = @At(value = "INVOKE", remap = true,
+        target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;getFrameTextureData(I)[[I"))
+    private int[][] nova$borrowFinishedUpload(final TextureAtlasSprite sprite, final int frame,
+                                             final Operation<int[][]> original) {
+        return nova$initialUploadPixels(sprite, frame, original);
+    }
+
+    @Unique
+    private static int[][] nova$initialUploadPixels(final TextureAtlasSprite sprite, final int frame,
+                                                   final Operation<int[][]> original) {
         if (sprite.getClass() == TextureAtlasSprite.class && sprite.framesTextureData instanceof OwnedAnimationFrames owned) {
             return owned.internalView().get(frame);
         }
