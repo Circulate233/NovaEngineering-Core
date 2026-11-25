@@ -53,7 +53,7 @@ base.material.yrdeen=原金
 
 config.field.AutoAECrafting.entry=自动AE合成
 config.field.DynamicPatternSize.entry=动态结构层数
-config.field.IgnoreFluids.entry=忽略流体
+config.field.IgnoreFluids.entry=忽略世界流体
 config.field.NeedAllIngredient.entry=完整材料需求
 config.field.UsingAE.entry=使用AE
 
@@ -544,7 +544,7 @@ item.novaeng_core.machine_assembly_tool.config=当前状态：
 item.novaeng_core.machine_assembly_tool.name=§9高级结构构造器
 item.novaeng_core.machine_assembly_tool.tooltip.0=右键机械控制器以进行投影
 item.novaeng_core.machine_assembly_tool.tooltip.1=在潜行状态下使用滚轮切换投影层数
-item.novaeng_core.machine_assembly_tool.tooltip.2=潜行右键机械控制器以触发自动搭建
+item.novaeng_core.machine_assembly_tool.tooltip.2=潜行右键控制器：未成型时搭建，已成型时拆卸，保留控制器
 item.novaeng_core.machine_assembly_tool.tooltip.3=右键空气打开配置GUI
 item.novaeng_core.magic_breaking_stone.name=破魔之石
 
@@ -603,6 +603,19 @@ key.novaeng.item_display.tooltip=按下 §6%s§r 将物品发送至聊天栏
 
 message.assembly.tip.already_assembly.start=模块化组装：机器开始组装
 message.assembly.tip.fail=模块化组装: 在 %s 放置方块失败，已返还材料
+message.assembly.tip.already_assembly=模块化组装：已有组装任务正在执行
+message.assembly.tip.too_high=模块化组装：结构超出世界高度，位置：%s
+message.assembly.tip.outside_world=模块化组装：结构超出世界边界
+message.assembly.tip.too_large=模块化组装：结构坐标数量超过一百万，无法处理
+message.assembly.tip.require_all=模块化组装：缺少 %s 类所需材料，未开始搭建
+message.assembly.tip.aborted=模块化组装：发生错误，任务已停止
+message.assembly.tip.complete=模块化组装：搭建完成，用时 %s 秒
+message.assembly.tip.partial=模块化组装：搭建结束，用时 %s 秒；缺料 %s，受阻 %s，区块未加载 %s，跳过流体 %s
+message.assembly.tip.required=模块化组装：所需材料
+message.assembly.tip.material_item=%s × %s
+message.assembly.tip.material_fluid=%s：%s mB
+message.assembly.tip.material_unavailable=%s 个方块要求没有可获取的材料选项
+message.assembly.tip.material_more=，以及另外 %s 种选项
 
 mmaltar.well_of_suffering.false=§6未连接
 mmaltar.well_of_suffering.true=§6已连接
@@ -1678,11 +1691,11 @@ novaeng.transition_orbit_emitter.thread.1=空间操纵核心
 
 text.dream_energy_port.0=替换梦之能量核心的智能数据接口以启用环流模式
 text.dream_energy_port.1=环流模式下,梦之能量核心将可以直接通过环流网络传输能量
-text.machine_assembly_tool.config.AutoAECrafting=在允许使用AE时，将会尝试请求可合成的缺失的材料的合成
+text.machine_assembly_tool.config.AutoAECrafting=需要使用AE。为缺失且可合成的材料打开AE确认页面；开启等待材料补充后会等到材料可取。
 text.machine_assembly_tool.config.DynamicPatternSize=搭建动态结构时所搭建的层数
-text.machine_assembly_tool.config.IgnoreFluids=是否在目标搭建位置为流体时继续搭建
-text.machine_assembly_tool.config.NeedAllIngredient=是否需要有结构所需的所有材料时才开始搭建
-text.machine_assembly_tool.config.UsingAE=允许使用背包内可用的第一个无线终端链接的网络内物品工作（支持饰品栏）
+text.machine_assembly_tool.config.IgnoreFluids=仅完整空间检查启用时生效：将世界中已有流体视为空气并直接替换。关闭完整空间检查时改为先回收流体。
+text.machine_assembly_tool.config.NeedAllIngredient=开启：材料齐全才开始。关闭：缺料时按等待材料补充设置选择等待或跳过。
+text.machine_assembly_tool.config.UsingAE=允许通过背包内第一个可用无线终端取料；回收物品和流体优先存入同一网络（支持饰品栏）。
 
 tile.Alfheimportal.name=精灵传送门
 tile.contenttweaker.acid_resistant_aluminum_building_block.name=§d耐酸铝结构块
@@ -1943,3 +1956,49 @@ tile.novaeng_core.infinity_ore.name=§6无尽碎片矿
 tile.novaeng_core.potato_server.name=§b服务器
 tile.novaeng_core.server_tier_1.name=§b服务器
 tile.novaeng_core.willowalloy_substrate.name=§6柳钢硅基板
+config.field.SkipFullSpaceCheck.entry=不检查完整空间
+config.field.WaitMaterials.entry=等待材料补充
+item.novaeng_core.machine_assembly_tool.tooltip.4=与采掘工具无序合成以永久消耗该工具，继承其采掘等级、精准采集和时运
+item.novaeng_core.machine_assembly_tool.tooltip.5=重新融合会替换旧工具；拆卸使用工具效果，不消耗保存的工具耐久
+item.novaeng_core.machine_assembly_tool.tooltip.6=未融合时按钻石级别采掘；不可破坏方块及受保护方块不会被拆除
+item.novaeng_core.machine_assembly_tool.tooltip.7=回收物品和流体优先存入AE，其次放入背包；空间不足时等待腾出空间
+item.novaeng_core.machine_assembly_tool.fused=已融合工具：%s
+item.novaeng_core.machine_assembly_tool.tooltip.8=流体尝试填充背包内的空容器，余量保存为流体资源包
+item.novaeng_core.machine_assembly_tool.tooltip.9=施工期间潜行左键同一控制器可直接取消任务，已回收余量仍会保留
+message.assembly.tip.require_space=模块化施工：完整空间检查失败，受阻 %s，区块未加载 %s；未开始搭建
+message.assembly.tip.waiting_material=模块化施工：等待材料补充，补齐后自动继续
+message.assembly.tip.recovery_full=模块化施工：回收空间不足，请清理背包或腾出AE存储空间
+message.assembly.tip.dismantle_start=模块化施工：开始拆卸
+message.assembly.tip.dismantle_complete=模块化施工：拆卸完成，用时 %s 秒
+message.assembly.tip.dismantle_partial=模块化施工：拆卸结束，用时 %s 秒；拆卸失败 %s，区块未加载 %s，具体位置和原因见上方消息
+message.assembly.tip.cancelled=模块化施工：已取消，已回收余量仍会保留
+message.assembly.tip.blocked_wait=模块化施工：等待位置可用（受保护、无法采掘或区块未加载）
+text.machine_assembly_tool.config.SkipFullSpaceCheck=默认关闭：预检所有待搭建位置，受阻或未加载则整次不动工。开启：先按工具采掘规则清障，再放置规划方块；已放对的方块保留。
+text.machine_assembly_tool.config.WaitMaterials=仅完整材料需求关闭时生效。开启：缺料时停在当前方块，补齐后继续；关闭：跳过缺料位置。
+message.assembly.tip.dismantle_failed=拆卸失败，已跳过：维度 %s，位置 (%s, %s, %s)，方块 %s。原因：%s
+message.assembly.tip.clear_failed=清障失败，已跳过：维度 %s，位置 (%s, %s, %s)，方块 %s。原因：%s
+message.assembly.hud.build=组装：待完成 %s　失败 %s　未加载 %s
+message.assembly.hud.dismantle=拆卸：待完成 %s　失败 %s　未加载 %s
+message.assembly.hud.build_complete=组装完成
+message.assembly.hud.dismantle_complete=拆卸完成
+message.assembly.harvest.default_tool=默认工具（采掘等级 3）
+message.assembly.harvest.player_unavailable=玩家已死亡或不在目标世界
+message.assembly.harvest.edit_disabled=玩家当前不允许编辑方块（allowEdit=false）
+message.assembly.harvest.cannot_edit=玩家编辑检查拒绝了该位置（canPlayerEdit=false）
+message.assembly.harvest.world_protected=世界保护检查拒绝了该位置（isBlockModifiable=false）
+message.assembly.harvest.outside_border=目标位置在世界边界之外
+message.assembly.harvest.world_busy=世界正在捕获或恢复方块快照，本次操作不允许修改方块
+message.assembly.harvest.chunk_unloaded=目标区块未加载，不会强制加载该区块
+message.assembly.harvest.chunk_changed=操作期间目标区块实例已被替换
+message.assembly.harvest.state_changed=操作期间目标方块状态发生变化，已停止破坏该位置
+message.assembly.harvest.unbreakable=方块硬度为负数，属于不可破坏方块
+message.assembly.harvest.tool_required=工具不满足采掘要求：需要类型 %s、等级 %s；当前工具为 %s
+message.assembly.harvest.break_cancelled=Forge BreakEvent 被事件监听器取消
+message.assembly.harvest.no_fluid_handler=该方块被识别为流体，但未提供可用的世界流体接口
+message.assembly.harvest.drain_refused=流体接口模拟可排出，但实际排出返回空或非正数量
+message.assembly.harvest.fluid_remains=已回收排出的流体，但该位置仍有流体，剩余部分已跳过
+message.assembly.harvest.remove_refused=方块的 removedByPlayer 回调拒绝移除
+message.assembly.harvest.set_air_refused=世界的 setBlockToAir 调用未成功
+message.assembly.harvest.block_remains=移除操作后，该位置仍不是空气
+message.assembly.harvest.block_unchanged=采集流程执行完毕，但原方块状态仍在该位置
+message.assembly.harvest.exception=方块处理抛出异常：%s（完整堆栈见服务端日志）

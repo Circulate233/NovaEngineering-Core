@@ -26,10 +26,12 @@ class TesrBatchLifecycleTest {
     private static List<String> guardedBatcherCalls(final ClassNode owner, final MethodNode method) {
         final List<String> result = new ArrayList<>();
         for (final MethodInsnNode call : calls(method)) {
-            if (call.name.contains("nova$beginBatchScope") || call.name.contains("nova$endBatchScope")) {
+            if (call.owner.equals(owner.name) && (call.name.contains("nova$beginBatchScope")
+                || call.name.contains("nova$endBatchScope") || call.name.contains("nova$drawOpenedBatchOnExit"))) {
                 result.addAll(guardedBatcherCalls(owner, method(owner, call.name, call.desc)));
             } else if (call.owner.equals(GUARD)
-                || call.owner.startsWith("com/gtnewhorizons/angelica/rendering/tesr/")) {
+                || call.owner.startsWith("com/gtnewhorizons/angelica/rendering/tesr/")
+                || (call.owner.equals(DISPATCHER) && call.name.equals("drawBatch"))) {
                 result.add(call.owner + "." + call.name + call.desc);
             }
         }
@@ -52,6 +54,17 @@ class TesrBatchLifecycleTest {
     private static MethodNode method(final ClassNode type, final String name, final String descriptor) {
         return type.methods.stream().filter(method -> method.name.equals(name) && method.desc.equals(descriptor))
                            .findFirst().orElseThrow();
+    }
+
+    private static void assertRedirectCount(final MethodNode before, final MethodNode after,
+                                            final String originalOwner, final String originalName,
+                                            final MethodNode redirect) {
+        final long originalCount = calls(before).stream()
+            .filter(call -> call.owner.equals(originalOwner) && call.name.equals(originalName)).count();
+        final long redirectCount = calls(after).stream()
+            .filter(call -> call.owner.equals(TARGET) && call.name.equals(redirect.name) && call.desc.equals(redirect.desc)).count();
+        assertTrue(originalCount > 0, "Missing original " + originalName);
+        assertEquals(originalCount, redirectCount, "Every " + originalName + " call site must be redirected");
     }
 
     private static List<MethodInsnNode> calls(final MethodNode method) {
@@ -80,26 +93,30 @@ class TesrBatchLifecycleTest {
     }
 
     @Test
-    void realTransformationPreservesGuardAroundAllNewBatchersAndBothExitPaths() throws Exception {
+    void realTransformationPreservesGuardAroundAllBatchersAndExitPaths() throws Exception {
         final ClassNode original = dependency(TARGET);
         final ClassNode transformed = transformed();
         final String descriptor = "(L" + TARGET + "$TileEntityRenderContext;)I";
         final MethodNode before = method(original, "renderBlockEntities", descriptor);
         final MethodNode after = method(transformed, "renderBlockEntities", descriptor);
-        assertEquals(List.of("push", "restoreForBatch", "pop", "restoreForBatch", "pop"),
-            calls(before).stream().filter(call -> call.owner.equals(GUARD)).map(call -> call.name).toList());
+        final MethodNode begin = handler(transformed, "nova$beginBatchScope");
+        final MethodNode end = handler(transformed, "nova$endBatchScope");
+        final MethodNode defer = handler(transformed, "nova$deferBatchOpen");
+        final MethodNode draw = handler(transformed, "nova$drawOpenedBatchOnExit");
 
-        // The guard must also cover beginPass/compileInstancedVariants and the extra flushes when
-        // every TileEntity is culled. Only the vanilla FastTESR batch is allowed to be lazy.
+        // Actinium's nested finally blocks can emit separate cleanup copies for returns and
+        // exceptions. Compare to the real dependency and retain cleanup at every call site.
         assertEquals(guardedBatcherCalls(original, before), guardedBatcherCalls(transformed, after));
-        assertEquals(1, calls(after).stream().filter(call -> call.name.contains("nova$beginBatchScope")).count());
-        assertEquals(2, calls(after).stream().filter(call -> call.name.contains("nova$endBatchScope")).count());
-        assertEquals(List.of(GUARD + ".push()V", SCOPES + ".begin()V"),
-            callSignatures(handler(transformed, "nova$beginBatchScope")));
-        assertEquals(List.of(SCOPES + ".end()V", GUARD + ".pop()V"),
-            callSignatures(handler(transformed, "nova$endBatchScope")));
-        assertEquals(0, calls(after).stream().filter(call -> call.owner.equals(DISPATCHER)
-            && (call.name.equals("preDrawBatch") || call.name.equals("drawBatch"))).count());
+        assertRedirectCount(before, after, GUARD, "push", begin);
+        assertRedirectCount(before, after, GUARD, "pop", end);
+        assertRedirectCount(before, after, DISPATCHER, "preDrawBatch", defer);
+        assertRedirectCount(before, after, DISPATCHER, "drawBatch", draw);
+        assertEquals(List.of(GUARD + ".push()V", SCOPES + ".begin()V"), callSignatures(begin));
+        assertEquals(List.of(SCOPES + ".end()V", GUARD + ".pop()V"), callSignatures(end));
+        assertTrue(calls(after).stream().noneMatch(call -> (call.owner.equals(DISPATCHER)
+            && (call.name.equals("preDrawBatch") || call.name.equals("drawBatch")))
+            || (call.owner.equals(GUARD) && (call.name.equals("push") || call.name.equals("pop")))),
+            "Guard and FastTESR calls must go through their scope-aware redirects");
         assertTrue(transformed.methods.stream().flatMap(method -> Arrays.stream(method.instructions.toArray()))
                                       .noneMatch(instruction -> instruction instanceof TypeInsnNode type
                                           && type.desc.startsWith("org/spongepowered/asm/mixin/injection/callback/")),

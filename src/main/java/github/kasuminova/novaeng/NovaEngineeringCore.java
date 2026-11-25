@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng;
 
 import github.kasuminova.novaeng.common.CommonProxy;
+import github.kasuminova.novaeng.common.assembly.AssemblyConstructionTasks;
 import github.kasuminova.novaeng.common.command.CommandBuilder;
 import github.kasuminova.novaeng.common.command.CommandSPacketProfiler;
 import github.kasuminova.novaeng.common.handler.WorldLoadedHandler;
@@ -10,6 +11,7 @@ import github.kasuminova.novaeng.common.machine.MMAltar;
 import github.kasuminova.novaeng.common.network.ParallelNetworkManager;
 import github.kasuminova.novaeng.common.network.PktAutoCraftConfirm;
 import github.kasuminova.novaeng.common.network.PktCellDriveStatusUpdate;
+import github.kasuminova.novaeng.common.network.PktConstructionEffect;
 import github.kasuminova.novaeng.common.network.PktECalculatorGUIData;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIData;
@@ -128,6 +130,8 @@ public class NovaEngineeringCore {
         NET_CHANNEL.registerMessage(PktItemDisplay.class, PktItemDisplay.class, start++, Side.SERVER);
         NET_CHANNEL.registerMessage(PktAutoCraftConfirm.class, PktAutoCraftConfirm.class, start++, Side.SERVER);
 
+        PktConstructionEffect.register();
+
         proxy.preInit();
 
         if (MixinDecisions.deCoreBindingEnabled()) {
@@ -169,6 +173,7 @@ public class NovaEngineeringCore {
 
     @Mod.EventHandler
     public void onServerStopping(FMLServerStoppingEvent event) {
+        AssemblyConstructionTasks.clear();
         MeteorWriteBatch.flushAll();
         BandwidthStats.logSummary("server stopping");
         log.info("{}服务器正在关闭，正在生成网络包报告。", TextFormatting.BLUE);

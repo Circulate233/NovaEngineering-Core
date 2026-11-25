@@ -42,7 +42,8 @@ public final class ClientLightingGuard {
     }
 
     public static boolean shouldProcessLighting(final World world) {
-        return !world.isRemote || (MixinDecisions.actiniumLoaded && isIrisEnabled()) || !isActive();
+        return !world.isRemote || !NovaEngCoreConfig.CLIENT.enableFullbright
+            || (MixinDecisions.actiniumLoaded && isIrisEnabled());
     }
 
     public static boolean consumeRenderRefresh() {

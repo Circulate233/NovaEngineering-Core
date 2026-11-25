@@ -244,6 +244,11 @@ public class NovaEngCoreConfig {
         public boolean compactBakedGeometry = true;
 
         @Config.RequiresMcRestart
+        @Config.Name("OptimizeCtmMaterialProbe")
+        @Config.Comment("Keep temporary vanilla geometry local to CTM's texture discovery bake.")
+        public boolean optimizeCtmMaterialProbe = false;
+
+        @Config.RequiresMcRestart
         @Config.Name("OptimizeFerritePredicates")
         @Config.Comment("Canonicalize multipart model predicates by property/value and by their sorted And/Or inputs, following FerriteCore's predicate cache.")
         public boolean optimizeFerritePredicates = true;
@@ -699,21 +704,6 @@ public class NovaEngCoreConfig {
         public boolean generateOresInTerrain = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeAlfheimDeduplicationSets")
-        @Config.Comment("Start Alfheim queues small, defer FIFO shrinking to pass boundaries, and shrink deduplication tables after sustained sparse passes. Insertion and deduplication order are unchanged.")
-        public boolean optimizeAlfheimDeduplicationSets = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeAlfheimChunkLookup")
-        @Config.Comment("Reuse an Alfheim lighting pass's most recently loaded chunk for adjacent light probes, while clearing the lookup at each sky or block light phase.")
-        public boolean optimizeAlfheimChunkLookup = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeAlfheimNeighborData")
-        @Config.Comment("Reuse decoded coordinates and the current section for Alfheim neighbor probes; boundary chunks and custom chunks retain their original lookup path.")
-        public boolean optimizeAlfheimNeighborData = true;
-
-        @Config.RequiresMcRestart
         @Config.Name("OptimizeLeafDecayPropagation")
         @Config.Comment("Propagate leaf support through four queue layers, retaining block probes, Forge callbacks and decay decisions.")
         public boolean optimizeLeafDecayPropagation = true;
@@ -858,12 +848,9 @@ public class NovaEngCoreConfig {
     }
 
     public static class MachineAssemblyTool {
-        @Config.Name("BuildQuantity")
-        @Config.RangeInt(min = 1)
-        public int buildQuantity = 100;
-
-        @Config.Name("BuildSpeed")
-        @Config.RangeInt(min = 1)
-        public int buildSpeed = 20;
+        @Config.Name("BuildBudgetMillis")
+        @Config.RangeInt(min = 1, max = 50)
+        @Config.Comment("Time per server tick shared by all active machine assembly jobs, including planning and block updates.")
+        public int buildBudgetMillis = 10;
     }
 }

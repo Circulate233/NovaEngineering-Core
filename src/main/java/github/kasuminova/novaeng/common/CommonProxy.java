@@ -6,6 +6,7 @@ import com.circulation.random_complement.common.util.MEHandler;
 import github.kasuminova.mmce.common.integration.ModIntegrationAE2;
 import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.common.adapter.RecipeAdapterExtended;
+import github.kasuminova.novaeng.common.assembly.effect.ConstructionEffectPayload;
 import github.kasuminova.novaeng.common.container.ContainerECalculatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorController;
 import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternBus;
@@ -73,6 +74,7 @@ import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.base.Mods;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -101,6 +103,9 @@ public class CommonProxy implements IGuiHandler {
 
     public boolean isClient() {
         return false;
+    }
+
+    public void receiveConstructionEffect(final ConstructionEffectPayload payload, final INetHandler connection) {
     }
 
     public void construction() {

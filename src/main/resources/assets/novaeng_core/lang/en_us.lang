@@ -53,7 +53,7 @@ base.material.yrdeen=Yrdeen
 
 config.field.AutoAECrafting.entry=Auto AE Crafting
 config.field.DynamicPatternSize.entry=Dynamic Structure Layers
-config.field.IgnoreFluids.entry=Ignore Fluids
+config.field.IgnoreFluids.entry=Ignore world fluids
 config.field.NeedAllIngredient.entry=Require All Ingredients
 config.field.UsingAE.entry=Use AE
 
@@ -544,7 +544,7 @@ item.novaeng_core.machine_assembly_tool.config=Current state:
 item.novaeng_core.machine_assembly_tool.name=§9Advanced Structure Builder
 item.novaeng_core.machine_assembly_tool.tooltip.0=Right-click a machine controller to project
 item.novaeng_core.machine_assembly_tool.tooltip.1=While sneaking, use the scroll wheel to change the number of projected layers
-item.novaeng_core.machine_assembly_tool.tooltip.2=Sneak-right-click a machine controller to trigger auto-building
+item.novaeng_core.machine_assembly_tool.tooltip.2=Sneak-right-click a controller to build an unformed structure or dismantle a formed one; keeps the controller
 item.novaeng_core.machine_assembly_tool.tooltip.3=Right-click the air to open the config GUI
 item.novaeng_core.magic_breaking_stone.name=Magic-Breaking Stone
 
@@ -603,6 +603,19 @@ key.novaeng.item_display.tooltip=Press §6%s§r Send item link to chat
 
 message.assembly.tip.already_assembly.start=Modular Assembly: machine assembly started
 message.assembly.tip.fail=Modular Assembly: failed to place a block at %s, materials refunded
+message.assembly.tip.already_assembly=Modular Assembly: an assembly task is already running
+message.assembly.tip.too_high=Modular Assembly: structure extends outside build height at %s
+message.assembly.tip.outside_world=Modular Assembly: structure extends outside the world border
+message.assembly.tip.too_large=Modular Assembly: structure exceeds the one-million-position processing limit
+message.assembly.tip.require_all=Modular Assembly: missing %s required ingredients; nothing was built
+message.assembly.tip.aborted=Modular Assembly: task stopped after an error
+message.assembly.tip.complete=Modular Assembly: construction completed in %s seconds
+message.assembly.tip.partial=Modular Assembly: construction finished in %s seconds; missing %s, blocked %s, unloaded %s, skipped fluid %s
+message.assembly.tip.required=Modular Assembly: required materials
+message.assembly.tip.material_item=%s × %s
+message.assembly.tip.material_fluid=%s: %s mB
+message.assembly.tip.material_unavailable=%s block requirements have no obtainable material alternative
+message.assembly.tip.material_more= and %s more alternatives
 
 mmaltar.well_of_suffering.false=§6Not connected
 mmaltar.well_of_suffering.true=§6Connected
@@ -1678,11 +1691,11 @@ novaeng.transition_orbit_emitter.thread.1=Space Manipulation Core
 
 text.dream_energy_port.0=Replace the Dream Energy Core's Smart Data Interface to enable flux mode
 text.dream_energy_port.1=In flux mode, the Dream Energy Core acts directly as a Flux Networks buffer
-text.machine_assembly_tool.config.AutoAECrafting=When AE usage is allowed, attempts to request crafting of missing craftable materials
+text.machine_assembly_tool.config.AutoAECrafting=Requires Use AE. Opens AE confirmation for missing craftable materials. Enable Wait for materials to wait for their delivery.
 text.machine_assembly_tool.config.DynamicPatternSize=Number of layers to build for dynamic structures
-text.machine_assembly_tool.config.IgnoreFluids=Whether to continue building when the target position is occupied by fluid
-text.machine_assembly_tool.config.NeedAllIngredient=Whether to start building only when all materials required by the structure are present
-text.machine_assembly_tool.config.UsingAE=Allow working with items from the network linked by the first available wireless terminal in your inventory (baubles supported)
+text.machine_assembly_tool.config.IgnoreFluids=Requires the full space check. Treat existing fluids as air and replace them directly. When the full check is skipped, recover fluids before building.
+text.machine_assembly_tool.config.NeedAllIngredient=Start only when all materials are available. When off, Wait for materials controls whether missing blocks wait or are skipped.
+text.machine_assembly_tool.config.UsingAE=Use the first available wireless terminal for supplies (including baubles). Recovered items and fluids go to that network first.
 
 tile.Alfheimportal.name=The Portal to Alfheim
 tile.contenttweaker.acid_resistant_aluminum_building_block.name=§dAcid-Resistant Aluminum Structural Block
@@ -1943,3 +1956,49 @@ tile.novaeng_core.infinity_ore.name=§6Infinity Splinter Ore
 tile.novaeng_core.potato_server.name=§bServer
 tile.novaeng_core.server_tier_1.name=§bServer
 tile.novaeng_core.willowalloy_substrate.name=§6Willowalloy Substrate
+config.field.SkipFullSpaceCheck.entry=Skip full space check
+config.field.WaitMaterials.entry=Wait for materials
+item.novaeng_core.machine_assembly_tool.tooltip.4=Craft shapelessly with a mining tool to consume it permanently and inherit its harvest level, Silk Touch and Fortune
+item.novaeng_core.machine_assembly_tool.tooltip.5=Fusing again replaces the old tool; dismantling does not wear the saved tool
+item.novaeng_core.machine_assembly_tool.tooltip.6=Without a fused tool, mines up to diamond level; respects unbreakable blocks and protection
+item.novaeng_core.machine_assembly_tool.tooltip.7=Recovered items and fluids go to AE first, then inventory; waits for room when storage is full
+item.novaeng_core.machine_assembly_tool.fused=Fused tool: %s
+item.novaeng_core.machine_assembly_tool.tooltip.8=Fluids fill available inventory containers; remaining fluid is stored in resource packets
+item.novaeng_core.machine_assembly_tool.tooltip.9=Sneak-left-click the same controller during construction to cancel; retained resources are kept
+message.assembly.tip.require_space=Construction: full space check failed; blocked %s, unloaded %s. Building has not started
+message.assembly.tip.waiting_material=Construction: waiting for materials; resumes automatically when supplied
+message.assembly.tip.recovery_full=Construction: recovery storage full; make room in inventory or AE storage
+message.assembly.tip.dismantle_start=Construction: dismantling started
+message.assembly.tip.dismantle_complete=Construction: dismantling complete in %s seconds
+message.assembly.tip.dismantle_partial=Construction: dismantling ended in %s seconds; failed %s, unloaded %s. See previous messages for positions and reasons
+message.assembly.tip.cancelled=Construction: cancelled; retained resources are kept
+message.assembly.tip.blocked_wait=Construction: waiting for access, harvest permission or a loaded chunk
+text.machine_assembly_tool.config.SkipFullSpaceCheck=Off by default: inspect every remaining target and abort before building if any are blocked or unloaded. On: mine obstructions using the saved tool before placement. Correct blocks are kept.
+text.machine_assembly_tool.config.WaitMaterials=Requires All materials to be off. On: wait at the current block until supplied. Off: skip missing blocks.
+message.assembly.tip.dismantle_failed=Dismantling failed, skipped: dimension %s, position (%s, %s, %s), block %s. Reason: %s
+message.assembly.tip.clear_failed=Clearing failed, skipped: dimension %s, position (%s, %s, %s), block %s. Reason: %s
+message.assembly.hud.build=Building: remaining %s   failed %s   unloaded %s
+message.assembly.hud.dismantle=Dismantling: remaining %s   failed %s   unloaded %s
+message.assembly.hud.build_complete=Building complete
+message.assembly.hud.dismantle_complete=Dismantling complete
+message.assembly.harvest.default_tool=default tool (harvest level 3)
+message.assembly.harvest.player_unavailable=The player is dead or no longer in the target world
+message.assembly.harvest.edit_disabled=The player is not allowed to edit blocks (allowEdit=false)
+message.assembly.harvest.cannot_edit=The player edit check rejected this position (canPlayerEdit=false)
+message.assembly.harvest.world_protected=World protection rejected this position (isBlockModifiable=false)
+message.assembly.harvest.outside_border=The target is outside the world border
+message.assembly.harvest.world_busy=The world is capturing or restoring block snapshots and cannot be modified by this operation
+message.assembly.harvest.chunk_unloaded=The target chunk is not loaded; it will not be force-loaded
+message.assembly.harvest.chunk_changed=The target chunk instance changed during the operation
+message.assembly.harvest.state_changed=The target block state changed during the operation
+message.assembly.harvest.unbreakable=The block is unbreakable (negative hardness)
+message.assembly.harvest.tool_required=The tool cannot harvest this block: requires type %s and level %s; current tool: %s
+message.assembly.harvest.break_cancelled=An event listener cancelled Forge BreakEvent
+message.assembly.harvest.no_fluid_handler=The block is a fluid but exposes no usable world fluid handler
+message.assembly.harvest.drain_refused=The fluid handler simulated a drain but returned no fluid or a nonpositive amount when executed
+message.assembly.harvest.fluid_remains=Drained fluid was recovered, but fluid remains at this position and has been skipped
+message.assembly.harvest.remove_refused=The block refused removal in removedByPlayer
+message.assembly.harvest.set_air_refused=World.setBlockToAir did not succeed
+message.assembly.harvest.block_remains=The position is still not air after removal
+message.assembly.harvest.block_unchanged=The harvest sequence completed but the original block state remains at this position
+message.assembly.harvest.exception=Block processing threw %s (full stack trace in the server log)

@@ -1,39 +1,31 @@
 package github.kasuminova.novaeng.mixin.minecraft;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import github.kasuminova.novaeng.client.resource.ModelJsonMetadataIndex;
-import github.kasuminova.novaeng.client.resource.SourcedResourceInputStream;
-import github.kasuminova.stellarcore.mixin.util.StellarCoreResourcePack;
-import net.minecraft.client.resources.DefaultResourcePack;
 import net.minecraft.client.resources.FallbackResourceManager;
 import net.minecraft.client.resources.FileResourcePack;
-import net.minecraft.client.resources.FolderResourcePack;
 import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.FMLFileResourcePack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-/** Attaches the winning resource-pack identity to model JSON streams during an active metadata generation. */
+/** The second getInputStream opens the winning data file; the first opens its optional .mcmeta. */
 @Mixin(FallbackResourceManager.class)
 public abstract class MixinFallbackResourceManager {
-
-    @Inject(method = "getInputStream", at = @At("RETURN"), cancellable = true, require = 1)
-    private void nova$identifyModelJsonSource(final ResourceLocation location,
-                                              final IResourcePack resourcePack,
-                                              final CallbackInfoReturnable<InputStream> cir) {
-        final ModelJsonMetadataIndex metadata = ModelJsonMetadataIndex.instance();
-        if (!metadata.isActive() || !location.getPath().endsWith(".json")) {
-            return;
+    @WrapOperation(method = "getResource", at = @At(value = "INVOKE",
+        target = "Lnet/minecraft/client/resources/FallbackResourceManager;getInputStream(Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/client/resources/IResourcePack;)Ljava/io/InputStream;",
+        ordinal = 1), require = 1)
+    private InputStream nova$openModelArchive(final FallbackResourceManager manager, final ResourceLocation location,
+                                              final IResourcePack pack, final Operation<InputStream> original) throws IOException {
+        final ModelJsonMetadataIndex index = ModelJsonMetadataIndex.instance();
+        if (index.isQuerying(location) && (pack.getClass() == FileResourcePack.class || pack.getClass() == FMLFileResourcePack.class)) {
+            return index.openArchive(location, pack, () -> original.call(manager, location, pack));
         }
-
-        final boolean cacheable = resourcePack instanceof FolderResourcePack
-            || resourcePack instanceof FileResourcePack
-            || resourcePack instanceof DefaultResourcePack
-            || resourcePack instanceof StellarCoreResourcePack stellarPack
-            && !stellarPack.stellar_core$isMutableResourcePack();
-        cir.setReturnValue(new SourcedResourceInputStream(cir.getReturnValue(), resourcePack, cacheable));
+        return original.call(manager, location, pack);
     }
 }

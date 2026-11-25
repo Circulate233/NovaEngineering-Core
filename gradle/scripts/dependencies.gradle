@@ -165,11 +165,7 @@ dependencies {
         }
     }
     modCompileOnly 'curse.maven:packagedastral-811828:7762599'
-    modCompileOnly("curse.maven:alfheim-lighting-engine-910715:6687458") {
-        accessTransformers.configure(it) {
-            config = project.file('accesstransformers/alfheim.cfg')
-        }
-    }
+    modCompileOnly 'maven.modrinth:pulsar-lighting-engine:0.6.2'
     modCompileOnly("curse.maven:red-core-873867:7455761")
     modImplementation("curse.maven:stellarcore-1064321:9430934")
     modCompileOnly("curse.maven:biomesoplenty-220318:3558882") {
@@ -182,7 +178,7 @@ dependencies {
             config = project.file('accesstransformers/ender-utilities.cfg')
         }
     }
-    modCompileOnly name: 'Actinium', version: 'alpha-0.0.14-0ecd38ed'
+    modCompileOnly name: 'Actinium', version: 'alpha-0.0.14-a8a5fcc0'
     modCompileOnly("curse.maven:chisel-235279:2915375")
     modCompileOnly("curse.maven:taiga-replant-replant-971802:5086860")
     modCompileOnly('curse.maven:librarianlib-continuous-1058274:6617935') {

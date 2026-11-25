@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.handler;
 
-import github.kasuminova.novaeng.NovaEngCoreConfig;
 import github.kasuminova.novaeng.client.util.NEWBlockArrayPreviewRenderHelper;
+import github.kasuminova.novaeng.common.assembly.AssemblyConstructionTasks;
 import github.kasuminova.novaeng.common.item.ItemMachineAssemblyTool;
 import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager;
@@ -14,8 +14,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -93,49 +95,39 @@ public final class MachineAssemblyHandler {
         }
     }
 
+    @SubscribeEvent
+    public void onPlayerLeftBlock(final PlayerInteractEvent.LeftClickBlock event) {
+        if (event.getEntityPlayer().isSneaking()
+            && event.getEntityPlayer().getHeldItemMainhand().getItem() instanceof ItemMachineAssemblyTool
+            && event.getEntityPlayer() instanceof EntityPlayerMP player
+            && AssemblyConstructionTasks.cancelAt(player, event.getPos())) event.setCanceled(true);
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPlayerTick(final TickEvent.PlayerTickEvent event) {
-        final var player = event.player;
-        final var world = player.world;
-        if (!(player instanceof EntityPlayerMP serverPlayer)
-            || world.getTotalWorldTime() % NovaEngCoreConfig.MACHINE_ASSEMBLY_TOOL.buildSpeed != 0) {
-            return;
-        }
-        final var assembly = NEWMachineAssemblyManager.getMachineAssembly(player);
-        if (assembly == null) {
-            return;
-        }
-        for (int i = 0; i < NovaEngCoreConfig.MACHINE_ASSEMBLY_TOOL.buildQuantity; i++) {
-            boolean restart;
-            do {
-                restart = false;
-                switch (assembly.assemblyBlock(world, serverPlayer)) {
-                    case ALREADY_EXISTS -> restart = true;
-                    case FAILURE -> {
-                        NEWMachineAssemblyManager.removeMachineAssembly(player);
-                        return;
-                    }
-                    case COMPLETE -> {
-                        player.sendMessage(new TextComponentTranslation("message.assembly.tip.success"));
-                        NEWMachineAssemblyManager.removeMachineAssembly(player);
-                        return;
-                    }
-                    case SUCCESS -> {
-                    }
-                }
-            } while (restart);
-        }
+    public void onServerTick(final TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        final var server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != null) AssemblyConstructionTasks.tick(server);
     }
 
     @SubscribeEvent
     public void onPlayerLogOut(final PlayerEvent.PlayerLoggedOutEvent event) {
-        AutoCraftingQueue.removeQueue(event.player);
-        NEWMachineAssemblyManager.removeMachineAssembly(event.player);
+        if (event.player instanceof EntityPlayerMP player) {
+            AssemblyConstructionTasks.cancel(player);
+            AutoCraftingQueue.removeQueue(player);
+        }
     }
 
     @SubscribeEvent
     public void onPlayerChangeDim(final PlayerEvent.PlayerChangedDimensionEvent event) {
-        AutoCraftingQueue.removeQueue(event.player);
-        NEWMachineAssemblyManager.removeMachineAssembly(event.player);
+        if (event.player instanceof EntityPlayerMP player) {
+            AssemblyConstructionTasks.cancel(player);
+            AutoCraftingQueue.removeQueue(player);
+        }
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(final WorldEvent.Unload event) {
+        if (event.getWorld() instanceof WorldServer world) AssemblyConstructionTasks.unload(world);
     }
 }

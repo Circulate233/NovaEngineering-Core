@@ -15,31 +15,18 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-/**
- * Generation-scoped JSON metadata index keyed by resource location and source-pack identity.
- *
- * <p>Each query first resolves and opens the current winning source. Static sources then share one
- * parsed result, while unknown and mutable sources are parsed every time. The cache therefore
- * avoids duplicate JSON parsing without bypassing dynamic overlay lookup or priority semantics.</p>
- *
- * <p>Nesting is tolerated through a depth counter rather than being rejected. A reload started from inside
- * another reload would otherwise abort the outer reload with an exception, which is a far worse outcome than
- * serving a slightly longer lived answer.</p>
- */
+/** Reload-scoped model metadata. The resource manager always selects the winning pack. */
 public final class ModelJsonMetadataIndex {
 
     private static final Metadata EMPTY = new Metadata(false);
     private static final ModelJsonMetadataIndex INSTANCE = new ModelJsonMetadataIndex();
 
-    private final AtomicLong nextGeneration = new AtomicLong();
-    private final AtomicInteger depth = new AtomicInteger();
-    private final AtomicReference<Generation> activeGeneration = new AtomicReference<>();
-
+    private volatile Generation activeGeneration;
+    private long nextGeneration;
+    private int depth;
+    private final ThreadLocal<Query> currentQuery = new ThreadLocal<>();
     private final Supplier<IResourceManager> resources;
 
     private ModelJsonMetadataIndex() {
@@ -62,11 +49,11 @@ public final class ModelJsonMetadataIndex {
     private static Metadata parse(final InputStream stream,
                                   final ResourceLocation location,
                                   final Generation generation) {
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            return readMetadata(reader);
+        try {
+            return readMetadata(new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8)));
         } catch (final IOException | RuntimeException failure) {
             logFailure(generation, location, failure);
-            return EMPTY;
+            return null; // Failed reads must be retried, including reads from archive packs.
         }
     }
 
@@ -108,64 +95,95 @@ public final class ModelJsonMetadataIndex {
     private static void logFailure(final Generation generation,
                                    final ResourceLocation location,
                                    final Throwable failure) {
-        if (generation.loggedFailures.add(location)) {
+        if (generation != null && generation.loggedFailures.add(location)) {
             NovaEngineeringCore.log.warn(
                 "Failed to read model JSON metadata for {} in generation {}.",
                 location, generation.id, failure);
         }
     }
 
-    public void begin() {
-        if (this.depth.incrementAndGet() == 1) {
-            this.activeGeneration.set(new Generation(this.nextGeneration.incrementAndGet()));
-        }
+    public synchronized void begin() {
+        ++depth;
+        activeGeneration = new Generation(++nextGeneration);
     }
 
     public boolean isActive() {
-        return this.activeGeneration.get() != null;
+        return activeGeneration != null;
+    }
+
+    public synchronized void end() {
+        if (depth > 0 && --depth == 0) {
+            activeGeneration = null;
+        }
     }
 
     public boolean hasUvlMarker(final ResourceLocation location) {
-        return this.lookup(location).uvlMarker;
+        return lookup(location).uvlMarker;
     }
 
-    public void end() {
-        if (this.depth.updateAndGet(current -> current > 0 ? current - 1 : 0) != 0) {
-            return;
+    public boolean isQuerying(final ResourceLocation location) {
+        final Query query = currentQuery.get();
+        return query != null && query.location == location && query.generation != null;
+    }
+
+    /** Called only for a known archive after the real fallback manager selects its winning pack. */
+    public InputStream openArchive(final ResourceLocation location, final Object source, final StreamOpener open)
+        throws IOException {
+        final Query query = currentQuery.get();
+        if (query == null || query.location != location || query.generation == null) {
+            return open.open();
         }
-        final Generation generation = this.activeGeneration.getAndSet(null);
-        if (generation != null) {
-            generation.metadata.clear();
-            generation.loggedFailures.clear();
+        final MetadataKey key = new MetadataKey(location, source);
+        final Metadata cached = query.generation.metadata.get(key);
+        if (cached != null) {
+            // The manager or another wrapper can still request the original bytes. Closing an
+            // unread stream on the normal metadata hit must not open the archive.
+            return new SourcedResourceInputStream(new DeferredResourceInputStream(open), source, true);
         }
+        return new SourcedResourceInputStream(open.open(), source, true);
     }
 
     private Metadata lookup(final ResourceLocation location) {
-        final Generation generation = this.activeGeneration.get();
-        if (generation == null) {
-            return EMPTY;
+        final Query previous = currentQuery.get();
+        try {
+            Generation generation;
+            Metadata result;
+            do {
+                generation = activeGeneration;
+                currentQuery.set(new Query(location, generation));
+                result = readResource(location, generation);
+            } while (generation != activeGeneration);
+            return result == null ? EMPTY : result;
+        } finally {
+            if (previous == null) {
+                currentQuery.remove();
+            } else {
+                currentQuery.set(previous);
+            }
         }
+    }
 
-        try (IResource resource = this.resources.get().getResource(location)) {
+    private Metadata readResource(final ResourceLocation location, final Generation generation) {
+        try (IResource resource = resources.get().getResource(location)) {
             final InputStream stream = resource.getInputStream();
-            if (!(stream instanceof SourcedResourceStream sourced) || !sourced.isCacheableSource()) {
+            if (generation == null || !(stream instanceof SourcedResourceStream sourced) || !sourced.isCacheableSource()) {
                 return parse(stream, location, generation);
             }
-
-            final MetadataKey key = new MetadataKey(location, sourced.sourceIdentity(), generation.id);
-            final Metadata result = generation.metadata.computeIfAbsent(
-                key, ignored -> parse(stream, location, generation));
-            if (this.activeGeneration.get() != generation) {
-                generation.metadata.remove(key, result);
-                return EMPTY;
-            }
-            return result;
+            final MetadataKey key = new MetadataKey(location, sourced.sourceIdentity());
+            return generation.metadata.computeIfAbsent(key, ignored -> parse(stream, location, generation));
         } catch (final FileNotFoundException ignored) {
             return EMPTY;
         } catch (final IOException | RuntimeException failure) {
             logFailure(generation, location, failure);
             return EMPTY;
         }
+    }
+
+    private record Query(ResourceLocation location, Generation generation) { }
+
+    @FunctionalInterface
+    public interface StreamOpener {
+        InputStream open() throws IOException;
     }
 
     private static final class Generation {
@@ -178,18 +196,17 @@ public final class ModelJsonMetadataIndex {
         }
     }
 
-    private record MetadataKey(ResourceLocation location, Object sourceIdentity, long generation) {
+    private record MetadataKey(ResourceLocation location, Object sourceIdentity) {
 
         @Override
         public boolean equals(final Object other) {
             if (this == other) {
                 return true;
             }
-            if (!(other instanceof MetadataKey(ResourceLocation location1, Object identity, long generation1))) {
+            if (!(other instanceof MetadataKey(ResourceLocation location1, Object identity))) {
                 return false;
             }
-            return this.generation == generation1
-                && this.sourceIdentity == identity
+            return this.sourceIdentity == identity
                 && this.location.equals(location1);
         }
 
@@ -197,7 +214,6 @@ public final class ModelJsonMetadataIndex {
         public int hashCode() {
             int result = this.location.hashCode();
             result = 31 * result + System.identityHashCode(this.sourceIdentity);
-            result = 31 * result + Long.hashCode(this.generation);
             return result;
         }
     }

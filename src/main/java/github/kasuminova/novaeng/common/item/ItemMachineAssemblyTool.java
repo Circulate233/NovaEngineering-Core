@@ -1,30 +1,25 @@
 package github.kasuminova.novaeng.common.item;
 
-import appeng.api.networking.crafting.ICraftingGrid;
-import appeng.util.item.AEItemStack;
 import com.brandon3055.draconicevolution.api.itemconfig.BooleanConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.IConfigurableItem;
 import com.brandon3055.draconicevolution.api.itemconfig.IItemConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.IntegerConfigField;
 import com.brandon3055.draconicevolution.api.itemconfig.ItemConfigFieldRegistry;
 import com.brandon3055.draconicevolution.api.itemconfig.ToolConfigHelper;
-import com.circulation.random_complement.common.interfaces.RCCraftingGridCache;
-import com.circulation.random_complement.common.util.MEHandler;
 import github.kasuminova.mmce.common.util.DynamicPattern;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
-import github.kasuminova.novaeng.common.util.AssemblyBlockArray;
-import github.kasuminova.novaeng.common.util.AutoCraftingQueue;
+import github.kasuminova.novaeng.common.assembly.AssemblyConstructionTasks;
+import github.kasuminova.novaeng.common.assembly.AssemblyMiningTool;
 import github.kasuminova.novaeng.common.util.NEWMachineAssemblyManager;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
-import hellfirepvp.modularmachinery.common.util.BlockArrayCache;
-import ink.ikx.mmce.common.utils.StructureIngredient;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -39,7 +34,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -55,7 +49,15 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     }
 
     public static boolean isIgnoreFluids(final ItemStack stack) {
-        return ToolConfigHelper.getFieldStorage(stack).getBoolean("IgnoreFluids");
+        return isRequireSpace(stack) && ToolConfigHelper.getFieldStorage(stack).getBoolean("IgnoreFluids");
+    }
+
+    public static boolean isRequireSpace(final ItemStack stack) {
+        return !ToolConfigHelper.getFieldStorage(stack).getBoolean("SkipFullSpaceCheck");
+    }
+
+    public static boolean isWaitMaterials(final ItemStack stack) {
+        return !isNeedAllIngredient(stack) && ToolConfigHelper.getFieldStorage(stack).getBoolean("WaitMaterials");
     }
 
     public static int getDynamicPatternSize(final ItemStack stack) {
@@ -63,7 +65,7 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     }
 
     public static boolean isAutoAECrafting(final ItemStack stack) {
-        return ToolConfigHelper.getFieldStorage(stack).getBoolean("AutoAECrafting");
+        return isUsingAE(stack) && ToolConfigHelper.getFieldStorage(stack).getBoolean("AutoAECrafting");
     }
 
     public static boolean isNeedAllIngredient(final ItemStack stack) {
@@ -125,6 +127,14 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         return Configs.REQUIRE_ALL;
     }
 
+    public BooleanConfigField getSkipFullSpaceCheckConfig() {
+        return Configs.SKIP_SPACE;
+    }
+
+    public BooleanConfigField getWaitMaterialsConfig() {
+        return Configs.WAIT_MATERIALS;
+    }
+
     @Override
     public @NonNull ActionResult<ItemStack> onItemRightClick(final @NonNull World world, final @NonNull EntityPlayer player, final @NonNull EnumHand hand) {
         if (hand != EnumHand.MAIN_HAND || player.isSneaking()) {
@@ -139,22 +149,22 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     @Override
     public @NonNull EnumActionResult onItemUse(final @NonNull EntityPlayer player, final @NonNull World world, final @NonNull BlockPos pos, final @NonNull EnumHand hand,
                                                final @NonNull EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (hand != EnumHand.MAIN_HAND || world.isRemote) {
+        if (hand != EnumHand.MAIN_HAND || world.isRemote || !player.isSneaking()
+            || !(player instanceof EntityPlayerMP serverPlayer)) {
             return EnumActionResult.PASS;
         }
         final var tile = world.getTileEntity(pos);
-        if (tile == null || !player.isSneaking()) {
+        if (tile == null) {
             return EnumActionResult.PASS;
         }
-        if (NEWMachineAssemblyManager.checkMachineAssembly(player)) {
+        if (AssemblyConstructionTasks.isBuilding(serverPlayer)) {
             player.sendMessage(new TextComponentTranslation("message.assembly.tip.already_assembly"));
             return EnumActionResult.FAIL;
         }
-        var state = world.getBlockState(pos);
+        final var state = world.getBlockState(pos);
         final var block = state.getBlock();
-        state = block.getActualState(state, world, pos);
-        DynamicMachine machine = null;
-        EnumFacing rotation = null;
+        DynamicMachine machine;
+        EnumFacing rotation;
         if (tile instanceof TileMultiblockMachineController controller) {
             machine = controller.getBlueprintMachine();
             if (machine == null) {
@@ -164,74 +174,23 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
                     return EnumActionResult.FAIL;
                 }
             }
-            rotation = player.world.getBlockState(pos).getValue(BlockController.FACING);
+            rotation = state.getValue(BlockController.FACING);
         } else {
-            final int meta = block.getMetaFromState(state);
-            final var iterator = NEWMachineAssemblyManager.getConstructorsIterator();
-            while (iterator.hasNext()) {
-                final var entry = iterator.next();
-                if (entry.getKey() == block && entry.getValue().containsKey(meta)) {
-                    machine = entry.getValue().get(meta);
-                    final var property = block.getBlockState().getProperty("facing");
-                    final Object value = property == null ? null : state.getValue(property);
-                    rotation = value instanceof EnumFacing direction ? direction : facing;
-                    break;
-                }
-            }
+            final var actualState = block.getActualState(state, world, pos);
+            machine = NEWMachineAssemblyManager.getDynamicMachine(actualState);
+            if (machine == null) return EnumActionResult.FAIL;
+            final var property = block.getBlockState().getProperty("facing");
+            final Object value = property == null ? null : actualState.getValue(property);
+            rotation = value instanceof EnumFacing direction ? direction : facing;
             if (rotation == EnumFacing.UP || rotation == EnumFacing.DOWN) {
                 rotation = EnumFacing.NORTH;
             }
-            if (machine == null || rotation == null) {
-                return EnumActionResult.FAIL;
-            }
         }
         final var stack = player.getHeldItem(hand);
-        var array = new AssemblyBlockArray(BlockArrayCache.getBlockArrayCache(machine.getPattern(), rotation));
-        int dynamicSize = getDynamicPatternSize(stack);
-        for (final var pattern : machine.getDynamicPatterns().values()) {
-            dynamicSize = Math.max(dynamicSize, pattern.getMinSize());
-        }
-        for (final var pattern : machine.getDynamicPatterns().values()) {
-            pattern.addPatternToBlockArray(array, Math.clamp(dynamicSize, pattern.getMinSize(), pattern.getMaxSize()),
-                pattern.getFaces().iterator().next(), rotation);
-        }
-        final var ingredients = StructureIngredient.of(player.world, pos, array.copy());
-        array = array.offset(pos);
-        if (world.isOutsideBuildHeight(array.getMin()) || world.isOutsideBuildHeight(array.getMax())) {
-            player.sendMessage(new TextComponentTranslation("message.assembly.tip.too_high",
-                "y = " + (array.getMin().getY() < 1 ? array.getMin().getY() : array.getMax().getY())));
-            return EnumActionResult.FAIL;
-        }
         final boolean usingAE = isUsingAE(stack);
-        final boolean autoCraft = usingAE && isAutoAECrafting(stack);
-        final var missing = NEWMachineAssemblyManager.checkAllItems(player, ingredients, usingAE, autoCraft);
-        final var requests = missing.list();
-        if (autoCraft && !requests.isEmpty()) {
-            final var terminal = MEHandler.getTerminalGuiObject(player);
-            if (terminal != null && terminal.getActionableNode() != null && terminal.getActionableNode().getGrid() != null) {
-                final var grid = terminal.getActionableNode().getGrid();
-                final RCCraftingGridCache crafting = grid.getCache(ICraftingGrid.class);
-                final var craftable = crafting.rc$getCraftableItems();
-                final var queue = new ArrayDeque<ItemStack>();
-                for (final var alternatives : requests) {
-                    for (final var item : alternatives) {
-                        if (!item.isEmpty() && craftable.containsKey(AEItemStack.fromItemStack(item))) {
-                            queue.add(item);
-                            break;
-                        }
-                    }
-                }
-                AutoCraftingQueue.setQueueAndStrat(queue, player);
-            }
-        }
-        if (requests.isEmpty() || !isNeedAllIngredient(stack)) {
-            array = NEWMachineAssemblyManager.addAssemblyMachine(player, array);
-            array.setMissing(missing.miss());
-            array.start(usingAE, isIgnoreFluids(stack));
-            player.sendMessage(new TextComponentTranslation("message.assembly.tip.already_assembly.start"));
-            return EnumActionResult.SUCCESS;
-        }
-        return EnumActionResult.PASS;
+        AssemblyConstructionTasks.enqueue(serverPlayer, machine, rotation, pos, getDynamicPatternSize(stack), usingAE,
+            usingAE && isAutoAECrafting(stack), isIgnoreFluids(stack), isNeedAllIngredient(stack), stack);
+        return EnumActionResult.SUCCESS;
     }
 
     @Override
@@ -244,6 +203,11 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         lines.add(" " + I18n.translateToLocal(Configs.DYNAMIC_SIZE.getUnlocalizedName()) + " : " + getDynamicPatternSize(stack));
         lines.add(" " + I18n.translateToLocal(Configs.AUTO_CRAFT.getUnlocalizedName()) + " : " + isAutoAECrafting(stack));
         lines.add(" " + I18n.translateToLocal(Configs.REQUIRE_ALL.getUnlocalizedName()) + " : " + isNeedAllIngredient(stack));
+        lines.add(" " + I18n.translateToLocal(Configs.WAIT_MATERIALS.getUnlocalizedName()) + " : " + isWaitMaterials(stack));
+        lines.add(" " + I18n.translateToLocal(Configs.SKIP_SPACE.getUnlocalizedName()) + " : " + !isRequireSpace(stack));
+        final var miningTool = AssemblyMiningTool.profile(stack);
+        if (!miningTool.isEmpty())
+            lines.add(I18n.translateToLocalFormatted("item.novaeng_core.machine_assembly_tool.fused", miningTool.getDisplayName()));
     }
 
     @Override
@@ -253,6 +217,8 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
         registry.register(stack, Configs.DYNAMIC_SIZE);
         registry.register(stack, Configs.AUTO_CRAFT);
         registry.register(stack, Configs.REQUIRE_ALL);
+        registry.register(stack, Configs.WAIT_MATERIALS);
+        registry.register(stack, Configs.SKIP_SPACE);
         return registry;
     }
 
@@ -262,6 +228,8 @@ public final class ItemMachineAssemblyTool extends ItemBasic implements IConfigu
     }
 
     private static final class Configs {
+        private static final BooleanConfigField SKIP_SPACE = new BooleanConfigField("SkipFullSpaceCheck", false, description("SkipFullSpaceCheck"));
+        private static final BooleanConfigField WAIT_MATERIALS = new BooleanConfigField("WaitMaterials", false, description("WaitMaterials"));
         private static final BooleanConfigField USING_AE = new BooleanConfigField("UsingAE", false, description("UsingAE"));
         private static final BooleanConfigField IGNORE_FLUIDS = new BooleanConfigField("IgnoreFluids", false, description("IgnoreFluids"));
         private static final IntegerConfigField DYNAMIC_SIZE = new IntegerConfigField("DynamicPatternSize", 0, 0,

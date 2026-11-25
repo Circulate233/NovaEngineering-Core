@@ -32,6 +32,7 @@ public final class MixinDecisions {
     public static final boolean packagedAstralLoaded = isPresent("packagedastral");
     public static final boolean circulationNetworksLoaded = isPresent("circulation_networks");
     public static final boolean stellarCoreLoaded = isPresent("stellar_core");
+    private static final boolean pulsarLoaded = isPresent("pulsar");
 
     private MixinDecisions() {
     }
@@ -59,6 +60,15 @@ public final class MixinDecisions {
             }
             case "minecraft.MixinAnimationFrameStorage" -> {
                 return NovaEngCoreConfig.CLIENT.compressAnimationFrames;
+            }
+            case "actinium.MixinSpriteMipPixels" -> {
+                return NovaEngCoreConfig.CLIENT.compressAnimationFrames && actiniumLoaded;
+            }
+            case "tconstruct.MixinColoredTextureFrameRead" -> {
+                return NovaEngCoreConfig.CLIENT.compressAnimationFrames && isPresent("tconstruct");
+            }
+            case "jei.MixinColorGetterFrameRead" -> {
+                return NovaEngCoreConfig.CLIENT.compressAnimationFrames && isPresent("jei");
             }
             case "minecraft.MixinModelResourceLocationStrings" -> {
                 return NovaEngCoreConfig.CLIENT.optimizeResourceLocationStableValue;
@@ -130,6 +140,7 @@ public final class MixinDecisions {
         if (mixinName.startsWith("geometry.")) {
             if (!NovaEngCoreConfig.CLIENT.compactBakedGeometry) return false;
             if (mixinName.startsWith("geometry.actinium.")) return actiniumLoaded;
+            if (mixinName.startsWith("geometry.ctm.")) return ctmLoaded && NovaEngCoreConfig.CLIENT.optimizeCtmMaterialProbe;
             if (mixinName.equals("geometry.MixinGeometryRenderItem")) return !isPresent("celeritasextra");
             if (mixinName.equals("geometry.MixinGeometryItemFrameLod")) return isPresent("celeritasextra");
             return true;
@@ -332,9 +343,17 @@ public final class MixinDecisions {
             case "neofontrender.MixinDoubleMeta" -> NovaEngCoreConfig.CLIENT.optimizeSpellingDictionaryRegions;
             case "stellarcore.MixinNBTTagBackingMapEquality" ->
                 NovaEngCoreConfig.PERFORMANCE.optimizeStellarNbtMapEquality;
-            case "alfheim.MixinDeduplicatedLongQueue" -> NovaEngCoreConfig.SERVER.optimizeAlfheimDeduplicationSets;
-            case "alfheim.MixinLightingEngine" -> NovaEngCoreConfig.SERVER.optimizeAlfheimChunkLookup;
-            case "alfheim.MixinLightingNeighborData" -> NovaEngCoreConfig.SERVER.optimizeAlfheimNeighborData;
+            case "pulsar.MixinLightEngineCacheFailure", "pulsar.MixinLightQueue",
+                 "pulsar.MixinBlockLightColors", "pulsar.MixinBlockLightFilters", "pulsar.MixinRgbStateProperties",
+                 "pulsar.MixinChunkLightCompletion", "pulsar.MixinChunkTaskReservations", "pulsar.MixinChunkTasks",
+                 "pulsar.MixinInitialLightCoordinator", "pulsar.MixinLightEngineWorkerPool",
+                 "pulsar.MixinPartialFaceLight",
+                 "pulsar.MixinSnapshotChunkMap", "pulsar.MixinSWMRNibbleArray", "pulsar.MixinWorldLightManager" ->
+                pulsarLoaded && PulsarBackportSelection.PULSAR_0_6_2;
+            case "pulsar.MixinLightDataSerializer", "pulsar.MixinScalarLightEdges" ->
+                pulsarLoaded && PulsarBackportSelection.SCALAR;
+            // Pulsar keeps the underlying client light data current while Fullbright changes display brightness.
+            case "minecraft.MixinVanillaLightPropagation" -> !pulsarLoaded;
             case "rtg.MixinChunkGeneratorBiomeWeights" -> NovaEngCoreConfig.SERVER.optimizeRtgBiomeWeights;
             case "rtg.MixinSpacedCellularNoiseBounds" -> NovaEngCoreConfig.SERVER.optimizeRtgCellularBounds;
             case "jei.MixinItemStackListFactory" -> NovaEngCoreConfig.CLIENT.optimizeJeiItemList;
