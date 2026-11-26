@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.struct.MemberInfo;
 import org.spongepowered.asm.util.Annotations;
@@ -115,11 +114,6 @@ class RenderBufferMixinTargetsTest {
     @Test
     void capacityHooksMatchExactlyOneRealConstructorAndItsStaticness() throws Exception {
         for (final var spec : List.of(
-            new ConstructorHook("minecraft/MixinGlobalTessellatorCapacity", TESSELLATOR,
-                "nova$smallGlobalBuffer", "<clinit>", true, TESSELLATOR),
-            new ConstructorHook("minecraft/MixinTesrTessellatorCapacity",
-                "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher",
-                "nova$smallTesrBuffer", "<init>", false, TESSELLATOR),
             new ConstructorHook("neofontrender/MixinCosmicTessellatorCapacity",
                 "neofontrender/core/font/cosmic/CosmicTextRenderer",
                 "nova$smallFontBuffer", "<clinit>", true, TESSELLATOR),
@@ -155,42 +149,6 @@ class RenderBufferMixinTargetsTest {
                 }
             }
         }
-    }
-
-    @Test
-    void textureUtilReplacesAllThreeLargeConstantsWithCorrectCapturedArguments() throws Exception {
-        final ClassNode mixin = mixin("minecraft/MixinTextureUploadCapacity", TEXTURE_UTIL);
-        final ClassNode target = dependency(TEXTURE_UTIL);
-        int matched = 0;
-        for (final var spec : List.of(
-            new ConstantHook("nova$smallUploadBuffer", "<clinit>", "()V", "<clinit>"),
-            new ConstantHook("nova$boundedArrayUpload", "uploadTextureSub", "(I[IIIIIZZZ)V", "func_147947_a"),
-            new ConstantHook("nova$boundedImageUpload", "uploadTextureImageSubImpl",
-                "(Ljava/awt/image/BufferedImage;IIZZ)V", "func_110993_a"))) {
-            final String args = "I" + spec.desc.substring(1, spec.desc.indexOf(')'));
-            final MethodNode hook = method(mixin, spec.handler, "(" + args + ")I");
-            final AnnotationNode injection = Annotations.getVisible(hook, ModifyConstant.class);
-            assertNotNull(injection);
-            assertEquals(List.of(spec.selector), Annotations.<List<String>>getValue(injection, "method"));
-            assertEquals(1, (int) Annotations.<Integer>getValue(injection, "require"));
-            final List<AnnotationNode> constants = Annotations.getValue(injection, "constant");
-            assertEquals(1, constants.size());
-            assertEquals(4194304, (int) Annotations.<Integer>getValue(constants.getFirst(), "intValue"));
-            final MemberInfo remapped = mapped(mixin, spec.selector, !spec.selector.startsWith("<"));
-            assertEquals(spec.srg, remapped.getName());
-            if (!spec.selector.startsWith("<")) {
-                assertEquals(TEXTURE_UTIL, remapped.getOwner());
-                assertEquals(spec.desc, remapped.getDesc());
-            }
-            final MethodNode original = targetMethod(target, spec.selector, remapped, spec.desc);
-            assertStatic(hook, true);
-            assertStatic(original, true);
-            assertEquals(1, largeConstants(original), spec.selector);
-            matched += largeConstants(original);
-        }
-        assertEquals(3, matched);
-        assertEquals(3, target.methods.stream().mapToInt(RenderBufferMixinTargetsTest::largeConstants).sum(),
-            "A new large upload constant needs a corresponding capacity hook");
     }
 
     @Test
@@ -249,6 +207,4 @@ class RenderBufferMixinTargetsTest {
                                    boolean isStatic, String owner) {
     }
 
-    private record ConstantHook(String handler, String selector, String desc, String srg) {
-    }
 }

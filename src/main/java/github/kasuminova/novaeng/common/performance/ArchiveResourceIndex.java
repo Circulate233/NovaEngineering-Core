@@ -126,17 +126,28 @@ public final class ArchiveResourceIndex {
         return snapshot.conventional;
     }
 
+    public static boolean mayContainWaypointIcons(final File source) {
+        final Snapshot snapshot = SNAPSHOTS.get(source);
+        if (snapshot == null || !snapshot.conventional || snapshot.waypointIcons) return true;
+        try {
+            return !snapshot.matches(Files.readAttributes(source.toPath(), BasicFileAttributes.class));
+        } catch (IOException failure) {
+            return true;
+        }
+    }
+
     private static Snapshot scan(final ZipFile zip, final BasicFileAttributes attributes) {
         final Set<String> roots = new ObjectOpenHashSet<>();
         final ObjectArrayList<String> entries = new ObjectArrayList<>();
         String previousRoot = null;
         boolean indexedRoot = false;
+        boolean waypointIcons = false;
         final Enumeration<? extends ZipEntry> iterator = zip.entries();
         while (iterator.hasMoreElements()) {
             final ZipEntry entry = iterator.nextElement();
             final String name = entry.getName();
             if (unusualPath(name) || entry.getMethod() != ZipEntry.STORED && entry.getMethod() != ZipEntry.DEFLATED) {
-                return snapshot(attributes, false, ObjectSets.emptySet(), new String[0]);
+                return snapshot(attributes, false, ObjectSets.emptySet(), new String[0], false);
             }
             if (!name.startsWith("assets/")) {
                 continue;
@@ -156,19 +167,23 @@ public final class ArchiveResourceIndex {
                 roots.add(previousRoot);
                 indexedRoot = INDEXED_ROOTS.contains(name.substring(namespaceEnd + 1, rootEnd));
             }
+            if (!waypointIcons && previousRoot.endsWith("/textures")
+                && name.startsWith("/waypoint/icon/", previousRoot.length()) && !entry.isDirectory()) {
+                waypointIcons = true;
+            }
             if (indexedRoot) {
                 entries.add(name.endsWith("/") ? name.substring(0, name.length() - 1) : name);
             }
         }
         final String[] paths = entries.toArray(String[]::new);
         Arrays.sort(paths);
-        return snapshot(attributes, true, roots, paths);
+        return snapshot(attributes, true, roots, paths, waypointIcons);
     }
 
     private static Snapshot snapshot(final BasicFileAttributes attributes, final boolean conventional,
-                                     final Set<String> roots, final String[] entries) {
+                                     final Set<String> roots, final String[] entries, final boolean waypointIcons) {
         return new Snapshot(attributes.size(), attributes.lastModifiedTime(), attributes.creationTime(),
-            attributes.fileKey(), conventional, roots, entries);
+            attributes.fileKey(), conventional, roots, entries, waypointIcons);
     }
 
     private static boolean unusualPath(final String name) {
@@ -191,7 +206,7 @@ public final class ArchiveResourceIndex {
     }
 
     private record Snapshot(long size, FileTime modified, FileTime created, Object fileKey,
-                            boolean conventional, Set<String> roots, String[] entries) {
+                            boolean conventional, Set<String> roots, String[] entries, boolean waypointIcons) {
         private boolean matches(final BasicFileAttributes attributes) {
             return size == attributes.size() && modified.equals(attributes.lastModifiedTime())
                 && created.equals(attributes.creationTime()) && Objects.equals(fileKey, attributes.fileKey());

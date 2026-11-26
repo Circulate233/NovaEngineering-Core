@@ -2,11 +2,14 @@ package github.kasuminova.novaeng;
 
 import com.cleanroommc.discovery.CleanroomModDiscoverer;
 import github.kasuminova.novaeng.common.asm.early.EarlyEventTransformer;
+import github.kasuminova.novaeng.common.asm.early.EarlySideTransformer;
+import github.kasuminova.novaeng.common.asm.early.EnderCoreMixinPatcherTransformer;
 import github.kasuminova.novaeng.common.util.VintageFixJarCacheFix;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.outlands.foundation.IExplicitTransformer;
 import top.outlands.foundation.TransformerDelegate;
 
 import javax.annotation.Nullable;
@@ -18,16 +21,27 @@ public class NovaEngCoreEarlyMixinLoader implements IFMLLoadingPlugin {
     public static final String LOG_PREFIX = "[NOVAENG_CORE_PRE]" + ' ';
 
     public NovaEngCoreEarlyMixinLoader() {
-        if (!Boolean.parseBoolean(System.getProperty("novaeng.earlyEventTransforms", "true"))) return;
+        final boolean eventTransforms = Boolean.parseBoolean(System.getProperty("novaeng.earlyEventTransforms", "true"));
+        final boolean enderCoreHeader = Boolean.parseBoolean(System.getProperty("novaeng.earlyEnderCoreMixinHeader", "true"));
+        final boolean sideByteScan = Boolean.parseBoolean(System.getProperty("novaeng.earlySideByteScan", "true"));
+        if (!eventTransforms && !enderCoreHeader && !sideByteScan) return;
         Launch.classLoader.addTransformerExclusion("github.kasuminova.novaeng.common.asm.early.");
-        final EarlyEventTransformer transformer = new EarlyEventTransformer();
-        t(EarlyEventTransformer.SUBSCRIBER, transformer);
-        t(EarlyEventTransformer.SUBSCRIPTION, transformer);
+        if (eventTransforms) {
+            final EarlyEventTransformer transformer = new EarlyEventTransformer();
+            registerBeforeDefinition(EarlyEventTransformer.SUBSCRIBER, transformer);
+            registerBeforeDefinition(EarlyEventTransformer.SUBSCRIPTION, transformer);
+        }
+        if (enderCoreHeader) {
+            registerBeforeDefinition(EnderCoreMixinPatcherTransformer.TARGET, new EnderCoreMixinPatcherTransformer());
+        }
+        if (sideByteScan) {
+            registerBeforeDefinition(EarlySideTransformer.TARGET, new EarlySideTransformer());
+        }
     }
 
-    private static void t(String target, EarlyEventTransformer transformer) {
+    private static void registerBeforeDefinition(final String target, final IExplicitTransformer transformer) {
         if (Launch.classLoader.isClassLoaded(target)) {
-            LOG.warn("{} was loaded before NovaCore's early event patch; keeping original behavior", target);
+            LOG.warn("{} was loaded before NovaCore's startup patch; keeping original behavior", target);
         } else {
             TransformerDelegate.registerExplicitTransformer(transformer, target);
         }

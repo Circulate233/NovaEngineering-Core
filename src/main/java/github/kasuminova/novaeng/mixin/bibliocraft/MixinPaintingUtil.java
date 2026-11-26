@@ -5,11 +5,20 @@ import jds.bibliocraft.helpers.PaintingUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /** Reuses only BiblioCraft's jar painting scan within one resource generation. */
 @Mixin(value = PaintingUtil.class, remap = false)
 public abstract class MixinPaintingUtil {
+
+    @ModifyArg(method = "getJarPaintings", at = @At(value = "INVOKE",
+        target = "Ljava/net/URLDecoder;decode(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"),
+        index = 0, require = 1)
+    private static String nova$preserveLiteralPlusInJarPath(final String path) {
+        // URLDecoder applies form semantics, but a '+' in a jar URL is a literal path character.
+        return path.replace("+", "%2B");
+    }
 
     @Inject(method = "getJarPaintings", at = @At("HEAD"), cancellable = true, require = 1)
     private static void nova$returnCachedJarPaintings(final CallbackInfoReturnable<String[]> cir) {

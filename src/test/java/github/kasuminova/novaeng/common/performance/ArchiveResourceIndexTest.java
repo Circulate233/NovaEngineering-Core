@@ -89,4 +89,20 @@ class ArchiveResourceIndexTest {
         assertTrue(ArchiveResourceIndex.mayContain(ordinary.toFile(), "assets/test/recipes//missing.json"));
         assertTrue(ArchiveResourceIndex.mayContain(ordinary.toFile(), "assets/test/models/missing.json"));
     }
+
+    @Test
+    void waypointIconProbeUsesOnlyCurrentConventionalSnapshots() throws IOException {
+        final Path jar = this.archive("waypoints.jar", List.of("assets/test/textures/waypoint/icons/near.png",
+            "assets/test/textures/waypoint/icon/"));
+        assertTrue(ArchiveResourceIndex.mayContainWaypointIcons(jar.toFile()));
+        ArchiveResourceIndex.mayContain(jar.toFile(), "assets/test/recipes");
+        assertFalse(ArchiveResourceIndex.mayContainWaypointIcons(jar.toFile()));
+
+        final FileTime modified = Files.getLastModifiedTime(jar);
+        this.archive("waypoints.jar", List.of("assets/test/textures/waypoint/icon/actual.PNG"));
+        Files.setLastModifiedTime(jar, FileTime.fromMillis(modified.toMillis() + 2000));
+        assertTrue(ArchiveResourceIndex.mayContainWaypointIcons(jar.toFile()));
+        ArchiveResourceIndex.mayContain(jar.toFile(), "assets/test/recipes");
+        assertTrue(ArchiveResourceIndex.mayContainWaypointIcons(jar.toFile()));
+    }
 }

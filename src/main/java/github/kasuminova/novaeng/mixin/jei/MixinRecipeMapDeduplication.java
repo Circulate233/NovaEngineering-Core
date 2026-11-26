@@ -1,8 +1,10 @@
 package github.kasuminova.novaeng.mixin.jei;
 
 import github.kasuminova.novaeng.common.performance.HeiIndexCapacity;
+import github.kasuminova.novaeng.common.performance.HeiRecipeCategoryIndex;
 import github.kasuminova.novaeng.common.performance.HeiRecipeIndexCompaction;
 import github.kasuminova.novaeng.common.performance.HeiRecipeInsertion;
+import github.kasuminova.novaeng.common.performance.string.StringCanon;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mezz.jei.api.ingredients.IIngredientRegistry;
 import mezz.jei.api.recipe.IIngredientType;
@@ -21,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.List;
 
 @Mixin(value = RecipeMap.class, remap = false)
-public abstract class MixinRecipeMapDeduplication implements HeiRecipeIndexCompaction {
+public abstract class MixinRecipeMapDeduplication implements HeiRecipeIndexCompaction, HeiRecipeCategoryIndex {
     @Shadow
     @Final
     private IIngredientRegistry ingredientRegistry;
@@ -42,6 +44,15 @@ public abstract class MixinRecipeMapDeduplication implements HeiRecipeIndexCompa
     public void nova$compactRecipeIndexes() {
         HeiIndexCapacity.trimTable(recipeWrapperTable);
         HeiIndexCapacity.trimMultiMap(categoryUidMap);
+    }
+
+    @Override
+    public void nova$addRecipeCategoryWithUid(final IRecipeCategory<?> category, final String ingredientUid,
+                                              final boolean shareStrings) {
+        final var categories = categoryUidMap.get(ingredientUid);
+        final String rawCategoryUid = category.getUid();
+        final String categoryUid = shareStrings ? StringCanon.value(rawCategoryUid) : rawCategoryUid;
+        if (!categories.contains(categoryUid)) categories.add(categoryUid);
     }
 
     /**

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.commons.ClassRemapper;
+import org.objectweb.asm.commons.SimpleRemapper;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -23,12 +25,15 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +41,82 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UuGraphAllocationTest {
+    private static void applyNodeView(final ClassNode node, final ClassLoader loader) throws Exception {
+        final ClassNode mixin = readClass(loader, "github/kasuminova/novaeng/mixin/ic2/MixinUuGraph$Node");
+        final ClassNode remapped = new ClassNode();
+        mixin.accept(new ClassRemapper(remapped, new SimpleRemapper(mixin.name, node.name)));
+        node.interfaces.add("github/kasuminova/novaeng/common/util/UuGraphNodeView");
+        for (final var field : remapped.fields) {
+            if (field.name.equals("nova$singleNodeView")) node.fields.add(field);
+        }
+        for (final MethodNode method : remapped.methods) {
+            if (method.name.equals("nova$singleNodeView")) node.methods.add(method);
+        }
+    }
+
+    @Test
+    void exactQueryCollectionStaysPrivateToReadOnlyGraphCallers() throws Exception {
+        final ClassLoader loader = getClass().getClassLoader();
+        final ClassNode graph = readClass(loader, "ic2/core/uu/UuGraph");
+        final Set<String> callers = new HashSet<>();
+        for (final MethodNode method : graph.methods) {
+            for (final var instruction : method.instructions) {
+                if (instruction instanceof MethodInsnNode call && call.owner.equals(graph.name) && call.name.equals("getAll"))
+                    callers.add(method.name);
+            }
+        }
+        assertEquals(Set.of("find", "registerTransform", "access$200"), callers);
+        final ClassNode node = readClass(loader, "ic2/core/uu/UuGraph$Node");
+        final Set<String> syntheticCallers = new HashSet<>();
+        for (final MethodNode method : node.methods) {
+            for (final var instruction : method.instructions) {
+                if (instruction instanceof MethodInsnNode call && call.owner.equals(graph.name) && call.name.equals("access$200"))
+                    syntheticCallers.add(method.name);
+            }
+        }
+        assertEquals(Set.of("updateValue"), syntheticCallers);
+    }
+
+    @Test
+    void nullQueryStillFailsBeforeAnyViewIsCreated() throws Exception {
+        for (final boolean optimized : new boolean[]{false, true}) {
+            final Graph graph = new Graph(optimized);
+            final var failure = assertThrows(InvocationTargetException.class, () -> graph.all(null));
+            assertEquals(NullPointerException.class, failure.getCause().getClass());
+            assertTrue(graph.nodes.isEmpty());
+        }
+    }
+
+    @Test
+    void exactViewIsReusedWithoutSharingMutableIteratorState() throws Exception {
+        final Graph graph = new Graph(true);
+        final Item item = new Item();
+        final Object query = graph.stack(item, 2, null, 64);
+        final Collection<?> first = graph.all(query);
+        final Collection<?> same = graph.all(graph.stack(item, 2, null, 8));
+        assertSame(first, same);
+        assertNotSame(first, graph.all(graph.stack(item, 3, null, 8)));
+        final var left = first.iterator();
+        final var right = same.iterator();
+        assertSame(left.next(), right.next());
+        assertThrows(UnsupportedOperationException.class, left::remove);
+        assertEquals(1, same.size());
+        // IC2's normalized stack shares its NBT. Seed both keys before reusing a separate query.
+        final Collection<?> firstTaggedView = graph.all(graph.stack(item, 2, tag(1), 1));
+        final Collection<?> secondTaggedView = graph.all(graph.stack(item, 2, tag(2), 1));
+        assertNotSame(firstTaggedView, secondTaggedView);
+        final NBTTagCompound queryTag = tag(1);
+        final Object taggedQuery = graph.stack(item, 2, queryTag, 32);
+        assertSame(firstTaggedView, graph.all(taggedQuery));
+        queryTag.setInteger("variant", 2);
+        assertSame(secondTaggedView, graph.all(taggedQuery));
+        assertSame(firstTaggedView, graph.all(graph.stack(item, 2, tag(1), 1)));
+    }
+
     private static NBTTagCompound tag(final int variant) {
         final NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("variant", variant);
@@ -211,14 +289,12 @@ class UuGraphAllocationTest {
             assertEquals(2, graph.nodes.size(), "query reuse must not insert a duplicate equal node");
             assertEquals(2, graph.all(graph.stack(item, 32767, null, 1)).size());
 
-            // Exercise insertion too, then reuse that caller to find an existing key.
-            final NBTTagCompound missTag = tag(3);
-            final Object miss = graph.stack(item, 4, missTag, 32);
-            assertNotSame(second, graph.lookup(miss));
+            // The miss inserts a key that shares its tag, so keep that tag stable.
+            final Object miss = graph.stack(item, 4, tag(3), 32);
+            final Object newNode = graph.lookup(miss);
+            assertNotSame(second, newNode);
             assertEquals(0, graph.cachedHash.getInt(miss), "a miss must hash the normalized copy too");
-            missTag.setInteger("variant", 2);
-            assertSame(second, graph.lookup(miss));
-            assertEquals(0, graph.cachedHash.getInt(miss));
+            assertSame(newNode, graph.lookup(graph.stack(item, 4, tag(3), 1)));
             assertEquals(3, graph.nodes.size());
         }
     }
@@ -240,6 +316,8 @@ class UuGraphAllocationTest {
                         try {
                             final ClassNode original = readClass(getParent(), name.replace('.', '/'));
                             if (optimized && name.equals("ic2.core.uu.UuGraph")) applyMixin(original, getParent());
+                            if (optimized && name.equals("ic2.core.uu.UuGraph$Node"))
+                                applyNodeView(original, getParent());
                             final ClassWriter out = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                             original.accept(out);
                             final byte[] bytes = out.toByteArray();

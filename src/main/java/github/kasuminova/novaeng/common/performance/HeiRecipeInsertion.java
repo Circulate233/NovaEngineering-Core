@@ -1,13 +1,18 @@
 package github.kasuminova.novaeng.common.performance;
 
 import github.kasuminova.novaeng.common.performance.string.StringCanon;
+import github.kasuminova.novaeng.mixin.jei.AccessorItemStackHelper;
+import github.kasuminova.novaeng.mixin.jei.AccessorStackHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
+import mezz.jei.plugins.vanilla.ingredients.item.ItemStackHelper;
 import mezz.jei.recipes.RecipeMap;
+import mezz.jei.startup.StackHelper;
+import net.minecraft.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public final class HeiRecipeInsertion {
         final RecipeMap map, final T wrapper, final IRecipeCategory<T> category,
         final IIngredientHelper<V> helper, final Map<String, List<IRecipeWrapper>> row,
         final List<V> ingredients, final boolean shareStrings) {
+        final AccessorStackHelper cache = activeItemUidCache(map, helper);
         boolean seenFirst = false;
         String firstId = null;
         Set<String> ids = null;
@@ -68,8 +74,20 @@ public final class HeiRecipeInsertion {
             } else {
                 wrappers.add(wrapper);
             }
-            // Keep the second UID call, callback order, and RecipeMap subclass overrides.
-            map.addRecipeCategory(category, ingredient, helper);
+            // HEI would immediately read the same identity-cached UID for this stack again.
+            if (cache != null && cache.nova$isUidCacheEnabled() && !((ItemStack) ingredient).isEmpty()) {
+                ((HeiRecipeCategoryIndex) map).nova$addRecipeCategoryWithUid(category, id, shareStrings);
+            } else {
+                map.addRecipeCategory(category, ingredient, helper);
+            }
         }
+    }
+
+    private static AccessorStackHelper activeItemUidCache(final RecipeMap map, final IIngredientHelper<?> helper) {
+        if (map.getClass() != RecipeMap.class || !(map instanceof HeiRecipeCategoryIndex)
+            || helper.getClass() != ItemStackHelper.class || !(helper instanceof AccessorItemStackHelper accessor))
+            return null;
+        final StackHelper stacks = accessor.nova$getStackHelper();
+        return stacks.getClass() == StackHelper.class && stacks instanceof AccessorStackHelper state ? state : null;
     }
 }

@@ -1,5 +1,9 @@
 package github.kasuminova.novaeng;
 
+import github.kasuminova.novaeng.common.performance.ZenTokenerDfaTransform;
+import github.kasuminova.novaeng.common.performance.EnderIoProfilerLabelTransform;
+import github.kasuminova.novaeng.common.performance.FusionInjectorScanTransform;
+import github.kasuminova.novaeng.common.performance.RuntimeEventAllocationTransform;
 import github.kasuminova.novaeng.common.util.MixinDecisions;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import net.minecraftforge.common.config.Config;
@@ -51,6 +55,26 @@ public class NovaEngCoreMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public void preApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) {
+        if (mixinClassName.equals(MIXIN_ROOT + "zenscript.MixinZenTokenerDfa")) {
+            ZenTokenerDfaTransform.apply(targetClass);
+        }
+        if (mixinClassName.equals(MIXIN_ROOT + "draconicevolution.MixinFusionInjectorScan")) {
+            reportRuntimeTransform(targetClassName, FusionInjectorScanTransform.apply(targetClass));
+        }
+        if (mixinClassName.equals(MIXIN_ROOT + "tconevo.MixinItemStackBarEventLazySet")) {
+            reportRuntimeTransform(targetClassName, RuntimeEventAllocationTransform.apply(targetClass));
+        }
+        if (mixinClassName.equals(MIXIN_ROOT + "enderio.MixinRelayingModelProfilerLabels")) {
+            reportRuntimeTransform(targetClassName, EnderIoProfilerLabelTransform.apply(targetClass));
+        }
+    }
+
+    private static void reportRuntimeTransform(final String targetClassName, final boolean applied) {
+        if (applied) {
+            NovaEngCoreEarlyMixinLoader.LOG.debug("Applied runtime allocation optimization: {}", targetClassName);
+        } else {
+            NovaEngCoreEarlyMixinLoader.LOG.warn("Skipped runtime allocation optimization for unsupported bytecode: {}", targetClassName);
+        }
     }
 
     @Override

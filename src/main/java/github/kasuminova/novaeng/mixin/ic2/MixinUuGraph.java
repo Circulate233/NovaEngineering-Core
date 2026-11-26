@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.ic2;
 
 import github.kasuminova.novaeng.common.util.UuGraphIterator;
+import github.kasuminova.novaeng.common.util.UuGraphNodeView;
 import ic2.core.uu.LeanItemStack;
 import ic2.core.uu.UuGraph;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -44,14 +45,14 @@ public class MixinUuGraph implements UuGraphIterator {
 
     /**
      * @author circulation
-     * @reason Exact-query callers only iterate; avoid the array, array view and mutable list.
+     * @reason Exact-query callers only read; reuse the normalized node's immutable singleton.
      */
     @Overwrite
     private static Collection<UuGraph.Node> getAll(LeanItemStack stack) {
         if (stack.getMeta() != 32767) {
             // IC2 hashes a normalized copy. Looking up the caller directly would cache its
             // NBT-dependent hash and make later queries stale if the caller mutates that NBT.
-            return ObjectLists.singleton(getInternal(stack));
+            return ((UuGraphNodeView) getInternal(stack)).nova$singleNodeView();
         }
         // Wildcards intentionally retain IC2's live item set, including its NBT semantics.
         Collection<UuGraph.Node> matches = itemNodes.get(stack.getItem());

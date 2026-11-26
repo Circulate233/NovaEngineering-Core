@@ -5,8 +5,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +22,85 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BlockGeometryPagesTest {
+    @Test
+    void capturingGeometryAndMaterialsDoesNotWaitForAnUnrelatedPageBind() throws Exception {
+        final BlockGeometryPages pages = new BlockGeometryPages(1);
+        final var writers = BlockGeometryPages.class.getDeclaredField("writers");
+        writers.setAccessible(true);
+        final Object writer = ((Object[]) writers.get(pages))[0];
+        final int[] words = BlockGeometryRecordTest.rectangle(2, new int[]{0, 1, 3, 2}, 0F, 0F, 1F, 0F, 1F);
+        final BakedQuad template = new BakedQuad(words, 7, EnumFacing.SOUTH, null, true, DefaultVertexFormats.ITEM);
+        try (final var executor = Executors.newSingleThreadExecutor()) {
+            // Simulate another worker binding page IDs on this stripe. Capture
+            // and material equality only use their own immutable records/indices.
+            synchronized (writer) {
+                final var encoded = executor.submit(() -> {
+                    final var record = pages.capture(words, 7, 0);
+                    final var material = pages.material(record.material, template);
+                    return material.quad(record.pageShape());
+                }).get(10, TimeUnit.SECONDS);
+                assertArrayEquals(words, encoded.getVertexData());
+                assertEquals(7, encoded.getTintIndex());
+            }
+        }
+        pages.seal();
+    }
+
+    @Test
+    void parallelEncodersCanCrossTheCloseBarrierWithoutRetainingOrChangingGeometry() throws Exception {
+        final BlockGeometryPages pages = new BlockGeometryPages(1);
+        final CountDownLatch started = new CountDownLatch(4);
+        final CountDownLatch crossBarrier = new CountDownLatch(1);
+        try (final var executor = Executors.newFixedThreadPool(4)) {
+            final var futures = new ArrayList<Future<?>>();
+            for (int worker = 0; worker < 4; worker++) {
+                final int tint = worker;
+                futures.add(executor.submit(() -> {
+                    final int[] words = BlockGeometryRecordTest.rectangle(2, new int[]{0, 1, 3, 2}, tint, 0F, 1F, 0F, 1F);
+                    final BakedQuad template = new BakedQuad(words, tint, EnumFacing.SOUTH, null, true, DefaultVertexFormats.ITEM);
+                    final BlockGeometryRecord before = pages.capture(words, 7, 0);
+                    started.countDown();
+                    if (!crossBarrier.await(10, TimeUnit.SECONDS)) throw new AssertionError("Close barrier timed out");
+                    for (int i = 0; i < 512; i++) {
+                        final BlockGeometryRecord record = i == 0 ? before : pages.capture(words, 7, 0);
+                        final var material = pages.material(record.material, template);
+                        final var sequence = pages.bind(record.pageShape(), material, null, null);
+                        final BakedQuad decoded = sequence.quad(0);
+                        assertArrayEquals(words, decoded.getVertexData());
+                        assertEquals(tint, decoded.getTintIndex());
+                        assertSame(EnumFacing.SOUTH, decoded.getFace());
+                        assertSame(DefaultVertexFormats.ITEM, decoded.getFormat());
+                        assertTrue(decoded.shouldApplyDiffuseLighting());
+                    }
+                    return null;
+                }));
+            }
+            try {
+                assertTrue(started.await(10, TimeUnit.SECONDS));
+                // All workers retain captured records while the indices are closed.
+                pages.seal();
+            } finally {
+                crossBarrier.countDown();
+            }
+            for (final Future<?> future : futures) future.get(20, TimeUnit.SECONDS);
+        }
+        final var writers = BlockGeometryPages.class.getDeclaredField("writers");
+        writers.setAccessible(true);
+        for (final Object writer : (Object[]) writers.get(pages)) {
+            for (final String name : new String[]{"current", "completed", "captures", "capturedMaterials"}) {
+                final var field = writer.getClass().getDeclaredField(name);
+                field.setAccessible(true);
+                assertNull(field.get(writer), "Late encoders must not restore the closed generation's indices");
+            }
+        }
+        // A later reload gets fresh, open indices rather than the detached writer.
+        final BlockGeometryPages next = new BlockGeometryPages(1);
+        final int[] words = {1, 2, 3};
+        assertSame(next.capture(words, 7, 0), next.capture(words, 7, 0));
+        assertNotSame(pages.capture(words, 7, 0), pages.capture(words, 7, 0));
+        next.seal();
+    }
+
     private static Object pageValue(final BlockGeometryPages.Sequence sequence, final String name, final int index) throws Exception {
         final var page = sequence.getClass().getDeclaredField("page");
         page.setAccessible(true);

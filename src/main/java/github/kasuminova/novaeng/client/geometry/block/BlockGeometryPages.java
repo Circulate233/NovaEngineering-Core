@@ -78,33 +78,41 @@ final class BlockGeometryPages {
     }
 
     private static final class Writer {
+        // These bounded indices do not touch page state or each other. Keep their
+        // encoding/equality work from holding up an unrelated page bind.
+        private final Object captureLock = new Object();
+        private final Object materialLock = new Object();
         private Page current;
         private List<WeakReference<Page>> completed;
         private Int2ObjectOpenHashMap<BlockGeometryRecord> captures;
         private Int2ObjectOpenHashMap<Material> capturedMaterials;
-        private boolean closed;
+        private volatile boolean closed;
 
-        synchronized BlockGeometryRecord capture(final int[] words, final int stride, final int position, final int hash) {
-            if (closed) return BlockGeometryRecord.capture(words, stride, position);
-            if (captures == null) captures = new Int2ObjectOpenHashMap<>();
-            final BlockGeometryRecord existing = captures.get(hash);
-            // Hashes only select a candidate; equality checks every source word before reuse.
-            if (existing != null && existing.matches(words, stride, position)) return existing;
-            final BlockGeometryRecord record = BlockGeometryRecord.capture(words, stride, position);
-            if (captures.size() == PAGE_SIZE) captures.clear();
-            captures.put(hash, record);
-            return record;
+        BlockGeometryRecord capture(final int[] words, final int stride, final int position, final int hash) {
+            synchronized (captureLock) {
+                if (closed) return BlockGeometryRecord.capture(words, stride, position);
+                if (captures == null) captures = new Int2ObjectOpenHashMap<>();
+                final BlockGeometryRecord existing = captures.get(hash);
+                // Hashes only select a candidate; equality checks every source word before reuse.
+                if (existing != null && existing.matches(words, stride, position)) return existing;
+                final BlockGeometryRecord record = BlockGeometryRecord.capture(words, stride, position);
+                if (captures.size() == PAGE_SIZE) captures.clear();
+                captures.put(hash, record);
+                return record;
+            }
         }
 
-        synchronized Material material(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int flags, final int hash) {
-            if (closed) return new Material(columns, quad, flags);
-            if (capturedMaterials == null) capturedMaterials = new Int2ObjectOpenHashMap<>();
-            final Material existing = capturedMaterials.get(hash);
-            if (existing != null && existing.matches(columns, quad, flags)) return existing;
-            final Material material = new Material(columns, quad, flags);
-            if (capturedMaterials.size() == PAGE_SIZE) capturedMaterials.clear();
-            capturedMaterials.put(hash, material);
-            return material;
+        Material material(final BlockGeometryRecord.Columns columns, final BakedQuad quad, final int flags, final int hash) {
+            synchronized (materialLock) {
+                if (closed) return new Material(columns, quad, flags);
+                if (capturedMaterials == null) capturedMaterials = new Int2ObjectOpenHashMap<>();
+                final Material existing = capturedMaterials.get(hash);
+                if (existing != null && existing.matches(columns, quad, flags)) return existing;
+                final Material material = new Material(columns, quad, flags);
+                if (capturedMaterials.size() == PAGE_SIZE) capturedMaterials.clear();
+                capturedMaterials.put(hash, material);
+                return material;
+            }
         }
 
         private Page page(final Shape shape, final Material material) {
@@ -172,22 +180,31 @@ final class BlockGeometryPages {
             return result;
         }
 
-        synchronized void seal(final CanonicalRecords canonical) {
-            closed = true;
-            if (completed != null) {
-                for (final WeakReference<Page> reference : completed) {
-                    final Page page = reference.get();
-                    if (page != null) page.canonicalize(canonical);
+        void seal(final CanonicalRecords canonical) {
+            synchronized (this) {
+                closed = true;
+                if (completed != null) {
+                    for (final WeakReference<Page> reference : completed) {
+                        final Page page = reference.get();
+                        if (page != null) page.canonicalize(canonical);
+                    }
+                    completed = null;
                 }
-                completed = null;
+                if (current != null) {
+                    current.seal();
+                    current.canonicalize(canonical);
+                }
+                current = null;
             }
-            if (current != null) {
-                current.seal();
-                current.canonicalize(canonical);
+            // Publish closure before draining either index. An encoder already
+            // inside its lock finishes before clear; later encoders never insert.
+            // Drain one lock at a time, without holding the page monitor.
+            synchronized (captureLock) {
+                captures = null;
             }
-            current = null;
-            captures = null;
-            capturedMaterials = null;
+            synchronized (materialLock) {
+                capturedMaterials = null;
+            }
         }
     }
 

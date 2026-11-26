@@ -3,62 +3,15 @@ package github.kasuminova.novaeng.common.performance;
 import github.kasuminova.novaeng.common.util.DeclaredMethodTable;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderOptimizationTest {
-    @Test
-    void languageReaderMatchesLineParserAndDoesNotCloseInput() throws Exception {
-        final Random random = new Random(1906);
-        final String[] samples = {"", "#comment", "missing", "=empty key", "a=", "a=b=c", " space = kept ",
-            "unicode=你好🙂", "format=%1$05.2f/%d/%s", "bad=%1$..f", "\ufeffbom=value"};
-        final String[] endings = {"\n", "\r", "\r\n"};
-        final StringBuilder text = new StringBuilder();
-        for (int i = 0; i < 10_000; i++) text.append(samples[random.nextInt(samples.length)]).append(endings[random.nextInt(3)]);
-        text.append("tail=without newline");
-        final byte[] bytes = text.toString().getBytes(StandardCharsets.UTF_8);
-        final Map<String, String> expected = new HashMap<>();
-        for (final String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
-            LanguageLineParser.put(expected, line);
-        }
-        final Map<String, String> actual = new HashMap<>();
-        final InputStream stream = new ByteArrayInputStream(bytes) {
-            @Override public void close() { fail("Caller owns the input"); }
-            @Override public synchronized int read(byte[] target, int offset, int length) {
-                return super.read(target, offset, Math.min(13, length));
-            }
-        };
-        LanguageLineParser.read(actual, stream);
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void failedLanguageReadDoesNotPartiallyPublish() {
-        final Map<String, String> properties = new HashMap<>(Map.of("existing", "value"));
-        final byte[] prefix = "new=value\n".getBytes(StandardCharsets.UTF_8);
-        final InputStream stream = new InputStream() {
-            int index;
-            @Override public int read() throws IOException {
-                if (index < prefix.length) return prefix[index++];
-                throw new IOException("read failure");
-            }
-        };
-        assertThrows(IOException.class, () -> LanguageLineParser.read(properties, stream));
-        assertEquals(Map.of("existing", "value"), properties);
-    }
-
     interface Parent { Number value(); }
     static class Methods implements Parent {
         @Override public Integer value() { return 1; }

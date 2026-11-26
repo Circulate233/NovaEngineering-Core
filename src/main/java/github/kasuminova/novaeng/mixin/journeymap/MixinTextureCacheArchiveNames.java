@@ -1,16 +1,28 @@
 package github.kasuminova.novaeng.mixin.journeymap;
 
+import github.kasuminova.novaeng.common.performance.ArchiveResourceIndex;
 import journeymap.client.texture.TextureCache;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Set;
 
 @Mixin(value = TextureCache.class, remap = false)
 public abstract class MixinTextureCacheArchiveNames {
+
+    @Inject(method = "collectTexturesFromArchive", at = @At("HEAD"), cancellable = true, require = 1)
+    private static void nova$skipArchivesWithoutWaypointIcons(final File source, final String prefix,
+                                                              final Set<ResourceLocation> out, final CallbackInfo ci) {
+        if ("textures/waypoint/icon".equals(prefix) && !ArchiveResourceIndex.mayContainWaypointIcons(source)) {
+            ci.cancel();
+        }
+    }
 
     @Redirect(method = "addArchiveEntry", at = @At(value = "INVOKE",
         target = "Ljava/lang/String;toLowerCase(Ljava/util/Locale;)Ljava/lang/String;"), require = 1)

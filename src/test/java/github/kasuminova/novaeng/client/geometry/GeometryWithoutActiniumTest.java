@@ -17,7 +17,7 @@ class GeometryWithoutActiniumTest {
     private static final String QUAD_VIEW = "dhj.embeddedt.embeddium.impl.model.quad.BakedQuadView";
 
     @Test
-    void vanillaBakeAndNullifierCacheRunWithoutActiniumOnTheClasspath() throws Throwable {
+    void vanillaBakeRunsWithoutActiniumOnTheClasspath() throws Throwable {
         final var urls = new LinkedHashSet<URL>();
         for (ClassLoader loader = getClass().getClassLoader(); loader != null; loader = loader.getParent()) {
             if (loader instanceof URLClassLoader urlLoader) urls.addAll(List.of(urlLoader.getURLs()));
@@ -40,7 +40,6 @@ class GeometryWithoutActiniumTest {
             assertThrows(ClassNotFoundException.class, () -> loader.loadClass(QUAD_VIEW));
             assertNull(loader.getResource(QUAD_VIEW.replace('.', '/') + ".class"));
             run(loader, "geometry.block.CompactBlockModelTest", "propertiesOrderAndStableWritablePublicationArePreserved");
-            run(loader, "enderutilities.NullifierBakedModelTest", "emptySelectedAndLockedShellsComposeWithoutMutatingTheirInputs");
         }
     }
 

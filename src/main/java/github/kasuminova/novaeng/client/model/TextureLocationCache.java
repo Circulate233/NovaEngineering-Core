@@ -11,7 +11,8 @@ import java.util.concurrent.ConcurrentMap;
 public final class TextureLocationCache {
 
     private static final int MAX_ENTRIES = 16384;
-    private static volatile ConcurrentMap<String, ResourceLocation> active;
+    private static final int MAX_ABSOLUTE_ENTRIES = 32768;
+    private static volatile Generation active;
     private static int depth;
 
     private TextureLocationCache() {
@@ -19,7 +20,7 @@ public final class TextureLocationCache {
 
     public static synchronized void begin() {
         if (depth++ == 0) {
-            active = new ConcurrentHashMap<>();
+            active = new Generation();
         }
     }
 
@@ -30,10 +31,11 @@ public final class TextureLocationCache {
     }
 
     public static ResourceLocation parse(final String name) {
-        final ConcurrentMap<String, ResourceLocation> locations = active;
-        if (locations == null) {
+        final Generation generation = active;
+        if (generation == null) {
             return new ResourceLocation(name);
         }
+        final ConcurrentMap<String, ResourceLocation> locations = generation.parsed;
         final ResourceLocation cached = locations.get(name);
         if (cached != null) {
             return cached;
@@ -47,5 +49,32 @@ public final class TextureLocationCache {
             }
         }
         return created;
+    }
+
+    public static ResourceLocation absoluteTexture(final ResourceLocation sprite) {
+        final String path = sprite.getPath();
+        final boolean prefixed = path.startsWith("textures/");
+        final boolean suffixed = path.endsWith(".png");
+        if (prefixed && suffixed) {
+            return sprite;
+        }
+        final Generation generation = active;
+        if (generation != null) {
+            final ResourceLocation cached = generation.absolute.get(sprite);
+            if (cached != null) return cached;
+        }
+
+        final String absolutePath = (prefixed ? "" : "textures/") + path + (suffixed ? "" : ".png");
+        final ResourceLocation created = new ResourceLocation(sprite.getNamespace(), absolutePath);
+        if (generation != null && generation.absolute.size() < MAX_ABSOLUTE_ENTRIES) {
+            final ResourceLocation previous = generation.absolute.putIfAbsent(sprite, created);
+            if (previous != null) return previous;
+        }
+        return created;
+    }
+
+    private static final class Generation {
+        private final ConcurrentMap<String, ResourceLocation> parsed = new ConcurrentHashMap<>();
+        private final ConcurrentMap<ResourceLocation, ResourceLocation> absolute = new ConcurrentHashMap<>();
     }
 }

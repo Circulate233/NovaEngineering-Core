@@ -219,11 +219,6 @@ public class NovaEngCoreConfig {
         public boolean compressAnimationFrames = true;
 
         @Config.RequiresMcRestart
-        @Config.Name("OptimizeNullifierModel")
-        @Config.Comment("Render the Ender Utilities Nullifier from bounded baked geometry without retaining ModelLoader or unbaked model registries.")
-        public boolean optimizeNullifierModel = true;
-
-        @Config.RequiresMcRestart
         @Config.Name("OptimizeRetainedRenderBuffers")
         @Config.Comment("Start long-lived GUI tessellators small and release finished loading-screen upload storage. Normal buffer growth is preserved.")
         public boolean optimizeRetainedRenderBuffers = true;
@@ -301,11 +296,6 @@ public class NovaEngCoreConfig {
         @Config.Name("OptimizeEnderIoXmlFactory")
         @Config.Comment("Reuse Ender IO's single-threaded XML input factory while keeping readers per document.")
         public boolean optimizeEnderIoXmlFactory = true;
-
-        @Config.RequiresMcRestart
-        @Config.Name("OptimizeEnderIoAlloyIndex")
-        @Config.Comment("Deduplicate item identities before building Ender IO alloy recipe permutations.")
-        public boolean optimizeEnderIoAlloyIndex = true;
 
         @Config.RequiresMcRestart
         @Config.Name("OptimizeShapelessRecipeAllocation")

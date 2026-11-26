@@ -1,18 +1,54 @@
 package github.kasuminova.novaeng.mixin.zenutils;
 
+import github.kasuminova.novaeng.common.performance.ScriptClasspathArchives;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import youyihj.zenutils.impl.member.bytecode.ClasspathBytesProvider;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 @Mixin(value = ClasspathBytesProvider.class, remap = false)
 public abstract class MixinClasspathBytesPath {
+    @Shadow
+    @Final
+    private List<FileSystem> jars;
+    @Shadow
+    private boolean closed;
+    @Unique
+    private int nova$releasedArchives;
+
+    /**
+     * @author NovaEngineering
+     * @reason Release each archive lease once, including after a repeated or partial close.
+     */
+    @Overwrite
+    public synchronized void close() throws IOException {
+        closed = true;
+        IOException failure = null;
+        while (nova$releasedArchives < jars.size()) {
+            try {
+                ScriptClasspathArchives.release(jars.get(nova$releasedArchives++));
+            } catch (IOException error) {
+                if (failure == null) {
+                    failure = error;
+                } else {
+                    failure.addSuppressed(error);
+                }
+            }
+        }
+        if (failure != null) throw failure;
+    }
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE",
         target = "Ljava/nio/file/Files;walkFileTree(Ljava/nio/file/Path;Ljava/nio/file/FileVisitor;)Ljava/nio/file/Path;"), require = 1)

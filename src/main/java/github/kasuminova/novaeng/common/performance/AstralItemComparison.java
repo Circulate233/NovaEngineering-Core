@@ -36,15 +36,17 @@ public final class AstralItemComparison {
             if (first.getMetadata() != second.getMetadata()) return false;
         } else if ((clauses & META_WILDCARD) != 0 && first.getMetadata() != second.getMetadata()
             && first.getMetadata() != 32767 && second.getItemDamage() != 32767) return false;
-        final NBTTagCompound firstCompound = first.hasTagCompound() ? first.getTagCompound() : null;
-        final NBTTagCompound secondCompound = second.hasTagCompound() ? second.getTagCompound() : null;
-        final boolean firstTag = firstCompound != null && !isTagEmpty(firstCompound);
-        final boolean secondTag = secondCompound != null && !isTagEmpty(secondCompound);
-        if ((clauses & NBT_STRICT) != 0) {
-            if (!firstTag && secondTag) return false;
-            if (firstTag && !(secondTag && firstCompound.equals(secondCompound))) return false;
-        } else if ((clauses & NBT_LEAST) != 0 && firstTag) {
-            if (!secondTag || !contains(firstCompound, secondCompound)) return false;
+        if ((clauses & (NBT_STRICT | NBT_LEAST)) != 0) {
+            final NBTTagCompound firstCompound = first.hasTagCompound() ? first.getTagCompound() : null;
+            final NBTTagCompound secondCompound = second.hasTagCompound() ? second.getTagCompound() : null;
+            final boolean firstTag = firstCompound != null && !isTagEmpty(firstCompound);
+            final boolean secondTag = secondCompound != null && !isTagEmpty(secondCompound);
+            if ((clauses & NBT_STRICT) != 0) {
+                if (!firstTag && secondTag) return false;
+                if (firstTag && !(secondTag && firstCompound.equals(secondCompound))) return false;
+            } else if (firstTag && (!secondTag || !contains(firstCompound, secondCompound))) {
+                return false;
+            }
         }
         return (clauses & CAPABILITIES_COMPATIBLE) == 0 || first.areCapsCompatible(second);
     }

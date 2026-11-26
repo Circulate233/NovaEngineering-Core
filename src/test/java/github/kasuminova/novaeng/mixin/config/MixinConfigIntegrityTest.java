@@ -168,10 +168,8 @@ public final class MixinConfigIntegrityTest {
             "mekanism.MixinSolarActivatorTexturePreload", "mekanism.MixinDimensionalStabilizerOverlaySnapshot",
             "astralsorcery.MixinBufferBatchCapacity", "neofontrender.MixinCosmicTessellatorCapacity",
             "neofontrender.MixinTextRouteCacheKeyHash", "neofontrender.MixinUiNavigationRuntime", "neofontrender.MixinUiTreeValidator",
-            "minecraft.MixinGlobalTessellatorCapacity", "minecraft.MixinTesrTessellatorCapacity", "minecraft.MixinTextureUploadCapacity",
-            "minecraft.forge.MixinSplashUploadBufferLifecycle", "customloadingscreen.MixinTextureAnimatorUploadMemory",
-            "jei.MixinJeiStarterHashCacheCleanup", "jei.MixinRecipeRegistryIndexMemory", "jei.MixinHeiTableMemoryAccess",
-            "enderutilities.MixinNullifierModelReloadLifecycle", "enderutilities.MixinNullifierModelBake").contains(name))
+            "customloadingscreen.MixinTextureAnimatorUploadMemory",
+            "jei.MixinJeiStarterHashCacheCleanup", "jei.MixinRecipeRegistryIndexMemory", "jei.MixinHeiTableMemoryAccess").contains(name))
             return "client";
         if (Set.of("mekanism.MixinFrequencyManagerTick", "mekanism.MixinMekanismFrequencyManagerLifecycle",
             "minecraft.MixinLazyAttributeModifierMaps", "minecraft.MixinLazyPathHeap", "minecraft.MixinLazyPathFinder",
@@ -245,7 +243,9 @@ public final class MixinConfigIntegrityTest {
             final List<String> mods = List.of("actinium", "celeritasextra", "moreoverlays", "mekanism",
                 "mekanismmultiblockmachine", "ftbquests", "itemfilters", "jei", "enderio", "geckolib3",
                 "appliedenergistics2", "modularmachinery", "tconstruct", "astralsorcery", "neofontrender",
-                "neofontrender_ui_enhancements", "customloadingscreen", "enderutilities");
+                "neofontrender_ui_enhancements", "customloadingscreen", "enderutilities", "endercore",
+                "crafttweaker", "zenutils", "journeymap", "draconicevolution", "nuclearcraft",
+                "extrabotany", "theoneprobe", "itemborders", "circulation_networks", "tconevo");
             final List<Set<String>> scenarios = new ArrayList<>();
             scenarios.add(Set.of());
             scenarios.add(Set.copyOf(mods));
@@ -268,6 +268,7 @@ public final class MixinConfigIntegrityTest {
                         final Class<?> settings = loader.loadClass("github.kasuminova.novaeng.NovaEngCoreConfig");
                         if (present.isEmpty() && !poolPresent) checkJourneyMapGates(actual, settings);
                         for (final boolean enabled : List.of(false, true)) {
+                            checkRuntimeAllocationGates(actual, settings, present, enabled);
                             for (final String name : List.of("MixinGLStateManagerGenericAttributes",
                                 "MixinGLSMCurrentAttribsGenericAttributes", "MixinRenderSystemGenericAttributes",
                                 "MixinShaderManagerGenericAttributes")) {
@@ -290,10 +291,6 @@ public final class MixinConfigIntegrityTest {
                             }
                             gate(actual, settings, "CLIENT", "compressAnimationFrames", enabled,
                                 "minecraft.MixinAnimationFrameStorage", enabled);
-                            for (final String name : List.of("minecraft.MixinGlobalTessellatorCapacity", "minecraft.MixinTesrTessellatorCapacity",
-                                "minecraft.MixinTextureUploadCapacity", "minecraft.forge.MixinSplashUploadBufferLifecycle")) {
-                                gate(actual, settings, "CLIENT", "optimizeRetainedRenderBuffers", enabled, name, enabled);
-                            }
                             for (final String name : List.of("MixinCosmicTessellatorCapacity")) {
                                 gate(actual, settings, "CLIENT", "optimizeRetainedRenderBuffers", enabled, "neofontrender." + name,
                                     enabled && present.contains("neofontrender"));
@@ -302,10 +299,6 @@ public final class MixinConfigIntegrityTest {
                                 enabled && present.contains("astralsorcery"));
                             gate(actual, settings, "CLIENT", "optimizeRetainedRenderBuffers", enabled, "customloadingscreen.MixinTextureAnimatorUploadMemory",
                                 enabled && present.contains("customloadingscreen"));
-                            for (final String name : List.of("MixinNullifierModelReloadLifecycle", "MixinNullifierModelBake")) {
-                                gate(actual, settings, "CLIENT", "optimizeNullifierModel", enabled, "enderutilities." + name,
-                                    enabled && present.contains("enderutilities"));
-                            }
                             gate(actual, settings, "CLIENT", "optimizeMenuWorkingAllocations", enabled, "neofontrender.MixinTextRouteCacheKeyHash",
                                 enabled && present.contains("neofontrender"));
                             for (final String name : List.of("MixinUiNavigationRuntime", "MixinUiTreeValidator")) {
@@ -360,6 +353,45 @@ public final class MixinConfigIntegrityTest {
                 for (final Path path : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(path);
             }
         }
+    }
+
+    private static void checkRuntimeAllocationGates(final Class<?> actual, final Class<?> config,
+                                                    final Set<String> present, final boolean enabled) throws Exception {
+        final Map<List<String>, List<String>> groups = Map.ofEntries(
+            Map.entry(List.of("enderio", "endercore"), List.of("enderio.MixinCollidableComponent",
+                "enderio.MixinBlockConduitBundleBounds", "enderio.AccessorEnderIoProfiler", "enderio.MixinRelayingModelProfilerLabels")),
+            Map.entry(List.of("enderutilities"), List.of("enderutilities.MixinGuiEnderUtilitiesTooltip")),
+            Map.entry(List.of("zenutils", "crafttweaker"), List.of("zenutils.MixinItemTooltipMatching")),
+            Map.entry(List.of("journeymap"), List.of("journeymap.MixinBlockMDScanPositions", "journeymap.MixinSurfaceHeightValues",
+                "journeymap.MixinTopoHeightValues", "journeymap.MixinJMChunkSnapshotWriter", "journeymap.MixinForgeRegistryMetadataEpoch")),
+            Map.entry(List.of("neofontrender", "neofontrender_ui_enhancements"), List.of("neofontrender.MixinTooltipIdentityText",
+                "neofontrender.AccessorTooltipNbtCompound", "neofontrender.AccessorTooltipNbtList")),
+            Map.entry(List.of("neofontrender"), List.of("neofontrender.MixinFontBindingsSnapshot")),
+            Map.entry(List.of("draconicevolution"), List.of("draconicevolution.MixinFusionInjectorScan")),
+            Map.entry(List.of("nuclearcraft"), List.of("nuclearcraft.MixinProcessorAutoPushDirections")),
+            Map.entry(List.of("modularmachinery"), List.of("mmce.MixinRequirementItemOwnedCopy", "mmce.MixinRecipeModifierAppliers",
+                "mmce.AccessorBlockPos2ValueMap", "mmce.MixinBlockArrayRuntimeQueries")),
+            Map.entry(List.of("extrabotany"), List.of("extrabotany.MixinCosmeticItemRenderLayerModels")),
+            Map.entry(List.of("theoneprobe"), List.of("theoneprobe.MixinConfigTextStyleCache")),
+            Map.entry(List.of("itemborders"), List.of("itemborders.MixinTextColorCache")),
+            Map.entry(List.of("circulation_networks"), List.of("circulation.MixinFullBrightDisplayListLookup")),
+            Map.entry(List.of("tconevo"), List.of("tconevo.MixinItemStackBarEventLazySet")));
+        for (final var group : groups.entrySet()) {
+            for (final String name : group.getValue()) {
+                gate(actual, config, "PERFORMANCE", "reduceRuntimeAllocations", enabled, name,
+                    enabled && present.containsAll(group.getKey()));
+            }
+        }
+        final Object performance = config.getField("PERFORMANCE").get(null);
+        final var enumCache = performance.getClass().getField("cacheEnumValuesArrays");
+        for (final boolean enums : List.of(false, true)) {
+            enumCache.setBoolean(performance, enums);
+            for (final String name : List.of("ae2.MixinAEPartLocationLookup", "ae2.MixinCableBusLightValues", "ae2.MixinFacingToRotationLookup")) {
+                gate(actual, config, "PERFORMANCE", "reduceRuntimeAllocations", enabled, name,
+                    enabled && enums && present.contains("appliedenergistics2"));
+            }
+        }
+        enumCache.setBoolean(performance, true);
     }
 
     private static void checkJourneyMapGates(final Class<?> actual, final Class<?> config) throws Exception {
