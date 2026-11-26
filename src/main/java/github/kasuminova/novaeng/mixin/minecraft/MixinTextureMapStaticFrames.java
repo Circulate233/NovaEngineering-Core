@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -26,14 +27,7 @@ public abstract class MixinTextureMapStaticFrames {
 
     @Shadow
     @Final
-    private Map<String, TextureAtlasSprite> mapRegisteredSprites;
-
-    @WrapOperation(method = "loadTextureAtlas", at = @At(value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;getFrameTextureData(I)[[I"), require = 0)
-    private int[][] nova$borrowInitialUpload(final TextureAtlasSprite sprite, final int frame,
-                                            final Operation<int[][]> original) {
-        return nova$initialUploadPixels(sprite, frame, original);
-    }
+    public Map<String, TextureAtlasSprite> mapRegisteredSprites;
 
     /** Cleanroom performs the initial upload synchronously in this Forge-named method. */
     @WrapOperation(method = "finishLoading", remap = false, require = 1, at = @At(value = "INVOKE", remap = true,
@@ -50,6 +44,18 @@ public abstract class MixinTextureMapStaticFrames {
             return owned.internalView().get(frame);
         }
         return original.call(sprite, frame);
+    }
+
+    @Redirect(method = "updateAnimations", at = @At(value = "INVOKE",
+        target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;updateAnimation()V"), require = 1)
+    private void nova$consumePrivateAnimationFrames(final TextureAtlasSprite sprite) {
+        if (sprite.framesTextureData instanceof OwnedAnimationFrames owned && !owned.isEmpty()) {
+            synchronized (owned.readLock()) {
+                sprite.updateAnimation();
+            }
+        } else {
+            sprite.updateAnimation();
+        }
     }
 
     @Inject(method = "loadTextureAtlas", at = @At("RETURN"), require = 1)

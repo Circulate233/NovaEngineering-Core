@@ -6,8 +6,8 @@ import github.kasuminova.novaeng.client.geometry.item.CompactItemModel;
 import github.kasuminova.novaeng.client.geometry.item.ItemContour;
 import github.kasuminova.novaeng.client.geometry.item.ItemSpriteCompatibility;
 import github.kasuminova.novaeng.client.memory.OwnedAnimationFrames;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -38,7 +38,10 @@ public abstract class MixinItemLayerModel {
     @Final
     private ItemOverrideList overrides;
 
-    /** @author NovaEngineering @reason Bake generated items directly from compact contours. */
+    /**
+     * @author NovaEngineering
+     * @reason Bake generated items directly from compact contours.
+     */
     @Overwrite
     public IBakedModel bake(final IModelState state, final VertexFormat format,
                             final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
@@ -56,8 +59,13 @@ public abstract class MixinItemLayerModel {
                 && sprite.getIconWidth() > 0 && sprite.getIconWidth() <= 256
                 && sprite.getIconHeight() > 0 && sprite.getIconHeight() <= 256) {
                 if (sprite.framesTextureData instanceof OwnedAnimationFrames owned) {
-                    contour = ItemContour.createFromMipmaps(sprite.getIconWidth(), sprite.getIconHeight(),
-                        sprite.getFrameCount(), owned.internalView());
+                    if (sprite.getFrameCount() == 0) {
+                        contour = ItemContour.createFromMipmaps(sprite.getIconWidth(), sprite.getIconHeight(),
+                            0, owned);
+                    } else synchronized (owned.readLock()) {
+                        contour = ItemContour.createFromMipmaps(sprite.getIconWidth(), sprite.getIconHeight(),
+                            sprite.getFrameCount(), owned.internalView());
+                    }
                 } else {
                     final int[][] frames = new int[sprite.getFrameCount()][];
                     for (int frame = 0; frame < frames.length; frame++) {
@@ -77,11 +85,13 @@ public abstract class MixinItemLayerModel {
     }
 
     @Unique
+    // Forge's getQuadsForSprite API requires this Optional; reuse the value already read during bake.
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private IBakedModel novaeng$vanillaItem(final IModelState state, final VertexFormat format,
-                                           final Function<ResourceLocation, TextureAtlasSprite> getter,
-                                           final Optional<TRSRTransformation> transform,
-                                           final TextureAtlasSprite[] observed, final int observedCount,
-                                           final boolean identity) {
+                                            final Function<ResourceLocation, TextureAtlasSprite> getter,
+                                            final Optional<TRSRTransformation> transform,
+                                            final TextureAtlasSprite[] observed, final int observedCount,
+                                            final boolean identity) {
         // Forge's original bake, using only the state/texture reads already consumed by the fast path.
         final ImmutableList.Builder<BakedQuad> quads = ImmutableList.builder();
         for (int layer = 0; layer < textures.size(); layer++) {

@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.neofontrender;
 
 import github.kasuminova.novaeng.client.font.TooltipBindings;
+import neofontrender.core.config.NeofontrenderConfig;
 import neofontrender.internal.nightconfig.core.file.CommentedFileConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,12 +11,17 @@ import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
-@Mixin(targets = "neofontrender.core.config.NeofontrenderConfig", remap = false)
+@Mixin(value = NeofontrenderConfig.class, remap = false)
 public abstract class MixinFontBindingsSnapshot {
-    @Shadow private static CommentedFileConfig config;
-    @Shadow @Final private static List<String> DEFAULT_BRILLIANT_BINDINGS;
-    @Unique private static final TooltipBindings nova$bindings = new TooltipBindings();
-    @Unique private static final List<String> nova$bindingsPath = List.of("brilliant", "bindings");
+    @Unique
+    private static final TooltipBindings nova$bindings = new TooltipBindings();
+    @Unique
+    private static final List<String> nova$bindingsPath = List.of("brilliant", "bindings");
+    @Shadow
+    private static CommentedFileConfig config;
+    @Shadow
+    @Final
+    private static List<String> DEFAULT_BRILLIANT_BINDINGS;
 
     /**
      * @author NovaEngineering

@@ -57,7 +57,7 @@ dependencies {
     // Exact library versions embedded by NeoFontRender UI Enhancements at runtime.
     compileOnly 'com.huaban:jieba-analysis:1.0.2'
     compileOnly 'net.sf.jazzy:jazzy:0.5.2-rtext-1.4.1-2'
-    modCompileOnly name: 'neofontrender', version: '0.8.0-full'
+    modCompileOnly("curse.maven:revo-font-1617673:9712477")
     modCompileOnly name: 'neofontrender-ui-enhancements', version: '0.8.9'
 
     if (propertyBool('enable_lwjglx')) {
@@ -178,7 +178,7 @@ dependencies {
             config = project.file('accesstransformers/ender-utilities.cfg')
         }
     }
-    modCompileOnly name: 'Actinium', version: 'alpha-0.0.14-a8a5fcc0'
+    modCompileOnly("curse.maven:actinium-1-12-2-optimization-1650442:9828866")
     modCompileOnly("curse.maven:chisel-235279:2915375")
     modCompileOnly("curse.maven:taiga-replant-replant-971802:5086860")
     modCompileOnly('curse.maven:librarianlib-continuous-1058274:6617935') {
