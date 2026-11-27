@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import github.kasuminova.novaeng.mixin.geometry.actinium.MixinGeometryDisplayLists;
 import github.kasuminova.novaeng.mixin.geometry.item.MixinItemLayerModel;
 import github.kasuminova.novaeng.testutil.ForgeReflectionEnvironment;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
@@ -24,9 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -55,12 +55,12 @@ class CompactItemModelTest {
     }
 
     private static int retainedCompactArrayCount(final Object root) throws IllegalAccessException {
-        return retainedCompactArrayCount(root, new IdentityHashMap<>());
+        return retainedCompactArrayCount(root, new ReferenceOpenHashSet<>());
     }
 
-    private static int retainedCompactArrayCount(final Object root, final IdentityHashMap<Object, Boolean> seen)
+    private static int retainedCompactArrayCount(final Object root, final ReferenceOpenHashSet<Object> seen)
         throws IllegalAccessException {
-        if (root == null || seen.put(root, Boolean.TRUE) != null) return 0;
+        if (root == null || !seen.add(root)) return 0;
         if (root.getClass().isArray()) return 1;
         if (!(root instanceof CompactItemModel) && root.getClass().getEnclosingClass() != CompactItemModel.class)
             return 0;
@@ -306,7 +306,7 @@ class CompactItemModelTest {
         final ItemQuadView cursor = new ItemQuadView();
         cursor.decode(contour, sprite, 2, contour.size());
         final int[] packed = cursor.getVertexData().clone();
-        final List<float[]> retained = new ArrayList<>();
+        final List<float[]> retained = new ObjectArrayList<>();
         cursor.pipe(new IVertexConsumer() {
             public VertexFormat getVertexFormat() {return DefaultVertexFormats.ITEM;}
             public void setQuadTint(int tint) { }
@@ -346,7 +346,7 @@ class CompactItemModelTest {
                             : Collections.singletonList(new int[][]{{-1, 0, -1, -1}}));
                         final Optional<TRSRTransformation> rootTransform = transformed
                             ? Optional.of(new TRSRTransformation(new javax.vecmath.Vector3f(.125F, 0, 0), null, null, null)) : Optional.empty();
-                        final List<String> calls = new ArrayList<>();
+                        final List<String> calls = new ObjectArrayList<>();
                         final IModelState state = part -> {
                             calls.add(part.isPresent() ? part.get().toString() : "root");
                             return part.isEmpty() ? rootTransform : Optional.empty();
@@ -365,7 +365,7 @@ class CompactItemModelTest {
                         overridesField.set(hook, ItemOverrideList.NONE);
                     final IBakedModel result = hook.bake(state, format, getter);
                         assertEquals(sprite != custom && !transformed, result instanceof CompactItemModel);
-                        final List<String> observed = List.copyOf(calls);
+                        final List<String> observed = Collections.unmodifiableList(new ObjectArrayList<>(calls));
                         calls.clear();
                         final IBakedModel baseline = new ItemLayerModel(textures).bake(state, format, getter);
                         assertEquals(calls, observed);
@@ -394,7 +394,7 @@ class CompactItemModelTest {
         for (final ImmutableList<ResourceLocation> textures : List.of(ImmutableList.<ResourceLocation>of(),
             ImmutableList.of(new ResourceLocation("test:layer")))) {
             for (final VertexFormat format : List.of(DefaultVertexFormats.POSITION, new VertexFormat())) {
-                final List<String> calls = new ArrayList<>();
+                final List<String> calls = new ObjectArrayList<>();
                 final IModelState state = part -> { calls.add(part.isEmpty() ? "root" : part.get().toString()); return Optional.empty(); };
                 final Function<ResourceLocation, TextureAtlasSprite> getter = location -> { calls.add(location.toString()); return sprite; };
                 final BakeHook hook = new BakeHook();
@@ -408,7 +408,7 @@ class CompactItemModelTest {
                 RuntimeException failure = null;
                 try { actual = hook.bake(state, format, getter); }
                 catch (final RuntimeException exception) { failure = exception; }
-                final List<String> observed = List.copyOf(calls);
+                final List<String> observed = Collections.unmodifiableList(new ObjectArrayList<>(calls));
                 calls.clear();
                 if (failure != null) {
                     final RuntimeException expected = assertThrows(failure.getClass(), () -> new ItemLayerModel(textures).bake(state, format, getter));
@@ -432,7 +432,7 @@ class CompactItemModelTest {
             setIconWidth(width);
             setIconHeight(height);
             initSprite(8192, 4096, 173, 251, false);
-            final List<int[][]> data = new ArrayList<>();
+            final List<int[][]> data = new ObjectArrayList<>();
             for (final int[] frame : frames) data.add(new int[][]{frame});
             setFramesTextureData(data);
         }

@@ -83,7 +83,7 @@ final class BlockGeometryPages {
         private final Object captureLock = new Object();
         private final Object materialLock = new Object();
         private Page current;
-        private List<WeakReference<Page>> completed;
+        private ObjectArrayList<WeakReference<Page>> completed;
         private Int2ObjectOpenHashMap<BlockGeometryRecord> captures;
         private Int2ObjectOpenHashMap<Material> capturedMaterials;
         private volatile boolean closed;
@@ -184,7 +184,8 @@ final class BlockGeometryPages {
             synchronized (this) {
                 closed = true;
                 if (completed != null) {
-                    for (final WeakReference<Page> reference : completed) {
+                    for (int index = 0; index < completed.size(); index++) {
+                        final WeakReference<Page> reference = completed.get(index);
                         final Page page = reference.get();
                         if (page != null) page.canonicalize(canonical);
                     }

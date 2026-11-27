@@ -5,6 +5,7 @@ import github.kasuminova.novaeng.common.performance.JourneyMapBlockPositions;
 import github.kasuminova.novaeng.common.performance.JourneyMapMetadataEpoch;
 import github.kasuminova.novaeng.common.performance.JourneyMapSectionWriter;
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import journeymap.common.chunk.JMChunkSnapshot;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -21,7 +22,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -135,10 +135,10 @@ class JourneyMapRuntimeAllocationTest {
             1024, 4095, 4096, Integer.MAX_VALUE}) {
             assertEquals(value, JourneyMapHeightValues.valueOf(value).intValue());
         }
-        final var futures = new ArrayList<CompletableFuture<Integer>>();
+        final var futures = new ObjectArrayList<CompletableFuture<Integer>>();
         for (int i = 0; i < 16; i++) futures.add(CompletableFuture.supplyAsync(() -> JourneyMapHeightValues.valueOf(2467)));
         final Integer winner = futures.getFirst().join();
-        for (final var future : futures) assertSame(winner, future.join());
+        for (int index = 0; index < futures.size(); index++) assertSame(winner, futures.get(index).join());
     }
 
     private static Method sectionMethod(final Class<?> owner) throws Exception {
@@ -157,7 +157,7 @@ class JourneyMapRuntimeAllocationTest {
         final ExtendedBlockStorage air = new ExtendedBlockStorage(0, true);
         final ExtendedBlockStorage mixed = new ExtendedBlockStorage(16, false);
         final ExtendedBlockStorage widePalette = new ExtendedBlockStorage(-16, true);
-        final ArrayList<IBlockState> states = new ArrayList<>();
+        final ObjectArrayList<IBlockState> states = new ObjectArrayList<>();
         for (final Block block : Block.REGISTRY) states.addAll(block.getBlockState().getValidStates());
         assertTrue(states.size() > 256, "Exercise the high byte of section palette indices using actual registered states");
         for (int y = 0; y < 16; y++) {

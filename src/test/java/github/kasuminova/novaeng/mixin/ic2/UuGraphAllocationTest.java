@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.ic2;
 
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,6 @@ import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +62,7 @@ class UuGraphAllocationTest {
     void exactQueryCollectionStaysPrivateToReadOnlyGraphCallers() throws Exception {
         final ClassLoader loader = getClass().getClassLoader();
         final ClassNode graph = readClass(loader, "ic2/core/uu/UuGraph");
-        final Set<String> callers = new HashSet<>();
+        final Set<String> callers = new ObjectOpenHashSet<>();
         for (final MethodNode method : graph.methods) {
             for (final var instruction : method.instructions) {
                 if (instruction instanceof MethodInsnNode call && call.owner.equals(graph.name) && call.name.equals("getAll"))
@@ -71,7 +71,7 @@ class UuGraphAllocationTest {
         }
         assertEquals(Set.of("find", "registerTransform", "access$200"), callers);
         final ClassNode node = readClass(loader, "ic2/core/uu/UuGraph$Node");
-        final Set<String> syntheticCallers = new HashSet<>();
+        final Set<String> syntheticCallers = new ObjectOpenHashSet<>();
         for (final MethodNode method : node.methods) {
             for (final var instruction : method.instructions) {
                 if (instruction instanceof MethodInsnNode call && call.owner.equals(graph.name) && call.name.equals("access$200"))

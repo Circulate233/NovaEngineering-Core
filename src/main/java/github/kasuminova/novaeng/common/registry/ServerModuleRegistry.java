@@ -7,12 +7,12 @@ import crafttweaker.api.minecraft.CraftTweakerMC;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import github.kasuminova.novaeng.common.item.ItemServerModule;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +59,7 @@ public class ServerModuleRegistry {
     }
 
     public static class ItemModuleRegistry {
-        private final List<ItemStack> matches = new ArrayList<>();
+        private final List<ItemStack> matches = new ObjectArrayList<>();
         private final ServerModuleBase<?> module;
 
         public ItemModuleRegistry(final ServerModuleBase<?> module) {
@@ -72,7 +72,8 @@ public class ServerModuleRegistry {
         }
 
         public ServerModuleBase<?> getModule(final ItemStack stack) {
-            for (final ItemStack match : matches) {
+            for (int index = 0; index < matches.size(); index++) {
+                final ItemStack match = matches.get(index);
                 if (match.isItemEqual(stack)) {
                     return module;
                 }

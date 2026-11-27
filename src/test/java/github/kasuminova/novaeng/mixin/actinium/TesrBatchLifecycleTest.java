@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.actinium;
 
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
@@ -9,7 +10,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +24,7 @@ class TesrBatchLifecycleTest {
     private static final String SCOPES = "github/kasuminova/novaeng/client/render/TileEntityBatchScopes";
 
     private static List<String> guardedBatcherCalls(final ClassNode owner, final MethodNode method) {
-        final List<String> result = new ArrayList<>();
+        final List<String> result = new ObjectArrayList<>();
         for (final MethodInsnNode call : calls(method)) {
             if (call.owner.equals(owner.name) && (call.name.contains("nova$beginBatchScope")
                 || call.name.contains("nova$endBatchScope") || call.name.contains("nova$drawOpenedBatchOnExit"))) {
@@ -68,7 +68,7 @@ class TesrBatchLifecycleTest {
     }
 
     private static List<MethodInsnNode> calls(final MethodNode method) {
-        final List<MethodInsnNode> calls = new ArrayList<>();
+        final List<MethodInsnNode> calls = new ObjectArrayList<>();
         for (final var instruction : method.instructions) {
             if (instruction instanceof MethodInsnNode call) calls.add(call);
         }

@@ -1,12 +1,12 @@
 package github.kasuminova.novaeng.common.hypernet.calculation;
 
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class CalculateTypes {
@@ -15,7 +15,7 @@ public final class CalculateTypes {
     public static final CalculateTypeNeuron NEURON = new CalculateTypeNeuron();
     public static final CalculateTypeQbit QBIT = new CalculateTypeQbit();
 
-    private static final Map<String, CalculateType> AVAILABLE_TYPES = new LinkedHashMap<>();
+    private static final Map<String, CalculateType> AVAILABLE_TYPES = new Object2ObjectLinkedOpenHashMap<>();
 
     static {
         registerType(INTRICATE);

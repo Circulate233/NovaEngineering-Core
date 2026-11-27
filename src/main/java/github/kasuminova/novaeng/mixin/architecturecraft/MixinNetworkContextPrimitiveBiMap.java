@@ -75,7 +75,6 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
         final NetworkContext owner, final BiMap<Class<? extends Message>, Integer> original) {
         final Reference2IntHashBiMap<Class<? extends Message>> replacement =
             new Reference2IntHashBiMap<>(16);
-        replacement.putAll(original);
         packetIds = replacement;
     }
 
@@ -129,9 +128,11 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
         PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
         payload.writeByte(((Reference2IntBiMap<?>) packetIds).getIntRequired(m.getClass()));
         int bools = this.booleanCount.count(m.getClass()) + this.optionalCount.count(m.getClass());
+        final List<WireField<?>> fields = this.marshallers.get(m.getClass());
         if (bools > 0) {
             BooleanList li = new BooleanArrayList(bools);
-            for (WireField<?> wf : this.marshallers.get(m.getClass())) {
+            for (int i = 0, size = fields.size(); i < size; i++) {
+                final WireField<?> wf = fields.get(i);
                 if (wf.getType() == Boolean.TYPE) {
                     li.add((boolean) wf.get(m));
                     continue;
@@ -148,7 +149,8 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
                 payload.writeByte(by);
             }
         }
-        for (WireField<?> field : this.marshallers.get(m.getClass())) {
+        for (int i = 0, size = fields.size(); i < size; i++) {
+            final WireField<?> field = fields.get(i);
             if (field.getType() != Boolean.TYPE) field.marshal(m, payload);
         }
         return new FMLProxyPacket(payload, this.channel);
@@ -186,9 +188,11 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
         Set<WireField<?>> present =
             new ObjectOpenHashSet<>(this.marshallers.get(m.getClass()).size());
         int bools = this.booleanCount.count(m.getClass()) + this.optionalCount.count(m.getClass());
+        final List<WireField<?>> fields = this.marshallers.get(m.getClass());
         if (bools > 0) {
             List<WireField<?>> flagFields = new ObjectArrayList<>(bools);
-            for (WireField<?> wf : this.marshallers.get(m.getClass())) {
+            for (int i = 0, size = fields.size(); i < size; i++) {
+                final WireField<?> wf = fields.get(i);
                 if (wf.getType() == Boolean.TYPE) {
                     flagFields.add(wf);
                     present.add(wf);
@@ -213,9 +217,10 @@ public abstract class MixinNetworkContextPrimitiveBiMap {
                 }
             }
         } else {
-            present.addAll(this.marshallers.get(m.getClass()));
+            present.addAll(fields);
         }
-        for (WireField<?> field : this.marshallers.get(m.getClass())) {
+        for (int i = 0, size = fields.size(); i < size; i++) {
+            final WireField<?> field = fields.get(i);
             if (field.getType() != Boolean.TYPE && present.contains(field)) field.unmarshal(m, payload);
         }
         return m;

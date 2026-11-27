@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.client.geometry;
 
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -7,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,7 +18,7 @@ class GeometryWithoutActiniumTest {
 
     @Test
     void vanillaBakeRunsWithoutActiniumOnTheClasspath() throws Throwable {
-        final var urls = new LinkedHashSet<URL>();
+        final var urls = new ObjectLinkedOpenHashSet<URL>();
         for (ClassLoader loader = getClass().getClassLoader(); loader != null; loader = loader.getParent()) {
             if (loader instanceof URLClassLoader urlLoader) urls.addAll(List.of(urlLoader.getURLs()));
         }

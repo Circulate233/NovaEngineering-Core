@@ -2,12 +2,12 @@ package github.kasuminova.novaeng.common.hypernet.old.base;
 
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IIngredient;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.minecraft.util.Tuple;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class NetNodeTypeRepairable extends NetNodeType {
     public static final String FIX_THREAD_NAME = "novaeng.hypernet.maintenance_controller";
 
-    protected final List<Tuple<List<IIngredient>, Integer>> fixIngredientList = new ArrayList<>();
+    protected final List<Tuple<List<IIngredient>, Integer>> fixIngredientList = new ObjectArrayList<>();
 
     public NetNodeTypeRepairable(final String typeName,
                                  final long energyUsage) {

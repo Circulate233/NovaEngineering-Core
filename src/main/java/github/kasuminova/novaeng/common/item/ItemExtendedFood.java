@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.common.item;
 
 import github.kasuminova.novaeng.common.core.CreativeTabNovaEng;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
@@ -12,7 +13,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +37,7 @@ public class ItemExtendedFood extends ItemFood {
     }
 
     public static List<Effect> effects() {
-        return new ArrayList<>();
+        return new ObjectArrayList<>();
     }
 
     @Override

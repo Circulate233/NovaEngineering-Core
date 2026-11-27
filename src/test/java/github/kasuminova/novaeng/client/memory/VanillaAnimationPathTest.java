@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.client.memory;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.data.AnimationFrame;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipFile;
@@ -68,7 +68,7 @@ public class VanillaAnimationPathTest {
         for (final int mipmaps : new int[]{0, 1, 4}) {
             for (final boolean explicitFrames : new boolean[]{false, true}) {
                 // A resource contains only its base image. The native loader leaves the other four slots null.
-                final Object ordinary = load(fixture, image, metadata(interpolate, explicitFrames), new ArrayList<>());
+                final Object ordinary = load(fixture, image, metadata(interpolate, explicitFrames), new ObjectArrayList<>());
                 final Object owned = load(fixture, image, metadata(interpolate, explicitFrames), new OwnedAnimationFrames());
                 assertIncompleteLoaderFrames(ordinary);
                 assertIncompleteLoaderFrames(owned);
@@ -124,7 +124,7 @@ public class VanillaAnimationPathTest {
     }
 
     private static AnimationMetadataSection metadata(final boolean interpolate, final boolean explicit) {
-        final List<AnimationFrame> frames = new ArrayList<>();
+        final List<AnimationFrame> frames = new ObjectArrayList<>();
         if (explicit) for (final int frame : new int[]{0, 2, 2, 5, 1, 4, 3}) frames.add(new AnimationFrame(frame, -1));
         return new AnimationMetadataSection(frames, 64, 64, 3, interpolate);
     }
@@ -148,7 +148,8 @@ public class VanillaAnimationPathTest {
         @SuppressWarnings("unchecked") final List<int[][]> raw = (List<int[][]>) sprite.getClass().getField("framesTextureData").get(sprite);
         final List<int[][]> frames = readPrivate(raw);
         assertEquals(6, frames.size());
-        for (final int[][] frame : frames) {
+        for (int index = 0; index < frames.size(); index++) {
+            final int[][] frame = frames.get(index);
             assertEquals(5, frame.length);
             assertNotNull(frame[0]);
             for (int level = 1; level < 5; level++) assertNull(frame[level]);
@@ -168,7 +169,7 @@ public class VanillaAnimationPathTest {
     }
 
     private static List<Upload> animate(final Object sprite) throws Exception {
-        final List<Upload> uploads = new ArrayList<>();
+        final List<Upload> uploads = new ObjectArrayList<>();
         UPLOADS.set(uploads);
         try {
             invoke(sprite, "updateAnimation", new Class<?>[0]);

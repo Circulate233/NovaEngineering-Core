@@ -29,7 +29,6 @@ public abstract class MixinGuiRegistryPrimitiveBiMap {
         require = 1)
     private static void nova$primitiveTable(final BiMap<String, Integer> original) {
         final Object2IntHashBiMap<String> replacement = new Object2IntHashBiMap<>(16);
-        replacement.putAll(original);
         guiMap = replacement;
     }
 

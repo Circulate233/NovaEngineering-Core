@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.client.geometry.block;
 
 import github.kasuminova.novaeng.client.geometry.CompactModel;
 import github.kasuminova.novaeng.client.geometry.GeometryGeneration;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.BlockPartFace;
@@ -21,12 +23,10 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,13 +136,13 @@ public final class BlockGeometryMemoryBenchmark {
     }
 
     private static void append(final StringBuilder report, final String label, final Object roots) throws Exception {
-        final IdentityHashMap<Object, Boolean> visited = new IdentityHashMap<>();
-        final ArrayDeque<Object> pending = new ArrayDeque<>();
-        pending.add(roots);
+        final ReferenceOpenHashSet<Object> visited = new ReferenceOpenHashSet<>();
+        final ObjectArrayFIFOQueue<Object> pending = new ObjectArrayFIFOQueue<>();
+        pending.enqueue(roots);
         long bytes = 0;
         while (!pending.isEmpty()) {
-            final Object value = pending.removeFirst();
-            if (excluded(value) || visited.put(value, Boolean.TRUE) != null) continue;
+            final Object value = pending.dequeue();
+            if (excluded(value) || !visited.add(value)) continue;
             bytes += instrumentation.getObjectSize(value);
             final Class<?> type = value.getClass();
             if (type.isArray()) {
@@ -162,8 +162,8 @@ public final class BlockGeometryMemoryBenchmark {
         report.append(label).append(": ").append(bytes).append(" bytes, ").append(visited.size()).append(" objects\n");
     }
 
-    private static void enqueue(final ArrayDeque<Object> pending, final Object value) {
-        if (value != null) pending.addLast(value);
+    private static void enqueue(final ObjectArrayFIFOQueue<Object> pending, final Object value) {
+        if (value != null) pending.enqueue(value);
     }
 
     private static boolean excluded(final Object value) {

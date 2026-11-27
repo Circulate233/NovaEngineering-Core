@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.geckolib3;
 
 import com.sun.management.ThreadMXBean;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import software.bernie.geckolib3.geo.raw.pojo.Bone;
 import software.bernie.geckolib3.geo.raw.pojo.Converter;
 import software.bernie.geckolib3.geo.raw.tree.RawBoneGroup;
@@ -9,7 +10,6 @@ import software.bernie.geckolib3.geo.raw.tree.RawGeometryTree;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -22,10 +22,10 @@ public final class RawGeometryTreeLookupTest {
 
     static void main(final String[] args) throws Exception {
         final Random random = new Random(0x47454f);
-        final List<RawGeometryTree> trees = new ArrayList<>();
+        final List<RawGeometryTree> trees = new ObjectArrayList<>();
         for (int sample = 0; sample < 100; sample++) {
             final RawGeometryTree tree = new RawGeometryTree();
-            final List<RawBoneGroup> groups = new ArrayList<>();
+            final List<RawBoneGroup> groups = new ObjectArrayList<>();
             for (int i = 0; i < 100; i++) {
                 final Bone bone = new Bone();
                 bone.setName(i % 13 == 0 ? null : "bone" + random.nextInt(20));
@@ -54,7 +54,9 @@ public final class RawGeometryTreeLookupTest {
 
         int models = 0;
         try (var paths = Files.walk(Path.of(args[0]))) {
-            for (final Path path : paths.filter(p -> p.toString().endsWith(".json")).toList()) {
+            final List<Path> jsonPaths = paths.filter(p -> p.toString().endsWith(".json")).toList();
+            for (int index = 0; index < jsonPaths.size(); index++) {
+                final Path path = jsonPaths.get(index);
                 final var raw = Converter.fromJsonString(Files.readString(path));
                 final var tree = RawGeometryTree.parseHierarchy(raw, null);
                 for (final Bone bone : raw.getMinecraftGeometry()[0].getBones()) {
@@ -90,7 +92,8 @@ public final class RawGeometryTreeLookupTest {
         final var bean = (ThreadMXBean) ManagementFactory.getThreadMXBean();
         final long id = Thread.currentThread().threadId();
         final long before = bean.getThreadAllocatedBytes(id);
-        for (final RawGeometryTree tree : trees) {
+        for (int index = 0; index < trees.size(); index++) {
+            final RawGeometryTree tree = trees.get(index);
             for (int i = 0; i < 20; i++) {
                 sink = optimized ? MixinRawGeometryTreeLookup.getGroupFromHierarchy(tree, "bone1")
                     : RawGeometryTree.getGroupFromHierarchy(tree, "bone1");

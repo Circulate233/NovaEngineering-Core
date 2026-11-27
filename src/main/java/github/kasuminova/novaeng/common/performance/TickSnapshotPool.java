@@ -22,12 +22,24 @@ public final class TickSnapshotPool<T> {
         Object[] array = this.borrow(entries.size());
         int size = 0;
         try {
-            for (final E entry : entries) {
-                if (accepts.test(entry)) {
-                    if (size == array.length) {
-                        array = Arrays.copyOf(array, Math.max(16, array.length * 2));
+            if (entries instanceof RandomAccess) {
+                for (int index = 0, count = entries.size(); index < count; index++) {
+                    final E entry = entries.get(index);
+                    if (accepts.test(entry)) {
+                        if (size == array.length) {
+                            array = Arrays.copyOf(array, Math.max(16, array.length * 2));
+                        }
+                        array[size++] = value.apply(entry);
                     }
-                    array[size++] = value.apply(entry);
+                }
+            } else {
+                for (final E entry : entries) {
+                    if (accepts.test(entry)) {
+                        if (size == array.length) {
+                            array = Arrays.copyOf(array, Math.max(16, array.length * 2));
+                        }
+                        array[size++] = value.apply(entry);
+                    }
                 }
             }
         } catch (final RuntimeException | Error failure) {

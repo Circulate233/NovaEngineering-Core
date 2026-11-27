@@ -65,7 +65,7 @@ public abstract class MixinFluidRegistryPrimitiveBiMap {
             opcode = Opcodes.PUTSTATIC),
         require = 1)
     private static void nova$primitiveIds(final BiMap<Fluid, Integer> original) {
-        fluidIDs = Object2IntHashBiMap.copyOf(original);
+        fluidIDs = new Object2IntHashBiMap<>();
     }
 
     @Redirect(
@@ -78,7 +78,7 @@ public abstract class MixinFluidRegistryPrimitiveBiMap {
             opcode = Opcodes.PUTSTATIC),
         require = 1)
     private static void nova$primitiveNames(final BiMap<Integer, String> original) {
-        fluidNames = Int2ObjectHashBiMap.copyOf(original);
+        fluidNames = new Int2ObjectHashBiMap<>();
     }
 
     /**

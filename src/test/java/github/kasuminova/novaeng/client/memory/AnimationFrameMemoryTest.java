@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.client.memory;
 
 import github.kasuminova.novaeng.client.geometry.item.ItemContour;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -57,13 +57,16 @@ class AnimationFrameMemoryTest {
         frames.pack(new PixelFrameCodec.Encoder());
         final var entries = OwnedAnimationFrames.class.getDeclaredField("frames");
         entries.setAccessible(true);
-        for (final Object frame : (List<?>) entries.get(frames)) {
+        final List<?> packedFrames = (List<?>) entries.get(frames);
+        for (int index = 0; index < packedFrames.size(); index++) {
+            final Object frame = packedFrames.get(index);
             final var source = frame.getClass().getDeclaredField("source");
             source.setAccessible(true);
             assertNull(source.get(frame), "32 KiB animation should retain encoded frames");
         }
         for (int frame = 0; frame < frames.size(); frame++) {
-            for (final int pixel : frames.internalView().get(frame)[0]) assertEquals(0xff000000 | frame, pixel);
+            final int[] pixels = frames.internalView().get(frame)[0];
+            for (int index = 0; index < pixels.length; index++) assertEquals(0xff000000 | frame, pixels[index]);
         }
     }
 
@@ -201,7 +204,7 @@ class AnimationFrameMemoryTest {
         final OwnedAnimationFrames original = new OwnedAnimationFrames();
         for (int i = 0; i < 5; i++) original.internalView().add(frame(i));
         original.prepareMipmaps();
-        final List<int[][]> generated = new ArrayList<>();
+        final List<int[][]> generated = new ObjectArrayList<>();
         for (int i = 0; i < original.size(); i++) {
             final int[][] prior = original.internalView().get(i);
             generated.add(new int[][]{prior[0], prior[1], new int[1024]});
@@ -227,7 +230,7 @@ class AnimationFrameMemoryTest {
         final OwnedAnimationFrames original = new OwnedAnimationFrames();
         for (int i = 0; i < 5; i++) original.internalView().add(frame(i));
         original.prepareMipmaps();
-        final List<int[][]> generated = new ArrayList<>();
+        final List<int[][]> generated = new ObjectArrayList<>();
         for (int i = 0; i < original.size(); i++) generated.add(original.internalView().get(i).clone());
         final OwnedAnimationFrames next = original.mipmaps(generated);
         original.clear();
@@ -264,7 +267,7 @@ class AnimationFrameMemoryTest {
         final OwnedAnimationFrames original = new OwnedAnimationFrames();
         for (int i = 0; i < 5; i++) original.internalView().add(frame(i));
         original.prepareMipmaps();
-        final List<int[][]> generated = new ArrayList<>();
+        final List<int[][]> generated = new ObjectArrayList<>();
         for (int i = 0; i < original.size(); i++) generated.add(original.internalView().get(i).clone());
         final OwnedAnimationFrames next = original.mipmaps(generated);
         original.clear();

@@ -3,26 +3,25 @@ package github.kasuminova.novaeng.common.util;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class FixedSizeDeque<E> implements Iterable<E> {
-    private final Deque<E> deque;
+    private final ObjectArrayList<E> deque;
     private final int maxSize;
 
     public FixedSizeDeque(int maxSize) {
         this.maxSize = maxSize;
-        this.deque = new ArrayDeque<>(maxSize);
+        this.deque = new ObjectArrayList<>(maxSize);
     }
 
     public void addFirst(E element) {
-        deque.addFirst(element);
+        deque.add(0, Objects.requireNonNull(element));
         if (deque.size() > maxSize) {
-            deque.removeLast();
+            deque.remove(deque.size() - 1);
         }
     }
 
@@ -34,25 +33,21 @@ public class FixedSizeDeque<E> implements Iterable<E> {
         if (index < 0 || index >= deque.size()) {
             throw new IndexOutOfBoundsException();
         }
-        int current = 0;
-        for (E element : deque) {
-            if (current++ == index) return element;
-        }
-        return null;
+        return deque.get(index);
     }
 
     public E getFirst() {
         if (deque.isEmpty()) {
             return null;
         }
-        return deque.getFirst();
+        return deque.get(0);
     }
 
     public E getLast() {
         if (deque.isEmpty()) {
             return null;
         }
-        return deque.getLast();
+        return deque.get(deque.size() - 1);
     }
 
     public int size() {

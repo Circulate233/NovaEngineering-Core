@@ -9,10 +9,10 @@ import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.client.gui.widget.container.Row;
 import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.gui.widget.SizedColumn;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public class StartStopPanel extends SizedColumn {
 
@@ -30,7 +30,7 @@ public class StartStopPanel extends SizedColumn {
         this.coreGUI = coreGUI;
         setWidthHeight(WIDTH, HEIGHT);
         addWidgets(
-            new MultiLineLabel(Collections.singletonList("§c状态：§a已启动§6（环数：3）"))
+            new MultiLineLabel(ObjectLists.singleton("§c状态：§a已启动§6（环数：3）"))
                 .setVerticalCentering(true)
                 .setAutoWrap(false)
                 .setAutoRecalculateSize(false)
@@ -43,7 +43,7 @@ public class StartStopPanel extends SizedColumn {
                     .setTexture(1, 0)
                     .setUnavailableTexture(1, 48)
                     .setTextureLocation(BUTTON_TEX_RES)
-                    .setTooltipFunction(button -> Collections.singletonList("§c单击停止工作进程。"))
+                    .setTooltipFunction(button -> ObjectLists.singleton("§c单击停止工作进程。"))
                     .setWidthHeight(31, 15)
                     .setMarginRight(3),
                 new Button4State()
@@ -52,7 +52,7 @@ public class StartStopPanel extends SizedColumn {
                     .setTexture(33, 0)
                     .setUnavailableTexture(33, 48)
                     .setTextureLocation(BUTTON_TEX_RES)
-                    .setTooltipFunction(button -> Collections.singletonList("§a单击开始启动进程。"))
+                    .setTooltipFunction(button -> ObjectLists.singleton("§a单击开始启动进程。"))
                     .setWidthHeight(31, 15)
             ).setMarginLeft(25)
         );

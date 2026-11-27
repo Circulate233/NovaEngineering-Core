@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.performance.string;
 
 import com.sun.management.ThreadMXBean;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -54,7 +54,7 @@ class WeakStringTableTest {
     @Test
     void onlyFixedWeakSlotsSurviveUniqueInputsAndDeadEntriesCanBeReplaced() throws Exception {
         final WeakStringTable table = new WeakStringTable(128, 128);
-        final List<String> live = new ArrayList<>();
+        final List<String> live = new ObjectArrayList<>();
         for (int i = 0; i < 4096; i++) live.add(table.canonicalize("unique-" + i));
         final var field = WeakStringTable.class.getDeclaredField("entries");
         field.setAccessible(true);
@@ -72,7 +72,7 @@ class WeakStringTableTest {
     void concurrentHitsPublishOneLiveValue() throws Exception {
         final WeakStringTable table = new WeakStringTable(128, 128);
         try (final var executor = Executors.newFixedThreadPool(8)) {
-            final var jobs = new ArrayList<Callable<String>>();
+            final var jobs = new ObjectArrayList<Callable<String>>();
             for (int i = 0; i < 128; i++) jobs.add(() -> table.slice("/threaded-value/", 1, 15));
             final var results = executor.invokeAll(jobs);
             final String expected = results.getFirst().get();

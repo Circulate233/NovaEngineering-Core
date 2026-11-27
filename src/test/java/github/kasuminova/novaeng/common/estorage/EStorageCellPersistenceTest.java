@@ -6,6 +6,8 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.me.storage.AbstractCellInventory;
 import github.kasuminova.novaeng.mixin.ae2.AccessorAbstractCellInventory;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.NBTTagCompound;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EStorageCellPersistenceTest {
     @Test
@@ -60,7 +62,7 @@ public class EStorageCellPersistenceTest {
             assertEquals(slotRemovals + metadataRemovals, tag.removed);
             assertEquals(amounts.length, tag.getShort("it"));
             long total = 0;
-            final List<Long> expected = new ObjectArrayList<>(amounts.length);
+            final LongList expected = new LongArrayList(amounts.length);
             for (final long amount : amounts) { total += amount; expected.add(amount); }
             assertEquals(total, tag.getLong("ic"));
             for (int i = 0; i < Math.max(previousCount, amounts.length); i++) {
@@ -122,11 +124,11 @@ public class EStorageCellPersistenceTest {
         }
 
         @SuppressWarnings("unchecked")
-        List<Long> amounts() throws Exception {
+        LongList amounts() throws Exception {
             final var load = EStorageCellInventory.class.getDeclaredMethod("getCellItems");
             load.setAccessible(true);
             final IItemList<IAEItemStack> stacks = (IItemList<IAEItemStack>) load.invoke(target);
-            final List<Long> amounts = new ObjectArrayList<>();
+            final LongList amounts = new LongArrayList();
             for (final IAEItemStack stack : stacks) amounts.add(stack.getStackSize());
             return amounts;
         }

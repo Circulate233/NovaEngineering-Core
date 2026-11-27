@@ -39,6 +39,7 @@ import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorMECh
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
 import github.kasuminova.novaeng.common.util.MediumType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.val;
 import net.minecraft.inventory.InventoryCrafting;
@@ -55,13 +56,11 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import thelm.packagingprovider.util.MixinHooks;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 @Mixin(value = CraftingCPUCluster.class, remap = false, priority = 0)
 public abstract class MixinCraftingCPUClusterTwo {
@@ -77,7 +76,7 @@ public abstract class MixinCraftingCPUClusterTwo {
     private Map<ICraftingPatternDetails, AccessorTaskProgress> tasks;
     @Shadow
     @Final
-    private Map<ICraftingPatternDetails, Queue<ICraftingMedium>> visitedMediums;
+    private Map<ICraftingPatternDetails, ObjectArrayFIFOQueue<ICraftingMedium>> visitedMediums;
     @Shadow
     private boolean somethingChanged;
     @Shadow
@@ -189,19 +188,19 @@ public abstract class MixinCraftingCPUClusterTwo {
                         InventoryCrafting ic = null;
                         didPatternCraft = false;
 
-                        Queue<ICraftingMedium> mediums = this.visitedMediums.get(key);
+                        ObjectArrayFIFOQueue<ICraftingMedium> mediums = this.visitedMediums.get(key);
                         if (mediums == null || mediums.isEmpty()) {
-                            mediums = new ArrayDeque<>();
+                            mediums = new ObjectArrayFIFOQueue<>();
                             for (ICraftingMedium availableMedium : cc.getMediums(key)) {
                                 if (availableMedium != null) {
-                                    mediums.add(availableMedium);
+                                    mediums.enqueue(availableMedium);
                                 }
                             }
                             this.visitedMediums.put(key, mediums);
                         }
 
                         while (!mediums.isEmpty()) {
-                            ICraftingMedium m = mediums.poll();
+                            ICraftingMedium m = mediums.dequeue();
                             if (value.getValue() > 0L && m != null && !m.isBusy()) {
                                 MediumType mediumType = this.r$specialMediumTreatment(m, key);
                                 if (ic == null) {
@@ -366,7 +365,10 @@ public abstract class MixinCraftingCPUClusterTwo {
                                     }
 
                                     if (value.getValue() > 0L && this.remainingOperations == 0) {
-                                        for (IAEItemStack output : voidSet) {
+                                        for (int outputIndex = 0, outputCount = voidSet.size();
+                                             outputIndex < outputCount;
+                                             outputIndex++) {
+                                            final IAEItemStack output = voidSet.get(outputIndex);
                                             this.r$nae2$ghostInject(output);
                                         }
                                         return;
@@ -392,7 +394,10 @@ public abstract class MixinCraftingCPUClusterTwo {
                 }
             }
         }
-        for (IAEItemStack output : voidSet) {
+        for (int outputIndex = 0, outputCount = voidSet.size();
+             outputIndex < outputCount;
+             outputIndex++) {
+            final IAEItemStack output = voidSet.get(outputIndex);
             this.r$nae2$ghostInject(output);
         }
     }

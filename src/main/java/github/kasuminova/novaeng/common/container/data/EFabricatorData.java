@@ -2,10 +2,10 @@ package github.kasuminova.novaeng.common.container.data;
 
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.prop.Levels;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -28,7 +28,7 @@ public record EFabricatorData(int length, boolean overclocked, boolean activeCoo
         int energyStored = buf.readInt();
         long totalCrafted = buf.readLong();
         Levels level = Levels.VALUES[buf.readByte()];
-        List<WorkerStatus> workers = new ArrayList<>(len);
+        List<WorkerStatus> workers = new ObjectArrayList<>(len);
         IntStream.range(0, len)
                  .mapToObj(i -> ByteBufUtils.readItemStack(buf))
                  .forEach(crafting -> workers.add(new WorkerStatus(crafting, buf.readInt())));

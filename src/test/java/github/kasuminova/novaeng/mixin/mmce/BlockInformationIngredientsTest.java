@@ -7,9 +7,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.SimpleRemapper;
 import org.objectweb.asm.tree.ClassNode;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 class BlockInformationIngredientsTest {
     private static Class<?> implementation() throws Exception {
         // Execute the actual mixin methods with conversion hooks, without bootstrapping a client/world.
-        final Map<String, String> names = new HashMap<>();
+        final Map<String, String> names = new Object2ObjectOpenHashMap<>();
         names.put("net/minecraft/item/ItemStack", internal(Stack.class));
         names.put("net/minecraft/block/state/IBlockState", internal(State.class));
         names.put("net/minecraft/util/math/BlockPos", internal(Position.class));
@@ -53,7 +53,7 @@ class BlockInformationIngredientsTest {
         final Object instance = type.getConstructor().newInstance();
         final var samples = type.getDeclaredField("samples");
         samples.setAccessible(true);
-        final List<State> states = new ArrayList<>(List.of(new State("a"), new State("b"), new State("a")));
+        final List<State> states = new ObjectArrayList<>(List.of(new State("a"), new State("b"), new State("a")));
         samples.set(instance, states);
         final var ingredients = type.getMethod("getIngredientList");
         final List<?> first = (List<?>) ingredients.invoke(instance);

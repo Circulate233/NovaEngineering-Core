@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.common.performance;
 
 import com.sun.management.ThreadMXBean;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientRegistry;
 import mezz.jei.api.recipe.IIngredientType;
@@ -18,10 +20,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,19 +34,20 @@ public class HeiGenericInsertionTest {
     private static volatile Object escaped;
 
     public static void main(String[] args) throws Exception {
-        List<List<String>> cases = new ArrayList<>(List.of(
+        List<List<String>> cases = new ObjectArrayList<>(List.of(
             List.of(), List.of("a"), Collections.singletonList(null),
             Arrays.asList(null, "a", "a", null), List.of("a", "b", "a", "c", "b"),
             List.of("Aa", "BB", "Aa", "AaAa", "BBBB"), List.of("null-id", "a", "null-id")));
         Random random = new Random(1896);
         for (int i = 0; i < 1000; i++) {
-            List<String> values = new ArrayList<>();
+            List<String> values = new ObjectArrayList<>();
             for (int n = random.nextInt(40); n > 0; n--) {
                 values.add(random.nextInt(5) == 0 ? null : "id" + random.nextInt(9));
             }
             cases.add(values);
         }
-        for (List<String> expanded : cases) {
+        for (int caseIndex = 0; caseIndex < cases.size(); caseIndex++) {
+            final List<String> expanded = cases.get(caseIndex);
             for (boolean stateful : new boolean[]{false, true}) {
                 Fixture baseline = new Fixture(expanded, stateful);
                 Fixture optimized = new Fixture(expanded, stateful);
@@ -61,7 +62,9 @@ public class HeiGenericInsertionTest {
             }
         }
         // Callback exceptions must leave the same partial wrapper/category state.
-        for (String failAt : List.of("expand", "uid:a", "category", "categoryUid")) {
+        final List<String> failurePoints = List.of("expand", "uid:a", "category", "categoryUid");
+        for (int index = 0; index < failurePoints.size(); index++) {
+            final String failAt = failurePoints.get(index);
             Fixture baseline = new Fixture(List.of("a", "b"), false);
             Fixture optimized = new Fixture(List.of("a", "b"), false);
             baseline.failAt = optimized.failAt = failAt;
@@ -106,12 +109,13 @@ public class HeiGenericInsertionTest {
             }
             Map<Object, List<String>> baseline = new Reference2ObjectOpenHashMap<>();
             for (var entry : groups.entrySet()) {
-                List<String> values = new ArrayList<>();
-                for (List<String> group : entry.getValue()) values.addAll(group);
+                List<String> values = new ObjectArrayList<>();
+                final List<List<String>> alternatives = entry.getValue();
+                for (int index = 0; index < alternatives.size(); index++) values.addAll(alternatives.get(index));
                 baseline.put(entry.getKey(), values);
             }
             Map<Object, List<String>> candidate = (Map<Object, List<String>>) flatten.invoke(null, groups);
-            equal(new ArrayList<>(baseline.keySet()), new ArrayList<>(candidate.keySet()));
+            equal(new ObjectArrayList<>(baseline.keySet()), new ObjectArrayList<>(candidate.keySet()));
             equal(size, candidate.size());
             for (Object key : baseline.keySet()) {
                 equal(baseline.get(key), candidate.get(key));
@@ -121,12 +125,12 @@ public class HeiGenericInsertionTest {
             }
             // Empty and singleton maps remain writable identity maps, including null keys.
             Object newKey = new Object();
-            candidate.put(newKey, new ArrayList<>());
-            candidate.put(null, new ArrayList<>());
+            candidate.put(newKey, new ObjectArrayList<>());
+            candidate.put(null, new ObjectArrayList<>());
             equal(true, candidate.containsKey(newKey));
             equal(true, candidate.containsKey(null));
         }
-        List<String> original = new ArrayList<>(List.of("a"));
+        List<String> original = List.of("a");
         List<String> copy = IngredientGroups.flatten(List.of(original));
         copy.clear();
         copy.add("b");
@@ -164,7 +168,7 @@ public class HeiGenericInsertionTest {
     }
 
     private static final class Fixture extends RecipeMap {
-        final List<String> events = new ArrayList<>();
+        final List<String> events = new ObjectArrayList<>();
         final List<String> expanded;
         final boolean stateful;
         final IIngredientHelper<String> helper;
@@ -249,7 +253,7 @@ public class HeiGenericInsertionTest {
 
         Map<String, Integer> rows() throws Exception {
             var table = (Table<IRecipeCategory, String, List<IRecipeWrapper>>) field("recipeWrapperTable");
-            Map<String, Integer> result = new LinkedHashMap<>();
+            Map<String, Integer> result = new Object2ObjectOpenHashMap<>();
             table.getRow(category).forEach((id, wrappers) -> result.put(id, wrappers.size()));
             return result;
         }
@@ -262,7 +266,7 @@ public class HeiGenericInsertionTest {
                 for (Field field : clazz.getDeclaredFields()) {
                     if (Map.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
-                        return new LinkedHashMap<>((Map<String, List<String>>) field.get(multi));
+                        return (Map<String, List<String>>) field.get(multi);
                     }
                 }
                 clazz = clazz.getSuperclass();

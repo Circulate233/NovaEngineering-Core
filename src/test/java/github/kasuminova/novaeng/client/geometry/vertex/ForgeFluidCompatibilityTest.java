@@ -3,6 +3,8 @@ package github.kasuminova.novaeng.client.geometry.vertex;
 import com.google.common.collect.ImmutableMap;
 import github.kasuminova.novaeng.client.geometry.CompactModel;
 import github.kasuminova.novaeng.client.geometry.TrustedGeometryList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -25,8 +27,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +64,7 @@ class ForgeFluidCompatibilityTest {
 
     private static ClassLoader transformedFluid() throws Exception {
         final Class<?> builder = ForgeBuilderCompatibilityTest.transformedBuilder();
-        final Map<String, String> names = new HashMap<>();
+        final Map<String, String> names = new Object2ObjectOpenHashMap<>();
         names.put(BASE, PREFIX + "FluidBaseProbe");
         names.put(CACHE, PREFIX + "FluidCacheProbe");
         names.put(CACHE + "$1", PREFIX + "FluidCacheLoaderProbe");
@@ -116,7 +117,7 @@ class ForgeFluidCompatibilityTest {
         final ClassNode cached = read(CACHE, names);
         final ClassNode cachedMixin = read(MIXIN + "MixinCachingBakedFluidRead", names);
         cachedMixin.methods.stream().filter(method -> method.name.equals("novaeng$readQuads")).forEach(cached.methods::add);
-        final Map<String, byte[]> classes = new HashMap<>();
+        final Map<String, byte[]> classes = new Object2ObjectOpenHashMap<>();
         for (final ClassNode node : List.of(base, cached, read(CACHE + "$1", names),
             read(BASE + "$VertexParameter", names), read("net/minecraftforge/client/model/ModelFluid$1", names))) {
             final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS) {
@@ -176,8 +177,8 @@ class ForgeFluidCompatibilityTest {
             assertEquals(left.getTintIndex(), right.getTintIndex());
             assertEquals(left.shouldApplyDiffuseLighting(), right.shouldApplyDiffuseLighting());
             final VertexFormat format = left.getFormat();
-            final List<float[]> a = new ArrayList<>();
-            final List<float[]> b = new ArrayList<>();
+            final List<float[]> a = new ObjectArrayList<>();
+            final List<float[]> b = new ObjectArrayList<>();
             left.pipe(LosslessFloatRecordTest.consumer(format, a));
             right.pipe(LosslessFloatRecordTest.consumer(format, b));
             assertEquals(a.size(), b.size());
@@ -230,7 +231,7 @@ class ForgeFluidCompatibilityTest {
         // getQuads is Forge's unchanged public cache selection body; novaeng$readQuads is the mixin.
         final IBakedModel original = caching(cacheType, sprite);
         final IBakedModel optimized = caching(cacheType, sprite);
-        final List<String> calls = new ArrayList<>();
+        final List<String> calls = new ObjectArrayList<>();
         final IExtendedBlockState state = (IExtendedBlockState) Proxy.newProxyInstance(getClass().getClassLoader(),
             new Class<?>[]{IExtendedBlockState.class}, (proxy, method, arguments) -> {
                 if (!method.getName().equals("getValue")) throw new AssertionError(method);
@@ -254,7 +255,7 @@ class ForgeFluidCompatibilityTest {
         for (final EnumFacing side : EnumFacing.values()) {
             calls.clear();
             final List<BakedQuad> expected = original.getQuads(state, side, 77);
-            final List<String> expectedCalls = List.copyOf(calls);
+            final List<String> expectedCalls = Collections.unmodifiableList(new ObjectArrayList<>(calls));
             calls.clear();
             final List<BakedQuad> actual = ((CompactModel) optimized).novaeng$readQuads(state, side, 77);
             assertEquals(expectedCalls, calls);

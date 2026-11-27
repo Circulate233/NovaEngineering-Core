@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.common.performance;
 
 import crazypants.enderio.base.config.recipes.IRecipeConfigElement;
 import crazypants.enderio.base.config.recipes.StaxFactory;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -14,13 +16,11 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -73,17 +73,19 @@ class StartupOptimizationTest {
 
     @Test
     void xmlCallbacksAndFailuresMatchOriginalReader() throws Exception {
-        for (final String xml : List.of(
+        final List<String> xmlCases = List.of(
             "<recipe a='1' b='2'> <!-- comment --> <child a='3'/><child/></recipe>",
             "<recipe bad='1'/>", "<recipe>text</recipe>", "<recipe><bad/></recipe>",
             "<recipe><?instruction data?></recipe>", "<recipe a='&amp;&lt;'><child>text</child></recipe>",
-            "<recipe><child/>", "<recipe/>")) {
+            "<recipe><child/>", "<recipe/>");
+        for (int index = 0; index < xmlCases.size(); index++) {
+            final String xml = xmlCases.get(index);
             assertEquals(readXml(xml, false), readXml(xml, true), xml);
         }
     }
 
     private static List<String> readXml(final String xml, final boolean optimized) throws Exception {
-        final List<String> events = new ArrayList<>();
+        final List<String> events = new ObjectArrayList<>();
         final XMLEventReader reader = XMLInputFactory.newFactory().createXMLEventReader(new StringReader(xml));
         final StaxFactory factory = new StaxFactory(reader, null);
         try {
@@ -152,7 +154,7 @@ class StartupOptimizationTest {
         final var b = root.resolve("README.txt");
         Files.writeString(a, "{}");
         Files.writeString(b, "readme");
-        final Set<String> paths = new HashSet<>();
+        final Set<String> paths = new ObjectOpenHashSet<>();
         DirectoryTreeScan.scan(root.toFile(), () -> true, paths::add);
         assertEquals(Set.of(root.relativize(a).toString(), root.relativize(b).toString()), paths);
         final AtomicBoolean current = new AtomicBoolean(true);

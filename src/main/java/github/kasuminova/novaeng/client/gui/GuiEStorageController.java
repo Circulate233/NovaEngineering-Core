@@ -14,6 +14,7 @@ import github.kasuminova.novaeng.common.container.data.EStorageCellData;
 import github.kasuminova.novaeng.common.container.data.EStorageEnergyData;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.Gui;
@@ -21,7 +22,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -30,7 +30,7 @@ public class GuiEStorageController extends GuiContainerDynamic<ContainerEStorage
     public static final ResourceLocation TEXTURES_BACKGROUND = new ResourceLocation(
         Tags.MOD_ID, "textures/gui/estorage_controller.png");
 
-    protected List<EStorageCellData> cellDataList = new ArrayList<>();
+    protected List<EStorageCellData> cellDataList = new ObjectArrayList<>();
     protected EStorageEnergyData energyData = null;
 
     public GuiEStorageController(final EStorageController controller, final EntityPlayer opening) {

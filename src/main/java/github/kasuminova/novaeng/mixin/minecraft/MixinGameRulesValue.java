@@ -22,8 +22,8 @@ public class MixinGameRulesValue {
 
     @Inject(method = "setValue", at = @At("HEAD"), cancellable = true)
     private void nova$setBooleanWithoutParsing(final String value, final CallbackInfo ci) {
-        final GameRuleBooleanFastPath.Result result = GameRuleBooleanFastPathImpl.instance()
-            .match(value).orElse(null);
+        final GameRuleBooleanFastPath.Result result =
+            GameRuleBooleanFastPathImpl.instance().match(value);
         if (result == null) {
             return;
         }

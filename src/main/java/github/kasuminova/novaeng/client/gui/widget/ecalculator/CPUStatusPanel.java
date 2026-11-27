@@ -71,7 +71,8 @@ public class CPUStatusPanel extends SizedColumn {
             final int maxElementPreRow = 6;
             int element = 0;
             Row row = new Row();
-            for (final ECalculatorData.ThreadCoreData core : threadCores) {
+            for (int index = 0; index < threadCores.size(); index++) {
+                final ECalculatorData.ThreadCoreData core = threadCores.get(index);
                 CPUStatus status = new CPUStatus(core);
                 row.addWidget(status.setMargin(1, 0, 1, 0));
                 element++;

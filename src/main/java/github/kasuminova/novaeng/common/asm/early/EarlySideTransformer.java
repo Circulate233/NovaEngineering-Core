@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.asm.early;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -18,7 +19,6 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import top.outlands.foundation.IExplicitTransformer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +30,7 @@ public final class EarlySideTransformer implements IExplicitTransformer {
     private static final String HELPER = "github/kasuminova/novaeng/common/asm/early/SideOnlyByteScan";
 
     private static boolean replacePredicate(final MethodNode method) {
-        final List<AbstractInsnNode> code = new ArrayList<>();
+        final List<AbstractInsnNode> code = new ObjectArrayList<>();
         for (final var instruction : method.instructions) if (instruction.getOpcode() >= 0) code.add(instruction);
         if (code.size() < 14
             || !aload3(code.get(0))

@@ -1,12 +1,12 @@
 package github.kasuminova.novaeng.client.font;
 
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +17,7 @@ class TooltipBindingsTest {
     void stringOnlySnapshotSeesReplacementNullsBlanksAndInPlaceChanges() {
         final TooltipBindings cache = new TooltipBindings();
         final List<String> defaults = List.of("default");
-        final ArrayList<String> values = new ArrayList<>(Arrays.asList(null, " ", " x=1 ", "\t", "y=2"));
+        final ObjectArrayList<String> values = new ObjectArrayList<>(Arrays.asList(null, " ", " x=1 ", "\t", "y=2"));
         final List<String> first = cache.resolve(values, defaults);
         assertEquals(List.of(" x=1 ", "y=2"), first);
         assertSame(first, cache.resolve(values, defaults));
@@ -37,14 +37,14 @@ class TooltipBindingsTest {
     @Test
     void arbitraryObjectsKeepBothToStringCallsAndOversizedInputsAreNotRetained() {
         final TooltipBindings cache = new TooltipBindings();
-        final ArrayList<Object> objects = new ArrayList<>();
+        final ObjectArrayList<Object> objects = new ObjectArrayList<>();
         objects.add(new Object() {
             int calls;
             @Override public String toString() { return "call-" + ++calls; }
         });
         assertEquals(List.of("call-2"), cache.resolve(objects, List.of()));
         assertEquals(List.of("call-4"), cache.resolve(objects, List.of()));
-        final ArrayList<String> values = new ArrayList<>(List.of("x".repeat(32769)));
+        final ObjectArrayList<String> values = new ObjectArrayList<>(List.of("x".repeat(32769)));
         assertNotSame(cache.resolve(values, List.of()), cache.resolve(values, List.of()));
         values.clear();
         for (int i = 0; i < 257; i++) values.add("x");

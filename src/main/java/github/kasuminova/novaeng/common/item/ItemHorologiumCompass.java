@@ -11,7 +11,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.Random;
 
 public class ItemHorologiumCompass extends ItemBasic {
@@ -49,9 +48,9 @@ public class ItemHorologiumCompass extends ItemBasic {
     public ActionResult<ItemStack> onItemRightClick(@NotNull World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
         if (!world.isRemote) return super.onItemRightClick(world, player, hand);
 
-        Optional<Long> testSeed = ConstellationSkyHandler.getInstance().getSeedIfPresent(world);
-        if (testSeed.isPresent()) {
-            int actualDay = getActualDay(world, testSeed.get());
+        final Long testSeed = ConstellationSkyHandler.getInstance().getSeedIfPresent(world).orElse(null);
+        if (testSeed != null) {
+            int actualDay = getActualDay(world, testSeed);
             player.sendMessage(new TextComponentTranslation("tile.horologium_compass.success", actualDay));
             player.getCooldownTracker().setCooldown(player.getHeldItem(hand).getItem(), 1200);
         }

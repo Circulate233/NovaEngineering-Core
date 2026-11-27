@@ -10,6 +10,7 @@ import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import nc.recipe.BasicRecipe;
 import nc.recipe.NCRecipes;
 import nc.recipe.ingredient.ChanceItemIngredient;
@@ -21,8 +22,6 @@ import nc.recipe.ingredient.OreIngredient;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,7 +42,7 @@ public class NCOBasicRecipeConverter {
 
         if (ingredient instanceof final ItemArrayIngredient arrayIngredient) {
             List<IItemIngredient> ingredientList = arrayIngredient.ingredientList;
-            List<ChancedIngredientStack> ingredientStackList = new ArrayList<>(ingredientList.size());
+            List<ChancedIngredientStack> ingredientStackList = new ObjectArrayList<>(ingredientList.size());
             for (IItemIngredient itemIngredient : ingredientList) {
                 if (itemIngredient instanceof final OreIngredient oreIngredient) {
                     int subInAmount = Math.round(RecipeModifier.applyModifiers(modifiers, RequirementTypesMM.REQUIREMENT_ITEM, ioType, oreIngredient.stackSize, false));
@@ -86,10 +85,10 @@ public class NCOBasicRecipeConverter {
 
     public static List<MachineRecipe> convert(final Function<ItemStack, MachineRecipe> recipeSupplier, final Predicate<List<ItemStack>> inputFilter, final List<RecipeModifier> modifiers, final int baseEnergyUsage) {
         List<BasicRecipe> recipeList = NCRecipes.manufactory.getRecipeList();
-        List<MachineRecipe> machineRecipes = new LinkedList<>();
+        List<MachineRecipe> machineRecipes = new ObjectArrayList<>();
 
         for (BasicRecipe basicRecipe : recipeList) {
-            LinkedList<ItemStack> inputList = new LinkedList<>();
+            List<ItemStack> inputList = new ObjectArrayList<>();
             for (IItemIngredient ingredient : basicRecipe.getItemIngredients()) {
                 inputList.addAll(ingredient.getInputStackHashingList());
             }

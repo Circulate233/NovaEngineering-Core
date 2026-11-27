@@ -7,10 +7,10 @@ import github.kasuminova.mmce.client.gui.widget.container.Row;
 import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.client.gui.GuiEFabricatorController;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
-import java.util.Collections;
 
 public class TitleButtonLine extends Row {
 
@@ -20,7 +20,7 @@ public class TitleButtonLine extends Row {
                 .setTexture(TextureProperties.of(151, 97))
                 .setHoveredTexture(TextureProperties.of(151, 97))
                 .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
-                .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.default")))
+                .setTooltipFunction(button -> ObjectLists.singleton(I18n.format("gui.efabricator.switch.default")))
                 .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
                 .setWidthHeight(14, 9)
             );
@@ -29,7 +29,7 @@ public class TitleButtonLine extends Row {
                 .setTexture(TextureProperties.of(151, 87))
                 .setHoveredTexture(TextureProperties.of(151, 87))
                 .setTextureLocation(GuiEFabricatorController.TEXTURES_ELEMENTS)
-                .setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.efabricator.switch.pattern_search")))
+                .setTooltipFunction(button -> ObjectLists.singleton(I18n.format("gui.efabricator.switch.pattern_search")))
                 .setOnClickedListener(button -> NovaEngineeringCore.NET_CHANNEL.sendToServer(new PktEFabricatorGUIAction(PktEFabricatorGUIAction.Action.SWITCH_GUI)))
                 .setWidthHeight(14, 9)
             );

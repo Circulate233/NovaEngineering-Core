@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.font;
 
 import github.kasuminova.novaeng.mixin.neofontrender.AccessorTooltipNbtCompound;
 import github.kasuminova.novaeng.mixin.neofontrender.AccessorTooltipNbtList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -9,7 +10,6 @@ import net.minecraft.nbt.NBTTagString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,20 +43,18 @@ public final class TooltipNbtText {
             }
             final Map<String, NBTBase> backing = accessor.nova$tooltipTagMap();
             Collection<String> keys = backing.keySet();
+            List<String> sortedKeys = null;
             if (COMPOUND_LOGGER.isDebugEnabled()) {
-                final ArrayList<String> sorted = new ArrayList<>(keys);
-                Collections.sort(sorted);
-                keys = sorted;
+                sortedKeys = new ObjectArrayList<>(keys);
+                Collections.sort(sortedKeys);
             }
             output.append('{');
             boolean first = true;
-            for (final String key : keys) {
-                if (!first) output.append(',');
-                first = false;
-                if (simpleKey(key)) output.append(key);
-                else quoted(output, key);
-                output.append(':');
-                appendValue(output, backing.get(key));
+            if (sortedKeys == null) {
+                for (final String key : keys) first = appendCompoundEntry(output, backing, key, first);
+            } else {
+                for (int index = 0; index < sortedKeys.size(); index++)
+                    first = appendCompoundEntry(output, backing, sortedKeys.get(index), first);
             }
             output.append('}');
         } else if (value != null && value.getClass() == NBTTagList.class) {
@@ -78,6 +76,16 @@ public final class TooltipNbtText {
             // Retain custom subclasses' toString implementations, including custom NBT types.
             output.append(value);
         }
+    }
+
+    private static boolean appendCompoundEntry(final StringBuilder output, final Map<String, NBTBase> backing,
+                                               final String key, final boolean first) {
+        if (!first) output.append(',');
+        if (simpleKey(key)) output.append(key);
+        else quoted(output, key);
+        output.append(':');
+        appendValue(output, backing.get(key));
+        return false;
     }
 
     private static boolean simpleKey(final String value) {

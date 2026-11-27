@@ -10,11 +10,11 @@ import github.kasuminova.novaeng.common.hypernet.old.NetNodeCache;
 import github.kasuminova.novaeng.common.hypernet.old.NetNodeImpl;
 import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DrillMonitor extends SizedColumn {
@@ -46,11 +46,11 @@ public class DrillMonitor extends SizedColumn {
         GlStateManager.translate(rx, ry, 0);
         GlStateManager.scale(FONT_SCALE, FONT_SCALE, 1F);
 
-        List<List<String>> contents = new ArrayList<>();
+        List<List<String>> contents = new ObjectArrayList<>();
         String status = I18n.format("gui.controller.status") + I18n.format(controller.getControllerStatus().getUnlocMessage());
         contents.add(fr.listFormattedStringToWidth(status, TEXT_WIDTH));
 
-        List<String> subContents = new ArrayList<>();
+        List<String> subContents = new ObjectArrayList<>();
         String depth = I18n.format("gui.geocentric_drill.monitor.depth",
             NovaEngUtils.formatFloat(controller.getDepth(), 1),
             NovaEngUtils.formatDecimal(controller.getTargetDepth())
@@ -62,7 +62,7 @@ public class DrillMonitor extends SizedColumn {
         subContents.addAll(fr.listFormattedStringToWidth(outputMultiplier, TEXT_WIDTH));
         contents.add(subContents);
 
-        subContents = new ArrayList<>();
+        subContents = new ObjectArrayList<>();
         NetNodeImpl node = NetNodeCache.getCache(controller, NetNodeImpl.class);
         if (node != null && node.isConnected()) {
             String connected = I18n.format("gui.hypernet.controller.connected");
@@ -76,7 +76,8 @@ public class DrillMonitor extends SizedColumn {
         contents.add(subContents);
 
         ry = 0;
-        for (final List<String> content : contents) {
+        for (int index = 0; index < contents.size(); index++) {
+            final List<String> content = contents.get(index);
             for (final String line : content) {
                 fr.drawString(line, 0, ry, 0xFFFFFF);
                 ry += FONT_HEIGHT;

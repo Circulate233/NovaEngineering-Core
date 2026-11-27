@@ -4,6 +4,7 @@ import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
 import github.kasuminova.novaeng.mixin.neofontrender.AccessorTooltipNbtCompound;
 import github.kasuminova.novaeng.mixin.neofontrender.AccessorTooltipNbtList;
 import net.minecraft.nbt.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -15,7 +16,6 @@ import org.objectweb.asm.tree.InsnNode;
 
 import java.util.List;
 import java.util.Random;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,7 +125,7 @@ class TooltipNbtTextTest {
         final byte[][] transformed = IsolatedMixinTransformer.transformInPackage(
             "github.kasuminova.novaeng.mixin.neofontrender", new String[]{compoundName, listName},
             "AccessorTooltipNbtCompound", "AccessorTooltipNbtList");
-        final Map<String, byte[]> definitions = new HashMap<>();
+        final Map<String, byte[]> definitions = new Object2ObjectOpenHashMap<>();
         for (int i = 0; i < transformed.length; i++) {
             final ClassNode node = new ClassNode();
             new ClassReader(transformed[i]).accept(node, 0);

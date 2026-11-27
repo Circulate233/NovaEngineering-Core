@@ -1,6 +1,8 @@
 package github.kasuminova.novaeng.common.profiler;
 
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -9,8 +11,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,18 +38,19 @@ public class TEUpdatePacketProfiler {
 
     public static List<String> getProfilerMessages(final int limit) {
         if (limit <= 0) {
-            return Collections.emptyList();
+            return ObjectLists.emptyList();
         }
 
-        List<String> messages = new LinkedList<>();
+        List<String> messages = new ObjectArrayList<>();
 
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted =
-            new LinkedList<>(TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
+            new ObjectArrayList<>(TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
         teSorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
         if (teSorted.size() > limit) teSorted.subList(limit, teSorted.size()).clear();
 
         messages.add("SPacketUpdateTileEntity stat:");
-        for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : teSorted) {
+        for (int index = 0; index < teSorted.size(); index++) {
+            final Map.Entry<Class<?>, Tuple<Long, Long>> entry = teSorted.get(index);
             Class<?> tClass = entry.getKey();
             long packetTotalAmount = entry.getValue().getFirst();
             long packetTotalSize = entry.getValue().getSecond();

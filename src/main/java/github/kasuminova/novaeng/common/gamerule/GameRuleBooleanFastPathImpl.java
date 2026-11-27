@@ -1,12 +1,10 @@
 package github.kasuminova.novaeng.common.gamerule;
 
-import java.util.Optional;
-
 /** Allocation-free cached-result implementation of {@link GameRuleBooleanFastPath}. */
 public final class GameRuleBooleanFastPathImpl implements GameRuleBooleanFastPath {
 
-    private static final Optional<Result> TRUE = Optional.of(new Result(true, 1));
-    private static final Optional<Result> FALSE = Optional.of(new Result(false, 0));
+    private static final Result TRUE = new Result(true, 1);
+    private static final Result FALSE = new Result(false, 0);
     private static final GameRuleBooleanFastPath INSTANCE = new GameRuleBooleanFastPathImpl();
 
     private GameRuleBooleanFastPathImpl() {
@@ -18,13 +16,13 @@ public final class GameRuleBooleanFastPathImpl implements GameRuleBooleanFastPat
     }
 
     @Override
-    public Optional<Result> match(final String value) {
+    public Result match(final String value) {
         if ("true".equalsIgnoreCase(value)) {
             return TRUE;
         }
         if ("false".equalsIgnoreCase(value)) {
             return FALSE;
         }
-        return Optional.empty();
+        return null;
     }
 }

@@ -10,8 +10,6 @@ import github.kasuminova.novaeng.client.gui.GuiEStorageController;
 import github.kasuminova.novaeng.client.gui.widget.estorage.event.ESGUIDataUpdateEvent;
 import github.kasuminova.novaeng.common.container.data.EStorageCellData;
 
-import java.util.Iterator;
-
 public class CellInfoColumn extends ScrollingColumn {
 
     protected final GuiEStorageController controllerGUI;
@@ -36,10 +34,11 @@ public class CellInfoColumn extends ScrollingColumn {
     public boolean onGuiEvent(final GuiEvent event) {
         if (event instanceof ESGUIDataUpdateEvent) {
             getWidgets().clear();
-            for (Iterator<EStorageCellData> it = controllerGUI.getCellDataList().iterator(); it.hasNext(); ) {
-                final EStorageCellData data = it.next();
+            final var cellDataList = controllerGUI.getCellDataList();
+            for (int index = 0; index < cellDataList.size(); index++) {
+                final EStorageCellData data = cellDataList.get(index);
                 EStorageCellInfo info = new EStorageCellInfo(data);
-                if (!it.hasNext()) {
+                if (index + 1 == cellDataList.size()) {
                     info.setMarginDown(0);
                 }
                 addWidget(info);

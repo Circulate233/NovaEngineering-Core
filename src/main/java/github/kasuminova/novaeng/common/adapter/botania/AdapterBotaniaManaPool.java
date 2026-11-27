@@ -18,6 +18,7 @@ import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -25,7 +26,6 @@ import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.recipe.RecipeManaInfusion;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +65,7 @@ public class AdapterBotaniaManaPool extends RecipeAdapter {
                                                       final List<ComponentRequirement<?, ?>> additionalRequirements,
                                                       final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers,
                                                       final List<String> recipeTooltips) {
-        List<MachineRecipe> recipes = new ArrayList<>();
+        List<MachineRecipe> recipes = new ObjectArrayList<>();
         for (final RecipeManaInfusion infusionRecipe : BotaniaAPI.manaInfusionRecipes) {
             MachineRecipe recipe = createRecipeShell(
                 new ResourceLocation("botania", "mana_infusion_" + incId),

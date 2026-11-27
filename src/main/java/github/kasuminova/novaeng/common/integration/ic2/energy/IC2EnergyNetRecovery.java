@@ -10,6 +10,7 @@ import ic2.api.energy.tile.IMetaDelegate;
 import ic2.core.block.comp.Energy;
 import ic2.core.energy.grid.EnergyNetLocal;
 import ic2.core.energy.grid.Tile;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -18,7 +19,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -51,7 +51,7 @@ public final class IC2EnergyNetRecovery {
 
         Map<BlockPos, Tile> registered = access.nova$getRegisteredTiles();
         Set<Tile> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        List<StaleNode> stale = new ArrayList<>();
+        List<StaleNode> stale = new ObjectArrayList<>();
         for (IEnergyTile subTile : subTiles) {
             BlockPos subPos = EnergyNet.instance.getPos(subTile);
             Tile previous = registered.get(subPos);

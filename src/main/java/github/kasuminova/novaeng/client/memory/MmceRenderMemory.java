@@ -170,7 +170,7 @@ public final class MmceRenderMemory {
         ((Set<TileMultiblockMachineController>) ALIVE.get(manager)).removeIf(controller -> controller.getWorld() == world);
         removeDrawBuffers(obsolete);
         UPLOAD_BUFFER.set((ReusableVBOUploader) UPLOADER.get(), null);
-        for (final GeoModelRenderTask task : removed) retire(task);
+        for (int index = 0; index < removed.size(); index++) retire(removed.get(index));
         clearIdlePool();
         if (RETIRED.isEmpty()) UNLOADED.clear();
     }

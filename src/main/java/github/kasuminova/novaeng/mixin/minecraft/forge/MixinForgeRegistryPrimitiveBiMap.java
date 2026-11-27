@@ -181,7 +181,7 @@ public abstract class MixinForgeRegistryPrimitiveBiMap<V extends IForgeRegistryE
             opcode = Opcodes.PUTFIELD),
         require = 1)
     private void nova$primitiveIds(final ForgeRegistry<V> owner, final BiMap<Integer, V> original) {
-        ids = Int2ObjectHashBiMap.copyOf(original);
+        ids = new Int2ObjectHashBiMap<>();
     }
 
     /**

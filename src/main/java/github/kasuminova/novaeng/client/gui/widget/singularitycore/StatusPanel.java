@@ -9,10 +9,10 @@ import github.kasuminova.novaeng.client.gui.GuiSingularityCore;
 import github.kasuminova.novaeng.client.gui.widget.ProgressBar;
 import github.kasuminova.novaeng.client.gui.widget.SizedRow;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public class StatusPanel extends SizedRow {
 
@@ -45,7 +45,7 @@ public class StatusPanel extends SizedRow {
                 .addForegroundTexture(new TextureProperties(BAR_TEX_RES, LEFT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
                 .setProgress(0.75f) // For testing
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c内部能源存储：%s%%",
+                    ObjectLists.singleton(String.format("§c内部能源存储：%s%%",
                         NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
                     )
                 )
@@ -57,7 +57,7 @@ public class StatusPanel extends SizedRow {
                 .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
                 .setProgress(0.4f) // For testing
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c奇点质量：%s%%",
+                    ObjectLists.singleton(String.format("§c奇点质量：%s%%",
                         NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
                     )
                 )
@@ -69,7 +69,7 @@ public class StatusPanel extends SizedRow {
                 .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
                 .setProgress(0.35f) // For testing
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c奇点引力场强度：%s%%",
+                    ObjectLists.singleton(String.format("§c奇点引力场强度：%s%%",
                         NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
                     )
                 )
@@ -81,7 +81,7 @@ public class StatusPanel extends SizedRow {
                 .addForegroundTexture(new TextureProperties(BAR_TEX_RES, MID_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
                 .setProgress(0.35f) // For testing
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c控制力场强度：%s%%",
+                    ObjectLists.singleton(String.format("§c控制力场强度：%s%%",
                         NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
                     )
                 )
@@ -93,7 +93,7 @@ public class StatusPanel extends SizedRow {
                 .addForegroundTexture(new TextureProperties(BAR_TEX_RES, RIGHT_BAR_TEX_X, BAR_TEX_Y, BAR_WIDTH, BAR_HEIGHT))
                 .setProgress(0.46f) // For testing
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c核心负载：%s%%",
+                    ObjectLists.singleton(String.format("§c核心负载：%s%%",
                         NovaEngUtils.formatDouble(progressBar.getProgressPercent() * 100, 2))
                     )
                 )

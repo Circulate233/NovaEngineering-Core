@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.util.LowerStringMap;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -35,15 +35,15 @@ class SharedAttributeNameMapTest {
         extra.put("GENERIC.MAXHEALTH", 30);
         extra.put("Follow.Range", 16);
         map.putAll(extra);
-        assertEquals(List.of(30, 16), new ArrayList<>(values));
+        assertEquals(List.of(30, 16), new ObjectArrayList<>(values));
         // Vanilla's containsValue delegates containsKey; retain that existing
         // behavior instead of silently fixing an unrelated public API here.
         assertTrue(map.containsValue("generic.maxhealth"));
         assertFalse(map.containsValue(30));
         assertEquals(30, map.remove(new StringBuilder("GENERIC.MAXHEALTH")));
-        assertEquals(List.of(16), new ArrayList<>(values));
+        assertEquals(List.of(16), new ObjectArrayList<>(values));
         map.put("GENERIC.MAXHEALTH", 40);
-        assertEquals(List.of("follow.range", "generic.maxhealth"), new ArrayList<>(map.keySet()));
+        assertEquals(List.of("follow.range", "generic.maxhealth"), new ObjectArrayList<>(map.keySet()));
         map.entrySet().iterator().next().setValue(24);
         assertEquals(24, map.get("FOLLOW.RANGE"));
         final var iterator = values.iterator();
@@ -69,7 +69,7 @@ class SharedAttributeNameMapTest {
         assertSame(layout.get(first), layout.get(second));
         assertEquals(20, first.get("shared.name.20"));
         assertEquals(-20, second.get("shared.name.20"));
-        assertEquals(48, new ArrayList<>(first.values()).size());
+        assertEquals(48, new ObjectArrayList<>(first.values()).size());
         final var expanded = SharedAttributeNameMap.class.getDeclaredField("expanded");
         expanded.setAccessible(true);
         assertNull(expanded.get(first), "Ordinary getAllAttributes iteration must not create entry nodes");
@@ -95,12 +95,12 @@ class SharedAttributeNameMapTest {
         assertEquals(22, compact.next(), "Entry exposure and replacement do not structurally modify the map");
         compact.remove();
         assertEquals(3, compact.next());
-        assertEquals(List.of(11, 3), new ArrayList<>(values));
+        assertEquals(List.of(11, 3), new ObjectArrayList<>(values));
         actual.remove("a");
         first.setValue(99);
         assertFalse(actual.containsKey("a"), "A detached entry must not reinsert its key");
         actual.put("a", 4);
-        assertEquals(List.of("c", "a"), new ArrayList<>(actual.keySet()));
+        assertEquals(List.of("c", "a"), new ObjectArrayList<>(actual.keySet()));
         final Iterator<Integer> invalidated = values.iterator();
         actual.put("d", 5);
         assertThrows(ConcurrentModificationException.class, invalidated::next);
@@ -119,12 +119,12 @@ class SharedAttributeNameMapTest {
         actual.put(null, null);
         expected.put(null, null);
         assertEquals(expected, actual);
-        assertEquals(new ArrayList<>(expected.values()), new ArrayList<>(actual.values()));
+        assertEquals(new ObjectArrayList<>(expected.values()), new ObjectArrayList<>(actual.values()));
         actual.remove("large.0");
         expected.remove("large.0");
         actual.put("large.0", -1);
         expected.put("large.0", -1);
-        assertEquals(new ArrayList<>(expected.keySet()), new ArrayList<>(actual.keySet()));
+        assertEquals(new ObjectArrayList<>(expected.keySet()), new ObjectArrayList<>(actual.keySet()));
     }
 
     @Test
@@ -152,7 +152,7 @@ class SharedAttributeNameMapTest {
                     default -> throw new AssertionError();
                 }
                 assertEquals(expected.size(), actual.size());
-                assertEquals(new ArrayList<>(expected.values()), new ArrayList<>(actual.values()));
+                assertEquals(new ObjectArrayList<>(expected.values()), new ObjectArrayList<>(actual.values()));
                 for (int index = 0; index < 12; index++) {
                     final String name = "random." + index;
                     assertEquals(expected.containsKey(name), actual.containsKey(name));

@@ -7,6 +7,7 @@ import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.machine.MachineRegistry;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -19,12 +20,11 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("deprecation")
 public class BlockEStorageController extends BlockController {
-    public static final Map<ResourceLocation, BlockEStorageController> REGISTRY = new LinkedHashMap<>();
+    public static final Map<ResourceLocation, BlockEStorageController> REGISTRY = new Object2ObjectArrayMap<>();
     public static final BlockEStorageController L4;
     public static final BlockEStorageController L6;
     public static final BlockEStorageController L9;

@@ -1,7 +1,7 @@
 package github.kasuminova.novaeng.common.logging.agent;
 
 import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 /** Installs before Foundation's parent-loaded loggers, without loading Forge or Log4j. */
 public final class LoggingSilencerAgent {
@@ -17,15 +17,18 @@ public final class LoggingSilencerAgent {
         instrumentation.addTransformer(transformer, true);
         // Other JVM agents may have initialized loggers before this premain. Rewrite those same
         // classes so already-published static final Logger references also become no-ops.
-        final var loaded = new ArrayList<Class<?>>();
-        for (final Class<?> type : instrumentation.getAllLoadedClasses()) {
+        final Class<?>[] loaded = instrumentation.getAllLoadedClasses();
+        int loadedCount = 0;
+        for (final Class<?> type : loaded) {
             if (!LoggingMethodTransformer.isTarget(type.getName().replace('.', '/'))) continue;
             if (!instrumentation.isModifiableClass(type)) {
                 throw new IllegalStateException("Cannot disable logging in unmodifiable class " + type.getName());
             }
-            loaded.add(type);
+            loaded[loadedCount++] = type;
         }
-        if (!loaded.isEmpty()) instrumentation.retransformClasses(loaded.toArray(Class<?>[]::new));
+        if (loadedCount != 0) {
+            instrumentation.retransformClasses(loadedCount == loaded.length ? loaded : Arrays.copyOf(loaded, loadedCount));
+        }
         // Instrumentation ignores transformer exceptions, so check before claiming success.
         if (transformer.getFailure() != null) {
             throw new IllegalStateException("Could not replace logging methods", transformer.getFailure());

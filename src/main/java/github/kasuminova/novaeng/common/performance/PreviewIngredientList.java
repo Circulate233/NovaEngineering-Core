@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ public final class PreviewIngredientList extends LinkedList<List<ItemStack>> {
                 this.hasEmptyFirstStack = true;
             } else {
                 final Item item = first.getItem();
-                List<List<ItemStack>> candidates = this.byItem.computeIfAbsent(item, k -> new ArrayList<>());
+                List<List<ItemStack>> candidates = this.byItem.computeIfAbsent(item, k -> new ObjectArrayList<>());
                 // Include multi-alternative groups: the original loop also merges into their first stack.
                 candidates.add(ingredients);
             }

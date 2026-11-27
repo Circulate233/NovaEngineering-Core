@@ -25,6 +25,7 @@ import hellfirepvp.modularmachinery.common.util.BlockArray;
 import hellfirepvp.modularmachinery.common.util.IBlockStateDescriptor;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
 import ink.ikx.mmce.common.utils.StackUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -46,7 +47,6 @@ import vazkii.botania.common.Botania;
 import vazkii.botania.common.block.ModBlocks;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -293,7 +293,7 @@ public class IllumPool implements MachineSpecial {
         Block blockDimensionCatalyst = com.meteor.extrabotany.common.block.ModBlocks.dimensioncatalyst;
 
         // 普通模式
-        final List<BlockPos> shiftedCatalystPositions = new ArrayList<>(CATALYST_POS_PRESET.size());
+        final List<BlockPos> shiftedCatalystPositions = new ObjectArrayList<>(CATALYST_POS_PRESET.size());
         for (BlockPos pos : CATALYST_POS_PRESET) shiftedCatalystPositions.add(pos.add(0, 1, 0));
         machine.getMultiBlockModifiers().add(new MultiBlockModifierReplacement(NORMAL_CATALYST,
             buildModifierReplacementBlockArray(blockBifrostPerm, shiftedCatalystPositions),

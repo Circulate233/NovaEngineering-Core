@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.performance.ftb;
 
 import java.util.List;
+import java.util.RandomAccess;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -22,9 +23,14 @@ public final class FtbQuestCandidates {
         final int originalSize = output.size();
         boolean complete = false;
         try {
-            for (final T candidate : candidates) {
-                if (filter.test(candidate)) {
-                    output.add(candidate);
+            if (candidates instanceof RandomAccess) {
+                for (int index = 0; index < candidates.size(); index++) {
+                    final T candidate = candidates.get(index);
+                    if (filter.test(candidate)) output.add(candidate);
+                }
+            } else {
+                for (final T candidate : candidates) {
+                    if (filter.test(candidate)) output.add(candidate);
                 }
             }
             complete = true;

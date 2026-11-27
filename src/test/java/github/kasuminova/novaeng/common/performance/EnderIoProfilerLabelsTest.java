@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.common.performance;
 
 import crazypants.enderio.util.Profiler;
 import github.kasuminova.novaeng.mixin.enderio.AccessorEnderIoProfiler;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -10,7 +11,6 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,14 +66,14 @@ class EnderIoProfilerLabelsTest {
 
     @Test
     void disabledProfilerDoesNotReadStateOrProduceLabels() {
-        final List<String> calls = new ArrayList<>();
+        final List<String> calls = new ObjectArrayList<>();
         EnderIoProfilerLabels.stop(new RecordingProfiler(false, calls), 123, null);
         assertEquals(List.of(), calls);
     }
 
     @Test
     void enabledProfilerKeepsLabelOrderAndObservesChangingNames() throws Exception {
-        final List<String> calls = new ArrayList<>();
+        final List<String> calls = new ObjectArrayList<>();
         final String[] currentName = {"first"};
         final Block block = labelBlock(calls, currentName);
         final IBlockState state = (IBlockState) Proxy.newProxyInstance(getClass().getClassLoader(),

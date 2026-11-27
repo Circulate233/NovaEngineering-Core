@@ -1,6 +1,6 @@
 package github.kasuminova.novaeng.common.performance;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 
 public final class ScriptPathSegments {
@@ -9,7 +9,7 @@ public final class ScriptPathSegments {
 
     /** Matches String.split on dot or the platform separator, including its trailing-empty rule. */
     public static String[] split(final String path, final char separator) {
-        final List<String> parts = new ArrayList<>();
+        final List<String> parts = new ObjectArrayList<>();
         int start = 0;
         for (int index = 0; index < path.length(); index++) {
             final char c = path.charAt(index);

@@ -47,7 +47,6 @@ public abstract class MixinDirectionsPrimitiveBiMap {
     private void nova$primitiveMetadata(
         final Directions owner, final BiMap<EnumFacing, Integer> original) {
         final var replacement = Object2IntHashBiMap.forEnum(EnumFacing.class);
-        replacement.putAll(original);
         metaFacingMapping = replacement;
     }
 

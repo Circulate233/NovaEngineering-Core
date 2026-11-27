@@ -13,12 +13,11 @@ import github.kasuminova.novaeng.common.container.data.EStorageEnergyData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import hellfirepvp.modularmachinery.common.base.Mods;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
-
-import java.util.Collections;
 
 @Getter
 public class EStorageGraph extends Row {
@@ -69,7 +68,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.fluid.percent",
                         NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
@@ -81,7 +80,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 double totalUsedBytes = 0;
                 double totalMaxBytes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     long maxBytes = EStorageCellDrive.getMaxBytes(data);
                     totalMaxBytes += maxBytes;
                     if (data.type() == DriveStorageType.FLUID) {
@@ -111,7 +112,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.item.percent",
                         NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
@@ -123,7 +124,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 double totalUsedBytes = 0;
                 double totalMaxBytes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     long maxBytes = EStorageCellDrive.getMaxBytes(data);
                     totalMaxBytes += maxBytes;
                     if (data.type() == DriveStorageType.ITEM) {
@@ -153,7 +156,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.gas.percent",
                         NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
@@ -165,7 +168,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 double totalUsedBytes = 0;
                 double totalMaxBytes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     long maxBytes = EStorageCellDrive.getMaxBytes(data);
                     totalMaxBytes += maxBytes;
                     if (data.type() == DriveStorageType.GAS) {
@@ -197,7 +202,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.total.percent",
                         NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );
@@ -209,7 +214,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 double totalUsedBytes = 0;
                 double totalMaxBytes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     long maxBytes = EStorageCellDrive.getMaxBytes(data);
                     long usedBytes = data.usedBytes();
                     totalMaxBytes += maxBytes;
@@ -240,7 +247,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.fluid_type",
                         NovaEngUtils.formatNumber((long) totalUsedFluidTypes.get(), 1),
                         NovaEngUtils.formatNumber((long) totalMaxFluidTypes.get(), 1)
@@ -254,7 +261,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 int totalUsedFluidTypes = 0;
                 int totalMaxFluidTypes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     if (data.type() == DriveStorageType.FLUID) {
                         totalUsedFluidTypes += data.usedTypes();
                         totalMaxFluidTypes += 25;
@@ -287,7 +296,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.item_type",
                         NovaEngUtils.formatNumber((long) totalUsedItemTypes.get(), 1),
                         NovaEngUtils.formatNumber((long) totalMaxItemTypes.get(), 1)
@@ -301,7 +310,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 int totalUsedItemTypes = 0;
                 int totalMaxItemTypes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     if (data.type() == DriveStorageType.ITEM) {
                         totalUsedItemTypes += data.usedTypes();
                         totalMaxItemTypes += 315;
@@ -334,7 +345,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.gas_type",
                         NovaEngUtils.formatNumber((long) totalUsedGasTypes.get(), 1),
                         NovaEngUtils.formatNumber((long) totalMaxGasTypes.get(), 1)
@@ -348,7 +359,9 @@ public class EStorageGraph extends Row {
             if (event instanceof ESGUIDataUpdateEvent) {
                 int totalUsedGasTypes = 0;
                 int totalMaxGasTypes = 0;
-                for (final EStorageCellData data : controllerGUI.getCellDataList()) {
+                final var cellDataList = controllerGUI.getCellDataList();
+                for (int index = 0; index < cellDataList.size(); index++) {
+                    final EStorageCellData data = cellDataList.get(index);
                     if (data.type() == DriveStorageType.GAS) {
                         totalUsedGasTypes += data.usedTypes();
                         totalMaxGasTypes += 25;
@@ -380,7 +393,7 @@ public class EStorageGraph extends Row {
         public void update(final WidgetGui gui) {
             super.update(gui);
             if (!value.isAnimFinished()) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.energy_usage",
                         NovaEngUtils.formatNumber((long) energyConsumePerTick.get())))
                 );
@@ -429,13 +442,13 @@ public class EStorageGraph extends Row {
             }
             shiftDown = GuiScreen.isShiftKeyDown();
             if (shiftDown) {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.energy_stored",
                         NovaEngUtils.formatNumber((long) energyStored.get()),
                         NovaEngUtils.formatNumber((long) maxEnergyStore.get()))
                 ));
             } else {
-                label.setContents(Collections.singletonList(
+                label.setContents(ObjectLists.singleton(
                     I18n.format("gui.estorage_controller.graph.energy_stored.percent",
                         NovaEngUtils.formatDouble(value.get() * 100, 1)))
                 );

@@ -7,9 +7,11 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.SimpleRemapper;
 import org.objectweb.asm.tree.ClassNode;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 class EnchantmentWrapperAllocationTest {
     private static Class<?> implementation() throws Exception {
-        final Map<String, String> names = new HashMap<>();
+        final Map<String, String> names = new Object2ObjectOpenHashMap<>();
         names.put("net/minecraft/item/ItemStack", internal(Stack.class));
         names.put("jeresources/entry/EnchantmentEntry", internal(Entry.class));
         names.put("jeresources/registry/EnchantmentRegistry", internal(Registry.class));
@@ -59,7 +61,7 @@ class EnchantmentWrapperAllocationTest {
         applicable.add(new Entry("one"));
         final Wrapper first = (Wrapper) create.invoke(null, stack);
         assertSame(stack, first.stack());
-        assertEquals(List.copyOf(applicable), first.entries());
+        assertEquals(Collections.unmodifiableList(new ObjectArrayList<>(applicable)), first.entries());
         applicable.clear();
         assertEquals(List.of(new Entry("two"), new Entry("one")), first.entries());
         assertNull(create.invoke(null, stack));
@@ -87,7 +89,7 @@ class EnchantmentWrapperAllocationTest {
 
     public static final class Registry {
         public static final Registry INSTANCE = new Registry();
-        public final Set<Entry> applicable = new LinkedHashSet<>();
+        public final Set<Entry> applicable = new ObjectLinkedOpenHashSet<>();
 
         public static Registry getInstance() {
             return INSTANCE;

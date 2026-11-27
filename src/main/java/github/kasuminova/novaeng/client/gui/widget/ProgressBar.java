@@ -7,13 +7,12 @@ import github.kasuminova.mmce.client.gui.util.RenderSize;
 import github.kasuminova.mmce.client.gui.util.TextureProperties;
 import github.kasuminova.mmce.client.gui.widget.base.DynamicWidget;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiScreen;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class ProgressBar extends DynamicWidget {
@@ -27,7 +26,7 @@ public class ProgressBar extends DynamicWidget {
     protected TextureProperties backgroundTexture = null;
 
     @Getter
-    protected List<TextureProperties> progressTextures = new ArrayList<>();
+    protected List<TextureProperties> progressTextures = new ObjectArrayList<>();
 
     protected AnimationValue progress = AnimationValue.ofFinished(0, 500, .25, .1, .25, 1);
     @Getter
@@ -54,83 +53,69 @@ public class ProgressBar extends DynamicWidget {
         double percent = Math.min(1, progress.get() / maxProgress);
 
         // Progress background
-        findProgressBackgroundTex(percent).ifPresent(tex -> tex.render(renderPos, gui));
+        final TextureProperties background = findProgressBackgroundTex(percent);
+        if (background != null) background.render(renderPos, gui);
 
         float renderPercent = (float) percent;
+        final TextureProperties foreground = findProgressForegroundTex(percent);
+        if (foreground == null) return;
+        foreground.bind(gui.mc.getTextureManager());
         if (isHorizontal()) {
-            // Horizontal.
             if (leftToRight) {
-                // Left to right.
-                findProgressForegroundTex(percent).ifPresent(tex -> {
-                    tex.bind(gui.mc.getTextureManager());
-                    gui.drawTexturedModalRect(
-                        renderPos.posX(), renderPos.posY(),
-                        tex.texX(), tex.texY(),
-                        (int) (tex.width() * renderPercent), tex.height()
-                    );
-                });
+                gui.drawTexturedModalRect(
+                    renderPos.posX(), renderPos.posY(),
+                    foreground.texX(), foreground.texY(),
+                    (int) (foreground.width() * renderPercent), foreground.height()
+                );
             } else {
-                // Right to left.
-                findProgressForegroundTex(percent).ifPresent(tex -> {
-                    tex.bind(gui.mc.getTextureManager());
-                    gui.drawTexturedModalRect(
-                        renderPos.posX() + (int) (tex.width() * (1 - renderPercent)), renderPos.posY(),
-                        tex.texX(), tex.texY(),
-                        (int) (tex.width() * renderPercent), tex.height()
-                    );
-                });
+                gui.drawTexturedModalRect(
+                    renderPos.posX() + (int) (foreground.width() * (1 - renderPercent)), renderPos.posY(),
+                    foreground.texX(), foreground.texY(),
+                    (int) (foreground.width() * renderPercent), foreground.height()
+                );
             }
         } else {
-            // Vertical.
             if (leftToRight) {
-                // Down to up.
-                findProgressForegroundTex(percent).ifPresent(tex -> {
-                    tex.bind(gui.mc.getTextureManager());
-                    gui.drawTexturedModalRect(
-                        renderPos.posX(), renderPos.posY(),
-                        tex.texX(), tex.texY(),
-                        tex.width(), (int) (tex.height() * renderPercent)
-                    );
-                });
+                gui.drawTexturedModalRect(
+                    renderPos.posX(), renderPos.posY(),
+                    foreground.texX(), foreground.texY(),
+                    foreground.width(), (int) (foreground.height() * renderPercent)
+                );
             } else {
-                // Up to down.
-                findProgressForegroundTex(percent).ifPresent(tex -> {
-                    tex.bind(gui.mc.getTextureManager());
-                    gui.drawTexturedModalRect(
-                        renderPos.posX(), renderPos.posY() + (int) (tex.height() * (1 - renderPercent)),
-                        tex.texX(), tex.texY() + (int) (tex.height() * (1 - renderPercent)),
-                        tex.width(), (int) (tex.height() * renderPercent)
-                    );
-                });
+                gui.drawTexturedModalRect(
+                    renderPos.posX(), renderPos.posY() + (int) (foreground.height() * (1 - renderPercent)),
+                    foreground.texX(), foreground.texY() + (int) (foreground.height() * (1 - renderPercent)),
+                    foreground.width(), (int) (foreground.height() * renderPercent)
+                );
             }
         }
     }
 
-    protected Optional<TextureProperties> findProgressForegroundTex(final double percent) {
+    protected TextureProperties findProgressForegroundTex(final double percent) {
         if (progressTextures.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
 
         int idx = (int) percent;
         if (idx >= progressTextures.size()) {
-            return Optional.of(progressTextures.getLast());
+            return progressTextures.getLast();
         } else {
-            return Optional.of(progressTextures.get(Math.max(idx, 0)));
+            return progressTextures.get(Math.max(idx, 0));
         }
     }
 
-    protected Optional<TextureProperties> findProgressBackgroundTex(final double percent) {
+    protected TextureProperties findProgressBackgroundTex(final double percent) {
         if (progressTextures.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
 
         int idx = ((int) percent) - 1;
         if (idx <= 0) {
-            return Optional.empty();
+            return null;
         } else if (idx >= progressTextures.size()) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(progressTextures.get(idx));
+        return progressTextures.get(idx);
     }
 
     // Progress settings.
@@ -239,7 +224,7 @@ public class ProgressBar extends DynamicWidget {
 
     @Override
     public List<String> getHoverTooltips(final WidgetGui widgetGui, final MousePos mousePos) {
-        return tooltipFunction != null ? tooltipFunction.apply(this) : Collections.emptyList();
+        return tooltipFunction != null ? tooltipFunction.apply(this) : ObjectLists.emptyList();
     }
 
     public ProgressBar setTooltipFunction(final Function<ProgressBar, List<String>> tooltipFunction) {

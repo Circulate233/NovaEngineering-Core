@@ -178,18 +178,25 @@ public class MonitorPanel extends SizedRow {
                 long totalStorage = data.totalStorage();
                 long usedExtraStorage = data.usedExtraStorage();
                 long usedTotalMemory = 0;
-                for (ECalculatorData.ECPUData ecpuData : data.ecpuList())
+                final List<ECalculatorData.ECPUData> ecpuList = data.ecpuList();
+                for (int index = 0; index < ecpuList.size(); index++) {
+                    final ECalculatorData.ECPUData ecpuData = ecpuList.get(index);
                     usedTotalMemory += ecpuData.usedMemory() - ecpuData.usedExtraMemory();
+                }
                 this.totalStorage = totalStorage;
                 this.usedMemory = usedTotalMemory;
                 this.usedExtraStorage = usedExtraStorage;
                 this.hyperThreads = 0;
-                for (ECalculatorData.ECPUData ecpuData : data.ecpuList())
+                for (int index = 0; index < ecpuList.size(); index++) {
+                    final ECalculatorData.ECPUData ecpuData = ecpuList.get(index);
                     if (ecpuData.usedExtraMemory() > 0) this.hyperThreads++;
-                this.threads = data.ecpuList().size() - hyperThreads;
+                }
+                this.threads = ecpuList.size() - hyperThreads;
                 this.maxThreads = 0;
                 this.maxHyperThreads = 0;
-                for (ECalculatorData.ThreadCoreData core : data.threadCores()) {
+                final List<ECalculatorData.ThreadCoreData> threadCores = data.threadCores();
+                for (int index = 0; index < threadCores.size(); index++) {
+                    final ECalculatorData.ThreadCoreData core = threadCores.get(index);
                     this.maxThreads += core.maxThreads();
                     this.maxHyperThreads += core.maxHyperThreads();
                 }
@@ -244,7 +251,9 @@ public class MonitorPanel extends SizedRow {
                 widgets.clear();
                 int element = 0;
                 Row row = new Row();
-                for (final ECalculatorData.ECPUData ecpuData : data.ecpuList()) {
+                final List<ECalculatorData.ECPUData> ecpuList = data.ecpuList();
+                for (int index = 0; index < ecpuList.size(); index++) {
+                    final ECalculatorData.ECPUData ecpuData = ecpuList.get(index);
                     row.addWidget(new Task(ecpuData));
                     element++;
                     if (element >= maxElementPerRow) {

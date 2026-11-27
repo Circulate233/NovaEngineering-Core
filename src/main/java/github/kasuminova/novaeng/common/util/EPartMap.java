@@ -27,7 +27,7 @@ public class EPartMap<P extends EPart<?>> {
 
     public void forEachPart(final Consumer<P> consumer) {
         for (List<P> partList : parts.values())
-            for (P part : partList) consumer.accept(part);
+            for (int index = 0; index < partList.size(); index++) consumer.accept(partList.get(index));
     }
 
     public void assemble(final EPartController<P> controller) {

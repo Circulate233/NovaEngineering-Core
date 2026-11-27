@@ -50,7 +50,6 @@ public abstract class MixinWorldCachePrimitiveBiMap {
     private void nova$primitiveTable(
         final WorldCache<?> owner, final BiMap<String, Integer> original) {
         final Object2IntHashBiMap<String> replacement = new Object2IntHashBiMap<>(16);
-        replacement.putAll(original);
         nameToID = replacement;
     }
 

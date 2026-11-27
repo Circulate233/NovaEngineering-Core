@@ -12,7 +12,6 @@ import github.kasuminova.novaeng.client.gui.widget.ecalculator.event.ECGUIDataUp
 import github.kasuminova.novaeng.common.container.data.ECalculatorData;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import it.unimi.dsi.fastutil.longs.LongListIterator;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -56,9 +55,8 @@ public class StorageBar extends DynamicWidget {
             int color = 0x7F87CEFA;
             int swapColor = 0x7F6495ED;
             int tmp;
-            LongListIterator it = this.usedMemory.iterator();
-            while (it.hasNext()) {
-                long usedMemory = it.nextLong();
+            for (int index = 0; index < this.usedMemory.size(); index++) {
+                long usedMemory = this.usedMemory.getLong(index);
                 float percent = (float) usedMemory / totalStorage;
                 int width = (int) Math.clamp(LINE_WIDTH * percent, 3, LINE_WIDTH);
 
@@ -74,7 +72,7 @@ public class StorageBar extends DynamicWidget {
                 Gui.drawRect(width - 1, 0, width, LINE_HEIGHT, color | 0xFF000000);
 
                 total += width;
-                if (total >= LINE_WIDTH || !it.hasNext()) {
+                if (total >= LINE_WIDTH || index + 1 >= this.usedMemory.size()) {
                     break;
                 }
 
@@ -99,8 +97,9 @@ public class StorageBar extends DynamicWidget {
             ECalculatorData data = ecGui.getData();
             this.totalStorage = data.totalStorage();
             this.usedMemory.clear();
-            for (final ECalculatorData.ECPUData ecpuData : data.ecpuList()) {
-                this.usedMemory.add(ecpuData.usedMemory());
+            final var ecpuList = data.ecpuList();
+            for (int index = 0; index < ecpuList.size(); index++) {
+                this.usedMemory.add(ecpuList.get(index).usedMemory());
             }
             this.usedMemory.sort(Comparator.comparingLong(value -> (long) value).reversed());
         }

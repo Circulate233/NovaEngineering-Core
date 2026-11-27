@@ -8,8 +8,6 @@ import github.kasuminova.mmce.client.gui.widget.Button5State;
 import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import lombok.Getter;
 
-import java.util.Optional;
-
 @Getter
 public class Button6State extends Button5State {
 
@@ -44,7 +42,7 @@ public class Button6State extends Button5State {
     }
 
     public Button6State setClickedMouseDownTexture(final TextureProperties clickedMouseDownTexture) {
-        this.clickedMouseDownTexture = Optional.ofNullable(clickedMouseDownTexture).orElse(TextureProperties.EMPTY);
+        this.clickedMouseDownTexture = clickedMouseDownTexture == null ? TextureProperties.EMPTY : clickedMouseDownTexture;
         return this;
     }
 

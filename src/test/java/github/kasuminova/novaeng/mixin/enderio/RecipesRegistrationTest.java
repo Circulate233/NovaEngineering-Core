@@ -3,9 +3,9 @@ package github.kasuminova.novaeng.mixin.enderio;
 import com.enderio.core.common.util.NNList;
 import crazypants.enderio.base.config.recipes.xml.AbstractConditional;
 import crazypants.enderio.base.recipe.RecipeLevel;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class RecipesRegistrationTest {
     @Test
     void registrationKeepsOrderLevelAndDynamicNameCallbacks() {
-        List<String> calls = new ArrayList<>();
+        List<String> calls = new ObjectArrayList<>();
         class Recipe extends AbstractConditional {
             private final String first;
             private final String second;

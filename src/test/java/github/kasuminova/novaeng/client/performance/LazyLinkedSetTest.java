@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.client.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -10,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LazyLinkedSetTest {
     @Test
     void matchesInsertionOrderNullDuplicatesAndAllMutations() {
-        final Set<String> expected = new LinkedHashSet<>();
+        final Set<String> expected = new ObjectLinkedOpenHashSet<>();
         final Set<String> actual = new LazyLinkedSet<>();
         for (final String value : Arrays.asList("b", null, "a", "b", "c")) {
             assertEquals(expected.add(value), actual.add(value));
@@ -59,7 +61,7 @@ class LazyLinkedSetTest {
         set.add("b");
         set.add(null);
         set.add("a");
-        final List<String> copied = new ArrayList<>();
+        final List<String> copied = new ObjectArrayList<>();
         iterator.forEachRemaining(copied::add);
         assertEquals(Arrays.asList("b", null, "a"), copied);
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();

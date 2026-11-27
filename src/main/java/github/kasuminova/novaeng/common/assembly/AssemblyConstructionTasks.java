@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -29,7 +30,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -38,7 +38,7 @@ public final class AssemblyConstructionTasks {
     private static final int SOLID_SLOTS = GROUPS * 2;
     private static final int STAGES = SOLID_SLOTS + GROUPS;
     private static final Reference2ObjectOpenHashMap<EntityPlayerMP, Task> ACTIVE = new Reference2ObjectOpenHashMap<>();
-    private static final ArrayDeque<Task> QUEUE = new ArrayDeque<>();
+    private static final ObjectLinkedOpenHashSet<Task> QUEUE = new ObjectLinkedOpenHashSet<>();
     private static final AssemblyPlacement PLACEMENT = new AssemblyPlacement();
 
     private AssemblyConstructionTasks() {
@@ -67,7 +67,7 @@ public final class AssemblyConstructionTasks {
         final var task = new Task(player, world, tile, anchor.toImmutable(), machine, facing, dynamicSize,
             usingAE, autoCraft, ignoreFluids, needAll, tool.copy());
         ACTIVE.put(player, task);
-        QUEUE.addLast(task);
+        QUEUE.add(task);
     }
 
     public static void tick(final MinecraftServer server) {
@@ -112,7 +112,7 @@ public final class AssemblyConstructionTasks {
                     PLACEMENT.flush(task.world);
                 }
                 if (task.finished) ACTIVE.remove(task.player, task);
-                else QUEUE.addLast(task);
+                else QUEUE.add(task);
             }
             if (!progressed) return;
         }

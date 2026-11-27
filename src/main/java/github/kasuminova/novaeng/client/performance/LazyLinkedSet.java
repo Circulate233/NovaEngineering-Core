@@ -1,12 +1,14 @@
 package github.kasuminova.novaeng.client.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
@@ -14,10 +16,10 @@ import java.util.Spliterators;
 public final class LazyLinkedSet<E> extends AbstractSet<E> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private LinkedHashSet<E> values;
+    private ObjectLinkedOpenHashSet<E> values;
     private transient int version;
 
-    public static <E> java.util.Set<E> create() {
+    public static <E> Set<E> create() {
         return new LazyLinkedSet<>();
     }
 
@@ -33,7 +35,7 @@ public final class LazyLinkedSet<E> extends AbstractSet<E> implements Serializab
 
     @Override
     public boolean add(final E value) {
-        if (values == null) values = new LinkedHashSet<>();
+        if (values == null) values = new ObjectLinkedOpenHashSet<>();
         if (!values.add(value)) return false;
         version++;
         return true;

@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import stanhebben.zenscript.ZenTokener;
 import stanhebben.zenscript.parser.CompiledDFA;
 import stanhebben.zenscript.parser.HashMapII;
@@ -10,10 +12,8 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -68,7 +68,7 @@ public final class ZenTokenerDfaGenerator {
     static int[] table(final CompiledDFA dfa) {
         // Upstream toArray() groups ranges using array indexes as character labels. It is not a lossless
         // serializer for this grammar. Emit the constructor's uncompressed edge representation instead.
-        final var values = new ArrayList<Integer>();
+        final var values = new IntArrayList();
         values.add(dfa.finals.length);
         for (int i = 0; i < dfa.finals.length; i++) {
             values.add(dfa.finals[i]);
@@ -81,19 +81,19 @@ public final class ZenTokenerDfaGenerator {
                 values.add(dfa.transitions[i].get(label));
             }
         }
-        return values.stream().mapToInt(Integer::intValue).toArray();
+        return values.toIntArray();
     }
 
     /**
      * Original state identity/order is unspecified. Canonical BFS and sorted labels make regeneration reproducible.
      */
     static CompiledDFA canonical(final CompiledDFA original) {
-        final var order = new ArrayList<Integer>();
-        final var ids = new HashMap<Integer, Integer>();
+        final var order = new IntArrayList();
+        final var ids = new Int2IntOpenHashMap();
         order.add(0);
         ids.put(0, 0);
         for (int i = 0; i < order.size(); i++) {
-            final HashMapII edges = original.transitions[order.get(i)];
+            final HashMapII edges = original.transitions[order.getInt(i)];
             final int[] labels = edges.keysArray();
             Arrays.sort(labels);
             for (final int label : labels) {
@@ -108,8 +108,8 @@ public final class ZenTokenerDfaGenerator {
         final int[] finals = new int[order.size()];
         for (int i = 0; i < order.size(); i++) {
             transitions[i] = new HashMapII();
-            finals[i] = original.finals[order.get(i)];
-            final HashMapII edges = original.transitions[order.get(i)];
+            finals[i] = original.finals[order.getInt(i)];
+            final HashMapII edges = original.transitions[order.getInt(i)];
             final int[] labels = edges.keysArray();
             Arrays.sort(labels);
             for (final int label : labels) transitions[i].put(label, ids.get(edges.get(label)));

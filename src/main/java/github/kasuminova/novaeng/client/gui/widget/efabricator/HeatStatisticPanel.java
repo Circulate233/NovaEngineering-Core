@@ -16,10 +16,10 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUp
 import github.kasuminova.novaeng.common.container.data.EFabricatorData;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorWorker;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -40,9 +40,9 @@ public class HeatStatisticPanel extends SizedColumn {
     public HeatStatisticPanel() {
         setWidthHeight(WIDTH, HEIGHT);
 
-        energyUsage = new BackgroundLabel(Collections.singletonList(I18n.format("gui.efabricator.max_energy_usage", 0)));
+        energyUsage = new BackgroundLabel(ObjectLists.singleton(I18n.format("gui.efabricator.max_energy_usage", 0)));
         energyUsage
-            .setTooltipFunction(label -> Collections.singletonList(I18n.format("gui.efabricator.max_energy_usage.tip")))
+            .setTooltipFunction(label -> ObjectLists.singleton(I18n.format("gui.efabricator.max_energy_usage.tip")))
             .setBackground(TextureProperties.of(TEXTURE_BACKGROUND.texRes(), 210, 102, 45, 9))
             .setPadding(1);
         energyUsage.getLabel()
@@ -52,7 +52,7 @@ public class HeatStatisticPanel extends SizedColumn {
                    .setScale(0.6f)
                    .setWidthHeight(43, 6)
                    .setMarginDown(2);
-        activeCooling = new BackgroundLabel(Collections.singletonList(I18n.format(
+        activeCooling = new BackgroundLabel(ObjectLists.singleton(I18n.format(
             "gui.efabricator.active_cooling", I18n.format("gui.efabricator.active_cooling.off")
         )));
         activeCooling
@@ -111,7 +111,7 @@ public class HeatStatisticPanel extends SizedColumn {
             }
 
             this.activeCooling.getLabel()
-                              .setContents(Collections.singletonList(
+                              .setContents(ObjectLists.singleton(
                                   I18n.format("gui.efabricator.active_cooling", data.activeCooling()
                                       ? I18n.format("gui.efabricator.active_cooling.on")
                                       : I18n.format("gui.efabricator.active_cooling.off")
@@ -133,7 +133,7 @@ public class HeatStatisticPanel extends SizedColumn {
                 energyUsage = data.level().applyOverclockEnergyUsage(energyUsage);
             }
             this.energyUsage.getLabel()
-                            .setContents(Collections.singletonList(
+                            .setContents(ObjectLists.singleton(
                                 I18n.format("gui.efabricator.max_energy_usage", NovaEngUtils.formatNumber(energyUsage, 1))
                             ));
 
@@ -184,7 +184,7 @@ public class HeatStatisticPanel extends SizedColumn {
 
         @Override
         public List<String> getHoverTooltips(final WidgetGui widgetGui, final MousePos mousePos) {
-            return tooltipFunction != null ? tooltipFunction.apply(this) : Collections.emptyList();
+            return tooltipFunction != null ? tooltipFunction.apply(this) : ObjectLists.emptyList();
         }
 
         public BackgroundLabel setTooltipFunction(final Function<BackgroundLabel, List<String>> tooltipFunction) {

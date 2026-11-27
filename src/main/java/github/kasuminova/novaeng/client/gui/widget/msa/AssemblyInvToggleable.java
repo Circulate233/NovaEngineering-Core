@@ -10,10 +10,10 @@ import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.mmce.client.gui.widget.container.Column;
 import github.kasuminova.novaeng.client.gui.widget.msa.event.AssemblyInvCloseEvent;
 import github.kasuminova.novaeng.client.gui.widget.msa.event.AssemblyInvOpenEvent;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public abstract class AssemblyInvToggleable extends AssemblyInv {
     protected final Column toggleButtonColumn = new Column();
@@ -44,7 +44,7 @@ public abstract class AssemblyInvToggleable extends AssemblyInv {
             toggleColumn(this.slotColumn);
             this.toggleSecond.setClicked(false);
         });
-        this.toggleFirst.setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.modular_server_assembler.assembly.inv.change.main")));
+        this.toggleFirst.setTooltipFunction(button -> ObjectLists.singleton(I18n.format("gui.modular_server_assembler.assembly.inv.change.main")));
         this.toggleFirst.setClicked(true);
 
         this.toggleSecond.setOnClickedListener(button -> {
@@ -55,7 +55,7 @@ public abstract class AssemblyInvToggleable extends AssemblyInv {
             toggleColumn(this.secondSlotColumn);
             this.toggleFirst.setClicked(false);
         });
-        this.toggleSecond.setTooltipFunction(button -> Collections.singletonList(I18n.format("gui.modular_server_assembler.assembly.inv.change.heat")));
+        this.toggleSecond.setTooltipFunction(button -> ObjectLists.singleton(I18n.format("gui.modular_server_assembler.assembly.inv.change.heat")));
 
         this.toggleButtonColumn.setMarginLeft(7).setMarginUp(7);
         this.toggleButtonColumn.addWidget(this.toggleFirst);

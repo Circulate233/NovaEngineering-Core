@@ -26,6 +26,7 @@ import appeng.me.helpers.IGridProxyable;
 import appeng.me.helpers.MachineSource;
 import github.kasuminova.novaeng.common.block.ecotech.efabricator.BlockEFabricatorMEChannel;
 import hellfirepvp.modularmachinery.ModularMachinery;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,7 +35,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 public class EStorageMEChannel extends EStoragePart implements ICellContainer, IActionHost, IGridProxyable, IAEPowerStorage {
 
@@ -57,7 +57,7 @@ public class EStorageMEChannel extends EStoragePart implements ICellContainer, I
     @SuppressWarnings("rawtypes")
     public List<IMEInventoryHandler> getCellArray(final IStorageChannel<?> channel) {
         if (partController != null) {
-            final List<IMEInventoryHandler> handlers = new ArrayList<>();
+            final List<IMEInventoryHandler> handlers = new ObjectArrayList<>();
             for (EStorageCellDrive drive : partController.getCellDrives()) {
                 final IMEInventoryHandler handler = drive.getHandler(channel);
                 if (handler != null) handlers.add(handler);

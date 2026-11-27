@@ -36,7 +36,8 @@ public class AEItemStackSet {
 
     public void writeToBuffer(final ByteBuf buf) {
         buf.writeInt(entryList.size());
-        for (Entry entry : entryList) {
+        for (int index = 0; index < entryList.size(); index++) {
+            final Entry entry = entryList.get(index);
             try {
                 entry.stack().writeToPacket(buf);
             } catch (Throwable ignored) {

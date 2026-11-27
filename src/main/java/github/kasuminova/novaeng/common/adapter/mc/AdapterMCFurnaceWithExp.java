@@ -14,6 +14,7 @@ import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -21,7 +22,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class AdapterMCFurnaceWithExp extends RecipeAdapter {
         FurnaceRecipes furnaceRecipes = FurnaceRecipes.instance();
         Map<ItemStack, ItemStack> inputOutputMap = furnaceRecipes.getSmeltingList();
 
-        List<MachineRecipe> smeltingRecipes = new ArrayList<>(inputOutputMap.size());
+        List<MachineRecipe> smeltingRecipes = new ObjectArrayList<>(inputOutputMap.size());
         for (Map.Entry<ItemStack, ItemStack> smelting : inputOutputMap.entrySet()) {
             ItemStack input = smelting.getKey();
             ItemStack output = smelting.getValue();

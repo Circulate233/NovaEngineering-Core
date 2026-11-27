@@ -11,6 +11,7 @@ import slimeknights.tconstruct.library.book.sectiontransformer.SectionTransforme
 import slimeknights.tconstruct.library.modifiers.Modifier;
 
 import java.util.List;
+import java.util.RandomAccess;
 
 // adapted from Tinkers' MEMES BookTransformerAppendModifiers
 public class BookTransformerAppendModifiers extends SectionTransformer {
@@ -31,15 +32,23 @@ public class BookTransformerAppendModifiers extends SectionTransformer {
     @Override
     public void transform(BookData book, SectionData section) {
         ContentListing listing = (ContentListing) section.pages.getFirst().content;
-        for (Modifier mod : modCollector) {
-            PageData page = new PageData();
-            page.source = source;
-            page.parent = section;
-            page.type = armour ? "armormodifier" : "modifier";
-            page.data = "modifiers/" + mod.identifier + ".json";
-            section.pages.add(page);
-            page.load();
-            listing.addEntry(mod.getLocalizedName(), page);
+        if (modCollector instanceof RandomAccess) {
+            for (int index = 0; index < modCollector.size(); index++) {
+                appendModifier(listing, section, modCollector.get(index));
+            }
+        } else {
+            for (final Modifier modifier : modCollector) appendModifier(listing, section, modifier);
         }
+    }
+
+    private void appendModifier(final ContentListing listing, final SectionData section, final Modifier modifier) {
+        PageData page = new PageData();
+        page.source = source;
+        page.parent = section;
+        page.type = armour ? "armormodifier" : "modifier";
+        page.data = "modifiers/" + modifier.identifier + ".json";
+        section.pages.add(page);
+        page.load();
+        listing.addEntry(modifier.getLocalizedName(), page);
     }
 }

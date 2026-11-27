@@ -19,20 +19,20 @@ import github.kasuminova.novaeng.common.hypernet.computer.module.ModulePSU;
 import github.kasuminova.novaeng.common.hypernet.computer.module.ServerModule;
 import github.kasuminova.novaeng.common.hypernet.computer.module.base.ServerModuleBase;
 import github.kasuminova.novaeng.common.registry.ServerModuleRegistry;
+import github.kasuminova.novaeng.common.util.ObjectHeapPriorityQueueWithIterator;
 import github.kasuminova.novaeng.common.util.TileItemHandler;
 import hellfirepvp.modularmachinery.common.tiles.base.TileEntitySynchronized;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -43,11 +43,11 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     protected final Properties prop = new Properties();
 
-    protected final List<ServerModule> modules = new ArrayList<>();
-    protected final List<Extension> extensions = new LinkedList<>();
+    protected final List<ServerModule> modules = new ObjectArrayList<>();
+    protected final List<Extension> extensions = new ObjectArrayList<>();
 
-    protected final List<Calculable> calculables = new ArrayList<>();
-    protected final Map<CalculateType, PriorityQueue<Calculable>> calculableTypeSet = new Object2ObjectLinkedOpenHashMap<>();
+    protected final List<Calculable> calculables = new ObjectArrayList<>();
+    protected final Map<CalculateType, ObjectHeapPriorityQueueWithIterator<Calculable>> calculableTypeSet = new Object2ObjectLinkedOpenHashMap<>();
 
     protected final Map<Class<?>, List<Object>> typeModulesCache = new Object2ObjectLinkedOpenHashMap<>();
     protected final Map<ServerModuleBase<?>, List<ServerModule>> baseModulesCache = new Object2ObjectLinkedOpenHashMap<>();
@@ -97,7 +97,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
         if (!started && !request.simulate()) {
             return new CalculateReply(0);
         }
-        PriorityQueue<Calculable> calculableSet = calculableTypeSet.get(request.type());
+        ObjectHeapPriorityQueueWithIterator<Calculable> calculableSet = calculableTypeSet.get(request.type());
         if (calculableSet == null) {
             return new CalculateReply(0);
         }
@@ -106,7 +106,8 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
         double totalGenerated = 0;
         double maxRequired = request.maxRequired();
-        for (final Extension extension : extensions) {
+        for (int index = 0; index < extensions.size(); index++) {
+            final Extension extension = extensions.get(index);
             extension.onCalculate(request);
         }
         for (final Calculable calculable : calculableSet) {
@@ -155,7 +156,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
             ServerModule moduleInstance = module.createInstance(this, stackInSlot);
             modules.add(moduleInstance);
-            baseModulesCache.computeIfAbsent(module, v -> new ArrayList<>()).add(moduleInstance);
+            baseModulesCache.computeIfAbsent(module, v -> new ObjectArrayList<>()).add(moduleInstance);
 
             if (moduleInstance instanceof Extension) {
                 addExtension((Extension) moduleInstance);
@@ -176,14 +177,14 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
             if (calculable.getCalculateTypeEfficiency(calculateType) <= 0D) {
                 continue;
             }
-            calculableTypeSet.computeIfAbsent(calculateType, v -> new PriorityQueue<>((o1, o2) -> {
+            calculableTypeSet.computeIfAbsent(calculateType, v -> new ObjectHeapPriorityQueueWithIterator<>((o1, o2) -> {
                 double efficiencyLeft = o1.getCalculateTypeEfficiency(calculateType);
                 double efficiencyRight = o2.getCalculateTypeEfficiency(calculateType);
                 if (efficiencyLeft == efficiencyRight) {
                     return 0;
                 }
                 return efficiencyLeft < efficiencyRight ? 1 : -1;
-            })).add(calculable);
+            })).enqueue(calculable);
         }
     }
 
@@ -193,12 +194,16 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
         int totalProvided = 0;
         int totalConsumed = 0;
 
-        for (final HardwareBandwidthProvider provider : getModulesByType(HardwareBandwidthProvider.class)) {
+        final List<HardwareBandwidthProvider> providers = getModulesByType(HardwareBandwidthProvider.class);
+        for (int index = 0; index < providers.size(); index++) {
+            final HardwareBandwidthProvider provider = providers.get(index);
             totalProvided += provider.getHardwareBandwidthProvision();
         }
         totalHardwareBandwidth = totalProvided;
 
-        for (final HardwareBandwidthConsumer consumer : getModulesByType(HardwareBandwidthConsumer.class)) {
+        final List<HardwareBandwidthConsumer> consumers = getModulesByType(HardwareBandwidthConsumer.class);
+        for (int index = 0; index < consumers.size(); index++) {
+            final HardwareBandwidthConsumer consumer = consumers.get(index);
             totalConsumed += consumer.getHardwareBandwidth();
         }
         usedHardwareBandwidth = totalConsumed;
@@ -227,14 +232,18 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
 
     public void recalculateEnergySystem() {
         long maxEnergyProvision = 0;
-        for (final ModulePSU modulePSU : getModulesByType(ModulePSU.class)) {
+        final List<ModulePSU> powerSupplies = getModulesByType(ModulePSU.class);
+        for (int index = 0; index < powerSupplies.size(); index++) {
+            final ModulePSU modulePSU = powerSupplies.get(index);
             maxEnergyProvision += modulePSU.getMaxEnergyProvision();
         }
         this.maxEnergyProvision = maxEnergyProvision;
 
         long maxEnergyCap = 0;
         long maxEnergyConsumption = 0;
-        for (final ModuleCapacitor capacitor : getModulesByType(ModuleCapacitor.class)) {
+        final List<ModuleCapacitor> capacitors = getModulesByType(ModuleCapacitor.class);
+        for (int index = 0; index < capacitors.size(); index++) {
+            final ModuleCapacitor capacitor = capacitors.get(index);
             maxEnergyCap += capacitor.getMaxEnergyCapProvision();
             maxEnergyConsumption += capacitor.getMaxEnergyConsumptionProvision();
         }
@@ -289,8 +298,9 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
             return (List<T>) cache;
         }
 
-        List<T> matched = new ArrayList<>();
-        for (final ServerModule module : modules) {
+        List<T> matched = new ObjectArrayList<>();
+        for (int index = 0; index < modules.size(); index++) {
+            final ServerModule module = modules.get(index);
             if (type.isAssignableFrom(module.getClass())) {
                 matched.add((T) module);
             }
@@ -303,7 +313,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
     // baseModules
 
     public List<ServerModule> getModulesByBase(ServerModuleBase<?> base) {
-        return baseModulesCache.getOrDefault(base, Collections.emptyList());
+        return baseModulesCache.getOrDefault(base, ObjectLists.emptyList());
     }
 
     // NBT read / write
@@ -440,7 +450,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
     // Utils
 
     public double getCalculateAvgEfficiency(final CalculateType type) {
-        PriorityQueue<Calculable> calculables = calculableTypeSet.get(type);
+        ObjectHeapPriorityQueueWithIterator<Calculable> calculables = calculableTypeSet.get(type);
         if (calculables == null || calculables.isEmpty()) {
             return 0D;
         }
@@ -467,7 +477,7 @@ public class ModularServer extends CalculateServer implements ServerInvProvider 
         return modules;
     }
 
-    public Map<CalculateType, PriorityQueue<Calculable>> getCalculableTypeSet() {
+    public Map<CalculateType, ObjectHeapPriorityQueueWithIterator<Calculable>> getCalculableTypeSet() {
         return Collections.unmodifiableMap(calculableTypeSet);
     }
 

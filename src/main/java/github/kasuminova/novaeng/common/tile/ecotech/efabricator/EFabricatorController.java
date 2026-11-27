@@ -87,9 +87,10 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         return (int) Math.round(value);
     }
 
-    private static int capacity(final List<IFluidHandler> handlers) {
+    private static int capacity(final ObjectArrayList<IFluidHandler> handlers) {
         int total = 0;
-        for (final var handler : handlers) {
+        for (int index = 0; index < handlers.size(); index++) {
+            final IFluidHandler handler = handlers.get(index);
             for (final var property : handler.getTankProperties()) {
                 total += Math.min(property.getCapacity(), Integer.MAX_VALUE - total);
                 if (total == Integer.MAX_VALUE) {
@@ -270,8 +271,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         this.updateGUIDataPacket();
         final long previous = this.totalCrafted;
         final var workers = this.getWorkers();
-        workers.forEach(worker -> worker.updateStatus(false));
-        for (final var worker : workers) {
+        for (int index = 0; index < workers.size(); index++) workers.get(index).updateStatus(false);
+        for (int index = 0; index < workers.size(); index++) {
+            final var worker = workers.get(index);
             if (worker.hasWork()) {
                 final int worked = worker.doWork();
                 this.totalCrafted += worked;
@@ -291,7 +293,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         if (this.coolantCache >= MAX_COOLANT_CACHE) {
             return;
         }
-        for (final var inputHandler : this.coolantInputHandlers) {
+        for (int inputIndex = 0; inputIndex < this.coolantInputHandlers.size(); inputIndex++) {
+            final var inputHandler = this.coolantInputHandlers.get(inputIndex);
             for (final var property : inputHandler.getTankProperties()) {
                 final var contents = property.getContents();
                 if (contents == null || contents.amount == 0) {
@@ -301,7 +304,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
                 if (coolant == null) {
                     continue;
                 }
-                for (final var outputHandler : this.coolantOutputHandlers) {
+                for (int outputIndex = 0; outputIndex < this.coolantOutputHandlers.size(); outputIndex++) {
+                    final var outputHandler = this.coolantOutputHandlers.get(outputIndex);
                     final int maximum = coolant.maxCanConsume(inputHandler, outputHandler);
                     if (maximum <= 0) {
                         continue;
@@ -337,7 +341,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
         } catch (final GridAccessException ignored) {
             return;
         }
-        for (final var worker : this.getWorkers()) {
+        final List<EFabricatorWorker> workers = this.getWorkers();
+        for (int index = 0; index < workers.size(); index++) {
+            final var worker = workers.get(index);
             if (worker.getEnergyCache() < worker.getMaxEnergyCache()) {
                 worker.supplyEnergy((int) energy.extractAEPower(worker.getMaxEnergyCache() - worker.getEnergyCache(),
                     Actionable.MODULATE, PowerMultiplier.CONFIG));
@@ -397,7 +403,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     public void updateParallelism() {
         double parallelism = 0;
         final List<EFabricatorParallelProc.Modifier> multipliers = new ObjectArrayList<>();
-        for (final var processor : this.getParallelProcs()) {
+        final List<EFabricatorParallelProc> processors = this.getParallelProcs();
+        for (int index = 0; index < processors.size(); index++) {
+            final var processor = processors.get(index);
             for (final var modifier : processor.getModifiers()) {
                 if (modifier.isBuff() || !this.activeCooling && modifier.debuff()) {
                     if (modifier.type() == EFabricatorParallelProc.Type.MULTIPLY) {
@@ -419,8 +427,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
                 }
             }
         }
-        for (final var modifier : multipliers) {
-            parallelism = modifier.apply(parallelism);
+        for (int index = 0; index < multipliers.size(); index++) {
+            parallelism = multipliers.get(index).apply(parallelism);
         }
         this.parallelism = roundToInt(parallelism);
     }
@@ -448,7 +456,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     public void recalculateEnergyUsage() {
         double drain = 64.0;
-        for (final var bus : this.getPatternBuses()) {
+        final List<EFabricatorPatternBus> buses = this.getPatternBuses();
+        for (int index = 0; index < buses.size(); index++) {
+            final var bus = buses.get(index);
             drain += bus.getValidPatterns();
         }
         if (this.energyConsumePerTick != drain) {
@@ -460,7 +470,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public boolean insertPattern(final ItemStack stack) {
-        for (final var bus : this.getPatternBuses()) {
+        final List<EFabricatorPatternBus> buses = this.getPatternBuses();
+        for (int index = 0; index < buses.size(); index++) {
+            final var bus = buses.get(index);
             final var inventory = bus.getPatterns();
             for (int i = 0; i < inventory.getSlots(); i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
@@ -474,7 +486,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     public boolean offerWork(final CraftWork work) {
         boolean success = false;
-        for (final var worker : this.getWorkers()) {
+        final List<EFabricatorWorker> workers = this.getWorkers();
+        for (int index = 0; index < workers.size(); index++) {
+            final var worker = workers.get(index);
             if (!worker.isFull()) {
                 worker.offerWork(work.split(worker.getRemainingSpace()));
                 success = true;
@@ -490,7 +504,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public boolean isQueueFull() {
-        for (final var worker : this.getWorkers()) {
+        final List<EFabricatorWorker> workers = this.getWorkers();
+        for (int index = 0; index < workers.size(); index++) {
+            final var worker = workers.get(index);
             if (!worker.isFull()) {
                 return false;
             }
@@ -499,7 +515,9 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
     }
 
     public boolean hasWork() {
-        for (final var worker : this.getWorkers()) {
+        final List<EFabricatorWorker> workers = this.getWorkers();
+        for (int index = 0; index < workers.size(); index++) {
+            final var worker = workers.get(index);
             if (worker.hasWork()) {
                 return true;
             }
@@ -544,7 +562,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     public int getEnergyStored() {
         int total = 0;
-        for (EFabricatorWorker worker : this.getWorkers()) total += worker.getEnergyCache();
+        final List<EFabricatorWorker> workers = this.getWorkers();
+        for (int index = 0; index < workers.size(); index++) total += workers.get(index).getEnergyCache();
         return total;
     }
 
@@ -562,7 +581,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     public int getCoolantInputFluids() {
         int total = 0;
-        for (final var handler : this.coolantInputHandlers) {
+        for (int index = 0; index < this.coolantInputHandlers.size(); index++) {
+            final var handler = this.coolantInputHandlers.get(index);
             for (final var property : handler.getTankProperties()) {
                 final var contents = property.getContents();
                 if (contents == null || contents.amount == 0 || MachineCoolants.INSTANCE.getCoolant(contents.getFluid()) == null) {
@@ -579,7 +599,8 @@ public final class EFabricatorController extends EPartController<EFabricatorPart
 
     public int getCoolantOutputFluids() {
         int total = 0;
-        for (final var handler : this.coolantOutputHandlers) {
+        for (int index = 0; index < this.coolantOutputHandlers.size(); index++) {
+            final var handler = this.coolantOutputHandlers.get(index);
             for (final var property : handler.getTankProperties()) {
                 final var contents = property.getContents();
                 if (contents == null || contents.amount == 0) {

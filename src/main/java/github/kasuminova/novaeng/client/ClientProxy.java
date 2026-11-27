@@ -139,7 +139,8 @@ public class ClientProxy extends CommonProxy {
             for (int[] rows : sprite.getFrameTextureData(0))
                 for (int colour : rows) if ((colour & 0xFF) > 0) colours.add(colour);
             long r = 0, g = 0, b = 0;
-            for (int colour : colours) {
+            for (int index = 0; index < colours.size(); index++) {
+                final int colour = colours.getInt(index);
                 r += (colour >> 16) & 0xFF;
                 g += (colour >> 8) & 0xFF;
                 b += colour & 0xFF;
@@ -235,16 +236,17 @@ public class ClientProxy extends CommonProxy {
 
         final List<Item> itemColorSnapshot;
         synchronized (COLOR_ITEMS_LOCK) {
-            itemColorSnapshot = colorsItems == null ? List.of() : new ReferenceArrayList<>(colorsItems);
+            itemColorSnapshot = colorsItems == null ? ObjectLists.emptyList() : new ReferenceArrayList<>(colorsItems);
             colorsItems = null;
         }
         final List<ItemRawOre.BlockRawOre> blockColorSnapshot;
         synchronized (COLOR_BLOCKS_LOCK) {
-            blockColorSnapshot = colorsBlocks == null ? List.of() : new ReferenceArrayList<>(colorsBlocks);
+            blockColorSnapshot = colorsBlocks == null ? ObjectLists.emptyList() : new ReferenceArrayList<>(colorsBlocks);
             colorsBlocks = null;
         }
 
-        for (var item : itemColorSnapshot) {
+        for (int index = 0; index < itemColorSnapshot.size(); index++) {
+            final Item item = itemColorSnapshot.get(index);
             if (item instanceof ItemRawOre r) {
                 final int i = getColorForODFirst(r.getPartOD());
                 itemColors.n$put(item, new IColor(i));
@@ -256,7 +258,8 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
-        for (var block : blockColorSnapshot) {
+        for (int index = 0; index < blockColorSnapshot.size(); index++) {
+            final ItemRawOre.BlockRawOre block = blockColorSnapshot.get(index);
             if (block == null) {
                 continue;
             }

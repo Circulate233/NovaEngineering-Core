@@ -1,5 +1,7 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -7,16 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
  * Read-only archive handles shared by the ZenUtils bytecode providers while each provider owns a lease.
  */
 public final class ScriptClasspathArchives {
-    private static final Map<ArchiveKey, Archive> ARCHIVES = new HashMap<>();
-    private static final Map<FileSystem, Archive> LEASES = new IdentityHashMap<>();
+    private static final Map<ArchiveKey, Archive> ARCHIVES = new Object2ObjectOpenHashMap<>();
+    private static final Map<FileSystem, Archive> LEASES = new Reference2ObjectOpenHashMap<>();
 
     private ScriptClasspathArchives() {
     }

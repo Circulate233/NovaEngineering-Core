@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.client.texture;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public final class SlotCapacityFrontierImpl implements SlotCapacityFrontier {
             return EMPTY;
         }
 
-        final List<Rectangle> rectangles = new ArrayList<>(capacityCount);
+        final ObjectArrayList<Rectangle> rectangles = new ObjectArrayList<>(capacityCount);
         for (final SlotCapacityFrontier child : children) {
             for (int i = 0; i < child.size(); i++) {
                 rectangles.add(new Rectangle(child.widthAt(i), child.heightAt(i)));
@@ -73,7 +74,8 @@ public final class SlotCapacityFrontierImpl implements SlotCapacityFrontier {
         final int[] mergedHeights = new int[rectangles.size()];
         int mergedSize = 0;
         int greatestHeight = -1;
-        for (final Rectangle rectangle : rectangles) {
+        for (int index = 0; index < rectangles.size(); index++) {
+            final Rectangle rectangle = rectangles.get(index);
             if (rectangle.height() <= greatestHeight) {
                 continue;
             }

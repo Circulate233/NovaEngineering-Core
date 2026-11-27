@@ -22,12 +22,12 @@ import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class AdapterStarlightInfuser extends RecipeAdapter {
                                                       final List<String> recipeTooltips) {
         int ids = InfusionRecipeRegistry.recipes.size() + InfusionRecipeRegistry.mtRecipes.size();
 
-        List<MachineRecipe> recipes = new ArrayList<>();
+        List<MachineRecipe> recipes = new ObjectArrayList<>();
         for (int id = 0; id < ids; id++) {
             AbstractInfusionRecipe infusionRecipe = InfusionRecipeRegistry.getRecipe(id);
             if (infusionRecipe == null) {

@@ -14,6 +14,7 @@ import github.kasuminova.novaeng.common.item.estorage.ItemBlockEStorageEnergyCel
 import hellfirepvp.modularmachinery.common.base.Mods;
 import hellfirepvp.modularmachinery.common.item.ItemDynamicColor;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -26,7 +27,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,11 +35,11 @@ import static hellfirepvp.modularmachinery.common.registry.RegistryItems.pending
 
 @SuppressWarnings({"MethodMayBeStatic", "UnusedReturnValue"})
 public class RegistryItems {
-    public static final List<Item> ITEMS_TO_REGISTER = new LinkedList<>();
-    public static final List<Item> ITEMS_TO_REGISTER_CT = new LinkedList<>();
+    public static final List<Item> ITEMS_TO_REGISTER = new ObjectArrayList<>();
+    public static final List<Item> ITEMS_TO_REGISTER_CT = new ObjectArrayList<>();
     public static final Map<String, Item> CUSTOM_MODEL_ITEMS_TO_REGISTER_CT = new Object2ObjectLinkedOpenHashMap<>();
 
-    public static final List<Item> ITEM_MODELS_TO_REGISTER = new LinkedList<>();
+    public static final List<Item> ITEM_MODELS_TO_REGISTER = new ObjectArrayList<>();
     public static final Map<String, Item> ITEM_CUSTOM_MODELS_TO_REGISTER = new Object2ObjectLinkedOpenHashMap<>();
 
     public static void registerItems() {

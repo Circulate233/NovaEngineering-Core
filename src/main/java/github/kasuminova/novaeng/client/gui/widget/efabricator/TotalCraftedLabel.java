@@ -7,9 +7,9 @@ import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUp
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.handler.EFabricatorEventHandler;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.resources.I18n;
 
-import java.util.Collections;
 
 public class TotalCraftedLabel extends Row {
 
@@ -19,7 +19,7 @@ public class TotalCraftedLabel extends Row {
     private double historyTotal;
 
     public TotalCraftedLabel() {
-        this.label = new MultiLineLabel(Collections.singletonList(
+        this.label = new MultiLineLabel(ObjectLists.singleton(
             I18n.format("gui.efabricator.total_crafted", 0)
         ));
         this.label.setScale(.8f);
@@ -53,7 +53,7 @@ public class TotalCraftedLabel extends Row {
             if (avgCraftPerTick > 0) {
                 updateLabel(newValue, avgCraftPerTick);
             } else {
-                this.label.setContents(Collections.singletonList(
+                this.label.setContents(ObjectLists.singleton(
                     I18n.format("gui.efabricator.total_crafted", NovaEngUtils.formatDecimal(newValue))
                 ));
             }
@@ -62,7 +62,7 @@ public class TotalCraftedLabel extends Row {
     }
 
     private void updateLabel(final long newValue, final double avgCraftPerTick) {
-        this.label.setContents(Collections.singletonList(
+        this.label.setContents(ObjectLists.singleton(
             I18n.format("gui.efabricator.total_crafted.update",
                 NovaEngUtils.formatDecimal(newValue),
                 avgCraftPerTick <= 0.1 ? "<0.1" : NovaEngUtils.formatDouble(avgCraftPerTick, 1)

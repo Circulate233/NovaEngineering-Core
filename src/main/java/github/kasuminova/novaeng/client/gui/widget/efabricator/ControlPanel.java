@@ -8,10 +8,10 @@ import github.kasuminova.novaeng.client.gui.widget.Button6State;
 import github.kasuminova.novaeng.client.gui.widget.efabricator.event.EFGUIDataUpdateEvent;
 import github.kasuminova.novaeng.common.network.PktEFabricatorGUIAction;
 import github.kasuminova.novaeng.common.util.MachineCoolants;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fluids.FluidStack;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ControlPanel extends Row {
@@ -35,7 +35,7 @@ public class ControlPanel extends Row {
                     }
                 })
                 .setTooltipFunction(button -> {
-                    List<String> tooltips = new ArrayList<>();
+                    List<String> tooltips = new ObjectArrayList<>();
                     tooltips.add(overclocking.isClicked()
                         ? I18n.format("gui.efabricator.overclocked.disable.tip")
                         : I18n.format("gui.efabricator.overclocked.enable.tip")
@@ -59,7 +59,7 @@ public class ControlPanel extends Row {
                     }
                 })
                 .setTooltipFunction(button -> {
-                    List<String> tooltips = new ArrayList<>();
+                    List<String> tooltips = new ObjectArrayList<>();
                     if (activeCooling.isClicked()) {
                         tooltips.add(I18n.format("gui.efabricator.active_cooling.disable.tip"));
                     } else {

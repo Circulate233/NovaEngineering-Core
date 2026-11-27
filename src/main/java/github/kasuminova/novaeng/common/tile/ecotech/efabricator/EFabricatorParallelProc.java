@@ -34,8 +34,8 @@ public final class EFabricatorParallelProc extends EFabricatorPart {
 
     private static NBTTagList writeModifiers(final List<Modifier> modifiers) {
         final NBTTagList tags = new NBTTagList();
-        for (final Modifier modifier : modifiers) {
-            tags.appendTag(modifier.writeToNBT());
+        for (int index = 0; index < modifiers.size(); index++) {
+            tags.appendTag(modifiers.get(index).writeToNBT());
         }
         return tags;
     }

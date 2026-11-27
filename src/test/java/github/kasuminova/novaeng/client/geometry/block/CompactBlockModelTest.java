@@ -17,10 +17,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -48,8 +48,8 @@ class CompactBlockModelTest {
 
     private static SimpleBakedModel model(final Sprite sprite, final BakedQuad... quads) {
         final EnumMap<EnumFacing, List<BakedQuad>> sides = new EnumMap<>(EnumFacing.class);
-        for (final EnumFacing face : EnumFacing.values()) sides.put(face, new ArrayList<>());
-        return new SimpleBakedModel(new ArrayList<>(List.of(quads)), sides, true, false,
+        for (final EnumFacing face : EnumFacing.values()) sides.put(face, new ObjectArrayList<>());
+        return new SimpleBakedModel(new ObjectArrayList<>(List.of(quads)), sides, true, false,
             sprite, ItemCameraTransforms.DEFAULT, ItemOverrideList.NONE);
     }
 

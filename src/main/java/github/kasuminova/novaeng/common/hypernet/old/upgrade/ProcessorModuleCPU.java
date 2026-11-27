@@ -6,12 +6,12 @@ import github.kasuminova.mmce.common.upgrade.UpgradeType;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.hypernet.old.upgrade.type.ProcessorModuleCPUType;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
     }
 
     public static List<ProcessorModuleCPU> filter(final Collection<List<MachineUpgrade>> upgradeLists) {
-        List<ProcessorModuleCPU> list = new ArrayList<>();
+        List<ProcessorModuleCPU> list = new ObjectArrayList<>();
         for (List<MachineUpgrade> upgradeList : upgradeLists) {
             for (final MachineUpgrade upgrade : upgradeList) {
                 if (upgrade instanceof final ProcessorModuleCPU cpu) {
@@ -64,7 +64,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
 
     @Override
     public List<String> getDescriptions() {
-        List<String> desc = new ArrayList<>();
+        List<String> desc = new ObjectArrayList<>();
         desc.add(I18n.format("upgrade.data_processor.module.cpu.tip.0"));
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
@@ -78,7 +78,7 @@ public class ProcessorModuleCPU extends DataProcessorModule {
 
     @Override
     public List<String> getBusGUIDescriptions() {
-        List<String> desc = new ArrayList<>();
+        List<String> desc = new ObjectArrayList<>();
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",
             NovaEngUtils.formatFLOPS(calculate(false, getComputationPointGeneration()))

@@ -10,6 +10,7 @@ import hellfirepvp.modularmachinery.common.crafting.requirement.RequirementFluid
 import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import nc.recipe.BasicRecipe;
 import nc.recipe.NCRecipes;
 import nc.recipe.ingredient.IFluidIngredient;
@@ -17,7 +18,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class AdapterNCOElectrolyzer extends AdapterNCOMachine {
     @Override
     public Collection<MachineRecipe> createRecipesFor(final ResourceLocation owningMachineName, final List<RecipeModifier> modifiers, final List<ComponentRequirement<?, ?>> additionalRequirements, final Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers, final List<String> recipeTooltips) {
         List<BasicRecipe> recipeList = NCRecipes.electrolyzer.getRecipeList();
-        List<MachineRecipe> machineRecipeList = new ArrayList<>(recipeList.size());
+        List<MachineRecipe> machineRecipeList = new ObjectArrayList<>(recipeList.size());
 
         for (BasicRecipe basicRecipe : recipeList) {
             MachineRecipe recipe = createRecipeShell(new ResourceLocation("nuclearcraft", "electrolyzer_" + incId),

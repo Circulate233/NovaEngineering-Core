@@ -4,12 +4,12 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import fi.dy.masa.enderutilities.gui.client.GuiHandyBag;
 import fi.dy.masa.enderutilities.gui.client.base.GuiEnderUtilities;
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +22,7 @@ class HandyBagTooltipTest {
         final var handler = MixinGuiEnderUtilitiesTooltip.class.getDeclaredMethod("nova$deferHandyBagTooltip",
             GuiEnderUtilities.class, int.class, int.class, Operation.class);
         handler.setAccessible(true);
-        final List<Object[]> calls = new ArrayList<>();
+        final List<Object[]> calls = new ObjectArrayList<>();
         final Operation<Void> draw = args -> { calls.add(args); return null; };
         final var mixin = new MixinGuiEnderUtilitiesTooltip();
         final GuiHandyBag bag = allocate(GuiHandyBag.class);
@@ -61,7 +61,7 @@ class HandyBagTooltipTest {
             "fi/dy/masa/enderutilities/gui/client/GuiHandyBag.class")) {
             new ClassReader(input).accept(bag, 0);
         }
-        final List<String> calls = new ArrayList<>();
+        final List<String> calls = new ObjectArrayList<>();
         for (final var method : bag.methods) {
             if (!method.name.equals("drawScreen") && !method.name.equals("func_73863_a")) continue;
             for (final var instruction : method.instructions) {

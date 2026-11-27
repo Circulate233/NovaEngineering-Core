@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.performance;
 
 import net.minecraft.util.EnumFacing;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,7 +15,7 @@ class ProcessorDirectionsTest {
     void allMasksKeepVanillaOrderAndRemainIndependentMutableSnapshots() {
         for (int mask = 0; mask < 64; mask++) {
             final Object[] handlers = new Object[6];
-            final List<EnumFacing> expected = new ArrayList<>();
+            final List<EnumFacing> expected = new ObjectArrayList<>();
             for (int i = 0; i < 6; i++) if ((mask & (1 << i)) != 0) {
                 handlers[i] = new Object();
                 expected.add(EnumFacing.values()[i]);

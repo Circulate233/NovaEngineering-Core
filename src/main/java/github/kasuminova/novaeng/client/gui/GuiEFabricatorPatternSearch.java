@@ -12,6 +12,7 @@ import github.kasuminova.novaeng.common.container.ContainerEFabricatorPatternSea
 import github.kasuminova.novaeng.common.container.data.EFabricatorPatternData;
 import github.kasuminova.novaeng.common.tile.ecotech.efabricator.EFabricatorController;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import lombok.Getter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,7 +20,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEFabricatorPatternSearch> {
 
@@ -38,7 +38,7 @@ public class GuiEFabricatorPatternSearch extends GuiContainerDynamic<ContainerEF
         this.xSize = 243;
         this.ySize = 202 + 10;
         this.widgetController = new WidgetController(WidgetGui.of(this));
-        this.widgetController.addWidget(new MultiLineLabel(Collections.singletonList(I18n.format("gui.efabricator.pattern_search.title")))
+        this.widgetController.addWidget(new MultiLineLabel(ObjectLists.singleton(I18n.format("gui.efabricator.pattern_search.title")))
             .setScale(.8f).setAutoWrap(false).setAbsXY(7, 3)
         );
         this.widgetController.addWidget(new SearchPanel(this.widgetController).setAbsXY(7, 15));

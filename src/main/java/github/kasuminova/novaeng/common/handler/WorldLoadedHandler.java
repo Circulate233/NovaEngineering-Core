@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.handler;
 
 import crafttweaker.annotations.ZenRegister;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
@@ -21,7 +21,7 @@ import static github.kasuminova.novaeng.NovaEngCoreConfig.SERVER;
 public class WorldLoadedHandler {
 
     public static final WorldLoadedHandler INSTANCE = new WorldLoadedHandler();
-    public static final Map<Integer, ForgeChunkManager.Ticket> map = new Object2ObjectOpenHashMap<>();
+    public static final Map<Integer, ForgeChunkManager.Ticket> map = new Int2ObjectOpenHashMap<>();
     public static final IntSet REGISTERED_DIMENSIONS = new IntLinkedOpenHashSet();
     public static final IntSet ERRORWROLD = new IntLinkedOpenHashSet();
     public static boolean init = true;

@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -19,7 +20,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -127,7 +127,7 @@ class ForgeBuilderCompatibilityTest {
         assertSame(LosslessFloatRecordTest.tree(first), LosslessFloatRecordTest.tree(second));
         assertSame(treeField.get(optimized), LosslessFloatRecordTest.tree(first));
         assertSame(treeField.get(optimized), treeField.get(optimized));
-        final List<float[]> arrays = new ArrayList<>();
+        final List<float[]> arrays = new ObjectArrayList<>();
         first.pipe(LosslessFloatRecordTest.consumer(format, arrays));
         arrays.getFirst()[0] = 0.875f;
         assertEquals(Float.floatToRawIntBits(0.875f), first.getVertexData()[0]);

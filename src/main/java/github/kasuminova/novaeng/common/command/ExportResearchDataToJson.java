@@ -6,6 +6,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.hypernet.old.research.SimpleResearchData;
 import github.kasuminova.novaeng.common.registry.RegistryHyperNet;
 import io.netty.util.internal.ThrowableUtil;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -43,7 +44,7 @@ public class ExportResearchDataToJson extends CommandBase {
     public void execute(@Nonnull final MinecraftServer server,
                         @Nonnull final ICommandSender sender,
                         @Nonnull final String[] args) {
-        List<SimpleResearchData> dataList = new java.util.ArrayList<>();
+        List<SimpleResearchData> dataList = new ObjectArrayList<>();
         for (var data : RegistryHyperNet.getAllResearchCognitionData())
             dataList.add(SimpleResearchData.of(data));
         String jsonString = GSON.toJson(new ToSerialize(dataList));

@@ -1,11 +1,12 @@
 package github.kasuminova.novaeng.client.model;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 
+import java.util.Collections;
 import java.util.Map;
 
 public final class MultipartModelCache {
@@ -51,6 +52,6 @@ public final class MultipartModelCache {
     }
 
     private static MultipartBakedModel createUncached(final Map<Predicate<IBlockState>, IBakedModel> selectors) {
-        return new MultipartBakedModel(ImmutableMap.copyOf(selectors));
+        return new MultipartBakedModel(Collections.unmodifiableMap(new Object2ObjectLinkedOpenHashMap<>(selectors)));
     }
 }

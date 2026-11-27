@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.client.moreoverlays;
 import at.feldim2425.moreoverlays.api.lightoverlay.ILightScanner;
 import at.feldim2425.moreoverlays.config.Config;
 import at.feldim2425.moreoverlays.lightoverlay.LightScannerVanilla;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LightOverlayAllocationTest {
     private static ScanWorld world() throws Exception {
         final ScanWorld world = allocate(ScanWorld.class);
-        world.calls = new ArrayList<>();
+        world.calls = new ObjectArrayList<>();
         final SpawnBlock block = allocate(SpawnBlock.class);
         world.normal = state(block, true);
         world.open = state(block, false);
@@ -75,7 +75,7 @@ class LightOverlayAllocationTest {
                     final BlockPos pos = new BlockPos(x, 64, -8);
                     world.calls.clear();
                     final byte expected = original.getSpawnModeAt(pos, world);
-                    final List<String> expectedCalls = new ArrayList<>(world.calls);
+                    final List<String> expectedCalls = new ObjectArrayList<>(world.calls);
                     world.calls.clear();
                     assertEquals(expected, cache.spawnMode(pos, world), "spawn mode at " + pos);
                     assertEquals(expectedCalls, world.calls, "queries at " + pos + ", ignoreLayer=" + ignoreLayer);
@@ -104,11 +104,11 @@ class LightOverlayAllocationTest {
             player.posZ = -10.75;
             final LightScannerVanilla original = new LightScannerVanilla();
             final LightScanCache cache = new LightScanCache();
-            final List<Pair<BlockPos, Byte>> publicModes = new ArrayList<>();
+            final List<Pair<BlockPos, Byte>> publicModes = new ObjectArrayList<>();
 
             original.update(player);
-            final List<Pair<BlockPos, Byte>> expected = new ArrayList<>(original.getLightModes());
-            final List<String> expectedCalls = new ArrayList<>(world.calls);
+            final List<Pair<BlockPos, Byte>> expected = original.getLightModes();
+            final List<String> expectedCalls = new ObjectArrayList<>(world.calls);
             world.calls.clear();
             cache.update(original, player, publicModes);
             assertEquals(expectedCalls, world.calls);
@@ -183,7 +183,7 @@ class LightOverlayAllocationTest {
 
     @Test
     void customScannerSkipsNullAndInvalidModesBeforeReadingPositions() {
-        final List<Pair<BlockPos, Byte>> entries = new ArrayList<>();
+        final List<Pair<BlockPos, Byte>> entries = new ObjectArrayList<>();
         entries.add(Pair.of(null, null));
         entries.add(Pair.of(null, (byte) 0));
         entries.add(Pair.of(null, (byte) -1));
@@ -338,7 +338,7 @@ class LightOverlayAllocationTest {
         final LightScanCache cache = new LightScanCache();
 
         CacheScanner() {
-            super(new ArrayList<>());
+            super(new ObjectArrayList<>());
         }
 
         @Override
@@ -356,7 +356,7 @@ class LightOverlayAllocationTest {
     }
 
     private static final class RecordingSink implements LightOverlayBatch.Sink {
-        final List<Vertex> vertices = new ArrayList<>();
+        final List<Vertex> vertices = new ObjectArrayList<>();
         int begins, ends;
 
         @Override

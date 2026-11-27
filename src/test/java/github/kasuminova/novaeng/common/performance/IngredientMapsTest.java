@@ -1,9 +1,9 @@
 package github.kasuminova.novaeng.common.performance;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -23,17 +23,17 @@ class IngredientMapsTest {
         for (int trial = 0; trial < 200; trial++) {
             var baseline = new Reference2ObjectOpenHashMap<Object, List<List<String>>>();
             var candidate = new Reference2ObjectOpenHashMap<Object, List<List<String>>>(1);
-            List<Object> keys = new ArrayList<>();
+            List<Object> keys = new ObjectArrayList<>();
             keys.add(null);
             for (int i = 0; i < 80; i++) keys.add(new EqualKey());
             // Include null first, null second, repeated singleton keys, and growth past
             // the default map's rehash thresholds. Equal keys have distinct identities.
             for (int insertion = 0; insertion < 250; insertion++) {
                 Object key = keys.get(random.nextInt(Math.min(keys.size(), insertion / 3 + 1)));
-                List<List<String>> values = new ArrayList<>(List.of(new ArrayList<>(Arrays.asList("a", null, "a"))));
+                List<List<String>> values = new ObjectArrayList<>(List.of(new ObjectArrayList<>(Arrays.asList("a", null, "a"))));
                 assertSame(baseline.put(key, values), IngredientMaps.put(candidate, key, values));
-                List<Object> expectedOrder = new ArrayList<>(baseline.keySet());
-                List<Object> actualOrder = new ArrayList<>(candidate.keySet());
+                List<Object> expectedOrder = new ObjectArrayList<>(baseline.keySet());
+                List<Object> actualOrder = new ObjectArrayList<>(candidate.keySet());
                 for (int i = 0; i < expectedOrder.size(); i++) assertSame(expectedOrder.get(i), actualOrder.get(i));
                 assertEquals(baseline.size(), candidate.size());
                 for (Object type : baseline.keySet()) assertSame(baseline.get(type), candidate.get(type));

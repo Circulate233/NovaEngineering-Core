@@ -41,7 +41,8 @@ public class PktEFabricatorGUIData implements IMessage, IMessageHandler<PktEFabr
 
     private static List<EFabricatorData.WorkerStatus> workerStatuses(final List<EFabricatorWorker> workers) {
         final List<EFabricatorData.WorkerStatus> statuses = new ObjectArrayList<>(workers.size());
-        for (EFabricatorWorker worker : workers) {
+        for (int index = 0; index < workers.size(); index++) {
+            final EFabricatorWorker worker = workers.get(index);
             final var queue = worker.getQueue();
             final EFabricatorWorker.CraftWork peek = queue.peek();
             statuses.add(new EFabricatorData.WorkerStatus(

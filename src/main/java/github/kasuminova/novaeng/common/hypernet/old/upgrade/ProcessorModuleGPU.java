@@ -3,11 +3,11 @@ package github.kasuminova.novaeng.common.hypernet.old.upgrade;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.mmce.common.upgrade.UpgradeType;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ZenRegister
@@ -27,7 +27,7 @@ public class ProcessorModuleGPU extends ProcessorModuleCPU {
 
     @Override
     public List<String> getDescriptions() {
-        List<String> desc = new ArrayList<>();
+        List<String> desc = new ObjectArrayList<>();
         desc.add(I18n.format("upgrade.data_processor.module.gpu.tip.0"));
 
         desc.add(I18n.format("upgrade.data_processor.module.cpu.generate",

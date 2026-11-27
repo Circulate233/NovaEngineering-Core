@@ -223,7 +223,7 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
     private static final class Ownership {
         private Reference2ObjectOpenHashMap<int[], Mip> pixels;
         private Reference2ObjectOpenHashMap<int[][], Frame> sourceFrames;
-        private final List<WeakReference<OwnedAnimationFrames>> lists = new ObjectArrayList<>(2);
+        private final ObjectArrayList<WeakReference<OwnedAnimationFrames>> lists = new ObjectArrayList<>(2);
         private int activeEdits;
         private boolean packAfterEdit;
 
@@ -260,7 +260,8 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
             pruneLists();
             // Packing discards the lookup tables. A later insertion must recover the
             // live aliases before accepting arrays shared with a published frame.
-            for (final WeakReference<OwnedAnimationFrames> reference : lists) {
+            for (int listIndex = 0; listIndex < lists.size(); listIndex++) {
+                final WeakReference<OwnedAnimationFrames> reference = lists.get(listIndex);
                 final OwnedAnimationFrames list = reference.get();
                 if (list == null) continue;
                 final int size = list.frames.size();
@@ -281,7 +282,8 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
             }
             // Resolve every raw identity before published outer arrays can replace mip entries.
             // Otherwise a later private frame could overwrite an already published canonical mip.
-            for (final WeakReference<OwnedAnimationFrames> reference : lists) {
+            for (int listIndex = 0; listIndex < lists.size(); listIndex++) {
+                final WeakReference<OwnedAnimationFrames> reference = lists.get(listIndex);
                 final OwnedAnimationFrames list = reference.get();
                 if (list == null) continue;
                 final int size = list.frames.size();
@@ -307,7 +309,8 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
             pruneLists();
             if (pixels == null) {
                 boolean hasSource = false;
-                for (final WeakReference<OwnedAnimationFrames> reference : lists) {
+                for (int listIndex = 0; listIndex < lists.size(); listIndex++) {
+                    final WeakReference<OwnedAnimationFrames> reference = lists.get(listIndex);
                     final OwnedAnimationFrames list = reference.get();
                     if (list == null) continue;
                     final int size = list.frames.size();
@@ -323,12 +326,14 @@ public final class OwnedAnimationFrames extends AbstractList<int[][]> implements
                 // Materialized outer arrays can acquire new mip references after the last pack.
                 if (hasSource) index();
             }
-            for (final WeakReference<OwnedAnimationFrames> reference : lists) {
+            for (int listIndex = 0; listIndex < lists.size(); listIndex++) {
+                final WeakReference<OwnedAnimationFrames> reference = lists.get(listIndex);
                 final OwnedAnimationFrames list = reference.get();
                 if (list == null) continue;
                 list.first = null;
                 list.second = null;
-                for (final Frame frame : list.frames) {
+                for (int frameIndex = 0; frameIndex < list.frames.size(); frameIndex++) {
+                    final Frame frame = list.frames.get(frameIndex);
                     if (frame == null) continue;
                     frame.captureSource(this);
                     if (!frame.published) frame.source = null;

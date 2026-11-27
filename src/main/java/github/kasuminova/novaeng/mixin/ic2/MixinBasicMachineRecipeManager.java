@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.mixin.ic2;
 import com.llamalad7.mixinextras.sugar.Local;
 import ic2.api.recipe.IRecipeInput;
 import ic2.core.recipe.BasicMachineRecipeManager;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +24,7 @@ public abstract class MixinBasicMachineRecipeManager {
     }
 
     private static java.util.List<String> displayNames(final java.util.Collection<ItemStack> stacks) {
-        final java.util.List<String> names = new java.util.ArrayList<>(stacks.size());
+        final java.util.List<String> names = new ObjectArrayList<>(stacks.size());
         for (ItemStack stack : stacks) names.add(stack.getDisplayName());
         return names;
     }

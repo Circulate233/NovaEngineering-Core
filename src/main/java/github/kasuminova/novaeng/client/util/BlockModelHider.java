@@ -5,13 +5,13 @@ import hellfirepvp.modularmachinery.common.base.Mods;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.base.TileMultiblockMachineController;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class BlockModelHider {
 
@@ -34,7 +34,7 @@ public class BlockModelHider {
             return;
         }
 
-        final List<BlockPos> hiddenPositions = new ArrayList<>(posList.size());
+        final List<BlockPos> hiddenPositions = new ObjectArrayList<>(posList.size());
         for (BlockPos pos : posList)
             hiddenPositions.add(MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()).add(ctrlPos));
         MultiblockWorldSavedData.addDisableModel(ctrlPos, hiddenPositions);
@@ -50,7 +50,7 @@ public class BlockModelHider {
             return;
         }
 
-        final List<BlockPos> hiddenPositions = new ArrayList<>(posList.size());
+        final List<BlockPos> hiddenPositions = new ObjectArrayList<>(posList.size());
         for (BlockPos pos : posList)
             hiddenPositions.add(MiscUtils.rotateYCCWNorthUntil(pos, ctrl.getControllerRotation()).add(ctrlPos));
         MultiblockWorldSavedData.addDisableModel(ctrlPos, hiddenPositions);

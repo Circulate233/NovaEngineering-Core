@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -12,7 +13,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** Removes only DE 2.3.28.193's temporary coordinate collections; injector decisions are unchanged. */
@@ -30,7 +30,7 @@ public final class FusionInjectorScanTransform {
         if (!TARGET.equals(type.name)) return false;
         for (final var method : type.methods) {
             if (!"updateInjectors".equals(method.name) || !"()V".equals(method.desc)) continue;
-            final List<AbstractInsnNode> instructions = new ArrayList<>();
+            final List<AbstractInsnNode> instructions = new ObjectArrayList<>();
             for (final var instruction : method.instructions) if (instruction.getOpcode() >= 0) instructions.add(instruction);
             int start = -1;
             FieldInsnNode position = null;
@@ -85,7 +85,7 @@ public final class FusionInjectorScanTransform {
     }
 
     private static List<AbstractInsnNode> expression(final FieldInsnNode pos) {
-        final List<AbstractInsnNode> result = new ArrayList<>();
+            final List<AbstractInsnNode> result = new ObjectArrayList<>();
         result.add(new TypeInsnNode(Opcodes.NEW, "java/util/ArrayList"));
         result.add(new InsnNode(Opcodes.DUP));
         result.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>", "()V", false));

@@ -9,15 +9,15 @@ import github.kasuminova.novaeng.common.hypernet.computer.assembly.AssemblyInvPo
 import github.kasuminova.novaeng.common.util.TileItemHandler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
 
 public class AssemblySlotManager {
 
     private final ModularServer modularServer;
-    private final Map<String, Int2ObjectMap<SlotConditionItemHandler>> inventorySlots = new HashMap<>();
+    private final Map<String, Int2ObjectMap<SlotConditionItemHandler>> inventorySlots = new Object2ObjectOpenHashMap<>();
 
     public AssemblySlotManager(final ModularServer modularServer) {
         this.modularServer = modularServer;

@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.mixin.mekanism;
 import com.sun.management.ThreadMXBean;
 import github.kasuminova.novaeng.common.util.FrequencyManagerRegistryAccess;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
 import mekanism.api.Coord4D;
 import mekanism.common.frequency.Frequency;
@@ -25,7 +26,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.util.AbstractSet;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
@@ -123,8 +123,8 @@ class FrequencyManagerTickTest {
         final Object saveHandler = handlerClass.getConstructor(String.class).newInstance("privateFrequencyHandler");
         handlerClass.getMethod("setManager", fixture.manager).invoke(saveHandler, privateManager);
         fixture.field("dataHandler").set(privateManager, saveHandler);
-        final HashMap<UUID, Object> teleporters = new HashMap<>();
-        final HashMap<UUID, Object> entangloporters = new HashMap<>();
+        final Object2ObjectOpenHashMap<UUID, Object> teleporters = new Object2ObjectOpenHashMap<>();
+        final Object2ObjectOpenHashMap<UUID, Object> entangloporters = new Object2ObjectOpenHashMap<>();
         teleporters.put(new UUID(0, 1), privateManager);
         teleporters.put(new UUID(0, 2), publicManager);
         entangloporters.put(new UUID(0, 1), privateManager); // Identity duplicate must be harmless.

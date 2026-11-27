@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.handler;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +21,7 @@ class HyperNetEventHandlerTest {
     @Test
     void endActionsQueuedByLowPriorityMachinesExecuteInTheSameTick() throws Exception {
         try (TickBus bus = new TickBus()) {
-            List<String> executed = new ArrayList<>();
+            List<String> executed = new ObjectArrayList<>();
             AtomicBoolean queueWork = new AtomicBoolean(true);
             bus.register(EventPriority.LOW, event -> {
                 if (((TickEvent.ServerTickEvent) event).phase == TickEvent.Phase.END && queueWork.get()) {
@@ -68,7 +68,7 @@ class HyperNetEventHandlerTest {
     @Test
     void startActionsKeepTheirOriginalPriorityAndEndActionsWaitForEnd() throws Exception {
         try (TickBus bus = new TickBus()) {
-            List<String> executed = new ArrayList<>();
+            List<String> executed = new ObjectArrayList<>();
             HyperNetEventHandler.addTickStartAction(() -> executed.add("start"));
             HyperNetEventHandler.addTickEndAction(() -> executed.add("end"));
             bus.register(EventPriority.LOW, event -> {
@@ -99,7 +99,7 @@ class HyperNetEventHandlerTest {
      */
     private static final class TickBus implements AutoCloseable {
         private final EventBus bus = new EventBus();
-        private final List<IEventListener> listeners = new ArrayList<>();
+        private final List<IEventListener> listeners = new ObjectArrayList<>();
         private final ListenerList listenerList = new TickEvent.ServerTickEvent(TickEvent.Phase.END).getListenerList();
         private final int busId;
 

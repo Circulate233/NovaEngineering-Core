@@ -1,6 +1,8 @@
 package github.kasuminova.novaeng.mixin.jei;
 
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import mezz.jei.Internal;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.recipe.IIngredientType;
@@ -14,9 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -32,13 +32,13 @@ public class HeiRecipeIdReplayTest {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static void replay() throws Exception {
-        List<String> events = new ArrayList<>();
+        List<String> events = new ObjectArrayList<>();
         int[] calls = {0};
         IIngredientType<String> strings = () -> String.class;
         IIngredientType<Long> numbers = () -> Long.class;
         IIngredientHelper stringHelper = helper("string", events, calls);
         IIngredientHelper numberHelper = helper("long", events, calls);
-        LinkedHashSet<IIngredientType<?>> types = new LinkedHashSet<>(List.of(strings, numbers));
+        ObjectLinkedOpenHashSet<IIngredientType<?>> types = new ObjectLinkedOpenHashSet<>(List.of(strings, numbers));
         // Skip unrelated game constructors; the installed jar uses SRG Minecraft method names,
         // while Gradle's test classpath contains development names. All methods under test are real.
         Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
@@ -95,7 +95,7 @@ public class HeiRecipeIdReplayTest {
                     calls[0] = stateful ? 1 : 0;
                     events.clear();
                     Object expected = invoke(original, baseline, category, ingredients);
-                    List<String> expectedEvents = new ArrayList<>(events);
+                    List<String> expectedEvents = new ObjectArrayList<>(events);
                     calls[0] = stateful ? 1 : 0;
                     events.clear();
                     Object actual = invoke(replacement, candidate, category, ingredients);
@@ -105,7 +105,7 @@ public class HeiRecipeIdReplayTest {
                 }
             }
             // Each invocation must observe edits to the existing lists and a fresh hash callback.
-            List<String> mutable = new ArrayList<>(Arrays.asList("first", null, "first"));
+            List<String> mutable = new ObjectArrayList<>(Arrays.asList("first", null, "first"));
             Ingredients ingredients = new Ingredients();
             ingredients.setInputLists(strings, List.of(mutable));
             for (int change = 0; change < 4; change++) {
@@ -113,7 +113,7 @@ public class HeiRecipeIdReplayTest {
                 events.clear();
                 calls[0] = 1;
                 Object expected = invoke(original, baseline, category, ingredients);
-                List<String> expectedEvents = new ArrayList<>(events);
+                List<String> expectedEvents = new ObjectArrayList<>(events);
                 events.clear();
                 calls[0] = 1;
                 equal(expected, invoke(replacement, candidate, category, ingredients));
@@ -127,9 +127,9 @@ public class HeiRecipeIdReplayTest {
     }
 
     private static List<List<Object>> groups(Random random) {
-        List<List<Object>> groups = new ArrayList<>();
+        List<List<Object>> groups = new ObjectArrayList<>();
         for (int count = random.nextInt(6); count > 0; count--) {
-            List<Object> values = random.nextBoolean() ? new ArrayList<>() : new LinkedList<>();
+            List<Object> values = random.nextBoolean() ? new ObjectArrayList<>() : new LinkedList<>();
             for (int size = random.nextInt(10); size > 0; size--) {
                 values.add(switch (random.nextInt(4)) {
                     case 0 -> null;

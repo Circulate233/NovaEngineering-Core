@@ -13,6 +13,7 @@ import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import nc.recipe.BasicRecipe;
 import nc.recipe.NCRecipes;
 import nc.recipe.ingredient.IItemIngredient;
@@ -22,7 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class AdapterNCOPressurizer extends AdapterNCOMachine {
                                                       Map<Class<?>, List<IEventHandler<RecipeEvent>>> eventHandlers,
                                                       List<String> recipeTooltips) {
         List<BasicRecipe> recipeList = NCRecipes.pressurizer.getRecipeList();
-        List<MachineRecipe> machineRecipeList = new ArrayList<>(recipeList.size());
+        List<MachineRecipe> machineRecipeList = new ObjectArrayList<>(recipeList.size());
 
         for (BasicRecipe basicRecipe : recipeList) {
             MachineRecipe recipe = createRecipeShell(new ResourceLocation("nuclearcraft", "pressurizer_" + incId),
@@ -67,7 +67,7 @@ public class AdapterNCOPressurizer extends AdapterNCOMachine {
 
                 if (iItemIngredient instanceof final ItemArrayIngredient arrayIngredient) {
                     List<IItemIngredient> ingredientList = arrayIngredient.ingredientList;
-                    List<ChancedIngredientStack> ingredientStackList = new ArrayList<>(ingredientList.size());
+                    List<ChancedIngredientStack> ingredientStackList = new ObjectArrayList<>(ingredientList.size());
                     for (IItemIngredient itemIngredient : ingredientList) {
 
                         if (itemIngredient instanceof final OreIngredient oreIngredient) {

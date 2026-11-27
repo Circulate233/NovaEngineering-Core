@@ -25,11 +25,9 @@ import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.util.TileItemHandler;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.resources.I18n;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -57,10 +55,16 @@ public class ServerInfoColumn extends ScrollingColumn {
             final SlotConditionItemHandler slot = slotManager.getSlot(invName, slotID);
             if (!slot.isInstalled()) continue;
             final String suffix = I18n.format("gui.modular_server_assembler.assembly.dependencies.uninstalled");
-            for (var dependency : slot.getDependencies())
+            final var dependencies = slot.getDependencies();
+            for (int index = 0; index < dependencies.size(); index++) {
+                final var dependency = dependencies.get(index);
                 if (!dependency.isInstalled()) tip.add(dependency.getSlotDescription() + suffix);
-            for (var dependency : slot.getSoftDependencies())
+            }
+            final var softDependencies = slot.getSoftDependencies();
+            for (int index = 0; index < softDependencies.size(); index++) {
+                final var dependency = softDependencies.get(index);
                 if (!dependency.isInstalled()) tip.add(dependency.getSlotDescription() + suffix);
+            }
         }
     }
 
@@ -87,7 +91,7 @@ public class ServerInfoColumn extends ScrollingColumn {
         widgets.clear();
 
         if (server == null) {
-            addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.missing_server"))));
+            addWidget(createLabel(ObjectLists.singleton(I18n.format("gui.modular_server_assembler.info.missing_server"))));
             return;
         }
 
@@ -109,10 +113,10 @@ public class ServerInfoColumn extends ScrollingColumn {
         addPropertiesTips();
         addHardwareBandwidthTips();
 
-        List<String> errorTips = new LinkedList<>();
+        List<String> errorTips = new ObjectArrayList<>();
         addErrorTips(installedCPUModules, errorTips, installedRAMModules, installedPSUModules, installedCapacitorModules, cpu, slotManager, calculateCard, extension, power);
 
-        addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.can_start",
+        addWidget(createLabel(ObjectLists.singleton(I18n.format("gui.modular_server_assembler.info.can_start",
             I18n.format("gui.modular_server_assembler.info.can_start." + (errorTips.isEmpty()))))));
         if (!errorTips.isEmpty()) {
             errorTips.addFirst(I18n.format("gui.modular_server_assembler.error"));
@@ -125,7 +129,7 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     private void addModuleTips(final int totalInstalledModules, final int installedCPUModules, final int installedRAMModules, final int installedCalculateCardModules, final int installedExtensionCardModules, final int installedPSUModules, final int installedCapacitorModules) {
-        addWidget(createLabel(Collections.singletonList(I18n.format("gui.modular_server_assembler.info.total_modules", totalInstalledModules))));
+        addWidget(createLabel(ObjectLists.singleton(I18n.format("gui.modular_server_assembler.info.total_modules", totalInstalledModules))));
         List<String> moduleTips = new ObjectArrayList<>();
         moduleTips.add(I18n.format("gui.modular_server_assembler.info.total_cpus", installedCPUModules));
         moduleTips.add(I18n.format("gui.modular_server_assembler.info.total_rams", installedRAMModules));
@@ -152,7 +156,7 @@ public class ServerInfoColumn extends ScrollingColumn {
     }
 
     protected void addPropertiesTips() {
-        List<String> propertiesTips = new ArrayList<>();
+        List<String> propertiesTips = new ObjectArrayList<>();
         propertiesTips.add(I18n.format("gui.modular_server_assembler.info.max_energy_cap", NovaEngUtils.formatNumber(server.getMaxEnergyCap())));
         propertiesTips.add(I18n.format("gui.modular_server_assembler.info.max_energy_consumption", NovaEngUtils.formatNumber(server.getMaxEnergyConsumption())));
         propertiesTips.add(I18n.format("gui.modular_server_assembler.info.max_energy_provision", NovaEngUtils.formatNumber(server.getMaxEnergyProvision())));

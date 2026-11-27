@@ -3,6 +3,7 @@ package github.kasuminova.novaeng.common.performance;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public final class JourneyMapSectionWriter {
                 }
             }
             out.writeInt(scratch.palette.size());
-            for (final IBlockState state : scratch.palette) out.write(prefix(state));
+            for (int index = 0; index < scratch.palette.size(); index++) out.write(prefix(scratch.palette.get(index)));
             // DataOutput writes these bytes verbatim: exactly the original big-endian writeShort loop.
             out.write(scratch.bytes);
         } finally {
@@ -109,7 +109,7 @@ public final class JourneyMapSectionWriter {
     }
 
     private static final class Scratch {
-        private final ArrayList<IBlockState> palette = new ArrayList<>();
+        private final ObjectArrayList<IBlockState> palette = new ObjectArrayList<>();
         private final Reference2IntOpenHashMap<IBlockState> indices = new Reference2IntOpenHashMap<>();
         private final byte[] bytes = new byte[8192];
 

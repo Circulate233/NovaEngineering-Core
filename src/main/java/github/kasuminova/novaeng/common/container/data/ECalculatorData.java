@@ -11,10 +11,10 @@ import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorCont
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorMEChannel;
 import github.kasuminova.novaeng.common.tile.ecotech.ecalculator.ECalculatorThreadCore;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public record ECalculatorData(long totalStorage, long usedExtraStorage, int accelerators,
@@ -24,10 +24,13 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         final long totalStorage = controller.getTotalBytes();
         final int accelerators = controller.getSharedParallelism();
         final List<ECalculatorThreadCore> threadCores = controller.getThreadCores();
-        final List<ThreadCoreData> dataList = new ArrayList<>();
-        for (final ECalculatorThreadCore threadCore : threadCores) {
+        final List<ThreadCoreData> dataList = new ObjectArrayList<>();
+        for (int coreIndex = 0; coreIndex < threadCores.size(); coreIndex++) {
+            final ECalculatorThreadCore threadCore = threadCores.get(coreIndex);
             int hyperThreads = 0;
-            for (final var cpu : threadCore.getCpus()) {
+            final List<appeng.me.cluster.implementations.CraftingCPUCluster> cpus = threadCore.getCpus();
+            for (int cpuIndex = 0; cpuIndex < cpus.size(); cpuIndex++) {
+                final var cpu = cpus.get(cpuIndex);
                 if (ECPUCluster.from(cpu).novaeng_ec$getUsedExtraStorage() > 0) hyperThreads++;
             }
             dataList.add(new ThreadCoreData(threadCore.getControllerLevel(), threadCore.getCpus().size() - hyperThreads, hyperThreads, threadCore.getMaxThreads(), threadCore.getMaxHyperThreads()));
@@ -35,7 +38,8 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         final List<ECPUData> ecpuData = getEcpuData(controller);
         int cpuUsagePerSecond = 0;
         long usedExtraStorage = 0;
-        for (ECPUData data : ecpuData) {
+        for (int index = 0; index < ecpuData.size(); index++) {
+            final ECPUData data = ecpuData.get(index);
             cpuUsagePerSecond += data.cpuUsagePerSecond();
             usedExtraStorage += data.usedExtraMemory();
         }
@@ -44,7 +48,7 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
 
     @Nonnull
     private static List<ECPUData> getEcpuData(final ECalculatorController controller) {
-        final List<ECPUData> ecpuData = new ArrayList<>();
+        final List<ECPUData> ecpuData = new ObjectArrayList<>();
         final ECalculatorMEChannel channel = controller.getChannel();
         if (channel == null) {
             return ecpuData;
@@ -80,7 +84,7 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
         long usedExtraStorage = buf.readLong();
         int accelerators = buf.readInt();
         byte threadCoreSize = buf.readByte();
-        List<ThreadCoreData> threadCores = new ArrayList<>();
+        List<ThreadCoreData> threadCores = new ObjectArrayList<>();
         if (threadCoreSize > 0) {
             for (byte i = 0; i < threadCoreSize; i++) {
                 Levels type = Levels.byOrdinal(buf.readByte());
@@ -92,7 +96,7 @@ public record ECalculatorData(long totalStorage, long usedExtraStorage, int acce
             }
         }
         byte ecpuSize = buf.readByte();
-        List<ECPUData> ecpuList = new ArrayList<>();
+        List<ECPUData> ecpuList = new ObjectArrayList<>();
         if (ecpuSize > 0) {
             for (byte i = 0; i < ecpuSize; i++) {
                 ecpuList.add(new ECPUData(AEItemStack.fromPacket(buf), buf.readLong(), buf.readLong(), buf.readInt(), buf.readInt()));

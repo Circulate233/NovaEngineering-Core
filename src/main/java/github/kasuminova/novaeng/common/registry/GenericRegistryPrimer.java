@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.registry;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.lang.reflect.Type;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class GenericRegistryPrimer {
 
     public <V extends IForgeRegistryEntry<V>> V register(V entry) {
         Class<V> type = entry.getRegistryType();
-        List<IForgeRegistryEntry<?>> entries = primed.computeIfAbsent(type, k -> new LinkedList<>());
+        List<IForgeRegistryEntry<?>> entries = primed.computeIfAbsent(type, k -> new ObjectArrayList<>());
         entries.add(entry);
         return entry;
     }

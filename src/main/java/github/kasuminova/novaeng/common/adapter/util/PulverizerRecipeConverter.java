@@ -8,10 +8,10 @@ import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -21,7 +21,7 @@ public class PulverizerRecipeConverter {
     public static List<MachineRecipe> convert(final Function<ItemStack, MachineRecipe> recipeSupplier, final Predicate<List<ItemStack>> inputFilter, final List<RecipeModifier> modifiers) {
         PulverizerManager.PulverizerRecipe[] recipeList = PulverizerManager.getRecipeList();
 
-        List<MachineRecipe> machineRecipes = new LinkedList<>();
+        List<MachineRecipe> machineRecipes = new ObjectArrayList<>();
 
         for (final PulverizerManager.PulverizerRecipe recipe : recipeList) {
             int energy = recipe.getEnergy();

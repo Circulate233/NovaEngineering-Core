@@ -4,6 +4,8 @@ import github.kasuminova.mmce.common.util.BlockPos2ValueMap;
 import com.sun.management.ThreadMXBean;
 import github.kasuminova.novaeng.common.performance.mmce.OwnedRequirementStack;
 import github.kasuminova.novaeng.common.performance.mmce.StructureQueries;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import hellfirepvp.modularmachinery.common.crafting.requirement.RequirementItem;
 import hellfirepvp.modularmachinery.common.crafting.requirement.type.RequirementType;
 import hellfirepvp.modularmachinery.common.machine.IOType;
@@ -26,7 +28,6 @@ import org.objectweb.asm.commons.SimpleRemapper;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -112,7 +113,7 @@ class RuntimeMachineAllocationTest {
         assertNotSame(source, construct(type, source));
 
         try (final var executor = Executors.newFixedThreadPool(4)) {
-            final List<Callable<ItemStack>> tasks = new ArrayList<>();
+            final List<Callable<ItemStack>> tasks = new ObjectArrayList<>();
             for (int i = 0; i < 100; i++) tasks.add(() -> {
                 final ItemStack attempt = source.copy();
                 return OwnedRequirementStack.construct(attempt, () -> construct(type, attempt));
@@ -184,7 +185,7 @@ class RuntimeMachineAllocationTest {
     @Test
     void packedStructureQueriesKeepOriginalOrderFallbackAndImmutableEscapingPositions() throws Exception {
         final PackedPattern pattern = new PackedPattern();
-        final List<BlockPos> calls = new ArrayList<>();
+        final List<BlockPos> calls = new ObjectArrayList<>();
         for (int i = -30; i < 30; i++) pattern.put(new BlockPos(i, -i, i * 3), new Check(true, calls));
         final BlockArray original = new BlockArray(123);
         final var field = BlockArray.class.getDeclaredField("pattern");
@@ -192,7 +193,7 @@ class RuntimeMachineAllocationTest {
         field.set(original, pattern);
         final BlockPos center = new BlockPos(400, 80, -200);
         assertTrue(original.matches(null, center, true, null));
-        final List<BlockPos> expected = List.copyOf(calls);
+        final List<BlockPos> expected = new ObjectArrayList<>(calls);
         calls.clear();
         assertTrue(StructureQueries.matchesPacked(pattern.nova$internal(), null, center, true, null));
         assertEquals(expected, calls);
@@ -203,7 +204,7 @@ class RuntimeMachineAllocationTest {
             List.of(new Check(false, calls), new Check(true, calls)));
         calls.clear();
         assertTrue(original.matches(null, center, false, replacements));
-        final List<BlockPos> withReplacement = List.copyOf(calls);
+        final List<BlockPos> withReplacement = new ObjectArrayList<>(calls);
         calls.clear();
         assertTrue(StructureQueries.matchesPacked(pattern.nova$internal(), null, center, false, replacements));
         assertEquals(withReplacement, calls);
@@ -220,8 +221,8 @@ class RuntimeMachineAllocationTest {
         }
         node.access &= ~Opcodes.ACC_ABSTRACT;
         final Object optimized = define(node).getConstructor().newInstance();
-        final Map<RequirementType<?, ?>, RecipeModifier.ModifierApplier> value = new java.util.HashMap<>();
-        final Map<RequirementType<?, ?>, RecipeModifier.ModifierApplier> chance = new java.util.HashMap<>();
+        final Map<RequirementType<?, ?>, RecipeModifier.ModifierApplier> value = new Object2ObjectOpenHashMap<>();
+        final Map<RequirementType<?, ?>, RecipeModifier.ModifierApplier> chance = new Object2ObjectOpenHashMap<>();
         for (final var field : optimized.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             field.set(optimized, field.getName().equals("modifierAppliers") ? value : chance);

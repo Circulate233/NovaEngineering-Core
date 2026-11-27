@@ -6,8 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Arrays;
 
 /** Reads the one startup switch before Forge or a logging framework is initialized. */
 public final class LoggingAgentConfig {
@@ -27,7 +26,8 @@ public final class LoggingAgentConfig {
     }
 
     static boolean read(final Path file) throws IOException {
-        final Deque<String> categories = new ArrayDeque<>();
+        String[] categories = new String[4];
+        int categoryCount = 0;
         boolean list = false;
         boolean enabled = false;
         try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
@@ -40,8 +40,8 @@ public final class LoggingAgentConfig {
                     continue;
                 }
                 if (line.equals("}")) {
-                    if (categories.isEmpty()) return false;
-                    categories.removeLast();
+                    if (categoryCount == 0) return false;
+                    categories[--categoryCount] = null;
                     continue;
                 }
                 if (line.length() > 2 && line.charAt(1) == ':') {
@@ -50,8 +50,8 @@ public final class LoggingAgentConfig {
                         continue;
                     }
                     final int assignment = unquotedIndex(line, '=');
-                    if (assignment < 0 || line.charAt(0) != 'B' || categories.size() != 2
-                        || !categories.getFirst().equals("general") || !categories.getLast().equals("performance")) {
+                    if (assignment < 0 || line.charAt(0) != 'B' || categoryCount != 2
+                        || !categories[0].equals("general") || !categories[categoryCount - 1].equals("performance")) {
                         continue;
                     }
                     if (unquote(line.substring(2, assignment).strip()).equals("DisableLogOutput")) {
@@ -62,10 +62,12 @@ public final class LoggingAgentConfig {
                 if (line.endsWith("{")) {
                     final String category = unquote(line.substring(0, line.length() - 1).strip());
                     if (category.isEmpty()) return false;
-                    categories.addLast(category);
+                    if (categoryCount == categories.length)
+                        categories = Arrays.copyOf(categories, categories.length << 1);
+                    categories[categoryCount++] = category;
                 }
             }
-            return !list && categories.isEmpty() && enabled;
+            return !list && categoryCount == 0 && enabled;
         } catch (final NoSuchFileException ignored) {
             return false;
         }

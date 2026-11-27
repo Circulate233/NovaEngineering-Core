@@ -12,10 +12,10 @@ import github.kasuminova.novaeng.client.gui.widget.InputBox;
 import github.kasuminova.novaeng.client.gui.widget.ProgressBar;
 import github.kasuminova.novaeng.client.gui.widget.SizedColumn;
 import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public class MultiplierControlPanel extends SizedColumn {
 
@@ -33,7 +33,7 @@ public class MultiplierControlPanel extends SizedColumn {
         this.coreGUI = coreGUI;
         this.setWidthHeight(WIDTH, HEIGHT);
         this.addWidgets(
-            new MultiLineLabel(Collections.singletonList("§c工作倍率设置"))
+            new MultiLineLabel(ObjectLists.singleton("§c工作倍率设置"))
                 .setAutoWrap(false)
                 .setAutoRecalculateSize(false)
                 .setWidthHeight(70, 10)
@@ -43,7 +43,7 @@ public class MultiplierControlPanel extends SizedColumn {
                 .setMaxProgress(1.5f)
                 .setProgress(.75f)
                 .setTooltipFunction(progressBar ->
-                    Collections.singletonList(String.format("§c工作倍率：%s%%",
+                    ObjectLists.singleton(String.format("§c工作倍率：%s%%",
                         NovaEngUtils.formatDouble((0.25f + progressBar.getProgress()) * 100, 2))
                     )
                 )
@@ -55,7 +55,7 @@ public class MultiplierControlPanel extends SizedColumn {
                         .setEnableBackground(false)
                         .setInputType(InputBox.InputType.NUMBER)
                         .setTooltipFunction(inputBox ->
-                            Collections.singletonList("§c在此处输入新的工作倍率（1.0 = 100%）。")
+                            ObjectLists.singleton("§c在此处输入新的工作倍率（1.0 = 100%）。")
                         )
                         .setWidthHeight(45, 10)
                         .setMargin(6, 5, 6, 0),
@@ -65,7 +65,7 @@ public class MultiplierControlPanel extends SizedColumn {
                         .setTexture(65, 0)
                         .setUnavailableTexture(102, 19)
                         .setTextureLocation(BUTTON_TEX_RES)
-                        .setTooltipFunction(button -> Collections.singletonList("§c单击应用新数值。"))
+                        .setTooltipFunction(button -> ObjectLists.singleton("§c单击应用新数值。"))
                         .setWidthHeight(36, 18)
                         .setMargin(0, 0, 2, 0)
                 )

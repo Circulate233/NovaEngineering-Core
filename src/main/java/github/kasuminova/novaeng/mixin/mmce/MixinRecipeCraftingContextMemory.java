@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.RandomAccess;
 
 @Mixin(value = RecipeCraftingContext.class, remap = false)
 public abstract class MixinRecipeCraftingContextMemory implements RecipeContextAccess {
@@ -73,11 +74,23 @@ public abstract class MixinRecipeCraftingContextMemory implements RecipeContextA
                 ObjectArrayList<ProcessingComponent<?>> valid = null;
                 final Collection<ProcessingComponent<?>> candidates = typeComponents.get(group.getKey());
                 if (candidates != null) {
-                    for (final ProcessingComponent<?> component : candidates) {
-                        if (requirement.isValidComponent(component, context)
-                            && (requirement.getTag() == null || requirement.getTag().equals(component.getTag()))) {
-                            if (valid == null) valid = new ObjectArrayList<>(2);
-                            valid.add(component);
+                    if (candidates instanceof List<?> candidateList && candidateList instanceof RandomAccess) {
+                        for (int i = 0, size = candidateList.size(); i < size; i++) {
+                            final ProcessingComponent<?> component =
+                                (ProcessingComponent<?>) candidateList.get(i);
+                            if (requirement.isValidComponent(component, context)
+                                && (requirement.getTag() == null || requirement.getTag().equals(component.getTag()))) {
+                                if (valid == null) valid = new ObjectArrayList<>(2);
+                                valid.add(component);
+                            }
+                        }
+                    } else {
+                        for (final ProcessingComponent<?> component : candidates) {
+                            if (requirement.isValidComponent(component, context)
+                                && (requirement.getTag() == null || requirement.getTag().equals(component.getTag()))) {
+                                if (valid == null) valid = new ObjectArrayList<>(2);
+                                valid.add(component);
+                            }
                         }
                     }
                 }
@@ -122,15 +135,30 @@ public abstract class MixinRecipeCraftingContextMemory implements RecipeContextA
                 return false;
             }
             ObjectArrayList<String> errors = null;
-            for (final ProcessingComponent<?> component : components) {
-                final CraftCheck check = requirement.canStartCrafting(component, context, currentRestrictions);
-                if (check.isSuccess()) {
-                    requirement.endRequirementCheck();
-                    return true;
+            if (components instanceof RandomAccess) {
+                for (int i = 0, size = components.size(); i < size; i++) {
+                    final ProcessingComponent<?> component = components.get(i);
+                    final CraftCheck check = requirement.canStartCrafting(component, context, currentRestrictions);
+                    if (check.isSuccess()) {
+                        requirement.endRequirementCheck();
+                        return true;
+                    }
+                    if (!check.isInvalid() && !check.getUnlocalizedMessage().isEmpty()) {
+                        if (errors == null) errors = new ObjectArrayList<>(2);
+                        errors.add(check.getUnlocalizedMessage());
+                    }
                 }
-                if (!check.isInvalid() && !check.getUnlocalizedMessage().isEmpty()) {
-                    if (errors == null) errors = new ObjectArrayList<>(2);
-                    errors.add(check.getUnlocalizedMessage());
+            } else {
+                for (final ProcessingComponent<?> component : components) {
+                    final CraftCheck check = requirement.canStartCrafting(component, context, currentRestrictions);
+                    if (check.isSuccess()) {
+                        requirement.endRequirementCheck();
+                        return true;
+                    }
+                    if (!check.isInvalid() && !check.getUnlocalizedMessage().isEmpty()) {
+                        if (errors == null) errors = new ObjectArrayList<>(2);
+                        errors.add(check.getUnlocalizedMessage());
+                    }
                 }
             }
             if (errors != null) {

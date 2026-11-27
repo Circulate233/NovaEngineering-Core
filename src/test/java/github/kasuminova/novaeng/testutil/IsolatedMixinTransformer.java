@@ -1,6 +1,8 @@
 package github.kasuminova.novaeng.testutil;
 
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.launch.MixinBootstrap;
@@ -26,8 +28,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public final class IsolatedMixinTransformer {
     public static byte[][] transformInPackage(final String mixinPackage, final String[] targets,
                                               final Map<String, byte[]> bytecodeOverrides,
                                               final String... mixins) throws Exception {
-        final var urls = new LinkedHashSet<URL>();
+        final var urls = new ObjectLinkedOpenHashSet<URL>();
         for (ClassLoader loader = IsolatedMixinTransformer.class.getClassLoader(); loader != null; loader = loader.getParent()) {
             if (loader instanceof URLClassLoader urlLoader) urls.addAll(List.of(urlLoader.getURLs()));
         }
@@ -82,8 +82,8 @@ public final class IsolatedMixinTransformer {
         final var getInstance = MixinService.class.getDeclaredMethod("getInstance");
         getInstance.setAccessible(true);
         final Object owner = getInstance.invoke(null);
-        final Map<IPropertyKey, Object> properties = new HashMap<>();
-        final Map<String, IPropertyKey> keys = new HashMap<>();
+        final Map<IPropertyKey, Object> properties = new Object2ObjectOpenHashMap<>();
+        final Map<String, IPropertyKey> keys = new Object2ObjectOpenHashMap<>();
         final IGlobalPropertyService propertyService = (IGlobalPropertyService) Proxy.newProxyInstance(loader,
             new Class<?>[]{IGlobalPropertyService.class}, (proxy, method, args) -> switch (method.getName()) {
                 case "resolveKey" -> keys.computeIfAbsent((String) args[0], key -> new IPropertyKey() { });

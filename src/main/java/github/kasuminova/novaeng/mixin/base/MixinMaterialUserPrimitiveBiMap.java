@@ -51,7 +51,6 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
     private void nova$primitiveTable(
         final MaterialUser owner, final BiMap<Integer, MaterialPart> original) {
         final Int2ReferenceHashBiMap<MaterialPart> replacement = new Int2ReferenceHashBiMap<>(16);
-        replacement.putAll(original);
         materialPartBiMap = replacement;
     }
 
@@ -104,7 +103,8 @@ public abstract class MixinMaterialUserPrimitiveBiMap {
     @Overwrite
     public void finishUp() {
         final var parts = new ObjectArrayList<>(materialPartBiMap.values());
-        for (MaterialPart part : parts) {
+        for (int i = 0; i < parts.size(); i++) {
+            final MaterialPart part = parts.get(i);
             try {
                 part.getData().validate();
             } catch (MaterialException failure) {

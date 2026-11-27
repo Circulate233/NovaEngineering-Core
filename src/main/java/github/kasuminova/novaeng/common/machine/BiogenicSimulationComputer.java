@@ -133,8 +133,8 @@ public final class BiogenicSimulationComputer implements MachineSpecial {
 
     private IItemStack outputLivingMatter(final IMachineController controller, final String key) {
         final var data = controller.getController().getCustomDataTag();
-        return DataModelHelper.getDataModelMetadata(new ItemStack((NBTTagCompound) data.getTag(key)))
-                              .map(model -> CraftTweakerMC.getIItemStack(model.getLivingMatter())).orElse(null);
+        final var model = DataModelHelper.getDataModelMetadata(new ItemStack((NBTTagCompound) data.getTag(key))).orElse(null);
+        return model == null ? null : CraftTweakerMC.getIItemStack(model.getLivingMatter());
     }
 
     private IItemStack outputPristineMatter(final IMachineController controller, final String key, final String countKey) {
@@ -145,9 +145,9 @@ public final class BiogenicSimulationComputer implements MachineSpecial {
         }
         final long count = data.getLong(countKey);
         final int random = controller.getController().getWorld().rand.nextInt(99) + 1;
-        final var model = DataModelHelper.getDataModelMetadata(new ItemStack((NBTTagCompound) tag));
+        final var model = DataModelHelper.getDataModelMetadata(new ItemStack((NBTTagCompound) tag)).orElse(null);
         final boolean success = count >= 32 && (count < 10032 ? random <= 6 : count < 20032 ? random <= 12 : count < 30032 ? random <= 14 : random <= 20);
-        return model.isPresent() ? success ? CraftTweakerMC.getIItemStack(model.get().getPristineMatter()) : null : CLAY.amount(1);
+        return model != null ? success ? CraftTweakerMC.getIItemStack(model.getPristineMatter()) : null : CLAY.amount(1);
     }
 
     private IItemStack outputData(final IMachineController controller, final String key, final String countKey) {

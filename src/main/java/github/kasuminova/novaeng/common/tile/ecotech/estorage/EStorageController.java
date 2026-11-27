@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.tile.ecotech.estorage;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import appeng.api.config.Actionable;
 import appeng.api.storage.ICellInventory;
 import appeng.api.storage.ICellInventoryHandler;
@@ -9,6 +10,7 @@ import github.kasuminova.novaeng.common.block.ecotech.estorage.BlockEStorageCont
 import github.kasuminova.novaeng.common.estorage.ECellDriveWatcher;
 import github.kasuminova.novaeng.common.tile.ecotech.EPartController;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.bus.EStorageBus;
+import github.kasuminova.novaeng.common.util.ObjectHeapPriorityQueueWithIterator;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import hellfirepvp.modularmachinery.client.ClientProxy;
@@ -22,10 +24,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 public class EStorageController extends EPartController<EStoragePart> {
 
@@ -46,8 +45,8 @@ public class EStorageController extends EPartController<EStoragePart> {
         new BlockPos(1, -1, 1)
     );
 
-    protected final Queue<EStorageEnergyCell> energyCellsMin = new PriorityQueue<>(Comparator.reverseOrder());
-    protected final Queue<EStorageEnergyCell> energyCellsMax = new PriorityQueue<>();
+    protected final ObjectHeapPriorityQueueWithIterator<EStorageEnergyCell> energyCellsMin = new ObjectHeapPriorityQueueWithIterator<>(Comparator.reverseOrder());
+    protected final ObjectHeapPriorityQueueWithIterator<EStorageEnergyCell> energyCellsMax = new ObjectHeapPriorityQueueWithIterator<>();
 
     protected BlockEStorageController parentController = null;
     protected double idleDrain = 64;
@@ -82,8 +81,8 @@ public class EStorageController extends EPartController<EStoragePart> {
     protected void onAddPart(final EStoragePart part) {
         if (part instanceof EStorageEnergyCell energyCell) {
             synchronized (energyCellsMax) {
-                energyCellsMax.add(energyCell);
-                energyCellsMin.add(energyCell);
+                energyCellsMax.enqueue(energyCell);
+                energyCellsMin.enqueue(energyCell);
             }
         } else if (part instanceof EStorageMEChannel c) {
             this.channel = c;
@@ -116,9 +115,10 @@ public class EStorageController extends EPartController<EStoragePart> {
         }
 
         synchronized (energyCellsMax) {
-            List<EStorageEnergyCell> toReInsert = new LinkedList<>();
+            List<EStorageEnergyCell> toReInsert = new ObjectArrayList<>();
             EStorageEnergyCell cell;
-            while ((cell = energyCellsMin.poll()) != null) {
+            while (!energyCellsMin.isEmpty()) {
+                cell = energyCellsMin.dequeue();
                 double prev = toInject;
                 toInject -= (toInject - cell.injectPower(toInject, mode));
                 toReInsert.add(cell);
@@ -128,7 +128,7 @@ public class EStorageController extends EPartController<EStoragePart> {
             }
 
             if (!toReInsert.isEmpty()) {
-                energyCellsMin.addAll(toReInsert);
+                for (int index = 0; index < toReInsert.size(); index++) energyCellsMin.enqueue(toReInsert.get(index));
             }
         }
 
@@ -153,8 +153,9 @@ public class EStorageController extends EPartController<EStoragePart> {
 
         synchronized (energyCellsMax) {
             EStorageEnergyCell cell;
-            List<EStorageEnergyCell> toReInsert = new LinkedList<>();
-            while ((cell = energyCellsMax.poll()) != null) {
+            List<EStorageEnergyCell> toReInsert = new ObjectArrayList<>();
+            while (!energyCellsMax.isEmpty()) {
+                cell = energyCellsMax.dequeue();
                 double prev = extracted;
                 extracted += cell.extractPower(amt - extracted, mode);
                 toReInsert.add(cell);
@@ -164,7 +165,7 @@ public class EStorageController extends EPartController<EStoragePart> {
             }
 
             if (!toReInsert.isEmpty()) {
-                energyCellsMax.addAll(toReInsert);
+                for (int index = 0; index < toReInsert.size(); index++) energyCellsMax.enqueue(toReInsert.get(index));
             }
         }
 
@@ -173,7 +174,9 @@ public class EStorageController extends EPartController<EStoragePart> {
 
     public void recalculateEnergyUsage() {
         double newIdleDrain = 64;
-        for (final EStorageCellDrive drive : getCellDrives()) {
+        final List<EStorageCellDrive> drives = getCellDrives();
+        for (int index = 0; index < drives.size(); index++) {
+            final EStorageCellDrive drive = drives.get(index);
             ECellDriveWatcher<IAEItemStack> watcher = drive.getWatcher();
             if (watcher == null) {
                 continue;

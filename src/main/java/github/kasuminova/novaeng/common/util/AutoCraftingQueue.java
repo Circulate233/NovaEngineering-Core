@@ -12,21 +12,21 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.CommonProxy;
 import github.kasuminova.novaeng.common.container.ContainerNEWCraftConfirm;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.Future;
 
 public final class AutoCraftingQueue {
 
     private static final Map<EntityPlayer, AutoCraftingQueue> QUEUES = new Object2ObjectOpenHashMap<>();
-    private Queue<ItemStack> queue = EmptyQueue.empty();
+    private ObjectArrayFIFOQueue<ItemStack> queue = new ObjectArrayFIFOQueue<>();
 
-    public static void setQueueAndStrat(final Queue<ItemStack> items, final EntityPlayer player) {
+    public static void setQueueAndStrat(final ObjectArrayFIFOQueue<ItemStack> items, final EntityPlayer player) {
         final AutoCraftingQueue queue = QUEUES.computeIfAbsent(player, ignored -> new AutoCraftingQueue());
         queue.queue = items;
         queue.executionQueue(player);
@@ -41,7 +41,7 @@ public final class AutoCraftingQueue {
         final AutoCraftingQueue queue = QUEUES.remove(player);
         if (queue != null) {
             queue.queue.clear();
-            queue.queue = EmptyQueue.empty();
+            queue.queue = new ObjectArrayFIFOQueue<>();
         }
     }
 
@@ -51,7 +51,7 @@ public final class AutoCraftingQueue {
             final var entry = entries.next();
             if (entry.getKey().world == world) {
                 entry.getValue().queue.clear();
-                entry.getValue().queue = EmptyQueue.empty();
+                entry.getValue().queue = new ObjectArrayFIFOQueue<>();
                 entries.remove();
             }
         }
@@ -60,23 +60,23 @@ public final class AutoCraftingQueue {
     public static void clearAll() {
         for (final AutoCraftingQueue queue : QUEUES.values()) {
             queue.queue.clear();
-            queue.queue = EmptyQueue.empty();
+            queue.queue = new ObjectArrayFIFOQueue<>();
         }
         QUEUES.clear();
     }
 
     public void clearQueue() {
         this.queue.clear();
-        this.queue = EmptyQueue.empty();
+        this.queue = new ObjectArrayFIFOQueue<>();
         QUEUES.values().removeIf(existing -> existing == this);
     }
 
     public boolean executionQueue(final EntityPlayer player) {
-        final ItemStack item = this.queue.poll();
-        if (item == null) {
+        if (this.queue.isEmpty()) {
             this.clearQueue();
             return false;
         }
+        final ItemStack item = this.queue.dequeue();
         Future<ICraftingJob> future = null;
         try {
             final var terminal = MEHandler.getTerminalGuiObject(player);

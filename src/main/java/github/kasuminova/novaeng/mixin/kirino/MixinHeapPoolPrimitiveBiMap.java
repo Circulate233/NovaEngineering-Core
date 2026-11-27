@@ -111,7 +111,6 @@ public abstract class MixinHeapPoolPrimitiveBiMap extends ArchetypeDataPool
         require = 1)
     private void nova$primitiveTable(final HeapPool owner, final BiMap<Integer, Integer> original) {
         final Int2IntHashBiMap replacement = new Int2IntHashBiMap(16);
-        replacement.putAll(original);
         entityDataIndexes = replacement;
     }
 

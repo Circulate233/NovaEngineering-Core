@@ -67,7 +67,8 @@ public class TileHyperNetTerminal extends TileCustomController {
         }
 
         int energyUsage = nodeProxy.isConnected() ? ENERGY_USAGE : ENERGY_USAGE / 10;
-        for (final IEnergyHandlerAsync handler : energyHandlers) {
+        for (int index = 0; index < energyHandlers.size(); index++) {
+            final IEnergyHandlerAsync handler = energyHandlers.get(index);
             if (handler.extractEnergy(energyUsage)) {
                 controllerStatus = CraftingStatus.working();
                 return true;

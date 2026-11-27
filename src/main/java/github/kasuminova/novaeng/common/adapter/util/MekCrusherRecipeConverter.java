@@ -7,13 +7,13 @@ import hellfirepvp.modularmachinery.common.lib.RequirementTypesMM;
 import hellfirepvp.modularmachinery.common.machine.IOType;
 import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mekanism.common.recipe.RecipeHandler;
 import mekanism.common.recipe.inputs.ItemStackInput;
 import mekanism.common.recipe.machines.CrusherRecipe;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 public class MekCrusherRecipeConverter {
     public static List<MachineRecipe> convert(final Function<ItemStack, MachineRecipe> recipeSupplier, final Predicate<List<ItemStack>> inputFilter, final List<RecipeModifier> modifiers, final int baseEnergyUsage) {
         Map<ItemStackInput, CrusherRecipe> crusherRecipes = RecipeHandler.Recipe.CRUSHER.get();
-        List<MachineRecipe> machineRecipes = new LinkedList<>();
+        List<MachineRecipe> machineRecipes = new ObjectArrayList<>();
 
         crusherRecipes.forEach((input, mekRecipe) -> {
             ItemStack inputStack = input.ingredient;

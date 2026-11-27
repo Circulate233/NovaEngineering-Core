@@ -14,10 +14,10 @@ import github.kasuminova.novaeng.common.crafttweaker.util.NovaEngUtils;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import github.kasuminova.novaeng.novaeng_core.Tags;
 import hellfirepvp.modularmachinery.common.base.Mods;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.Collections;
 
 public class EStorageCellInfo extends SizedColumn {
 
@@ -123,15 +123,15 @@ public class EStorageCellInfo extends SizedColumn {
         getWidgets().clear();
 
         // Type
-        addWidget(new MultiLineLabel(Collections.singletonList(
+        addWidget(new MultiLineLabel(ObjectLists.singleton(
             I18n.format("gui.estorage_controller.cell_info.tip.0", typeName, levelName))
         ).setAutoWrap(false).setScale(.6F).setHeight(7).setMargin(10, 0, 2, 0));
         // StoredTypes / MaxTypes
-        addWidget(new MultiLineLabel(Collections.singletonList(
+        addWidget(new MultiLineLabel(ObjectLists.singleton(
             I18n.format("gui.estorage_controller.cell_info.tip.1", usedTypes, maxTypes))
         ).setAutoWrap(false).setScale(.6F).setHeight(7).setMargin(10, 0, 0, 0));
         // UsedBytes / MaxBytes
-        addWidget(new MultiLineLabel(Collections.singletonList(
+        addWidget(new MultiLineLabel(ObjectLists.singleton(
             I18n.format("gui.estorage_controller.cell_info.tip.2",
                 NovaEngUtils.formatNumber(usedBytes, 1),
                 NovaEngUtils.formatNumber(maxBytes, 1)

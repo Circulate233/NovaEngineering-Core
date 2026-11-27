@@ -1,9 +1,10 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.util.EnumFacing;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
 
@@ -23,13 +24,13 @@ public final class ProcessorDirections {
 
     private static List<List<EnumFacing>> createDirections() {
         final EnumFacing[] facing = EnumFacing.values();
-        final List<List<EnumFacing>> result = new ArrayList<>(64);
+        final ObjectArrayList<List<EnumFacing>> result = new ObjectArrayList<>(64);
         for (int mask = 0; mask < 64; mask++) {
-            final List<EnumFacing> values = new ArrayList<>(Integer.bitCount(mask));
+            final ObjectArrayList<EnumFacing> values = new ObjectArrayList<>(Integer.bitCount(mask));
             for (int i = 0; i < 6; i++) if ((mask & (1 << i)) != 0) values.add(facing[i]);
-            result.add(List.copyOf(values));
+            result.add(ObjectLists.unmodifiable(values));
         }
-        return List.copyOf(result);
+        return ObjectLists.unmodifiable(result);
     }
 
     private static final class MutableSnapshot extends AbstractList<EnumFacing> implements RandomAccess {
@@ -45,7 +46,7 @@ public final class ProcessorDirections {
 
         private void copy() {
             if (!copied) {
-                values = new ArrayList<>(values);
+                values = new ObjectArrayList<>(values);
                 copied = true;
             }
         }

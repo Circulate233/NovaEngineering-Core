@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.util.collection;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import org.junit.jupiter.api.Test;
 
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +28,7 @@ class WeakObject2IntCacheTest {
     @Test
     void cleanupRemovesClearedKeysEvenBeforeQueueNotificationAndShrinksPeakStorage() throws Exception {
         final WeakObject2IntCache<Value> cache = new WeakObject2IntCache<>();
-        final List<Value> live = new ArrayList<>();
+        final List<Value> live = new ObjectArrayList<>();
         for (int i = 0; i < 10000; i++) {
             final Value key = new Value(i);
             if (i < 50) live.add(key);
@@ -43,7 +43,10 @@ class WeakObject2IntCacheTest {
         cache.cleanUp();
         assertEquals(50, map.size());
         assertTrue(capacity(map) < before / 8);
-        for (final Value key : live) assertEquals(key.id - 25, cache.getCached(new Value(key.id)));
+        for (int index = 0; index < live.size(); index++) {
+            final Value key = live.get(index);
+            assertEquals(key.id - 25, cache.getCached(new Value(key.id)));
+        }
         assertEquals(0, cache.getCached(new Value(25)));
         assertEquals(WeakObject2IntCache.ABSENT, cache.getCached(new Value(9999)));
     }
@@ -81,7 +84,7 @@ class WeakObject2IntCacheTest {
     @Test
     void maintenanceStillShrinksAfterLookupsAlreadyDrainedTheQueue() throws Exception {
         final WeakObject2IntCache<Value> cache = new WeakObject2IntCache<>();
-        final List<Value> live = new ArrayList<>();
+        final List<Value> live = new ObjectArrayList<>();
         for (int i = 0; i < 1000; i++) {
             final Value key = new Value(i);
             live.add(key);

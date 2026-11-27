@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.common.profiler;
 
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.text.TextFormatting;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,30 +51,34 @@ public class CPacketProfiler {
         long profileTimeExisted = enabled ? System.currentTimeMillis() - profilerStartTime : profilerStopTime - profilerStartTime;
         double networkBandwidthPerSec = profileTimeExisted <= 0 ? 0 : (totalPacketSize / ((double) profileTimeExisted / 1000D));
 
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new LinkedList<>(PACKET_TOTAL_SIZE.entrySet());
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new ObjectArrayList<>(PACKET_TOTAL_SIZE.entrySet());
         sorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
         if (sorted.size() > limit) sorted.subList(limit, sorted.size()).clear();
         List<Map.Entry<Class<?>, Tuple<Long, Long>>> teSorted =
-            new LinkedList<>(TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
+            new ObjectArrayList<>(TEUpdatePacketProfiler.TE_UPDATE_PACKET_TOTAL_SIZE.entrySet());
         teSorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
         if (teSorted.size() > limit) teSorted.subList(limit, teSorted.size()).clear();
 
         CPacketProfilerData data = new CPacketProfilerData((float) networkBandwidthPerSec);
-        sorted.forEach((entry) -> {
+        for (int index = 0; index < sorted.size(); index++) {
+            final Map.Entry<Class<?>, Tuple<Long, Long>> entry = sorted.get(index);
             Class<?> pktClass = entry.getKey();
             if (pktClass.getName().startsWith("net.minecraft")) {
                 data.addPacket(pktClass.getSimpleName(), (int) (long) entry.getValue().getFirst(), entry.getValue().getSecond());
             } else {
                 data.addPacket(pktClass.getName(), (int) (long) entry.getValue().getFirst(), entry.getValue().getSecond());
             }
-        });
-        teSorted.forEach((entry) -> data.addTileEntityPacket(entry.getKey().getName(), (int) (long) entry.getValue().getFirst(), entry.getValue().getSecond()));
+        }
+        for (int index = 0; index < teSorted.size(); index++) {
+            final Map.Entry<Class<?>, Tuple<Long, Long>> entry = teSorted.get(index);
+            data.addTileEntityPacket(entry.getKey().getName(), (int) (long) entry.getValue().getFirst(), entry.getValue().getSecond());
+        }
 
         return data;
     }
 
     public static List<String> getProfilerMessages(final int limit) {
-        List<String> messages = new LinkedList<>();
+        List<String> messages = new ObjectArrayList<>();
 
         long totalPacketSize = TOTAL_RECEIVED_DATA_SIZE.get();
 
@@ -90,11 +94,12 @@ public class CPacketProfiler {
             return messages;
         }
 
-        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new LinkedList<>(PACKET_TOTAL_SIZE.entrySet());
+        List<Map.Entry<Class<?>, Tuple<Long, Long>>> sorted = new ObjectArrayList<>(PACKET_TOTAL_SIZE.entrySet());
         sorted.sort((o1, o2) -> Long.compare(o2.getValue().getSecond(), o1.getValue().getSecond()));
         if (sorted.size() > limit) sorted.subList(limit, sorted.size()).clear();
 
-        for (final Map.Entry<Class<?>, Tuple<Long, Long>> entry : sorted) {
+        for (int index = 0; index < sorted.size(); index++) {
+            final Map.Entry<Class<?>, Tuple<Long, Long>> entry = sorted.get(index);
             Class<?> pClass = entry.getKey();
             long packetTotalAmount = entry.getValue().getFirst();
             long packetTotalSize = entry.getValue().getSecond();

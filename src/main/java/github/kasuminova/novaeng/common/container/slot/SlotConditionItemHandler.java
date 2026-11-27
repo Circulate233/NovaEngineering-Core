@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.container.slot;
 
 import github.kasuminova.novaeng.common.util.TileItemHandler;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,19 +10,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public abstract class SlotConditionItemHandler extends SlotItemHandler {
     protected final int displayID;
     @Getter
-    protected final List<SlotConditionItemHandler> dependencies = new LinkedList<>();
+    protected final List<SlotConditionItemHandler> dependencies = new ObjectArrayList<>();
     @Getter
-    protected final List<SlotConditionItemHandler> dependents = new LinkedList<>();
+    protected final List<SlotConditionItemHandler> dependents = new ObjectArrayList<>();
     @Getter
-    protected final List<SlotConditionItemHandler> softDependents = new LinkedList<>();
+    protected final List<SlotConditionItemHandler> softDependents = new ObjectArrayList<>();
     @Getter
-    protected final List<SlotConditionItemHandler> softDependencies = new LinkedList<>();
+    protected final List<SlotConditionItemHandler> softDependencies = new ObjectArrayList<>();
     protected boolean enabled = false;
     @Getter
     protected boolean hovered = false;
@@ -35,7 +35,8 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
 
     @Override
     public boolean canTakeStack(final EntityPlayer playerIn) {
-        for (final SlotConditionItemHandler dependent : dependents) {
+        for (int index = 0; index < dependents.size(); index++) {
+            final SlotConditionItemHandler dependent = dependents.get(index);
             if (dependent.isInstalled()) {
                 return false;
             }
@@ -86,7 +87,8 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
     }
 
     public boolean isAvailable() {
-        for (final SlotConditionItemHandler dependency : dependencies) {
+        for (int index = 0; index < dependencies.size(); index++) {
+            final SlotConditionItemHandler dependency = dependencies.get(index);
             if (!dependency.isInstalled()) {
                 return false;
             }
@@ -97,7 +99,7 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
     @SideOnly(Side.CLIENT)
     public List<String> getHoverTooltips() {
         String slotDesc = getSlotDescription();
-        List<String> tooltips = new LinkedList<>();
+        List<String> tooltips = new ObjectArrayList<>();
         tooltips.add(slotDesc);
 
         if (isInvalid()) {
@@ -107,7 +109,8 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
 
         if (!dependencies.isEmpty()) {
             tooltips.add(I18n.format("gui.modular_server_assembler.assembly.dependencies"));
-            for (final SlotConditionItemHandler dependency : dependencies) {
+            for (int index = 0; index < dependencies.size(); index++) {
+                final SlotConditionItemHandler dependency = dependencies.get(index);
                 if (dependency.isInstalled()) {
                     tooltips.add(dependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.installed"));
                 } else {
@@ -117,13 +120,15 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
         }
         if (!dependents.isEmpty()) {
             tooltips.add(I18n.format("gui.modular_server_assembler.assembly.dependents"));
-            for (final SlotConditionItemHandler dependent : dependents) {
+            for (int index = 0; index < dependents.size(); index++) {
+                final SlotConditionItemHandler dependent = dependents.get(index);
                 tooltips.add(dependent.getSlotDescription());
             }
         }
         if (!softDependencies.isEmpty()) {
             tooltips.add(I18n.format("gui.modular_server_assembler.assembly.soft_dependencies"));
-            for (final SlotConditionItemHandler dependency : softDependencies) {
+            for (int index = 0; index < softDependencies.size(); index++) {
+                final SlotConditionItemHandler dependency = softDependencies.get(index);
                 if (dependency.isInstalled()) {
                     tooltips.add(dependency.getSlotDescription() + I18n.format("gui.modular_server_assembler.assembly.dependencies.installed"));
                 } else {
@@ -133,7 +138,8 @@ public abstract class SlotConditionItemHandler extends SlotItemHandler {
         }
         if (!softDependents.isEmpty()) {
             tooltips.add(I18n.format("gui.modular_server_assembler.assembly.soft_dependents"));
-            for (final SlotConditionItemHandler dependent : softDependents) {
+            for (int index = 0; index < softDependents.size(); index++) {
+                final SlotConditionItemHandler dependent = softDependents.get(index);
                 tooltips.add(dependent.getSlotDescription());
             }
         }

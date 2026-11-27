@@ -1,14 +1,16 @@
 package github.kasuminova.novaeng.common.profiler;
 
 import com.mojang.authlib.GameProfile;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.util.text.TextFormatting;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,50 +40,49 @@ public class SPacketProfiler {
     }
 
     public static List<String> getProfilerMessages() {
-        Map<Class<?>, AtomicLong> packetCounter = new ConcurrentHashMap<>();
+        final Object2LongOpenHashMap<Class<?>> packetCounter = new Object2LongOpenHashMap<>();
         PLAYER_CLIENT_PACKETS.forEach((profile, map) ->
             map.forEach((pClass, counter) ->
-                packetCounter.computeIfAbsent(pClass, v -> new AtomicLong(0)).addAndGet(counter.get())));
+                packetCounter.addTo(pClass, counter.get())));
 
-        List<Map.Entry<Class<?>, AtomicLong>> largest = new ArrayList<>(packetCounter.entrySet());
-        largest.sort((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()));
+        final List<Object2LongMap.Entry<Class<?>>> largest = new ObjectArrayList<>(packetCounter.object2LongEntrySet());
+        largest.sort((o1, o2) -> Long.compare(o2.getLongValue(), o1.getLongValue()));
         int largestLimit = Math.min(50, packetCounter.size() / 2 + packetCounter.size() % 2);
         if (largest.size() > largestLimit) largest.subList(largestLimit, largest.size()).clear();
 
-        List<Map.Entry<Class<?>, AtomicLong>> smallest = new ArrayList<>(packetCounter.entrySet());
-        smallest.sort(Comparator.comparingLong(o -> o.getValue().get()));
+        final List<Object2LongMap.Entry<Class<?>>> smallest = new ObjectArrayList<>(packetCounter.object2LongEntrySet());
+        smallest.sort((o1, o2) -> Long.compare(o1.getLongValue(), o2.getLongValue()));
         int smallestLimit = Math.min(50, packetCounter.size() / 2);
         if (smallest.size() > smallestLimit) smallest.subList(smallestLimit, smallest.size()).clear();
 
-        Map<Class<?>, Map<GameProfile, AtomicLong>> pClassCounter = new ConcurrentHashMap<>();
-        PLAYER_CLIENT_PACKETS.forEach((profile, map) -> map.forEach((pClass, counter) -> pClassCounter
-            .computeIfAbsent(pClass, v -> new ConcurrentHashMap<>())
-            .computeIfAbsent(profile, v -> new AtomicLong(0))
-            .addAndGet(counter.get()))
-        );
+        final Object2ObjectOpenHashMap<Class<?>, Object2LongOpenHashMap<GameProfile>> pClassCounter = new Object2ObjectOpenHashMap<>();
+        PLAYER_CLIENT_PACKETS.forEach((profile, map) -> map.forEach((pClass, counter) ->
+            pClassCounter.computeIfAbsent(pClass, ignored -> new Object2LongOpenHashMap<>()).addTo(profile, counter.get())));
 
-        List<String> messages = new ArrayList<>();
+        List<String> messages = new ObjectArrayList<>();
         messages.add(TextFormatting.BLUE + "已接收的网络包（最大排序，至多 50）：");
-        largest.forEach(entry -> {
+        for (int index = 0; index < largest.size(); index++) {
+            final Object2LongMap.Entry<Class<?>> entry = largest.get(index);
             Class<?> pClass = entry.getKey();
-            AtomicLong counter = entry.getValue();
-            messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());
-        });
+            long counter = entry.getLongValue();
+            messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter);
+        }
 
         messages.add(TextFormatting.BLUE + "已接收的网络包（最小排序，至多 50）：");
-        smallest.forEach(entry -> {
+        for (int index = 0; index < smallest.size(); index++) {
+            final Object2LongMap.Entry<Class<?>> entry = smallest.get(index);
             Class<?> pClass = entry.getKey();
-            AtomicLong counter = entry.getValue();
-            messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());
-        });
+            long counter = entry.getLongValue();
+            messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter);
+        }
 
         messages.add(TextFormatting.RED + "统计中的可疑网络包：");
         pClassCounter.forEach((pClass, map) -> {
             if (map.size() == 1) {
-                map.forEach((profile, counter) -> {
-                    messages.add(TextFormatting.RED + profile.getName() + " (" + profile.getId() + ")");
-                    messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());
-                });
+                final Object2LongMap.Entry<GameProfile> entry = map.object2LongEntrySet().iterator().next();
+                final GameProfile profile = entry.getKey();
+                messages.add(TextFormatting.RED + profile.getName() + " (" + profile.getId() + ")");
+                messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + entry.getLongValue());
             }
         });
 
@@ -89,13 +90,14 @@ public class SPacketProfiler {
     }
 
     public static List<String> getFullProfilerMessages() {
-        List<String> messages = new ArrayList<>();
+        List<String> messages = new ObjectArrayList<>();
 
         PLAYER_CLIENT_PACKETS.forEach((profile, map) -> {
             messages.add(TextFormatting.BLUE + profile.getName() + " (" + profile.getId() + ")");
-            List<Map.Entry<Class<?>, AtomicLong>> sorted = new ArrayList<>(map.entrySet());
+            List<Map.Entry<Class<?>, AtomicLong>> sorted = new ObjectArrayList<>(map.entrySet());
             sorted.sort((o1, o2) -> Long.compare(o2.getValue().get(), o1.getValue().get()));
-            for (Map.Entry<Class<?>, AtomicLong> entry : sorted) {
+            for (int index = 0; index < sorted.size(); index++) {
+                final Map.Entry<Class<?>, AtomicLong> entry = sorted.get(index);
                 Class<?> pClass = entry.getKey();
                 AtomicLong counter = entry.getValue();
                 messages.add(TextFormatting.BLUE + "  " + getPacketClassName(pClass) + ": " + TextFormatting.GOLD + counter.get());

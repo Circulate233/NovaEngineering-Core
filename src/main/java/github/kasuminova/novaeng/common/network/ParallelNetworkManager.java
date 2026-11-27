@@ -7,6 +7,7 @@ import github.kasuminova.novaeng.NovaEngineeringCore;
 import github.kasuminova.novaeng.common.mod.Mods;
 import hellfirepvp.modularmachinery.ModularMachinery;
 import ic2.core.network.NetworkManager;
+import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import mekanism.common.Mekanism;
@@ -15,13 +16,11 @@ import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ParallelNetworkManager {
 
-    private final Map<Object, Queue<ActionExecutor>> groupQueues = new ConcurrentHashMap<>();
+    private final Map<Object, ObjectHeapPriorityQueue<ActionExecutor>> groupQueues = new ConcurrentHashMap<>();
     private final ReferenceSet<Object> blacklistChannels = new ReferenceOpenHashSet<>();
 
     public void init() {
@@ -73,18 +72,20 @@ public class ParallelNetworkManager {
     }
 
     public void offerAction(final Object group, final Action action, final int priority) {
-        Queue<ActionExecutor> queue = groupQueues.computeIfAbsent(group, k -> new PriorityQueue<>());
+        final ObjectHeapPriorityQueue<ActionExecutor> queue =
+            groupQueues.computeIfAbsent(group, k -> new ObjectHeapPriorityQueue<>());
         synchronized (queue) {
-            queue.offer(new ActionExecutor(action, priority));
+            queue.enqueue(new ActionExecutor(action, priority));
         }
     }
 
     public void execute() {
         ModularMachinery.EXECUTE_MANAGER.addTask(() -> {
-            for (final Queue<ActionExecutor> queue : groupQueues.values()) {
+            for (final ObjectHeapPriorityQueue<ActionExecutor> queue : groupQueues.values()) {
                 synchronized (queue) {
                     ActionExecutor action;
-                    while ((action = queue.poll()) != null) {
+                    while (!queue.isEmpty()) {
+                        action = queue.dequeue();
                         action.run();
                     }
                 }

@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.mixin.mmce;
 
 import github.kasuminova.novaeng.common.performance.mmce.DescriptorCanonicalPool;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -13,7 +14,6 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +44,14 @@ public final class DescriptorCanonicalizationTest {
         final var internBefore = baseline.getMethod("canonicalize");
         final var internAfter = candidate.getMethod("canonicalize");
         final var clear = candidate.getMethod("clearPool");
-        final List<Object> representativesBefore = new ArrayList<>();
-        final List<Object> representativesAfter = new ArrayList<>();
+        final List<Object> representativesBefore = new ObjectArrayList<>();
+        final List<Object> representativesAfter = new ObjectArrayList<>();
         final Random random = new Random(18961119);
         for (int i = 0; i < 10000; i++) {
             // Include ordered alternatives, nulls and hash collisions across list implementations.
             final List<Object> values = Arrays.asList(random.nextInt(32), i % 3 == 0 ? null : random.nextInt(4));
             final Object a = internBefore.invoke(before.newInstance(values));
-            final Object b = internAfter.invoke(after.newInstance(new ArrayList<>(values)));
+            final Object b = internAfter.invoke(after.newInstance(new ObjectArrayList<>(values)));
             final int index = representativesBefore.indexOf(a);
             if (index < 0) {
                 representativesBefore.add(a);
@@ -69,7 +69,7 @@ public final class DescriptorCanonicalizationTest {
         // Run the actual transplanted mixin overwrite through parallel reflection calls.
         try (final var executor = Executors.newFixedThreadPool(16)) {
             final CountDownLatch start = new CountDownLatch(1);
-            final List<Future<?>> futures = new ArrayList<>();
+            final List<Future<?>> futures = new ObjectArrayList<>();
             for (int worker = 0; worker < 16; worker++) {
                 futures.add(executor.submit(() -> {
                     start.await();
@@ -82,7 +82,7 @@ public final class DescriptorCanonicalizationTest {
                 }));
             }
             start.countDown();
-            for (final var future : futures) future.get(30, TimeUnit.SECONDS);
+            for (int index = 0; index < futures.size(); index++) futures.get(index).get(30, TimeUnit.SECONDS);
         }
         poolCollisionsAndResets();
         blockInformationStillLocks(Path.of(args[0]));
@@ -167,7 +167,7 @@ public final class DescriptorCanonicalizationTest {
         final var canonicalize = type.getMethod("canonicalize");
         final var representatives = new ConcurrentHashMap<Integer, Object>();
         try (final var executor = Executors.newFixedThreadPool(16)) {
-            final List<Future<?>> futures = new ArrayList<>();
+            final List<Future<?>> futures = new ObjectArrayList<>();
             for (int w = 0; w < 16; w++) {
                 final int worker = w;
                 futures.add(executor.submit(() -> {
@@ -181,7 +181,7 @@ public final class DescriptorCanonicalizationTest {
                     return null;
                 }));
             }
-            for (final var future : futures) future.get(30, TimeUnit.SECONDS);
+            for (int index = 0; index < futures.size(); index++) futures.get(index).get(30, TimeUnit.SECONDS);
         }
         require(representatives.size() == 2048, "all BlockInformation values survive concurrent growth");
         type.getMethod("clearPool").invoke(null);
@@ -197,7 +197,7 @@ public final class DescriptorCanonicalizationTest {
         final Key collision = new Key(33);
         require(pool.canonicalize(collision) == collision, "colliding unequal keys remain distinct");
         try (final var executor = Executors.newFixedThreadPool(16)) {
-            final List<Future<?>> futures = new ArrayList<>();
+            final List<Future<?>> futures = new ObjectArrayList<>();
             for (int w = 0; w < 16; w++) {
                 final int worker = w;
                 futures.add(executor.submit(() -> {
@@ -208,7 +208,7 @@ public final class DescriptorCanonicalizationTest {
                     }
                 }));
             }
-            for (final var future : futures) future.get(30, TimeUnit.SECONDS);
+            for (int index = 0; index < futures.size(); index++) futures.get(index).get(30, TimeUnit.SECONDS);
         }
         pool.clear();
         final Key fresh = new Key(1);
@@ -231,7 +231,7 @@ public final class DescriptorCanonicalizationTest {
                 final AtomicInteger count = new AtomicInteger();
                 final CountDownLatch start = new CountDownLatch(1);
                 try (final var executor = Executors.newFixedThreadPool(16)) {
-                    final List<Future<?>> futures = new ArrayList<>();
+                    final List<Future<?>> futures = new ObjectArrayList<>();
                     for (int w = 0; w < 16; w++) {
                         final int worker = w;
                         futures.add(executor.submit(() -> {
@@ -250,7 +250,7 @@ public final class DescriptorCanonicalizationTest {
                     }
                     final long begin = System.nanoTime();
                     start.countDown();
-                    for (final var future : futures) future.get(30, TimeUnit.SECONDS);
+                    for (int index = 0; index < futures.size(); index++) futures.get(index).get(30, TimeUnit.SECONDS);
                     System.out.printf("pool benchmark trial=%d striped=%s calls=1600000 ms=%.3f checksum=%d%n",
                         trial, striped, (System.nanoTime() - begin) / 1e6, count.get());
                 }

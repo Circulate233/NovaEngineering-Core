@@ -9,6 +9,7 @@ import github.kasuminova.novaeng.common.item.estorage.EStorageCell;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageCellDrive;
 import github.kasuminova.novaeng.common.tile.ecotech.estorage.EStorageController;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -18,12 +19,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorageGUIData, IMessage> {
 
-    protected final List<EStorageCellData> dataList = new ArrayList<>();
+    protected final List<EStorageCellData> dataList = new ObjectArrayList<>();
     protected EStorageEnergyData energyData = null;
 
     public PktEStorageGUIData() {
@@ -48,7 +48,7 @@ public class PktEStorageGUIData implements IMessage, IMessageHandler<PktEStorage
         if (!(cur instanceof GuiEStorageController)) {
             return;
         }
-        List<EStorageCellData> sorted = new ArrayList<>(dataList);
+        List<EStorageCellData> sorted = new ObjectArrayList<>(dataList);
         sorted.sort((o1, o2) -> {
             int byteResult = Long.compare(o2.usedBytes(), o1.usedBytes());
             if (byteResult != 0) return byteResult;

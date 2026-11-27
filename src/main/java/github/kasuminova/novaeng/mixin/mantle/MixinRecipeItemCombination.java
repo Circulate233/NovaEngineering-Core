@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.mixin.mantle;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.asm.mixin.Final;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import slimeknights.mantle.util.RecipeMatch;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +33,8 @@ public abstract class MixinRecipeItemCombination extends RecipeMatch {
     @Overwrite
     public Optional<Match> matches(final NonNullList<ItemStack> stacks) {
         if (this.itemStacks.size() > 16) {
-            return nova$matchLargeCombination(stacks);
+            final Match match = nova$matchLargeCombination(stacks);
+            return match == null ? Optional.empty() : Optional.of(match);
         }
         // Integer indices 0..15 occupy distinct, ascending buckets in the original default HashSet.
         int needed = 0;
@@ -51,7 +52,7 @@ public abstract class MixinRecipeItemCombination extends RecipeMatch {
                     final ItemStack copy = stack.copy();
                     copy.setCount(1);
                     if (found == null) {
-                        found = new LinkedList<>();
+                        found = new ObjectArrayList<>();
                     }
                     found.add(copy);
                     needed &= ~(1 << index);
@@ -63,12 +64,12 @@ public abstract class MixinRecipeItemCombination extends RecipeMatch {
             return Optional.empty();
         }
         // Match.stacks remains mutable, including a successful combination with no required slots.
-        return Optional.of(new Match(found == null ? new LinkedList<>() : found, this.amountMatched));
+        return Optional.of(new Match(found == null ? new ObjectArrayList<>() : found, this.amountMatched));
     }
 
     @Unique
-    private Optional<Match> nova$matchLargeCombination(final NonNullList<ItemStack> stacks) {
-        final List<ItemStack> found = new LinkedList<>();
+    private Match nova$matchLargeCombination(final NonNullList<ItemStack> stacks) {
+        final List<ItemStack> found = new ObjectArrayList<>();
         final IntSet needed = new IntOpenHashSet();
         for (int index = 0; index < this.itemStacks.size(); index++) {
             if (!this.itemStacks.get(index).isEmpty()) {
@@ -88,6 +89,6 @@ public abstract class MixinRecipeItemCombination extends RecipeMatch {
                 }
             }
         }
-        return needed.isEmpty() ? Optional.of(new Match(found, this.amountMatched)) : Optional.empty();
+        return needed.isEmpty() ? new Match(found, this.amountMatched) : null;
     }
 }

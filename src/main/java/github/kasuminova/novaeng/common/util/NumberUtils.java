@@ -1,39 +1,48 @@
 package github.kasuminova.novaeng.common.util;
 
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-
 public class NumberUtils {
 
-    public static OptionalInt tryParseInt(String str) {
+    public static Integer tryParseInt(String str) {
         try {
-            return OptionalInt.of(Integer.parseInt(str));
+            return Integer.valueOf(str);
         } catch (NumberFormatException e) {
-            return OptionalInt.empty();
+            return null;
         }
     }
 
-    public static OptionalLong tryParseLong(String str) {
+    public static Long tryParseLong(String str) {
         try {
-            return OptionalLong.of(Long.parseLong(str));
+            return Long.valueOf(str);
         } catch (NumberFormatException e) {
-            return OptionalLong.empty();
+            return null;
         }
     }
 
-    public static OptionalDouble tryParseDouble(String str) {
+    public static Double tryParseDouble(String str) {
         try {
-            return OptionalDouble.of(Double.parseDouble(str));
+            return Double.valueOf(str);
         } catch (NumberFormatException e) {
-            return OptionalDouble.empty();
+            return null;
         }
     }
 
     public static boolean canParse(String str) {
-        return tryParseInt(str).isPresent() ||
-            tryParseLong(str).isPresent() ||
-            tryParseDouble(str).isPresent();
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException ignored) {
+        }
+        try {
+            Long.parseLong(str);
+            return true;
+        } catch (NumberFormatException ignored) {
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 
 }

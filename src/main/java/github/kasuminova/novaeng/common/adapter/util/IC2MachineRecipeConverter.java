@@ -11,10 +11,10 @@ import hellfirepvp.modularmachinery.common.modifier.RecipeModifier;
 import hellfirepvp.modularmachinery.common.util.ItemUtils;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.Recipes;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -30,7 +30,7 @@ public class IC2MachineRecipeConverter {
                                               final List<RecipeModifier> modifiers,
                                               final int baseEnergyUsage,
                                               Iterable<? extends ic2.api.recipe.MachineRecipe<IRecipeInput, Collection<ItemStack>>> icRecipes) {
-        List<MachineRecipe> machineRecipes = new LinkedList<>();
+        List<MachineRecipe> machineRecipes = new ObjectArrayList<>();
 
         for (final ic2.api.recipe.MachineRecipe<IRecipeInput, Collection<ItemStack>> icRecipe : icRecipes) {
             List<ItemStack> inputs = icRecipe.getInput().getInputs();
@@ -45,7 +45,7 @@ public class IC2MachineRecipeConverter {
                     recipe.addRequirement(new RequirementItem(IOType.INPUT, ItemUtils.copyStackWithSize(inputs.getFirst(), inAmount)));
                 }
             } else {
-                List<ChancedIngredientStack> ingredientStackList = new LinkedList<>();
+                List<ChancedIngredientStack> ingredientStackList = new ObjectArrayList<>();
                 for (ItemStack input : inputs) {
                     int inAmount = Math.round(RecipeModifier.applyModifiers(modifiers, RequirementTypesMM.REQUIREMENT_ITEM, IOType.INPUT, icRecipe.getInput().getAmount(), false));
                     if (inAmount > 0) {

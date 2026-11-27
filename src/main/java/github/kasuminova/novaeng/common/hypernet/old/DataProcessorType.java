@@ -9,6 +9,7 @@ import hellfirepvp.modularmachinery.common.integration.crafttweaker.MachineModif
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.RecipeBuilder;
 import hellfirepvp.modularmachinery.common.integration.crafttweaker.event.MMEvents;
 import hellfirepvp.modularmachinery.common.machine.factory.FactoryRecipeThread;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -16,7 +17,6 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ZenRegister
@@ -28,7 +28,7 @@ public class DataProcessorType extends NetNodeType {
     private final int heatDistribution;
     private final int overheatThreshold;
 
-    private final List<Tuple<Tuple<IIngredient[], IIngredient[]>, Integer>> radiatorIngredientList = new ArrayList<>();
+    private final List<Tuple<Tuple<IIngredient[], IIngredient[]>, Integer>> radiatorIngredientList = new ObjectArrayList<>();
 
     private String dynamicPatternName = "";
 
@@ -83,7 +83,8 @@ public class DataProcessorType extends NetNodeType {
                      .build();
 
         int counter = 0;
-        for (final Tuple<Tuple<IIngredient[], IIngredient[]>, Integer> radiatorIngredient : radiatorIngredientList) {
+        for (int index = 0; index < radiatorIngredientList.size(); index++) {
+            final Tuple<Tuple<IIngredient[], IIngredient[]>, Integer> radiatorIngredient = radiatorIngredientList.get(index);
             Tuple<IIngredient[], IIngredient[]> io = radiatorIngredient.getFirst();
             IIngredient[] input = io.getFirst();
             IIngredient[] output = io.getSecond();

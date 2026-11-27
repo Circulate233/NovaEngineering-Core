@@ -120,7 +120,8 @@ public final class SpaceGenerator implements MachineSpecial {
                 event.setFailed("novaeng.space_generator.failed.no_output");
             }
         });
-        for (final String oreName : ores) {
+        for (int index = 0; index < ores.size(); index++) {
+            final String oreName = ores.get(index);
             final String ore = oreName.substring(3);
             final var singularity = CraftTweakerAPI.oreDict.get("singularity" + ore);
             if (!singularity.isEmpty()) {

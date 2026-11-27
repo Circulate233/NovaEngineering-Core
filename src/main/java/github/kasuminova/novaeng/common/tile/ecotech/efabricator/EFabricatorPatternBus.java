@@ -83,7 +83,8 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
 
     public List<ICraftingPatternDetails> getDetails() {
         final List<ICraftingPatternDetails> result = new ObjectArrayList<>(this.validPatterns);
-        for (final var detail : this.details) {
+        for (int index = 0; index < this.details.size(); index++) {
+            final var detail = this.details.get(index);
             if (detail != null) {
                 result.add(detail);
             }
@@ -100,7 +101,8 @@ public final class EFabricatorPatternBus extends EFabricatorPart implements IAEA
         if (snapshot == null) {
             snapshot = new ICraftingPatternDetails[this.validPatterns];
             int index = 0;
-            for (final ICraftingPatternDetails detail : this.details) {
+            for (int detailIndex = 0; detailIndex < this.details.size(); detailIndex++) {
+                final ICraftingPatternDetails detail = this.details.get(detailIndex);
                 if (detail != null) {
                     snapshot[index++] = detail;
                 }

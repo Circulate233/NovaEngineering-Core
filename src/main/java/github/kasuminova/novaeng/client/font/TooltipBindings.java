@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.client.font;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +14,26 @@ public final class TooltipBindings {
     private static final int MAX_CHARACTERS = 32768;
     private Object[] previous;
     private List<String> normalized;
+
+    private static List<String> normalize(final List<?> values, final List<String> defaults) {
+        final List<String> result = new ObjectArrayList<>();
+        if (values instanceof java.util.RandomAccess) {
+            for (int index = 0; index < values.size(); index++) {
+                final Object value = values.get(index);
+                if (value != null && !value.toString().trim().isEmpty()) result.add(value.toString());
+            }
+        } else {
+            for (final Object value : values) {
+                if (value != null && !value.toString().trim().isEmpty()) result.add(value.toString());
+            }
+        }
+        return result.isEmpty() ? defaults : Collections.unmodifiableList(result);
+    }
+
+    private void clear() {
+        previous = null;
+        normalized = null;
+    }
 
     public synchronized List<String> resolve(final Object raw, final List<String> defaults) {
         if (!(raw instanceof List<?> values)) {
@@ -40,21 +63,8 @@ public final class TooltipBindings {
         }
         if (!same) {
             previous = values.toArray();
-            normalized = normalize(values, Collections.emptyList());
+            normalized = normalize(values, ObjectLists.emptyList());
         }
         return normalized.isEmpty() ? defaults : normalized;
-    }
-
-    private void clear() {
-        previous = null;
-        normalized = null;
-    }
-
-    private static List<String> normalize(final List<?> values, final List<String> defaults) {
-        final ArrayList<String> result = new ArrayList<>();
-        for (final Object value : values) {
-            if (value != null && !value.toString().trim().isEmpty()) result.add(value.toString());
-        }
-        return result.isEmpty() ? defaults : Collections.unmodifiableList(result);
     }
 }

@@ -1,10 +1,10 @@
 package github.kasuminova.novaeng.common.performance;
 
 import github.kasuminova.novaeng.common.util.DeclaredMethodTable;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +25,8 @@ class LoaderOptimizationTest {
 
     @Test
     void methodIndexMatchesReflectionIncludingBridgesCollisionsAndConcurrency() throws Exception {
-        final List<Thread> workers = new ArrayList<>();
-        final List<Throwable> failures = java.util.Collections.synchronizedList(new ArrayList<>());
+        final List<Thread> workers = new ObjectArrayList<>();
+        final List<Throwable> failures = java.util.Collections.synchronizedList(new ObjectArrayList<>());
         for (int i = 0; i < 8; i++) {
             final Thread worker = new Thread(() -> {
                 try {
@@ -43,7 +43,7 @@ class LoaderOptimizationTest {
             workers.add(worker);
             worker.start();
         }
-        for (final Thread worker : workers) worker.join(10_000);
+        for (int index = 0; index < workers.size(); index++) workers.get(index).join(10_000);
         assertTrue(workers.stream().noneMatch(Thread::isAlive));
         assertTrue(failures.isEmpty(), failures.toString());
         assertArrayEquals(Child.class.getMethods(), DeclaredMethodTable.publicMethods(Child.class));

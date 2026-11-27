@@ -3,9 +3,9 @@ package github.kasuminova.novaeng.client.geometry.block;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -52,7 +52,7 @@ class BlockGeometryPagesTest {
         final CountDownLatch started = new CountDownLatch(4);
         final CountDownLatch crossBarrier = new CountDownLatch(1);
         try (final var executor = Executors.newFixedThreadPool(4)) {
-            final var futures = new ArrayList<Future<?>>();
+            final var futures = new ObjectArrayList<Future<?>>();
             for (int worker = 0; worker < 4; worker++) {
                 final int tint = worker;
                 futures.add(executor.submit(() -> {
@@ -82,7 +82,7 @@ class BlockGeometryPagesTest {
             } finally {
                 crossBarrier.countDown();
             }
-            for (final Future<?> future : futures) future.get(20, TimeUnit.SECONDS);
+            for (int index = 0; index < futures.size(); index++) futures.get(index).get(20, TimeUnit.SECONDS);
         }
         final var writers = BlockGeometryPages.class.getDeclaredField("writers");
         writers.setAccessible(true);

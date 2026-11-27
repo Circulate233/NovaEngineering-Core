@@ -13,6 +13,7 @@ import github.kasuminova.novaeng.common.machine.GeocentricDrill;
 import github.kasuminova.novaeng.common.network.PktGeocentricDrillControl;
 import github.kasuminova.novaeng.common.tile.machine.GeocentricDrillController;
 import github.kasuminova.novaeng.novaeng_core.Tags;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -22,7 +23,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Collections;
 
 public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricDrill> {
 
@@ -56,9 +56,9 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
         this.dive.setTooltipFunction(button -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
             if (isControlDown) {
-                return Collections.singletonList(I18n.format("gui.geocentric_drill.dive.ctrl_down"));
+                return ObjectLists.singleton(I18n.format("gui.geocentric_drill.dive.ctrl_down"));
             }
-            return Collections.singletonList(I18n.format("gui.geocentric_drill.dive"));
+            return ObjectLists.singleton(I18n.format("gui.geocentric_drill.dive"));
         });
         this.dive.setOnClickedListener((button) -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
@@ -75,9 +75,9 @@ public class GuiGeocentricDrill extends GuiContainerDynamic<ContainerGeocentricD
         this.ascend.setTooltipFunction(button -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
             if (isControlDown) {
-                return Collections.singletonList(I18n.format("gui.geocentric_drill.ascend.ctrl_down"));
+                return ObjectLists.singleton(I18n.format("gui.geocentric_drill.ascend.ctrl_down"));
             }
-            return Collections.singletonList(I18n.format("gui.geocentric_drill.ascend"));
+            return ObjectLists.singleton(I18n.format("gui.geocentric_drill.ascend"));
         });
         this.ascend.setOnClickedListener((button) -> {
             boolean isControlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);

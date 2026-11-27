@@ -99,8 +99,8 @@ public final class JeiItemListCollector {
             if (candidates == null) {
                 tab.displayAllRelevantItems(items);
             } else {
-                for (final Item item : candidates) {
-                    item.getSubItems(tab, items);
+                for (int index = 0; index < candidates.size(); index++) {
+                    candidates.get(index).getSubItems(tab, items);
                 }
             }
         } catch (final Throwable failure) {
@@ -135,7 +135,7 @@ public final class JeiItemListCollector {
                 }
             } else {
                 // getSubItems may ignore getCreativeTabs, so membership alone cannot filter custom callbacks.
-                for (final List<Item> items : result.values()) {
+        for (final List<Item> items : result.values()) {
                     items.add(item);
                 }
             }

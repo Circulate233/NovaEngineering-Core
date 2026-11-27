@@ -182,7 +182,10 @@ class UiTreeRefreshCacheTest {
                 public List<UiNodeId> roots() { return roots; }
                 public Collection<UiNode> nodes() { return nodes; }
                 public UiNode node(final UiNodeId id) {
-                    for (final UiNode node : nodes) if (Objects.equals(id, node.id())) return node;
+                    for (int index = 0; index < nodes.size(); index++) {
+                        final UiNode node = nodes.get(index);
+                        if (Objects.equals(id, node.id())) return node;
+                    }
                     return null;
                 }
                 public UiNodeId focusedNodeId() { return focus; }

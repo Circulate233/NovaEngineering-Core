@@ -11,10 +11,10 @@ import github.kasuminova.novaeng.client.gui.widget.msa.event.AssemblyInvOpenEven
 import github.kasuminova.novaeng.common.container.slot.AssemblySlotManager;
 import github.kasuminova.novaeng.common.container.slot.SlotConditionItemHandler;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
-import java.util.Collections;
 import java.util.List;
 
 public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends SlotDynamic<T> {
@@ -65,16 +65,24 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
             return;
         }
 
-        for (final SlotConditionItemHandler dependency : slot.getDependencies()) {
+        final var dependencies = slot.getDependencies();
+        for (int index = 0; index < dependencies.size(); index++) {
+            final SlotConditionItemHandler dependency = dependencies.get(index);
             if (renderDependiceColorOverlay(renderPos, dependency)) return;
         }
-        for (final SlotConditionItemHandler dependent : slot.getDependents()) {
+        final var dependents = slot.getDependents();
+        for (int index = 0; index < dependents.size(); index++) {
+            final SlotConditionItemHandler dependent = dependents.get(index);
             if (renderDependencyColorOverlay(renderPos, dependent)) return;
         }
-        for (final SlotConditionItemHandler dependency : slot.getSoftDependencies()) {
+        final var softDependencies = slot.getSoftDependencies();
+        for (int index = 0; index < softDependencies.size(); index++) {
+            final SlotConditionItemHandler dependency = softDependencies.get(index);
             if (renderDependiceColorOverlay(renderPos, dependency)) return;
         }
-        for (final SlotConditionItemHandler dependent : slot.getSoftDependents()) {
+        final var softDependents = slot.getSoftDependents();
+        for (int index = 0; index < softDependents.size(); index++) {
+            final SlotConditionItemHandler dependent = softDependents.get(index);
             if (renderDependencyColorOverlay(renderPos, dependent)) return;
         }
     }
@@ -128,6 +136,6 @@ public abstract class SlotAssembly<T extends SlotConditionItemHandler> extends S
 
     @Override
     public List<String> getHoverTooltips(final MousePos mousePos) {
-        return slot == null ? Collections.emptyList() : slot.getHoverTooltips();
+        return slot == null ? ObjectLists.emptyList() : slot.getHoverTooltips();
     }
 }

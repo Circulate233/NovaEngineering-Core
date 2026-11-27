@@ -16,9 +16,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -178,24 +175,24 @@ public class InputBox extends DynamicWidget {
         }
 
         if (onUserConfirmInt != null) {
-            OptionalInt parsed = NumberUtils.tryParseInt(text);
-            if (parsed.isPresent() && onUserConfirmInt.apply(this, parsed.getAsInt())) {
+            Integer parsed = NumberUtils.tryParseInt(text);
+            if (parsed != null && onUserConfirmInt.apply(this, parsed)) {
                 field.setText("");
                 return true;
             }
         }
 
         if (onUserConfirmLong != null) {
-            OptionalLong parsed = NumberUtils.tryParseLong(text);
-            if (parsed.isPresent() && onUserConfirmLong.apply(this, parsed.getAsLong())) {
+            Long parsed = NumberUtils.tryParseLong(text);
+            if (parsed != null && onUserConfirmLong.apply(this, parsed)) {
                 field.setText("");
                 return true;
             }
         }
 
         if (onUserConfirmDouble != null) {
-            OptionalDouble parsed = NumberUtils.tryParseDouble(text);
-            if (parsed.isPresent() && onUserConfirmDouble.apply(this, parsed.getAsDouble())) {
+            Double parsed = NumberUtils.tryParseDouble(text);
+            if (parsed != null && onUserConfirmDouble.apply(this, parsed)) {
                 field.setText("");
                 return true;
             }

@@ -11,6 +11,7 @@ import com.sumirelabs.pulsar.rgb.RgbLight;
 import com.sumirelabs.pulsar.rgb.RgbPaletteOverrides;
 import com.sumirelabs.pulsar.rgb.RgbSettings;
 import github.kasuminova.novaeng.common.performance.PulsarRgbTables;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -25,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Objects;
@@ -204,7 +204,7 @@ public abstract class MixinBlockLightColors {
         if (cached != null) return cached;
         if (!PulsarRgbTables.colorsFrozen()) throw new IllegalStateException("RGB colors not initialized");
 
-        final var rows = new ArrayList<String>();
+        final var rows = new ObjectArrayList<String>();
         rows.add("gameplay:" + RgbSettings.profile());
         PulsarRgbTables.appendColorRows(rows, palette.values.colors());
         PulsarRgbTables.appendFilterRows(rows, palette.values.filters());

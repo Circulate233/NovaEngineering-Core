@@ -150,8 +150,10 @@ public class CPacketProfilerDataProcessor {
         final List<Map.Entry<String, CPacketProfilerData.PacketData>> entries = new ObjectArrayList<>(source.entrySet());
         entries.sort(Map.Entry.comparingByValue());
         final Map<String, CPacketProfilerData.PacketData> sorted = new Object2ObjectLinkedOpenHashMap<>(entries.size());
-        for (Map.Entry<String, CPacketProfilerData.PacketData> entry : entries)
+        for (int index = 0; index < entries.size(); index++) {
+            final Map.Entry<String, CPacketProfilerData.PacketData> entry = entries.get(index);
             sorted.put(entry.getKey(), entry.getValue());
+        }
         return sorted;
     }
 
@@ -178,7 +180,8 @@ public class CPacketProfilerDataProcessor {
         GameProfile maxPlayer = null;
         boolean hasMaxPlayer = false;
         boolean hasMaxBandwidth = false;
-        for (Map.Entry<GameProfile, CPacketProfilerData> entry : entries) {
+        for (int index = 0; index < entries.size(); index++) {
+            final Map.Entry<GameProfile, CPacketProfilerData> entry = entries.get(index);
             final double bandwidth = entry.getValue().getNetworkBandwidthPerSecond();
             sorted.put(entry.getKey(), entry.getValue());
             totalBandwidthPerSecond += bandwidth;

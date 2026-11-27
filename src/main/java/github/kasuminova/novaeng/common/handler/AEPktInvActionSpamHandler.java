@@ -5,8 +5,8 @@ import com.google.common.cache.CacheBuilder;
 import github.kasuminova.mmce.common.concurrent.TaskExecutor;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 
-import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -27,29 +27,29 @@ public class AEPktInvActionSpamHandler {
     }
 
     public static class PacketCounter {
-        protected final LinkedList<Element> data = new LinkedList<>();
+        protected final ObjectArrayFIFOQueue<Element> data = new ObjectArrayFIFOQueue<>();
         protected int counter = 0;
 
         public int addPacket(int currentTick) {
             // 空列表时直接添加。
             if (data.isEmpty()) {
-                data.addLast(new Element(currentTick));
+                data.enqueue(new Element(currentTick));
                 return counter = 1;
             }
 
             // 新网络包接收时调用。
-            Element last = data.getLast();
+            Element last = data.last();
             if (last.currentTick == currentTick) {
                 last.incCount();
             } else {
-                data.addLast(new Element(currentTick));
+                data.enqueue(new Element(currentTick));
             }
             counter++;
 
             // 移除旧数据。
             Element first;
-            while ((first = data.peekFirst()) != null && first.currentTick < currentTick - 60) {
-                data.removeFirst();
+            while (!data.isEmpty() && (first = data.first()).currentTick < currentTick - 60) {
+                data.dequeue();
                 counter -= first.count;
             }
 

@@ -8,10 +8,10 @@ import github.kasuminova.mmce.client.gui.widget.base.WidgetGui;
 import github.kasuminova.novaeng.client.gui.GuiEFabricatorController;
 import github.kasuminova.novaeng.client.gui.widget.ProgressBar;
 import github.kasuminova.novaeng.client.gui.widget.SizedColumn;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
-import java.util.Collections;
 
 public class CraftingStatus extends SizedColumn {
 
@@ -48,7 +48,7 @@ public class CraftingStatus extends SizedColumn {
                 .setHorizontal(true)
                 .addForegroundTexture(TEXTURE_PROGRESS_FOREGROUND)
                 .setMaxProgress(100)
-                .setTooltipFunction(input -> Collections.singletonList(
+                .setTooltipFunction(input -> ObjectLists.singleton(
                     I18n.format("gui.efabricator.queue.status", (int) input.getProgress(), (int) input.getMaxProgress())
                 ))
                 .setWidthHeight(14, 3)

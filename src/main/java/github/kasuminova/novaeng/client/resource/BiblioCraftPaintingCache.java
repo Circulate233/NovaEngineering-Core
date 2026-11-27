@@ -1,7 +1,6 @@
 package github.kasuminova.novaeng.client.resource;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Keeps BiblioCraft's jar-painting directory result for one model reload generation.
@@ -13,29 +12,29 @@ import java.util.Deque;
  */
 public final class BiblioCraftPaintingCache {
 
-    private static final ThreadLocal<Deque<Generation>> GENERATIONS = new ThreadLocal<>();
+    private static final ThreadLocal<ObjectArrayList<Generation>> GENERATIONS = new ThreadLocal<>();
 
     private BiblioCraftPaintingCache() {
     }
 
     /** Starts a fresh cache generation for the current reload call. */
     public static void beginGeneration() {
-        Deque<Generation> generations = GENERATIONS.get();
+        ObjectArrayList<Generation> generations = GENERATIONS.get();
         if (generations == null) {
-            generations = new ArrayDeque<>();
+            generations = new ObjectArrayList<>();
             GENERATIONS.set(generations);
         }
-        generations.push(new Generation());
+        generations.add(new Generation());
     }
 
     /** Ends the current cache generation and restores an enclosing one, if present. */
     public static void endGeneration() {
-        final Deque<Generation> generations = GENERATIONS.get();
+        final ObjectArrayList<Generation> generations = GENERATIONS.get();
         if (generations == null || generations.isEmpty()) {
             return;
         }
 
-        generations.pop();
+        generations.removeLast();
         if (generations.isEmpty()) {
             GENERATIONS.remove();
         }
@@ -45,30 +44,31 @@ public final class BiblioCraftPaintingCache {
      * Returns whether a result has already been recorded in the current reload generation.
      */
     public static boolean hasCachedResult() {
-        final Deque<Generation> generations = GENERATIONS.get();
-        return generations != null && !generations.isEmpty() && generations.peek().initialized;
+        final ObjectArrayList<Generation> generations = GENERATIONS.get();
+        return generations != null && !generations.isEmpty()
+            && generations.getLast().initialized;
     }
 
     /**
      * Returns the recorded result for the current reload generation.
      */
     public static String[] getCachedResult() {
-        final Deque<Generation> generations = GENERATIONS.get();
+        final ObjectArrayList<Generation> generations = GENERATIONS.get();
         if (generations == null || generations.isEmpty()) {
             return null;
         }
-        return generations.peek().paintings;
+        return generations.getLast().paintings;
     }
 
     /**
      * Records the original result for the current reload generation.
      */
     public static void cacheResult(final String[] paintings) {
-        final Deque<Generation> generations = GENERATIONS.get();
+        final ObjectArrayList<Generation> generations = GENERATIONS.get();
         if (generations == null || generations.isEmpty()) {
             return;
         }
-        final Generation generation = generations.peek();
+        final Generation generation = generations.getLast();
         synchronized (generation) {
             if (!generation.initialized) {
                 generation.paintings = paintings;

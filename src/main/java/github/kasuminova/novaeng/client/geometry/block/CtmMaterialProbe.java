@@ -1,8 +1,8 @@
 package github.kasuminova.novaeng.client.geometry.block;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -12,7 +12,7 @@ public final class CtmMaterialProbe {
     private static final ScopedValue<Object> UNPUBLISHED_MODEL = ScopedValue.newInstance();
 
     private final Object ctm;
-    private final Map<Object, IBakedModel> baked = new HashMap<>();
+    private final Map<Object, IBakedModel> baked = new Object2ObjectOpenHashMap<>();
     private Object textureGetter;
 
     private CtmMaterialProbe(final Object ctm) {

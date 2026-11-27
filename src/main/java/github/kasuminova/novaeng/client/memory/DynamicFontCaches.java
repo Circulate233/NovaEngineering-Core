@@ -27,14 +27,16 @@ public final class DynamicFontCaches {
     public static void clearDynamicCaches() {
         final ObjectArrayList<CosmicTextRenderer> snapshot = new ObjectArrayList<>();
         synchronized (RENDERERS) {
-            final var iterator = RENDERERS.iterator();
-            while (iterator.hasNext()) {
-                final CosmicTextRenderer renderer = iterator.next().get();
-                if (renderer == null) iterator.remove();
-                else snapshot.add(renderer);
+            for (int index = 0; index < RENDERERS.size(); ) {
+                final CosmicTextRenderer renderer = RENDERERS.get(index).get();
+                if (renderer == null) RENDERERS.remove(index);
+                else {
+                    snapshot.add(renderer);
+                    index++;
+                }
             }
         }
         // Keep registry and renderer monitors separate; close() unregisters under the renderer monitor.
-        for (final CosmicTextRenderer renderer : snapshot) renderer.clearCaches(false);
+        for (int index = 0; index < snapshot.size(); index++) snapshot.get(index).clearCaches(false);
     }
 }

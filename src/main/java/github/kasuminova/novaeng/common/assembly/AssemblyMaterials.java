@@ -29,6 +29,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
@@ -60,7 +61,6 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 
@@ -646,7 +646,7 @@ final class AssemblyMaterials {
         private ICraftingGrid crafting;
         private Object2IntLinkedOpenHashMap<IAEItemStack> quantities;
         private ObjectIterator<Object2IntMap.Entry<IAEItemStack>> craftEntries;
-        private ArrayDeque<ItemStack> queue;
+        private ObjectArrayFIFOQueue<ItemStack> queue;
         private Recipe choice;
         private ITextComponent line;
         private int choiceIndex, choiceCount, unavailable;
@@ -722,13 +722,13 @@ final class AssemblyMaterials {
             if (quantities == null) return true;
             if (craftEntries == null) {
                 craftEntries = quantities.object2IntEntrySet().fastIterator();
-                queue = new ArrayDeque<>(quantities.size());
+                queue = new ObjectArrayFIFOQueue<>();
             }
             if (craftEntries.hasNext()) {
                 final var entry = craftEntries.next();
                 final var stack = entry.getKey().createItemStack();
                 stack.setCount(entry.getIntValue());
-                queue.addLast(stack);
+                queue.enqueue(stack);
                 return false;
             }
             resolveME();

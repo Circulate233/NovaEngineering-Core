@@ -7,10 +7,10 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.SimpleRemapper;
 import org.objectweb.asm.tree.ClassNode;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class MaterialWrapperAllocationTest {
     private static Object implementation(final Material material) throws Exception {
-        final Map<String, String> names = new HashMap<>();
+        final Map<String, String> names = new Object2ObjectOpenHashMap<>();
         names.put("net/minecraft/item/ItemStack", internal(Stack.class));
         names.put("net/minecraftforge/fluids/Fluid", internal(Fluid.class));
         names.put("net/minecraftforge/fluids/FluidStack", internal(FluidStack.class));
@@ -82,9 +82,11 @@ class MaterialWrapperAllocationTest {
     @Test
     void outputsRunDynamicCallbacksInRegistryOrderOnEachCall() throws Exception {
         final Material material = new Material();
-        final List<String> calls = new ArrayList<>();
+        final List<String> calls = new ObjectArrayList<>();
         Registry.parts.clear();
-        for (final String name : List.of("one", "two")) {
+        final List<String> names = List.of("one", "two");
+        for (int index = 0; index < names.size(); index++) {
+            final String name = names.get(index);
             Registry.parts.add(new Part() {
                 public boolean canUseMaterial(final Material value) {
                     calls.add("check:" + name);
@@ -164,8 +166,8 @@ class MaterialWrapperAllocationTest {
     }
 
     public static final class Registry {
-        public static final List<Recipe> recipes = new ArrayList<>();
-        public static final Set<Part> parts = new LinkedHashSet<>();
+        public static final List<Recipe> recipes = new ObjectArrayList<>();
+        public static final Set<Part> parts = new ObjectLinkedOpenHashSet<>();
 
         public static List<Recipe> candidates(final Fluid fluid) {
             return recipes;

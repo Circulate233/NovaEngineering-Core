@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.client.font;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 
 import java.util.List;
 
@@ -17,14 +18,21 @@ public final class BoundedStringLists {
     }
 
     public synchronized void put(final String input, final List<String> result) {
-        if (input == null || input.length() > 512 || entries.containsKey(input)) return;
-        final List<String> immutable = List.copyOf(result);
-        entries.putAndMoveToLast(input, immutable);
+        if (input == null || input.length() > 512 || result == null || entries.containsKey(input)) return;
+        store(input, ObjectLists.unmodifiable(new ObjectArrayList<>(result)));
+    }
+
+    private synchronized List<String> store(final String input, final List<String> result) {
+        if (input != null && input.length() <= 512 && entries.containsKey(input))
+            return entries.getAndMoveToLast(input);
+        if (input == null || input.length() > 512) return result;
+        entries.putAndMoveToLast(input, result);
         characters += input.length();
         while (entries.size() > 64 || characters > 8192) {
             characters -= entries.firstKey().length();
             entries.removeFirst();
         }
+        return result;
     }
 
     /**
@@ -33,7 +41,7 @@ public final class BoundedStringLists {
     public List<String> path(final String input) {
         List<String> result = get(input);
         if (result != null) return result;
-        final List<String> parts = new ObjectArrayList<>(4);
+        final ObjectArrayList<String> parts = new ObjectArrayList<>(4);
         int start = 0;
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '.') {
@@ -42,8 +50,6 @@ public final class BoundedStringLists {
             }
         }
         parts.add(input.substring(start));
-        result = List.copyOf(parts);
-        put(input, result);
-        return result;
+        return store(input, ObjectLists.unmodifiable(parts));
     }
 }

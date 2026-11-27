@@ -41,7 +41,7 @@ public abstract class MixinFluidIdMapMessagePrimitiveBiMap {
         require = 1)
     private void nova$primitiveIds(
         final FluidIdMapMessage owner, final BiMap<Fluid, Integer> original) {
-        fluidIds = Object2IntHashBiMap.copyOf(original);
+        fluidIds = new Object2IntHashBiMap<>();
     }
 
     /**

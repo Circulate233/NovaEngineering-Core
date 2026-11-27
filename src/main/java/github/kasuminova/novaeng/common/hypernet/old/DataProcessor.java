@@ -19,9 +19,8 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
 import stanhebben.zenscript.annotations.ZenSetter;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
@@ -38,7 +37,7 @@ public class DataProcessor extends NetNode {
     private final Queue<Double> recentCalculation = Queues.createConcurrentQueue();
 
     private final DataProcessorType type;
-    private final Deque<Double> computationalLoadHistory = new ArrayDeque<>();
+    private final DoubleArrayList computationalLoadHistory = new DoubleArrayList();
 
     private final List<ProcessorModuleCPU> moduleCPUS = new CopyOnWriteArrayList<>();
     private final List<ProcessorModuleRAM> moduleRAMS = new CopyOnWriteArrayList<>();
@@ -172,10 +171,10 @@ public class DataProcessor extends NetNode {
                 totalCalculation += calculation;
             }
 
-            this.computationalLoadHistory.addFirst(totalCalculation);
+            this.computationalLoadHistory.add(0, totalCalculation);
             this.computationalLoadHistoryCache += totalCalculation;
             if (this.computationalLoadHistory.size() > 100) {
-                this.computationalLoadHistoryCache -= this.computationalLoadHistory.pollLast();
+                this.computationalLoadHistoryCache -= this.computationalLoadHistory.removeDouble(this.computationalLoadHistory.size() - 1);
             }
 
             this.computationalLoad = this.computationalLoadHistoryCache / this.computationalLoadHistory.size();

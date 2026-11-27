@@ -1,6 +1,5 @@
 package github.kasuminova.novaeng.mixin.zenutils;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import crafttweaker.api.item.IIngredient;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
@@ -21,7 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.AbstractMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,18 +37,13 @@ class ItemTooltipMatchingTest {
 
     private static Method handler() throws Exception {
         final var method = MixinItemTooltipMatching.class.getDeclaredMethod("nova$skipUnrelatedTooltipWrapper",
-            ItemStack.class, Operation.class, Map.Entry.class);
+            ItemStack.class, Map.Entry.class);
         method.setAccessible(true);
         return method;
     }
 
-    private static IItemStack wrap(final IIngredient selector, final ItemStack stack,
-                                   final AtomicInteger conversions) throws Exception {
-        final Operation<IItemStack> original = args -> {
-            conversions.incrementAndGet();
-            return CraftTweakerMC.getIItemStackForMatching((ItemStack) args[0]);
-        };
-        return (IItemStack) handler().invoke(null, stack, original,
+    private static IItemStack wrap(final IIngredient selector, final ItemStack stack) throws Exception {
+        return (IItemStack) handler().invoke(null, stack,
             new AbstractMap.SimpleImmutableEntry<>(selector, null));
     }
 
@@ -57,57 +51,62 @@ class ItemTooltipMatchingTest {
     void mismatchedPlainItemKeepsVanillaMatchResultWithoutDeepNbtConversion() throws Exception {
         final Item selected = new Item();
         final Item other = new Item();
-        final AtomicInteger conversions = new AtomicInteger();
         for (int size : new int[]{1, 2, 64}) {
             for (int metadata : new int[]{0, 5, 32767}) {
                 final IIngredient selector = new MCItemStack(new ItemStack(selected, size, metadata));
                 final ItemStack candidate = new ItemStack(other, size, metadata);
                 final NBTTagCompound tag = new NBTTagCompound();
-                final NBTTagCompound child = new NBTTagCompound();
+                final CountingTag child = new CountingTag();
                 child.setIntArray("payload", new int[4096]);
                 tag.setTag("nested", child);
                 candidate.setTagCompound(tag);
                 final IItemStack baseline = CraftTweakerMC.getIItemStackForMatching(candidate);
-                final IItemStack optimized = wrap(selector, candidate, conversions);
+                assertTrue(child.keyReads > 0, "baseline must traverse the nested NBT");
+                child.keyReads = 0;
+                final IItemStack optimized = wrap(selector, candidate);
+                assertEquals(0, child.keyReads, "unrelated items must skip deep NBT conversion");
                 assertNull(optimized);
                 assertFalse(selector.matches(baseline));
                 assertEquals(selector.matches(baseline), selector.matches(optimized));
             }
         }
-        assertEquals(0, conversions.get());
     }
 
     @Test
     void matchingItemsTaggedSelectorsAndCustomMatchersAlwaysGetFreshCurrentWrapper() throws Exception {
         final Item one = new Item();
         final Item two = new Item();
-        final AtomicInteger conversions = new AtomicInteger();
         final ItemStack candidate = new ItemStack(one);
         final IIngredient same = new MCItemStack(new ItemStack(one));
-        final IItemStack first = wrap(same, candidate, conversions);
+        final IItemStack first = wrap(same, candidate);
         candidate.setCount(3);
         final NBTTagCompound changed = new NBTTagCompound();
         changed.setInteger("changed", 19);
         candidate.setTagCompound(changed);
-        final IItemStack second = wrap(same, candidate, conversions);
+        final IItemStack second = wrap(same, candidate);
         assertNotSame(first, second);
         assertEquals(3, second.getAmount());
         assertEquals(19, second.getTag().memberGet("changed").asInt());
 
         final ItemStack tagged = new ItemStack(two);
         tagged.setTagCompound(changed.copy());
-        wrap(new MCItemStack(tagged), candidate, conversions);
+        final IItemStack taggedWrapper = wrap(new MCItemStack(tagged), candidate);
+        assertNotSame(second, taggedWrapper);
+        assertEquals(19, taggedWrapper.getTag().memberGet("changed").asInt());
         final IIngredient subclass = new MCItemStack(new ItemStack(two)) {
             @Override public boolean matches(final IItemStack item) { return item != null; }
         };
-        assertTrue(subclass.matches(wrap(subclass, candidate, conversions)));
+        final IItemStack subclassWrapper = wrap(subclass, candidate);
+        assertNotSame(taggedWrapper, subclassWrapper);
+        assertTrue(subclass.matches(subclassWrapper));
         final IIngredient custom = (IIngredient) Proxy.newProxyInstance(IIngredient.class.getClassLoader(),
             new Class<?>[]{IIngredient.class}, (proxy, method, args) -> {
                 if (method.getName().equals("matches")) return args[0] != null;
                 throw new AssertionError("Custom ingredient must not be inspected: " + method);
             });
-        assertTrue(custom.matches(wrap(custom, candidate, conversions)));
-        assertEquals(5, conversions.get());
+        final IItemStack customWrapper = wrap(custom, candidate);
+        assertNotSame(subclassWrapper, customWrapper);
+        assertTrue(custom.matches(customWrapper));
     }
 
     @Test
@@ -136,5 +135,15 @@ class ItemTooltipMatchingTest {
         assertEquals(0, unguarded);
         assertEquals(1, matches);
         assertEquals(1, modifiers);
+    }
+
+    private static final class CountingTag extends NBTTagCompound {
+        private int keyReads;
+
+        @Override
+        public Set<String> getKeySet() {
+            keyReads++;
+            return super.getKeySet();
+        }
     }
 }

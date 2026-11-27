@@ -89,7 +89,8 @@ public abstract class MixinWorldEntitySpawner {
         final WorldBorder border = world.getWorldBorder();
         final PlayerChunkMap chunkMap = world.getPlayerChunkMap();
         final boolean defaultBorder = border.getClass() == WorldBorder.class;
-        for (final EntityPlayer player : world.playerEntities) {
+        for (int i = 0, size = world.playerEntities.size(); i < size; i++) {
+            final EntityPlayer player = world.playerEntities.get(i);
             if (!player.isSpectator()) {
                 candidates.addPlayer(MathHelper.floor(player.posX / 16.0), MathHelper.floor(player.posZ / 16.0),
                     border, chunkMap, defaultBorder);

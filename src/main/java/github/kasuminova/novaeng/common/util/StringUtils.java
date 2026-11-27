@@ -2,6 +2,7 @@ package github.kasuminova.novaeng.common.util;
 
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.NovaEngineeringCore;
+import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.util.text.translation.I18n;
@@ -11,7 +12,6 @@ import stanhebben.zenscript.annotations.ZenMethod;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.PriorityQueue;
 
 @ZenRegister
 @ZenClass("novaeng.StringUtils")
@@ -27,7 +27,7 @@ public class StringUtils {
      * @return 排序后的列表
      */
     public static List<String> sortWithMatchRate(final String filter, final Collection<String> source) {
-        PriorityQueue<MatchResult> sorted = new PriorityQueue<>();
+        final ObjectHeapPriorityQueue<MatchResult> sorted = new ObjectHeapPriorityQueue<>();
 
         char[] filterCharArr = filter.replace(" ", "").toLowerCase().toCharArray();
 
@@ -36,12 +36,12 @@ public class StringUtils {
 
             int matchRate = getMatchRate(filterCharArr, str);
             if (matchRate > 0) {
-                sorted.add(new MatchResult(s, matchRate));
+                sorted.enqueue(new MatchResult(s, matchRate));
             }
         }
 
         final List<String> result = new ObjectArrayList<>(sorted.size());
-        for (final var element : sorted) result.add(element.str);
+        while (!sorted.isEmpty()) result.add(sorted.dequeue().str);
         return result;
     }
 

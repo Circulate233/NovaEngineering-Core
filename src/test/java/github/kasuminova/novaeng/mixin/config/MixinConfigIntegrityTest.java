@@ -11,6 +11,10 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.Diagnostic;
@@ -21,11 +25,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -76,8 +77,10 @@ public final class MixinConfigIntegrityTest {
         try (final var paths = Files.walk(repo.resolve("src/main/java/github/kasuminova/novaeng/mixin"))) {
             files = paths.filter(p -> p.toString().endsWith(".java")).sorted().toList();
         }
-        final Map<String, Boolean> types = new HashMap<>();
-        for (final CompilationUnitTree unit : parse(files)) {
+        final Object2BooleanOpenHashMap<String> types = new Object2BooleanOpenHashMap<>();
+        final List<CompilationUnitTree> parsedMixins = parse(files);
+        for (int unitIndex = 0; unitIndex < parsedMixins.size(); unitIndex++) {
+            final CompilationUnitTree unit = parsedMixins.get(unitIndex);
             final String prefix = unit.getPackageName().toString().substring(ROOT.length());
             new TreeScanner<Void, String>() {
                 @Override
@@ -91,15 +94,15 @@ public final class MixinConfigIntegrityTest {
                 }
             }.scan(unit, null);
         }
-        final Map<String, String> registered = new LinkedHashMap<>();
-        final List<String> problems = new ArrayList<>();
+        final Map<String, String> registered = new Object2ObjectLinkedOpenHashMap<>();
+        final List<String> problems = new ObjectArrayList<>();
         try (final ZipFile jar = Files.isDirectory(artifact) ? null : new ZipFile(artifact.toFile())) {
             for (final String side : List.of("mixins", "client", "server")) {
                 final JsonArray entries = config.getAsJsonArray(side);
                 for (final JsonElement entry : entries) {
                     final String name = entry.getAsString();
                     if (registered.putIfAbsent(name, side) != null) problems.add("Duplicate registration: " + name);
-                    if (!Boolean.TRUE.equals(types.get(name))) problems.add("Missing @Mixin source: " + name);
+                    if (!types.getBoolean(name)) problems.add("Missing @Mixin source: " + name);
                     final String resource = (ROOT + name).replace('.', '/') + ".class";
                     if (!(jar == null ? Files.isRegularFile(artifact.resolve(resource)) : jar.getEntry(resource) != null)) {
                         problems.add("Missing compiled mixin: " + resource);
@@ -118,14 +121,16 @@ public final class MixinConfigIntegrityTest {
             }
         });
         for (final String name : DORMANT.keySet()) {
-            require(Boolean.TRUE.equals(types.get(name)), "Stale dormant exception: " + name);
+            require(types.getBoolean(name), "Stale dormant exception: " + name);
             require(!registered.containsKey(name), "Remove dormant exception after reviewing activation: " + name);
         }
         // The current plugin returns null. If it starts generating mixins, extend the audit to its
         // actual output instead of treating shouldApplyMixin as registration.
         final Path plugin = repo.resolve("src/main/java/github/kasuminova/novaeng/NovaEngCoreMixinConfigPlugin.java");
         boolean staticPlugin = false;
-        for (final CompilationUnitTree unit : parse(List.of(plugin))) {
+        final List<CompilationUnitTree> pluginSources = parse(List.of(plugin));
+        for (int unitIndex = 0; unitIndex < pluginSources.size(); unitIndex++) {
+            final CompilationUnitTree unit = pluginSources.get(unitIndex);
             final boolean[] found = {false};
             new TreeScanner<Void, Void>() {
                 @Override
@@ -142,7 +147,9 @@ public final class MixinConfigIntegrityTest {
         require(staticPlugin, "Plugin dynamic selection changed; audit getMixins output explicitly");
 
         final Path decisions = repo.resolve("src/main/java/" + DECISIONS.replace('.', '/') + ".java");
-        for (final CompilationUnitTree unit : parse(List.of(decisions))) {
+        final List<CompilationUnitTree> decisionSources = parse(List.of(decisions));
+        for (int unitIndex = 0; unitIndex < decisionSources.size(); unitIndex++) {
+            final CompilationUnitTree unit = decisionSources.get(unitIndex);
             new TreeScanner<Void, Void>() {
                 @Override
                 public Void visitLiteral(final LiteralTree literal, final Void unused) {
@@ -190,7 +197,7 @@ public final class MixinConfigIntegrityTest {
         try (final var manager = compiler.getStandardFileManager(diagnostics, null, null)) {
             final JavacTask task = (JavacTask) compiler.getTask(null, manager, diagnostics,
                 List.of("-proc:none", "-encoding", "UTF-8"), null, manager.getJavaFileObjectsFromPaths(paths));
-            final List<CompilationUnitTree> result = new ArrayList<>();
+            final List<CompilationUnitTree> result = new ObjectArrayList<>();
             task.parse().forEach(result::add);
             require(diagnostics.getDiagnostics().stream().noneMatch(d -> d.getKind() == Diagnostic.Kind.ERROR),
                 "Source parse errors: " + diagnostics.getDiagnostics());
@@ -205,7 +212,9 @@ public final class MixinConfigIntegrityTest {
             // from the real config source, so a misspelled setting still fails compilation.
             final StringBuilder config = new StringBuilder("package github.kasuminova.novaeng; public class NovaEngCoreConfig {");
             final Path configSource = repo.resolve("src/main/java/github/kasuminova/novaeng/NovaEngCoreConfig.java");
-            for (final CompilationUnitTree unit : parse(List.of(configSource))) {
+            final List<CompilationUnitTree> configSources = parse(List.of(configSource));
+            for (int unitIndex = 0; unitIndex < configSources.size(); unitIndex++) {
+                final CompilationUnitTree unit = configSources.get(unitIndex);
                 new TreeScanner<Void, Void>() {
                     @Override
                     public Void visitClass(final ClassTree tree, final Void unused) {
@@ -240,17 +249,17 @@ public final class MixinConfigIntegrityTest {
             final int result = ToolProvider.getSystemJavaCompiler().run(null, null, null, "-proc:none", "-d", temp.toString(),
                 decisions.toString(), stubConfig.toString(), stubDiscovery.toString());
             require(result == 0, "Compile actual MixinDecisions against the config API");
-            final List<String> mods = List.of("actinium", "celeritasextra", "moreoverlays", "mekanism",
+            final Set<String> mods = Set.of("actinium", "celeritasextra", "moreoverlays", "mekanism",
                 "mekanismmultiblockmachine", "ftbquests", "itemfilters", "jei", "enderio", "geckolib3",
                 "appliedenergistics2", "modularmachinery", "tconstruct", "astralsorcery", "neofontrender",
                 "neofontrender_ui_enhancements", "customloadingscreen", "enderutilities", "endercore",
                 "crafttweaker", "zenutils", "journeymap", "draconicevolution", "nuclearcraft",
                 "extrabotany", "theoneprobe", "itemborders", "circulation_networks", "tconevo");
-            final List<Set<String>> scenarios = new ArrayList<>();
+            final List<Set<String>> scenarios = new ObjectArrayList<>();
             scenarios.add(Set.of());
-            scenarios.add(Set.copyOf(mods));
+            scenarios.add(Collections.unmodifiableSet(mods));
             for (final String omitted : mods) {
-                final Set<String> present = new HashSet<>(mods);
+                final Set<String> present = new ObjectOpenHashSet<>(mods);
                 present.remove(omitted);
                 scenarios.add(present);
             }
@@ -259,7 +268,8 @@ public final class MixinConfigIntegrityTest {
             for (final boolean poolPresent : List.of(false, true)) {
                 if (poolPresent) Files.write(poolResource, new byte[0]);
                 else Files.deleteIfExists(poolResource);
-                for (final Set<String> present : scenarios) {
+                for (int scenarioIndex = 0; scenarioIndex < scenarios.size(); scenarioIndex++) {
+                    final Set<String> present = scenarios.get(scenarioIndex);
                     try (final URLClassLoader loader = new URLClassLoader(new URL[]{temp.toUri().toURL()}, ClassLoader.getPlatformClassLoader())) {
                         final Class<?> discovery = loader.loadClass("com.cleanroommc.discovery.CleanroomModDiscoverer");
                         @SuppressWarnings("unchecked") final Set<String> loaded = (Set<String>) discovery.getField("MODS").get(null);
@@ -377,7 +387,9 @@ public final class MixinConfigIntegrityTest {
             Map.entry(List.of("circulation_networks"), List.of("circulation.MixinFullBrightDisplayListLookup")),
             Map.entry(List.of("tconevo"), List.of("tconevo.MixinItemStackBarEventLazySet")));
         for (final var group : groups.entrySet()) {
-            for (final String name : group.getValue()) {
+            final List<String> names = group.getValue();
+            for (int nameIndex = 0; nameIndex < names.size(); nameIndex++) {
+                final String name = names.get(nameIndex);
                 gate(actual, config, "PERFORMANCE", "reduceRuntimeAllocations", enabled, name,
                     enabled && present.containsAll(group.getKey()));
             }

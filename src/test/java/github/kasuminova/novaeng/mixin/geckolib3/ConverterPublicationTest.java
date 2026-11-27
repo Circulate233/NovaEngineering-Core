@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.mixin.geckolib3;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -9,7 +10,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -86,10 +86,10 @@ public final class ConverterPublicationTest {
                 if (!(expected.getCause() instanceof IllegalStateException)) throw expected;
             }
         }
-        final List<Object[]> results = new ArrayList<>();
+        final List<Object[]> results = new ObjectArrayList<>();
         try (final var executor = Executors.newFixedThreadPool(16)) {
             final CountDownLatch start = new CountDownLatch(1);
-            final List<Future<Object[]>> futures = new ArrayList<>();
+            final List<Future<Object[]>> futures = new ObjectArrayList<>();
             for (int i = 0; i < 16; i++) {
                 final boolean writerFirst = i % 2 == 0;
                 futures.add(executor.submit(() -> {
@@ -99,10 +99,11 @@ public final class ConverterPublicationTest {
                 }));
             }
             start.countDown();
-            for (final var future : futures) results.add(future.get(30, TimeUnit.SECONDS));
+            for (int i = 0; i < futures.size(); i++) results.add(futures.get(i).get(30, TimeUnit.SECONDS));
         }
         if (attempts.get() != (fail ? 2 : 1)) throw new AssertionError("duplicate mapper initialization: " + attempts);
-        for (final Object[] result : results) {
+        for (int i = 0; i < results.size(); i++) {
+            final Object[] result = results.get(i);
             if (result[0] == null || result[1] == null || result[0] != results.getFirst()[0] || result[1] != results.getFirst()[1])
                 throw new AssertionError("accessors were not published together");
         }

@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.client.geometry.vertex;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -10,7 +11,6 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -233,7 +233,7 @@ class LosslessFloatRecordTest {
             }
         final UnpackedBakedQuad actual = new OwnedUnpackedQuadRecord(flat.snapshot(), -1,
             EnumFacing.NORTH, new Sprite(), true, format).materialize();
-        final List<float[]> retained = new ArrayList<>();
+        final List<float[]> retained = new ObjectArrayList<>();
         actual.pipe(consumer(format, retained));
         retained.getFirst()[0] = 0.75f;
         final int[] packed = actual.getVertexData();
@@ -242,7 +242,7 @@ class LosslessFloatRecordTest {
         assertSame(packed, actual.getVertexData());
         assertEquals(Float.floatToRawIntBits(0.75f), packed[0]);
         packed[0] = Float.floatToRawIntBits(0.125f);
-        final List<float[]> second = new ArrayList<>();
+        final List<float[]> second = new ObjectArrayList<>();
         actual.pipe(consumer(format, second));
         assertSame(retained.getFirst(), second.getFirst());
         assertEquals(0.5f, second.getFirst()[0]);
@@ -271,11 +271,11 @@ class LosslessFloatRecordTest {
         assertEquals(7, read.getTintIndex());
         assertEquals(EnumFacing.WEST, read.getFace());
         assertFalse(read.shouldApplyDiffuseLighting());
-        final List<float[]> first = new ArrayList<>();
+        final List<float[]> first = new ObjectArrayList<>();
         read.pipe(consumer(format, first));
         assertEquals(0x7fc00059, Float.floatToRawIntBits(first.getFirst()[3]));
         first.getFirst()[0] = 0.75f;
-        final List<float[]> second = new ArrayList<>();
+        final List<float[]> second = new ObjectArrayList<>();
         read.pipe(consumer(format, second));
         assertSame(first.getFirst(), second.getFirst());
         assertEquals(0.75f, second.getFirst()[0]);

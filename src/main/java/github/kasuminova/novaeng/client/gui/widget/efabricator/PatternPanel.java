@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import mezz.jei.api.search.ISearchIndex;
 import mezz.jei.search.GeneralizedSuffixTree;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -339,7 +339,7 @@ public class PatternPanel extends SizedColumn {
         @Override
         public List<String> getHoverTooltips(final WidgetGui widgetGui, final MousePos mousePos) {
             if (!Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty()) {
-                return Collections.singletonList(I18n.format("gui.efabricator.pattern_search.put_pattern"));
+                return ObjectLists.singleton(I18n.format("gui.efabricator.pattern_search.put_pattern"));
             }
             return super.getHoverTooltips(widgetGui, mousePos);
         }

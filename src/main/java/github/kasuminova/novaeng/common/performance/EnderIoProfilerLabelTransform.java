@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.performance;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -11,7 +12,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** Exact getQuads diagnostic expression only; unexpected bytecode is left untouched. */
@@ -35,7 +35,7 @@ public final class EnderIoProfilerLabelTransform {
             }
         }
         if (target == null || !target.tryCatchBlocks.isEmpty()) return false;
-        final List<AbstractInsnNode> code = new ArrayList<>();
+        final List<AbstractInsnNode> code = new ObjectArrayList<>();
         for (final AbstractInsnNode node : target.instructions) if (node.getOpcode() >= 0) code.add(node);
         int found = -1;
         int stopCalls = 0;

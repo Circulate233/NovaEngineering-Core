@@ -1,6 +1,7 @@
 package github.kasuminova.novaeng.common.performance;
 
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.objectweb.asm.ClassReader;
@@ -16,7 +17,7 @@ import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -49,36 +50,6 @@ class RuntimeMachineMixinCompatibilityTest {
             () -> verify(target, Map.of())));
     }
 
-    @TestFactory
-    Stream<DynamicTest> installedProductionTargetsAcceptEveryMachineMixin() throws Exception {
-        // Optional external fixture: CI still checks configured dependencies above. The local baseline
-        // client is the default fixture; another installation can be supplied without editing tests.
-        final Path mods = Path.of(System.getProperty("novaeng.test.runtimeMods",
-            "F:/nova/NovaEngineering-World-V2/run/client/mods"));
-        if (!Files.isDirectory(mods)) return Stream.empty();
-        final Map<String, Map<String, byte[]>> jars = new HashMap<>();
-        for (final Target target : TARGETS) if (!jars.containsKey(target.jar)) {
-            final Path file = mods.resolve(target.jar);
-            assertTrue(Files.isRegularFile(file), "Missing production fixture " + file);
-            // Include inherited members and sibling classes from the same real JAR. Mixing a raw
-            // target with dependency-version superclass metadata would miss compatibility failures.
-            final Map<String, byte[]> classes = new HashMap<>();
-            try (final ZipFile zip = new ZipFile(file.toFile())) {
-                final var entries = zip.entries();
-                while (entries.hasMoreElements()) {
-                    final var entry = entries.nextElement();
-                    if (!entry.getName().endsWith(".class") || entry.getName().startsWith("META-INF/")) continue;
-                    try (final var input = zip.getInputStream(entry)) {
-                        classes.put(entry.getName().substring(0, entry.getName().length() - 6), input.readAllBytes());
-                    }
-                }
-            }
-            jars.put(target.jar, Map.copyOf(classes));
-        }
-        return TARGETS.stream().map(target -> DynamicTest.dynamicTest("production " + target.mixin,
-            () -> verify(target, jars.get(target.jar))));
-    }
-
     private static void verify(final Target target, final Map<String, byte[]> fixture) throws Exception {
         final byte[] original;
         if (fixture.containsKey(target.name)) original = fixture.get(target.name);
@@ -88,7 +59,7 @@ class RuntimeMachineMixinCompatibilityTest {
             original = input.readAllBytes();
         }
         final ClassNode before = read(original);
-        final Map<String, byte[]> overrides = new HashMap<>(fixture);
+        final Map<String, byte[]> overrides = new Object2ObjectOpenHashMap<>(fixture);
         if (target.method.equals("updateInjectors")) {
             // The real plugin runs this guarded patch in preApply for this marker. Perform the same
             // operation before isolated Mixin application without loading the production plugin.
@@ -144,6 +115,36 @@ class RuntimeMachineMixinCompatibilityTest {
             }
             default -> throw new AssertionError(target);
         }
+    }
+
+    @TestFactory
+    Stream<DynamicTest> installedProductionTargetsAcceptEveryMachineMixin() throws Exception {
+        // Optional external fixture: CI still checks configured dependencies above. The local baseline
+        // client is the default fixture; another installation can be supplied without editing tests.
+        final Path mods = Path.of(System.getProperty("novaeng.test.runtimeMods",
+            "F:/nova/NovaEngineering-World-V2/run/client/mods"));
+        if (!Files.isDirectory(mods)) return Stream.empty();
+        final Map<String, Map<String, byte[]>> jars = new Object2ObjectOpenHashMap<>();
+        for (final Target target : TARGETS) if (!jars.containsKey(target.jar)) {
+            final Path file = mods.resolve(target.jar);
+            assertTrue(Files.isRegularFile(file), "Missing production fixture " + file);
+            // Include inherited members and sibling classes from the same real JAR. Mixing a raw
+            // target with dependency-version superclass metadata would miss compatibility failures.
+            final Map<String, byte[]> classes = new Object2ObjectOpenHashMap<>();
+            try (final ZipFile zip = new ZipFile(file.toFile())) {
+                final var entries = zip.entries();
+                while (entries.hasMoreElements()) {
+                    final var entry = entries.nextElement();
+                    if (!entry.getName().endsWith(".class") || entry.getName().startsWith("META-INF/")) continue;
+                    try (final var input = zip.getInputStream(entry)) {
+                        classes.put(entry.getName().substring(0, entry.getName().length() - 6), input.readAllBytes());
+                    }
+                }
+            }
+            jars.put(target.jar, Collections.unmodifiableMap(classes));
+        }
+        return TARGETS.stream().map(target -> DynamicTest.dynamicTest("production " + target.mixin,
+            () -> verify(target, jars.get(target.jar))));
     }
 
     private static void assertLookupUsesSyntheticValues(final ClassNode node) {

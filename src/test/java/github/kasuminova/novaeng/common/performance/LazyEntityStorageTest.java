@@ -12,6 +12,7 @@ import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.world.IBlockAccess;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -29,7 +30,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -190,7 +190,7 @@ class LazyEntityStorageTest {
         assertEquals(0, ((PathPoint[]) field(heap, "pathPoints")).length);
         probe.getMethod("clearPath").invoke(heap);
         assertEquals(0, ((PathPoint[]) field(heap, "pathPoints")).length);
-        final List<PathPoint> points = new ArrayList<>();
+        final List<PathPoint> points = new ObjectArrayList<>();
         for (int index = 299; index >= 0; index--) {
             final PathPoint point = new PathPoint(index, 0, 0);
             point.distanceToTarget = index;

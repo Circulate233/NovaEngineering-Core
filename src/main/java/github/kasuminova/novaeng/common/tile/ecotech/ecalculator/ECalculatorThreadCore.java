@@ -73,7 +73,8 @@ public class ECalculatorThreadCore extends ECalculatorPart {
     }
 
     public void refreshCPUSource() {
-        for (final CraftingCPUCluster cluster : cpus) {
+        for (int index = 0; index < cpus.size(); index++) {
+            final CraftingCPUCluster cluster = cpus.get(index);
             ECPUCluster eCluster = ECPUCluster.from(cluster);
             // Refresh machine source.
             eCluster.novaeng_ec$setThreadCore(this);
@@ -105,7 +106,7 @@ public class ECalculatorThreadCore extends ECalculatorPart {
             return 0L;
         }
         long total = 0;
-        for (CraftingCPUCluster cpu : cpus) total += cpu.getAvailableStorage();
+        for (int index = 0; index < cpus.size(); index++) total += cpus.get(index).getAvailableStorage();
         return total;
     }
 

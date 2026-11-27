@@ -2,6 +2,8 @@ package github.kasuminova.novaeng.mixin.actinium;
 
 import com.google.gson.JsonParser;
 import github.kasuminova.novaeng.testutil.IsolatedMixinTransformer;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.objectweb.asm.ClassReader;
@@ -14,9 +16,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -81,7 +81,7 @@ class ActiniumMixinCompatibilityTest {
 
     @TestFactory
     Stream<DynamicTest> registeredActiniumMixinsApplyToTheActualDependency() throws Exception {
-        final var targets = new LinkedHashMap<String, List<String>>();
+        final var targets = new Object2ObjectLinkedOpenHashMap<String, List<String>>();
         try (final var stream = getClass().getResourceAsStream("/novaeng_core.mixin.json")) {
             assertNotNull(stream);
             final var config = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -97,7 +97,7 @@ class ActiniumMixinCompatibilityTest {
                             if (!List.of("value", "targets").contains(annotation.values.get(index))) continue;
                             for (final Object value : (List<?>) annotation.values.get(index + 1)) {
                                 final String target = value instanceof Type type ? type.getInternalName() : value.toString().replace('.', '/');
-                                targets.computeIfAbsent(target, ignored -> new ArrayList<>()).add(mixin);
+                                targets.computeIfAbsent(target, ignored -> new ObjectArrayList<>()).add(mixin);
                             }
                         }
                     }

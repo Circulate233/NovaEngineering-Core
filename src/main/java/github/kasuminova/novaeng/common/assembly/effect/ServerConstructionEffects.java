@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.shorts.Short2ByteOpenHashMap;
@@ -32,7 +33,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
@@ -143,7 +143,7 @@ public final class ServerConstructionEffects {
         final MinecraftServer server;
         final Reference2ObjectOpenHashMap<WorldServer, WorldIndex> worlds = new Reference2ObjectOpenHashMap<>();
         final ReferenceOpenHashSet<Audience> audiences = new ReferenceOpenHashSet<>();
-        final ArrayDeque<Work> work = new ArrayDeque<>();
+        final ObjectArrayFIFOQueue<Work> work = new ObjectArrayFIFOQueue<>();
         long tick;
         long nextId;
         int remainingBytes;
@@ -171,15 +171,15 @@ public final class ServerConstructionEffects {
             }
             int waiting = 0;
             while (!work.isEmpty() && waiting < work.size() && System.nanoTime() - started < SYNC_NANOS) {
-                var next = work.removeFirst();
+                var next = work.dequeue();
                 switch (next.advance()) {
                     case DONE -> waiting = 0;
                     case CONTINUE -> {
-                        work.addLast(next);
+                        work.enqueue(next);
                         waiting = 0;
                     }
                     case WAIT -> {
-                        work.addLast(next);
+                        work.enqueue(next);
                         waiting++;
                     }
                 }
@@ -344,7 +344,7 @@ public final class ServerConstructionEffects {
                 layout = new Layout(dismantle, startTick, wireTicks, plan.size(), areaBuilder.build());
                 queueHud();
                 publishing = true;
-                session.work.addLast(new PublishEffect(this, sectors.values().iterator()));
+                session.work.enqueue(new PublishEffect(this, sectors.values().iterator()));
             }
         }
 
@@ -385,7 +385,7 @@ public final class ServerConstructionEffects {
             for (long mask = unsettled; mask != 0; mask &= mask - 1) {
                 var region = regions[Long.numberOfTrailingZeros(mask)];
                 region.syncAfterTick = tick;
-                for (var sector : region.sectors) sector.queueDelta();
+                for (int index = 0; index < region.sectors.size(); index++) region.sectors.get(index).queueDelta();
             }
             unsettled = 0;
         }
@@ -409,7 +409,7 @@ public final class ServerConstructionEffects {
             var info = layout;
             if (hudQueued || info == null) return;
             hudQueued = true;
-            session.work.addLast(() -> {
+            session.work.enqueue(() -> {
                 var end = ending;
                 if (live() && (end == null || !end.cancelled()) && connected(owner, ownerConnection)
                     && PktConstructionEffect.supportedBy(ownerConnection.netManager)) {
@@ -438,7 +438,7 @@ public final class ServerConstructionEffects {
             if (startTick < 0 || sectors.isEmpty() || ending != null || !live()) return;
             ending = new End(dimension, id, currentTick(), cancelled, successful);
             if (!cancelled) queueHud();
-            session.work.addLast(new CloseEffect(this));
+            session.work.enqueue(new CloseEffect(this));
         }
 
         private boolean live() {
@@ -659,7 +659,7 @@ public final class ServerConstructionEffects {
             if (deltaQueued) return;
             deltaQueued = true;
             effect.pendingDeltas++;
-            effect.session.work.addLast(new Delta(this));
+            effect.session.work.enqueue(new Delta(this));
         }
 
         @Nullable Geometry snapshot(Audience recipient, boolean replacing) {
@@ -784,7 +784,7 @@ public final class ServerConstructionEffects {
                 || revision == sector.revision && !sector.hasMissingTimes(recipient)) return;
             replayQueued = true;
             recipient.pendingReplays++;
-            recipient.effect.session.work.addLast(this);
+            recipient.effect.session.work.enqueue(this);
         }
 
         @Override
@@ -853,7 +853,7 @@ public final class ServerConstructionEffects {
             if (near) for (var viewer : viewers) viewer.queueReplay();
             if (!visibilityQueued && (near ? hidden : !hidden && sentSectors != 0)) {
                 visibilityQueued = true;
-                effect.session.work.addLast(this::syncVisibility);
+                effect.session.work.enqueue(this::syncVisibility);
             }
         }
 

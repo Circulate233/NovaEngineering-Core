@@ -45,7 +45,6 @@ public abstract class MixinOreDictionaryArbiterPrimitiveBiMap {
     private static void nova$primitiveTable(final BiMap<String, Integer> original) {
         final Object2IntHashBiMap<String> replacement =
             new Object2IntHashBiMap<>(oreIDs == null ? 32 : oreIDs.size());
-        replacement.putAll(original);
         oreIDs = replacement;
     }
 

@@ -153,7 +153,9 @@ final class ConstructionAnimation {
         } else if (!packet.excluded().isEmpty()) {
             exclude(x, y, z, packet.excluded());
         }
-        for (final var time : packet.regions()) {
+        final var regionTimes = packet.regions();
+        for (int index = 0; index < regionTimes.size(); index++) {
+            final var time = regionTimes.get(index);
             final int region = time.region();
             if (region % MAX_LOGICAL_CHUNKS >= groupCount) {
                 throw new IllegalArgumentException("Construction transition references an unknown group");

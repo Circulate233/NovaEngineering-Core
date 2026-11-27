@@ -1,5 +1,6 @@
 package github.kasuminova.novaeng.common.hypernet.computer.module.base;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import crafttweaker.annotations.ZenRegister;
 import github.kasuminova.novaeng.common.hypernet.computer.ModularServer;
 import github.kasuminova.novaeng.common.hypernet.computer.module.ModuleRAM;
@@ -8,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ZenRegister
@@ -28,7 +28,7 @@ public class ModuleRAMBase extends ServerModuleBase<ModuleRAM> {
 
     @Override
     public List<String> getTooltip(final ModuleRAM moduleInstance) {
-        List<String> tooltip = new ArrayList<>(super.getTooltip(moduleInstance));
+        List<String> tooltip = new ObjectArrayList<>(super.getTooltip(moduleInstance));
         tooltip.add(I18n.format("novaeng.hypernet.hardware_bandwidth.provide", this.hardwareBandwidthProvision));
         return tooltip;
     }

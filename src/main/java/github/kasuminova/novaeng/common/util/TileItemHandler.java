@@ -187,7 +187,8 @@ public class TileItemHandler extends IItemHandlerImpl {
         }
         final NBTTagList stackSet = new NBTTagList();
         final NBTTagList invSet = new NBTTagList();
-        for (final ItemStack stack : stacks) {
+        for (int stackIndex = 0; stackIndex < stacks.size(); stackIndex++) {
+            final ItemStack stack = stacks.get(stackIndex);
             final NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
             if (stack.getCount() >= 127) {
                 tag.setInteger("Count", stack.getCount());

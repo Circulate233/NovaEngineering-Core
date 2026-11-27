@@ -84,7 +84,8 @@ public abstract class MixinPlayerChunkMapCache {
     private void novaeng$expireRetainedChunks(CallbackInfo ci) {
         var config = NovaEngCoreConfig.NETWORK;
         long now = System.nanoTime();
-        for (EntityPlayerMP player : players) {
+        for (int i = 0, size = players.size(); i < size; i++) {
+            final EntityPlayerMP player = players.get(i);
             DelayedChunkCache cache = novaeng$chunkCaches.get(player);
             if (cache == null) {
                 continue;

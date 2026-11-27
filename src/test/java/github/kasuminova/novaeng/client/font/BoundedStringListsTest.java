@@ -1,11 +1,11 @@
 package github.kasuminova.novaeng.client.font;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import neofontrender.internal.nightconfig.core.Config;
 import neofontrender.internal.nightconfig.core.utils.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +48,7 @@ class BoundedStringListsTest {
     @Test
     void cacheBoundsAndImmutableResultsHoldUnderUniqueInputChurn() {
         final BoundedStringLists cache = new BoundedStringLists();
-        final List<String> mutable = new ArrayList<>(List.of("one", "two"));
+        final List<String> mutable = new ObjectArrayList<>(List.of("one", "two"));
         cache.put("onetwo", mutable);
         mutable.clear();
         assertEquals(List.of("one", "two"), cache.get("onetwo"));

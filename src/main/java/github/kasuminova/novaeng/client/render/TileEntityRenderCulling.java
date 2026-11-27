@@ -58,7 +58,8 @@ public final class TileEntityRenderCulling {
             PASSES.remove();
             return;
         }
-        for (final Pass pass : stack.passes) {
+        for (int index = 0; index < stack.passes.size(); index++) {
+            final Pass pass = stack.passes.get(index);
             if (pass.world == world) pass.clear();
         }
     }

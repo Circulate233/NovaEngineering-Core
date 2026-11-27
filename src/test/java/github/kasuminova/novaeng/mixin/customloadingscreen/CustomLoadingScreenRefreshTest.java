@@ -84,7 +84,7 @@ class CustomLoadingScreenRefreshTest {
         }
         final List<MemberInfo> selectors = this.selectors();
         final List<MemberInfo> mapped = new ObjectArrayList<>();
-        for (final MemberInfo selector : selectors) mapped.add(mappedSelector(selector));
+        for (int index = 0; index < selectors.size(); index++) mapped.add(mappedSelector(selectors.get(index)));
         int refreshes = 0;
         int localReloads = 0;
         for (final MethodNode method : target.methods) {

@@ -71,14 +71,17 @@ public abstract class MixinFoodCatalogLazy {
             if (nova$pendingItems == null) {
                 return;
             }
+            final List<Item> pendingItems = nova$pendingItems;
             final List<ItemStack> result = new ObjectArrayList<>();
-            for (final Item item : nova$pendingItems) {
+            for (int i = 0, size = pendingItems.size(); i < size; i++) {
+                final Item item = pendingItems.get(i);
                 try (Stream<ItemStack> items = getSubItems(item)) {
                     items.filter(AppleCoreAPI.accessor::isFood).forEachOrdered(result::add);
                 }
             }
             final Map<ItemStack, String> names = new Reference2ObjectOpenHashMap<>();
-            for (final ItemStack stack : result) {
+            for (int i = 0, size = result.size(); i < size; i++) {
+                final ItemStack stack = result.get(i);
                 names.put(stack, I18n.format(stack.getTranslationKey() + ".name"));
             }
             // Equivalent to the original two stable sorts, with one translation per stack.

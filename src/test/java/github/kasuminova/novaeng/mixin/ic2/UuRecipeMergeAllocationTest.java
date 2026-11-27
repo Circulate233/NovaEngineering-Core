@@ -1,5 +1,8 @@
 package github.kasuminova.novaeng.mixin.ic2;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import org.junit.jupiter.api.Test;
@@ -11,11 +14,8 @@ import org.objectweb.asm.tree.MethodNode;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,22 +41,22 @@ class UuRecipeMergeAllocationTest {
         final Item[] items = {new Item().setHasSubtypes(true), new Item(), new Item().setHasSubtypes(true)};
         final Random random = new Random(0x554752415048L);
         for (int trial = 0; trial < 700; trial++) {
-            final List<List<StackSpec>> inputs = new ArrayList<>();
+            final List<List<StackSpec>> inputs = new ObjectArrayList<>();
             final int inputCount = random.nextInt(9);
             for (int i = 0; i < inputCount; i++) {
                 final List<StackSpec> alternatives;
                 if (!inputs.isEmpty() && random.nextBoolean()) {
-                    alternatives = new ArrayList<>(inputs.get(random.nextInt(inputs.size())));
+                    alternatives = new ObjectArrayList<>(inputs.get(random.nextInt(inputs.size())));
                     Collections.shuffle(alternatives, random);
                     alternatives.replaceAll(s -> new StackSpec(s.item, s.meta, s.tag, size(random)));
                 } else {
-                    alternatives = new ArrayList<>();
+                    alternatives = new ObjectArrayList<>();
                     final int size = random.nextInt(7);
                     for (int j = 0; j < size; j++) alternatives.add(spec(random));
                 }
                 inputs.add(alternatives);
             }
-            final List<StackSpec> outputs = new ArrayList<>();
+            final List<StackSpec> outputs = new ObjectArrayList<>();
             final int outputCount = random.nextInt(10);
             for (int i = 0; i < outputCount; i++) outputs.add(spec(random));
             assertEquals(baseline.merge(items, inputs, outputs), optimized.merge(items, inputs, outputs),
@@ -84,9 +84,9 @@ class UuRecipeMergeAllocationTest {
         final Machine baseline = new Machine(false);
         final Machine optimized = new Machine(true);
         final Item[] items = {new Item().setHasSubtypes(true)};
-        final List<List<StackSpec>> inputs = new ArrayList<>();
+        final List<List<StackSpec>> inputs = new ObjectArrayList<>();
         for (final int length : new int[]{4, 2, 8, 4, 2, 8, 4, 2, 8}) {
-            final List<StackSpec> group = new ArrayList<>();
+            final List<StackSpec> group = new ObjectArrayList<>();
             for (int i = 0; i < length; i++) group.add(new StackSpec(0, i, i, length + i));
             if (inputs.size() < 6) group.set(length - 1, new StackSpec(0, inputs.size() % 3 + 30, -1, 1));
             inputs.add(group);
@@ -178,16 +178,16 @@ class UuRecipeMergeAllocationTest {
 
         private Result merge(final Item[] items, final List<List<StackSpec>> inputSpecs,
                              final List<StackSpec> outputSpecs) throws Exception {
-            final Map<Object, Integer> originalStacks = new IdentityHashMap<>();
-            final Map<Object, Integer> originalGroups = new IdentityHashMap<>();
-            final List<List<Object>> sourceInputs = new ArrayList<>();
+            final Reference2IntOpenHashMap<Object> originalStacks = new Reference2IntOpenHashMap<>();
+            final Reference2IntOpenHashMap<Object> originalGroups = new Reference2IntOpenHashMap<>();
+            final List<List<Object>> sourceInputs = new ObjectArrayList<>();
             for (final List<StackSpec> specs : inputSpecs) {
-                final List<Object> alternatives = new ArrayList<>();
+                final List<Object> alternatives = new ObjectArrayList<>();
                 for (final StackSpec spec : specs) alternatives.add(create(items, spec, originalStacks));
                 originalGroups.put(alternatives, originalGroups.size());
                 sourceInputs.add(alternatives);
             }
-            final List<Object> sourceOutputs = new ArrayList<>();
+            final List<Object> sourceOutputs = new ObjectArrayList<>();
             for (final StackSpec spec : outputSpecs) sourceOutputs.add(create(items, spec, originalStacks));
             final List<GroupView> sourceInputSnapshot = snapshotGroups(sourceInputs, originalGroups, originalStacks);
             final List<StackView> sourceOutputSnapshot = snapshotStacks(sourceOutputs, originalStacks);
@@ -203,7 +203,7 @@ class UuRecipeMergeAllocationTest {
                 snapshotStacks(mergedOutputs, originalStacks));
         }
 
-        private Object create(final Item[] items, final StackSpec spec, final Map<Object, Integer> aliases) throws Exception {
+        private Object create(final Item[] items, final StackSpec spec, final Reference2IntMap<Object> aliases) throws Exception {
             final NBTTagCompound nbt;
             if (spec.tag < 0) {
                 nbt = null;
@@ -216,16 +216,16 @@ class UuRecipeMergeAllocationTest {
             return stack;
         }
 
-        private List<GroupView> snapshotGroups(final List<List<Object>> groups, final Map<Object, Integer> groupAliases,
-                                               final Map<Object, Integer> stackAliases) throws Exception {
-            final List<GroupView> snapshot = new ArrayList<>();
+        private List<GroupView> snapshotGroups(final List<List<Object>> groups, final Reference2IntMap<Object> groupAliases,
+                                               final Reference2IntMap<Object> stackAliases) throws Exception {
+            final List<GroupView> snapshot = new ObjectArrayList<>();
             for (final List<Object> group : groups)
                 snapshot.add(new GroupView(snapshotStacks(group, stackAliases), groupAliases.getOrDefault(group, -1)));
             return snapshot;
         }
 
-        private List<StackView> snapshotStacks(final List<Object> stacks, final Map<Object, Integer> aliases) throws Exception {
-            final List<StackView> snapshot = new ArrayList<>();
+        private List<StackView> snapshotStacks(final List<Object> stacks, final Reference2IntMap<Object> aliases) throws Exception {
+            final List<StackView> snapshot = new ObjectArrayList<>();
             for (final Object stack : stacks)
                 snapshot.add(new StackView((Item) item.invoke(stack),
                     (int) meta.invoke(stack), (NBTTagCompound) tag.invoke(stack), (int) size.invoke(stack), aliases.getOrDefault(stack, -1)));
