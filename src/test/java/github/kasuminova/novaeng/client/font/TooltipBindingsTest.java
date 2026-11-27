@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +18,8 @@ class TooltipBindingsTest {
     void stringOnlySnapshotSeesReplacementNullsBlanksAndInPlaceChanges() {
         final TooltipBindings cache = new TooltipBindings();
         final List<String> defaults = List.of("default");
-        final ObjectArrayList<String> values = new ObjectArrayList<>(Arrays.asList(null, " ", " x=1 ", "\t", "y=2"));
+        // The external TOML API supplies an exact ArrayList, which is the only list type cached here.
+        final List<String> values = new ArrayList<>(Arrays.asList(null, " ", " x=1 ", "\t", "y=2"));
         final List<String> first = cache.resolve(values, defaults);
         assertEquals(List.of(" x=1 ", "y=2"), first);
         assertSame(first, cache.resolve(values, defaults));

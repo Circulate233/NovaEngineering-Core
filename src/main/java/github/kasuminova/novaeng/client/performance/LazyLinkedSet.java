@@ -59,9 +59,30 @@ public final class LazyLinkedSet<E> extends AbstractSet<E> implements Serializab
         if (values != null) {
             final Iterator<E> iterator = values.iterator();
             return new Iterator<>() {
-                @Override public boolean hasNext() { return iterator.hasNext(); }
-                @Override public E next() { return iterator.next(); }
-                @Override public void remove() { iterator.remove(); version++; }
+                private int expectedVersion = version;
+
+                @Override
+                public boolean hasNext() {
+                    checkForModification();
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public E next() {
+                    checkForModification();
+                    return iterator.next();
+                }
+
+                @Override
+                public void remove() {
+                    checkForModification();
+                    iterator.remove();
+                    expectedVersion = ++version;
+                }
+
+                private void checkForModification() {
+                    if (expectedVersion != version) throw new ConcurrentModificationException();
+                }
             };
         }
         final int expectedVersion = version;
